@@ -11,6 +11,9 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        sage: "#9DC183",
+        tea: "#D0F0C0",
+        fern: "#4F7942",
       },
     },
   },
