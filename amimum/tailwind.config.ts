@@ -9,11 +9,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        customGreen1: "#00764F",
+        customGreen2: "#8CC1B0",
+        customGreen3: "#001E14",
+        customGreen4: "#D9EAE5",
+        customGreen5: "#E6F1ED",
       },
     },
   },
   plugins: [],
 };
+
 export default config;
