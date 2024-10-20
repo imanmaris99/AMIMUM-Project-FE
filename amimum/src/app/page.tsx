@@ -1,7 +1,13 @@
-export default function Home() {
+
+const Homepage = () => {
   return (
-    <div>
-      <h1>Hello World</h1>
+    <main>
+      <div>
+        <p>Selamat Datang,</p>
+      <h4 className="font-bold text-xl font-jakarta">Nama User</h4>
     </div>
+    </main>
   );
-}
+};
+
+export default Homepage;

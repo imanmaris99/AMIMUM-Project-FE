@@ -9,3 +9,16 @@
 .font-inter {
   font-family: 'Inter', sans-serif;
 }
+
+body {
+  display: flex;
+  justify-content: center;
+  background-color: black;
+}
+
+main {
+  width: 425px;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: white;
+}
