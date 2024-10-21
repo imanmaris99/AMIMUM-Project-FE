@@ -50,3 +50,7 @@ main {
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+.shadow-box {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
