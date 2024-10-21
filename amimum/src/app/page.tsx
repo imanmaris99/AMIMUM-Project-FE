@@ -7,6 +7,7 @@ import PromoCard from "@/components/PromoCard";
 import Label from "@/components/Label";
 import ProductionCard from "@/components/ProductionCard";
 import { useState } from "react";
+import Navbar from "@/components/Navbar";
 
 const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -121,20 +122,26 @@ const Home = () => {
             <ProductionCard key={index} />
           ))}
           {visibleItems < productionItems.length && (
-            <div className="flex flex-col justify-center items-center bg-customGreen5 rounded-lg gap-4 p-2" onClick={loadMoreItems}>
+            <div
+              className="flex flex-col justify-center items-center bg-customGreen5 rounded-lg gap-4 p-2"
+              onClick={loadMoreItems}
+            >
               <div className="flex justify-center items-center bg-white rounded-full w-12 h-12">
                 <Icon icon="arrowDown" />
               </div>
 
               <div>
-                <button className="text-sm">
-                  Muat Lainnya
-                </button>
+                <button className="text-sm">Muat Lainnya</button>
               </div>
             </div>
           )}
         </div>
       </section>
+
+      {/* Navbar */}
+      <nav className="mt-6">
+        <Navbar />
+      </nav>
     </main>
   );
 };
