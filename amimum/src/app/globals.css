@@ -41,3 +41,12 @@ main {
   flex: 0 0 33.33%;
   box-sizing: border-box;
 }
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
