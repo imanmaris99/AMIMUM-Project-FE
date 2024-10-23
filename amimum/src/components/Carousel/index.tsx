@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import PromoCard from "@/components/PromoCard";
 
 interface CarouselProps {
     items: any[];
