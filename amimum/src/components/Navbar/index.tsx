@@ -1,7 +1,9 @@
 "use client";
 
-import Icon from "../Icon";
 import { useRouter, usePathname } from "next/navigation";
+import { GoHome, GoHeart } from "react-icons/go";
+import { HiOutlineWallet } from "react-icons/hi2";
+import { VscAccount } from "react-icons/vsc";
 
 const Navbar = () => {
   const router = useRouter();
@@ -12,7 +14,7 @@ const Navbar = () => {
   };
 
   const getIconClass = (path: string) => {
-    return currentPath === path ? "bg-primary" : "bg-white";
+    return currentPath === path ? "bg-primary text-white" : "bg-white text-black";
   };
 
   return (
@@ -20,16 +22,16 @@ const Navbar = () => {
       <div className="shadow-box">
         <div className="flex justify-center items-center gap-12 h-14">
           <div className={`${getIconClass("/")} rounded-full p-2`} onClick={() => handleClick("/")}>
-            <Icon icon="home" />
+            <GoHome size={32} />
           </div>
           <div className={`${getIconClass("/wishlist")} rounded-full p-2`} onClick={() => handleClick("/wishlist")}>
-            <Icon icon="heart" />
+            <GoHeart size={32} />
           </div>
           <div className={`${getIconClass("/wallet")} rounded-full p-2`} onClick={() => handleClick("/wallet")}>
-            <Icon icon="wallet" />
+            <HiOutlineWallet size={32} />
           </div>
           <div className={`${getIconClass("/account")} rounded-full p-2`} onClick={() => handleClick("/account")}>
-            <Icon icon="account" />
+            <VscAccount size={32} />
           </div>
         </div>
       </div>
