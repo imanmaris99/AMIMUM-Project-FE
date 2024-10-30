@@ -11,7 +11,7 @@ interface AccordionExpandDefaultProps {
 }
 
 export default function AccordionExpandDefault({ title, content }: AccordionExpandDefaultProps) {
-  const [isExpanded, setIsExpanded] = React.useState(true);
+  const [isExpanded, setIsExpanded] = React.useState(false);
 
   const handleAccordionChange = () => {
     setIsExpanded(!isExpanded);
