@@ -35,7 +35,7 @@ const Carousel = ({
           {Array.from({ length: Math.ceil(items.length / itemsToShow) }).map((_, index) => (
             <button
               key={index}
-              className={`w-2 h-2 rounded-full mx-1 mt-2 ${index === Math.floor(currentIndex / itemsToShow) ? 'bg-customGreen1' : 'bg-gray-300'}`}
+              className={`w-2 h-2 rounded-full mx-1 mt-2 ${index === Math.floor(currentIndex / itemsToShow) ? 'bg-primary' : 'bg-gray-300'}`}
               onClick={() => setCurrentIndex(index * itemsToShow)}
             />
           ))}

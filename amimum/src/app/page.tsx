@@ -1,6 +1,5 @@
 "use client";
 
-import Icon from "@/components/Icon";
 import Search from "@/components/Search";
 import Carousel from "@/components/Carousel";
 import PromoCard from "@/components/PromoCard";
@@ -8,6 +7,10 @@ import Tag from "@/components/Tag";
 import ProductionCard from "@/components/ProductionCard";
 import AccordionExpandDefault from "@/components/AccordionExpandDefault";
 import { useState } from "react";
+import { IoBagOutline } from "react-icons/io5";
+import { IoNotificationsOutline } from "react-icons/io5";
+import { GoChevronDown } from "react-icons/go";
+
 
 const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -74,8 +77,8 @@ const Home = () => {
           </div>
 
           <div className="flex justify-center items-center gap-3">
-            <Icon icon="bag2" />
-            <Icon icon="notification" />
+            <IoBagOutline size={32} />
+            <IoNotificationsOutline size={32} />
           </div>
         </div>
 
@@ -129,7 +132,7 @@ const Home = () => {
               onClick={loadMoreItems}
             >
               <div className="flex justify-center items-center bg-white rounded-full w-12 h-12">
-                <Icon icon="arrowDown" />
+                <GoChevronDown size={32} />
               </div>
 
               <div>
@@ -170,7 +173,7 @@ const Home = () => {
         <div className="mx-6 mt-6 flex justify-center items-center">
           <p className="text-sm">
             ©2024 <span className="text-gray-500">by</span>{" "}
-            <span className="font-bold text-customGreen1">AmImUm Team</span>.
+            <span className="font-bold text-primary">AmImUm Team</span>.
           </p>
         </div>
       </section>
