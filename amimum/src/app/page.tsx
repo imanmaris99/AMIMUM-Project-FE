@@ -8,10 +8,11 @@ import Label from "@/components/Label";
 import ProductionCard from "@/components/ProductionCard";
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
+import { Accordion, AccordionItem } from "@nextui-org/react";
 
 const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [visibleItems, setVisibleItems] = useState(8); // State untuk melacak jumlah item yang ditampilkan
+  const [visibleItems, setVisibleItems] = useState(8);
 
   const promoItems = [
     <PromoCard />,
@@ -57,8 +58,10 @@ const Home = () => {
     <ProductionCard />,
   ];
 
+  const remainingItems = productionItems.length - visibleItems;
+
   const loadMoreItems = () => {
-    setVisibleItems((prevVisibleItems) => prevVisibleItems + 9); // Tambah 9 item lagi
+    setVisibleItems((prevVisibleItems) => prevVisibleItems + 9);
   };
 
   return (
@@ -117,7 +120,7 @@ const Home = () => {
           <h6 className="font-semibold font-jakarta">Produksi oleh</h6>
         </div>
 
-        <div className="mx-6 mt-6 grid grid-cols-3 gap-4">
+        <div className="mx-6 mt-6 mb-6 grid grid-cols-3 gap-4">
           {productionItems.slice(0, visibleItems).map((_, index) => (
             <ProductionCard key={index} />
           ))}
@@ -131,17 +134,14 @@ const Home = () => {
               </div>
 
               <div>
-                <button className="text-sm">Muat Lainnya</button>
+                <button className="text-sm">
+                  Muat Lainnya ({remainingItems})
+                </button>
               </div>
             </div>
           )}
         </div>
       </section>
-
-      {/* Navbar */}
-      <nav className="mt-6">
-        <Navbar />
-      </nav>
     </main>
   );
 };
