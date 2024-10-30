@@ -4,7 +4,7 @@ import Icon from "@/components/Icon";
 import Search from "@/components/Search";
 import Carousel from "@/components/Carousel";
 import PromoCard from "@/components/PromoCard";
-import Label from "@/components/Label";
+import Tag from "@/components/Tag";
 import ProductionCard from "@/components/ProductionCard";
 import AccordionExpandDefault from "@/components/AccordionExpandDefault";
 import { useState } from "react";
@@ -103,7 +103,7 @@ const Home = () => {
 
         <div className="mx-6 mt-6 flex gap-2 overflow-x-auto hide-scrollbar whitespace-nowrap">
           {categories.map((category, index) => (
-            <Label
+            <Tag
               key={index}
               title={category}
               isSelected={selectedCategory === category}
