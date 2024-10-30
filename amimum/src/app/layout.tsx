@@ -26,7 +26,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased font-jakarta font-inter">
         {children}
-        {/* <Navbar /> */}
+        <Navbar />
       </body>
     </html>
   );
