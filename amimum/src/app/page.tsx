@@ -64,7 +64,7 @@ const Home = () => {
   };
 
   return (
-    <main>
+    <main className="pb-20">
       {/* Header */}
       <header>
         <div className="flex justify-between items-center mt-14 mx-6">
@@ -165,6 +165,13 @@ const Home = () => {
             title="Tentang aplikasi AmImUm herbal"
             content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget."
           />
+        </div>
+
+        <div className="mx-6 mt-6 flex justify-center items-center">
+          <p className="text-sm">
+            ©2024 <span className="text-gray-500">by</span>{" "}
+            <span className="font-bold text-customGreen1">AmImUm Team</span>.
+          </p>
         </div>
       </section>
     </main>
