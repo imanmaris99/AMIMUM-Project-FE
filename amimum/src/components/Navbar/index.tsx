@@ -12,7 +12,7 @@ const Navbar = () => {
   };
 
   const getIconClass = (path: string) => {
-    return currentPath === path ? "bg-customGreen1" : "bg-white";
+    return currentPath === path ? "bg-primary" : "bg-white";
   };
 
   return (
