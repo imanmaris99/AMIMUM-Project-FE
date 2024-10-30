@@ -6,9 +6,8 @@ import Carousel from "@/components/Carousel";
 import PromoCard from "@/components/PromoCard";
 import Label from "@/components/Label";
 import ProductionCard from "@/components/ProductionCard";
+import AccordionExpandDefault from "@/components/AccordionExpandDefault";
 import { useState } from "react";
-import Navbar from "@/components/Navbar";
-import { Accordion, AccordionItem } from "@nextui-org/react";
 
 const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -140,6 +139,32 @@ const Home = () => {
               </div>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section>
+        <div className="mx-6 mt-6">
+          <h6 className="font-semibold font-jakarta">FAQ</h6>
+        </div>
+
+        <div className="mx-6 mt-6 flex flex-col gap-2">
+          <AccordionExpandDefault
+            title="Tentang aplikasi AmImUm herbal"
+            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget."
+          />
+          <AccordionExpandDefault
+            title="Tentang aplikasi AmImUm herbal"
+            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget."
+          />
+          <AccordionExpandDefault
+            title="Tentang aplikasi AmImUm herbal"
+            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget."
+          />
+          <AccordionExpandDefault
+            title="Tentang aplikasi AmImUm herbal"
+            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget."
+          />
         </div>
       </section>
     </main>
