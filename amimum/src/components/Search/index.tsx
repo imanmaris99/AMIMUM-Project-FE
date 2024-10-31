@@ -1,7 +1,6 @@
 "use client";
 
 import Button from "../Button";
-import Image from "next/image";
 import { CiSearch } from "react-icons/ci";
 
 
