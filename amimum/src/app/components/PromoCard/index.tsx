@@ -1,11 +1,10 @@
 import Image from "next/image";
-import jamuJago from "../../../public/assets/images/jamu_jago_1.png";
 
 const PromoCard = () => {
   return (
     <div className="bg-customGreen5 rounded-lg h-36 flex flex-col items-center justify-center w-24">
       <div className="bg-white rounded-lg px-3 py-2 flex flex-col justify-center items-center">
-        <Image src={jamuJago} alt="promo" width={50} height={50} />
+        <Image src="/jamu_jago_1.png" alt="promo" width={50} height={50} />
       </div>
 
       <div className="flex flex-col justify-center items-center mt-2 gap-1">

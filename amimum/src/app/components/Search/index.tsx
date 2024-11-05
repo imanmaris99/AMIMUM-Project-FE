@@ -1,7 +1,7 @@
 "use client";
 
 import { CiSearch } from "react-icons/ci";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
 
 const handleSearch = () => {

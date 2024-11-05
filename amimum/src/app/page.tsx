@@ -1,65 +1,18 @@
 "use client";
 
-import Search from "@/components/Search";
-import Carousel from "@/components/Carousel";
-import PromoCard from "@/components/PromoCard";
-import Tag from "@/components/Tag";
-import ProductionCard from "@/components/ProductionCard";
-import AccordionExpandDefault from "@/components/AccordionExpandDefault";
+import { Search, AccordionExpandDefault, Carousel, ProductionCard, PromoCard, Tag } from "./components";
 import { useState } from "react";
 import { IoBagOutline } from "react-icons/io5";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { GoChevronDown } from "react-icons/go";
 
-
 const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [visibleItems, setVisibleItems] = useState(8);
 
-  const promoItems = [
-    <PromoCard />,
-    <PromoCard />,
-    <PromoCard />,
-    <PromoCard />,
-    <PromoCard />,
-    <PromoCard />,
-    <PromoCard />,
-    <PromoCard />,
-    <PromoCard />,
-    <PromoCard />,
-    <PromoCard />,
-    <PromoCard />,
-  ];
-
-  const categories = [
-    "Kategori 1",
-    "Kategori 2",
-    "Kategori 3",
-    "Kategori 4",
-    "Kategori 5",
-  ];
-
-  const productionItems = [
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-    <ProductionCard />,
-  ];
-
+  const promoItems = Array.from({ length: 12 }, (_, index) => <PromoCard key={index} />);
+  const categories = Array.from({ length: 5 }, (_, index) => `Kategori ${index + 1}`);
+  const productionItems = Array.from({ length: 27 }, (_, index) => <ProductionCard key={index} />);
   const remainingItems = productionItems.length - visibleItems;
 
   const loadMoreItems = () => {
@@ -123,9 +76,7 @@ const Home = () => {
         </div>
 
         <div className="mx-6 mt-6 mb-6 grid grid-cols-3 gap-4">
-          {productionItems.slice(0, visibleItems).map((_, index) => (
-            <ProductionCard key={index} />
-          ))}
+          {productionItems.slice(0, visibleItems)}
           {visibleItems < productionItems.length && (
             <div
               className="flex flex-col justify-center items-center bg-customGreen5 rounded-lg gap-4 p-2"
@@ -152,22 +103,13 @@ const Home = () => {
         </div>
 
         <div className="mx-6 mt-6 flex flex-col gap-2">
-          <AccordionExpandDefault
-            title="Tentang aplikasi AmImUm herbal"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget."
-          />
-          <AccordionExpandDefault
-            title="Tentang aplikasi AmImUm herbal"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget."
-          />
-          <AccordionExpandDefault
-            title="Tentang aplikasi AmImUm herbal"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget."
-          />
-          <AccordionExpandDefault
-            title="Tentang aplikasi AmImUm herbal"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget."
-          />
+          {Array.from({ length: 4 }, (_, index) => (
+            <AccordionExpandDefault
+              key={index}
+              title="Tentang aplikasi AmImUm herbal"
+              content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget."
+            />
+          ))}
         </div>
 
         <div className="mx-6 mt-6 flex justify-center items-center">
