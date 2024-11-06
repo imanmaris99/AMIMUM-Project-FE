@@ -1,4 +1,4 @@
-export {default as AccordionExpandDefault} from "./AccordionExpandDefault"
+export {default as AccordionExpandDefault} from "../../components/ui/AccordionExpandDefault"
 export {default as Carousel} from "./Carousel"
 export {default as Navbar} from "./Navbar"
 export {default as ProductionCard} from "./ProductionCard"
