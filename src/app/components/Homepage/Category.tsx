@@ -1,12 +1,10 @@
 import { useState } from "react";
 import Tag from "../Tag";
+import { useFetchCategories } from "@/hooks/useFetchCategories";
 
 const Category = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
-  const categories = Array.from(
-    { length: 5 },
-    (_, index) => `Kategori ${index + 1}`
-  );
+  const { categories, isLoading, error } = useFetchCategories();
 
   return (
     <>
@@ -18,9 +16,9 @@ const Category = () => {
         {categories.map((category, index) => (
           <Tag
             key={index}
-            title={category}
-            isSelected={selectedCategory === category}
-            onClick={() => setSelectedCategory(category)}
+            title={category.name}
+            isSelected={selectedCategory === category.name}
+            onClick={() => setSelectedCategory(category.name)}
           />
         ))}
       </div>
