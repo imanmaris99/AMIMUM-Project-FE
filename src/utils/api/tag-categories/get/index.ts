@@ -6,7 +6,7 @@ export const getCategories = async () => {
     const apiToken = process.env.NEXT_API_TOKEN;
 
     try {
-        const response = await axios.get(`${baseUrl}/categories/`, {
+        const response = await axios.get(`${baseUrl}/categories/all`, {
             headers: {
                 Authorization: `Bearer ${apiToken}`
             }
