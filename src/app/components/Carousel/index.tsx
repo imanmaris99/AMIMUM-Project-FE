@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 
 interface CarouselProps {
-    items: any[];
+    items: string[];
     itemsToShow: number;
     interval?: number;
 }
