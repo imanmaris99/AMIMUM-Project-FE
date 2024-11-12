@@ -1,5 +1,7 @@
+"use client";
+
 import { useState } from "react";
-import { ProductionCard } from "..";
+import { ProductionCard } from "@/app/components";
 import { GoChevronDown } from "react-icons/go";
 
 const Production = () => {

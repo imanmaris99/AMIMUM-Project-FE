@@ -1,5 +1,4 @@
-import Carousel from "../Carousel";
-import PromoCard from "../PromoCard";
+import { Carousel, PromoCard } from "@/app/components";
 
 const Promo = () => {
   const promoItems = Array.from({ length: 12 }, (_, index) => <PromoCard key={index} />);

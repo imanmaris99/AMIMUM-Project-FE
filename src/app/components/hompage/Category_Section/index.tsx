@@ -1,5 +1,7 @@
+"use client";
+
 import { useState } from "react";
-import Tag from "../Tag";
+import { Tag } from "@/app/components";
 import { useFetchCategories } from "@/hooks/useFetchCategories";
 
 const Category = () => {

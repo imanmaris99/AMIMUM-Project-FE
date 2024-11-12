@@ -1,5 +1,5 @@
 import { IoBagOutline, IoNotificationsOutline } from "react-icons/io5";
-import Search from "../Search";
+import { Search } from "@/app/components";
 
 const Header = () => {
   return (

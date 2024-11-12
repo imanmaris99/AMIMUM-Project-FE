@@ -1,4 +1,4 @@
-import { AccordionExpandDefault } from "..";
+import { AccordionExpandDefault } from "@/app/components";
 
 const FAQ = () => {
   return (
