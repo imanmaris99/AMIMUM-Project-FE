@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Tag } from "@/app/components";
+import { Tag, TagSkeleton } from "@/app/components/common/Tag";
 import { useCategories } from "@/hooks/useCategories";
 import { CategoryProps } from "@/types/apiTypes";
 
@@ -9,9 +9,10 @@ const Category = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const { categories, isLoading, isError } = useCategories();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <TagSkeleton />;
+
   if (isError) return <div>Error fetching categories</div>;
-  
+
   return (
     <>
       <div className="mx-6 mt-6">
