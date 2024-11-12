@@ -2,12 +2,16 @@
 
 import { useState } from "react";
 import { Tag } from "@/app/components";
-import { useFetchCategories } from "@/hooks/useFetchCategories";
+import { useCategories } from "@/hooks/useCategories";
+import { CategoryProps } from "@/types/apiTypes";
 
 const Category = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
-  const { categories, isLoading, error } = useFetchCategories();
+  const { categories, isLoading, isError } = useCategories();
 
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error fetching categories</div>;
+  
   return (
     <>
       <div className="mx-6 mt-6">
@@ -15,7 +19,7 @@ const Category = () => {
       </div>
 
       <div className="mx-6 mt-6 flex gap-2 overflow-x-auto hide-scrollbar whitespace-nowrap">
-        {categories.map((category, index) => (
+        {categories?.map((category: CategoryProps, index: number) => (
           <Tag
             key={index}
             title={category.name}

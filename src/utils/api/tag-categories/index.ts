@@ -17,7 +17,6 @@ export const getCategories = async () => {
             throw new Error("Failed to fetch categories");
         }
     } catch (error) {
-        console.error(error);
         throw error;
     }
 };
