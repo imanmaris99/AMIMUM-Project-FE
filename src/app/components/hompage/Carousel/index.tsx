@@ -32,21 +32,23 @@ const Carousel = ({ items, itemsToShow, interval = 4000 }: CarouselProps) => {
           </div>
         ))}
       </div>
-      <div className="carousel-indicators flex justify-center mt-2">
-        {Array.from({ length: Math.ceil(items.length / itemsToShow) }).map(
-          (_, index) => (
-            <button
-              key={index}
-              className={`w-2 h-2 rounded-full mx-1 mt-2 ${
-                index === Math.floor(currentIndex / itemsToShow)
-                  ? "bg-primary"
-                  : "bg-gray-300"
-              }`}
-              onClick={() => setCurrentIndex(index * itemsToShow)}
-            />
-          )
-        )}
-      </div>
+      {items.length >= 4 && (
+        <div className="carousel-indicators flex justify-center mt-2">
+          {Array.from({ length: Math.ceil(items.length / itemsToShow) }).map(
+            (_, index) => (
+              <button
+                key={index}
+                className={`w-2 h-2 rounded-full mx-1 mt-2 ${
+                  index === Math.floor(currentIndex / itemsToShow)
+                    ? "bg-primary"
+                    : "bg-gray-300"
+                }`}
+                onClick={() => setCurrentIndex(index * itemsToShow)}
+              />
+            )
+          )}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,7 +1,14 @@
 import { Carousel, PromoCard } from "@/app/components";
+import { usePromo } from "@/hooks/usePromo";
+import PromoCardSkeleton from "@/app/components/hompage/PromoCard/PromoCardSkeleton";
+import { PromoProps } from "@/types/apiTypes";
 
 const Promo = () => {
-  const promoItems = Array.from({ length: 12 }, (_, index) => <PromoCard key={index} />);
+  const { promo, isLoading, isError } = usePromo();
+
+  if (!promo || promo.length === 0) {
+    return null;
+  }
 
   return (
     <>
@@ -10,7 +17,22 @@ const Promo = () => {
       </div>
 
       <div className="mx-6 mt-6">
-        <Carousel items={promoItems} itemsToShow={3} />
+        {isLoading ? (
+          <div className="grid grid-cols-3 gap-2 overflow-x-auto hide-scrollbar whitespace-nowrap">
+            {[...Array(3)].map((_, index) => (
+              <PromoCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : isError ? (
+          <p>Error: {isError.message}</p>
+        ) : (
+          <Carousel
+            items={promo.map((promoItem: PromoProps, index: number) => (
+              <PromoCard key={index} promo={promoItem} />
+            ))}
+            itemsToShow={3}
+          />
+        )}
       </div>
     </>
   );
