@@ -2,6 +2,7 @@ import { AccordionExpandDefault } from "@/app/components";
 import { useArticles } from "@/hooks/useArticles";
 import { ArticleProps } from "@/types/apiTypes";
 import AccordionSkeleton from "@/components/ui/AccordionExpandDefault/AccordionSkeleton";
+import Footer from "../../layout/Footer";
 
 const FAQ = () => {
   const { articles, isLoading } = useArticles();
@@ -22,11 +23,8 @@ const FAQ = () => {
             ))}
       </div>
 
-      <div className="mx-6 mt-6 flex justify-center items-center">
-        <p className="text-sm">
-          ©2024 <span className="text-gray-500">by</span>{" "}
-          <span className="font-bold text-primary">AmImUm Team</span>.
-        </p>
+      <div>
+        <Footer />
       </div>
     </>
   );
