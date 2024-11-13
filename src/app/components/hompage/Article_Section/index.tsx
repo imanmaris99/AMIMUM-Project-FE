@@ -9,7 +9,7 @@ const FAQ = () => {
   return (
     <>
       <div className="mx-6 mt-6">
-        <h6 className="font-semibold font-jakarta">FAQ</h6>
+        <h6 className="font-semibold font-jakarta">Artikel</h6>
       </div>
 
       <div className="mx-6 mt-6 flex flex-col gap-2">
