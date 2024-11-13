@@ -37,3 +37,10 @@ export interface ProductionProps {
     created_at: string;
 }
 
+export interface ArticleProps {
+    display_id: number;
+    title: string;
+    img: string;
+    description_list: string[];
+}
+

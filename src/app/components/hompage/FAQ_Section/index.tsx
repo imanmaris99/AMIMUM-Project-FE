@@ -1,6 +1,11 @@
 import { AccordionExpandDefault } from "@/app/components";
+import { useArticles } from "@/hooks/useArticles";
+import { ArticleProps } from "@/types/apiTypes";
+import AccordionSkeleton from "@/components/ui/AccordionExpandDefault/AccordionSkeleton";
 
 const FAQ = () => {
+  const { articles, isLoading } = useArticles();
+
   return (
     <>
       <div className="mx-6 mt-6">
@@ -8,13 +13,13 @@ const FAQ = () => {
       </div>
 
       <div className="mx-6 mt-6 flex flex-col gap-2">
-        {Array.from({ length: 4 }, (_, index) => (
-          <AccordionExpandDefault
-            key={index}
-            title="Tentang aplikasi AmImUm herbal"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget."
-          />
-        ))}
+        {isLoading
+          ? Array.from({ length: 4 }, (_, index) => (
+              <AccordionSkeleton key={index} />
+            ))
+          : articles?.map((article: ArticleProps, index: number) => (
+              <AccordionExpandDefault key={index} article={article} />
+            ))}
       </div>
 
       <div className="mx-6 mt-6 flex justify-center items-center">
