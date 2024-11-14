@@ -1,7 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-        domains: ["qopjphumrfywzveemvko.supabase.co"],
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'qopjphumrfywzveemvko.supabase.co',
+            },
+            {
+                protocol: 'https',
+                hostname: 'jamuiboe.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'lestarijayabangsa.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'www.hpaihalalnetwork.com',
+            },
+        ],
     },
 };
 
