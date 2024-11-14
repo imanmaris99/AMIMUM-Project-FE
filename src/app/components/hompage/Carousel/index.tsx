@@ -12,27 +12,37 @@ const Carousel = ({ items, itemsToShow, interval = 4000 }: CarouselProps) => {
 
   useEffect(() => {
     const slideInterval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + itemsToShow) % items.length);
+      setCurrentIndex((prevIndex) => {
+        const nextIndex = prevIndex + itemsToShow;
+        if (nextIndex >= items.length) {
+          return 0;
+        }
+        return nextIndex;
+      });
     }, interval);
 
     return () => clearInterval(slideInterval);
   }, [itemsToShow, items.length, interval]);
+
+  const handleIndicatorClick = (index: number) => {
+    setCurrentIndex(index * itemsToShow);
+  };
 
   return (
     <div className="carousel">
       <div
         className="carousel-items"
         style={{
-          transform: `translateX(-${currentIndex * (100 / itemsToShow)}%)`,
+          transform: `translateX(-${(currentIndex / itemsToShow) * 100}%)`,
         }}
       >
         {items.map((item, index) => (
-          <div key={index} className="carousel-item">
+          <div key={index} className="carousel-item" style={{ flex: `0 0 ${100 / itemsToShow}%` }}>
             {item}
           </div>
         ))}
       </div>
-      {items.length >= 4 && (
+      {items.length > itemsToShow && (
         <div className="carousel-indicators flex justify-center mt-2">
           {Array.from({ length: Math.ceil(items.length / itemsToShow) }).map(
             (_, index) => (
@@ -43,7 +53,7 @@ const Carousel = ({ items, itemsToShow, interval = 4000 }: CarouselProps) => {
                     ? "bg-primary"
                     : "bg-gray-300"
                 }`}
-                onClick={() => setCurrentIndex(index * itemsToShow)}
+                onClick={() => handleIndicatorClick(index)}
               />
             )
           )}
