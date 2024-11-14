@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import styles from "./Carousel.module.css";
 
 interface CarouselProps {
   items: React.ReactNode[];
@@ -29,21 +30,21 @@ const Carousel = ({ items, itemsToShow, interval = 4000 }: CarouselProps) => {
   };
 
   return (
-    <div className="carousel">
+    <div className={styles.carousel}>
       <div
-        className="carousel-items"
+        className={styles.carouselItems}
         style={{
           transform: `translateX(-${(currentIndex / itemsToShow) * 100}%)`,
         }}
       >
         {items.map((item, index) => (
-          <div key={index} className="carousel-item" style={{ flex: `0 0 ${100 / itemsToShow}%` }}>
+          <div key={index} className={styles.carouselItem} style={{ flex: `0 0 ${100 / itemsToShow}%` }}>
             {item}
           </div>
         ))}
       </div>
       {items.length > itemsToShow && (
-        <div className="carousel-indicators flex justify-center mt-2">
+        <div className="flex justify-center mt-2">
           {Array.from({ length: Math.ceil(items.length / itemsToShow) }).map(
             (_, index) => (
               <button
