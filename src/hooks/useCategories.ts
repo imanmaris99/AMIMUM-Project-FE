@@ -9,6 +9,6 @@ export const useCategories = () => {
     return {
         categories: data,
         isLoading: !error && !data,
-        isError: error,
+        isError: error?.response?.status,
     };
 };

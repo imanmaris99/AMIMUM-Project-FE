@@ -4,7 +4,18 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { SkeletonHeader } from "./SkeletonHeader";
 
 const Header = () => {
-  const { userProfile, isLoading } = useUserProfile();
+  const { userProfile, isLoading, isError } = useUserProfile();
+
+  switch (isError) {
+    case 404:
+      return <div>Data tidak ditemukan. Silakan coba lagi nanti.</div>;
+    case 409:
+      return <div>Terjadi konflik data. Silakan coba lagi nanti.</div>;
+    case 500:
+      return <div>Terjadi kesalahan server. Silakan coba lagi nanti.</div>;
+    default:
+      break;
+  }
 
   return (
     <>

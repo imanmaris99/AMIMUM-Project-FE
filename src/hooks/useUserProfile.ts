@@ -9,6 +9,6 @@ export const useUserProfile = () => {
     return {
         userProfile: data,
         isLoading: !error && !data,
-        isError: error,
+        isError: error?.response?.status,
     };
 };

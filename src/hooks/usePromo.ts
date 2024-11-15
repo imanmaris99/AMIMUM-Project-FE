@@ -9,6 +9,6 @@ export const usePromo = () => {
     return {
         promo: data,
         isLoading: !error && !data,
-        isError: error,
+        isError: error?.response?.status,
     };
 };

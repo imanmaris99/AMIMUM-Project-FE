@@ -4,8 +4,19 @@ import { ArticleProps } from "@/types/apiTypes";
 import AccordionSkeleton from "@/components/ui/AccordionExpandDefault/AccordionSkeleton";
 import Footer from "../../layout/Footer";
 
-const FAQ = () => {
-  const { articles, isLoading } = useArticles();
+const ArticleSection = () => {
+  const { articles, isLoading, isError } = useArticles();
+
+  switch (isError) {
+    case 404:
+      return <div>Data tidak ditemukan. Silakan coba lagi nanti.</div>;
+    case 409:
+      return <div>Terjadi konflik data. Silakan coba lagi nanti.</div>;
+    case 500:
+      return <div>Terjadi kesalahan server. Silakan coba lagi nanti.</div>;
+    default:
+      break;
+  }
 
   return (
     <>
@@ -30,4 +41,4 @@ const FAQ = () => {
   );
 };
 
-export default FAQ;
+export default ArticleSection;

@@ -8,12 +8,23 @@ import { ProductionProps } from "@/types/apiTypes";
 import ProductionCardSkeleton from "@/app/components/hompage/ProductionCard/ProductionCardSkeleton";
 
 const Production = () => {
-  const { productions, isLoading } = useProductions();
+  const { productions, isLoading, isError } = useProductions();
   const [visibleItems, setVisibleItems] = useState(8);
 
   const loadMoreItems = () => {
     setVisibleItems((prevVisibleItems) => prevVisibleItems + 9);
   };
+
+  switch (isError) {
+    case 404:
+      return <div>Data tidak ditemukan. Silakan coba lagi nanti.</div>;
+    case 409:
+      return <div>Terjadi konflik data. Silakan coba lagi nanti.</div>;
+    case 500:
+      return <div>Terjadi kesalahan server. Silakan coba lagi nanti.</div>;
+    default:
+      break;
+  }
 
   return (
     <>

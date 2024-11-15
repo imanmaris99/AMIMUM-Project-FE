@@ -9,6 +9,6 @@ export const useProductions = () => {
     return {
         productions: data,
         isLoading: !error && !data,
-        isError: error,
+        isError: error?.response?.status,
     }
 };

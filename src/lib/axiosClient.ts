@@ -19,14 +19,39 @@ axiosClient.interceptors.request.use((config) => {
 });
 
 axiosClient.interceptors.response.use((response) => response.data, (error) => {
-    if (error.response && error.response.status === 401) {
+    if (error.response) {
+        const status = error.response.status;
+        let title = 'Error';
+        let text = 'An unexpected error occurred. Please try again later.';
+        let confirmButtonText = 'OK';
+
+        switch (status) {
+            case 401:
+                title = 'Sesi Berakhir';
+                text = 'Sesi Anda telah berakhir. Silakan masuk kembali untuk melanjutkan.';
+                confirmButtonText = 'Pergi ke Login';
+                break;
+            case 404:
+                title = 'Tidak Ditemukan';
+                text = 'Sumber daya yang Anda minta tidak dapat ditemukan. Mohon periksa kembali URL atau hubungi dukungan.';
+                break;
+            case 409:
+                title = 'Konflik';
+                text = 'Terjadi konflik dengan status sumber daya saat ini. Mohon periksa data Anda dan coba lagi.';
+                break;
+            case 500:
+                title = 'Kesalahan Server';
+                text = 'Terjadi kesalahan pada server kami. Mohon coba lagi nanti atau hubungi dukungan jika masalah berlanjut.';
+                break;
+        }
+
         Swal.fire({
-            icon: 'warning',
-            title: 'Session Expired',
-            text: 'Your session has expired. Please log in again to continue.',
-            confirmButtonText: 'Go to Login'
+            icon: status === 401 ? 'warning' : 'error',
+            title: title,
+            text: text,
+            confirmButtonText: confirmButtonText
         }).then((result) => {
-            if (result.isConfirmed) {
+            if (status === 401 && result.isConfirmed) {
                 window.location.href = "/login";
             }
         });

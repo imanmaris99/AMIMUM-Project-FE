@@ -8,6 +8,6 @@ export const useArticles = () => {
     return {
         articles: data,
         isLoading: !data && !error,
-        error: error
+        isError: error?.response?.status
     };
 };
