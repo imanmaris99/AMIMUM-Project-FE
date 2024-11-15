@@ -19,6 +19,7 @@ export default function AccordionExpandDefault({ article }: { article: ArticlePr
         expanded={isExpanded}
         className={`border rounded-lg ${isExpanded ? 'bg-white' : 'bg-gray-100'}`}
         onChange={handleAccordionChange}
+        style={{ boxShadow: 'none' }}
       >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
