@@ -18,6 +18,10 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'www.hpaihalalnetwork.com',
             },
+            {
+                protocol: 'https',
+                hostname: 'milagros.co.id',
+            },
         ],
     },
 };
