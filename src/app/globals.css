@@ -23,25 +23,6 @@ main {
   background-color: white;
 }
 
-.carousel {
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-}
-
-.carousel-items {
-  display: flex;
-  transition: transform 1s ease-in-out;
-}
-
-.carousel-item {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 0 0 33.33%;
-  box-sizing: border-box;
-}
-
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
