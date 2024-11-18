@@ -2,7 +2,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 const axiosClient = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
+    baseURL: "https://amimumprojectbe-production.up.railway.app",
     headers: {
         "Content-Type": "application/json",
     },
