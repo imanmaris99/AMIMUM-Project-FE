@@ -1,4 +1,6 @@
-import * as React from "react";
+"use client";
+
+import { useState } from "react";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -7,7 +9,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ArticleProps } from "@/types/apiTypes";
 
 export default function AccordionExpandDefault({ article }: { article: ArticleProps }) {
-  const [isExpanded, setIsExpanded] = React.useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleAccordionChange = () => {
     setIsExpanded(!isExpanded);
