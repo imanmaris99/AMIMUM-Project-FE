@@ -24,12 +24,21 @@ axiosClient.interceptors.response.use((response) => response.data, (error) => {
         let title = 'Error';
         let text = 'An unexpected error occurred. Please try again later.';
         let confirmButtonText = 'OK';
+        
+        const token = localStorage.getItem("access_token");
+        if (token && status === 401) {
+            localStorage.removeItem("access_token");
+        }
 
         switch (status) {
             case 401:
                 title = 'Sesi Berakhir';
                 text = 'Sesi Anda telah berakhir. Silakan masuk kembali untuk melanjutkan.';
                 confirmButtonText = 'Pergi ke Login';
+                break;
+            case 403:
+                title = 'Tidak Dapat Mengakses';
+                text = 'Anda tidak memiliki izin untuk mengakses sumber daya ini. Mohon periksa izin Anda dan coba lagi.';
                 break;
             case 404:
                 title = 'Tidak Ditemukan';
@@ -46,7 +55,7 @@ axiosClient.interceptors.response.use((response) => response.data, (error) => {
         }
 
         Swal.fire({
-            icon: status === 401 ? 'warning' : 'error',
+            icon: status === 401 && token ? 'warning' : 'error',
             title: title,
             text: text,
             confirmButtonText: confirmButtonText,
