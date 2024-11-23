@@ -49,7 +49,10 @@ axiosClient.interceptors.response.use((response) => response.data, (error) => {
             icon: status === 401 ? 'warning' : 'error',
             title: title,
             text: text,
-            confirmButtonText: confirmButtonText
+            confirmButtonText: confirmButtonText,
+            customClass: {
+                popup: 'swal-mobile-popup'
+            }
         }).then((result) => {
             if (status === 401 && result.isConfirmed) {
                 window.location.href = "/login";

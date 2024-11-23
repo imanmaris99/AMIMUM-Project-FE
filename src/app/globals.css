@@ -23,6 +23,11 @@ main {
   background-color: white;
 }
 
+.swal-mobile-popup {
+  max-width: 380px;
+  margin: 0 auto;
+}
+
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
