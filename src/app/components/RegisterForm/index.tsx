@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import toast, { Toaster } from 'react-hot-toast';
 import { useRouter } from "next/navigation";
 
-
 const formSchema = z
   .object({
     firstname: z.string().min(2, { message: "First Name must be at least 2 characters long" }),
