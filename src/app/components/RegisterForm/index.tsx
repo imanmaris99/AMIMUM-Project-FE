@@ -90,7 +90,7 @@ const RegisterForm = () => {
                         First Name
                       </FormLabel>
                       <FormControl>
-                        <Input id="firstname" placeholder="First Name" {...field} />
+                        <Input id="firstname" placeholder="Nama Depan" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -105,7 +105,7 @@ const RegisterForm = () => {
                         Last Name
                       </FormLabel>
                       <FormControl>
-                        <Input id="lastname" placeholder="Last Name" {...field} />
+                        <Input id="lastname" placeholder="Nama Belakang" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -122,12 +122,12 @@ const RegisterForm = () => {
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select your gender" />
+                            <SelectValue placeholder="Jenis Kelamin" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="male">male</SelectItem>
-                          <SelectItem value="female">female</SelectItem>
+                          <SelectItem value="male">Laki-Laki</SelectItem>
+                          <SelectItem value="female">Perempuan</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -158,7 +158,7 @@ const RegisterForm = () => {
                         Phone Number
                       </FormLabel>
                       <FormControl>
-                        <PhoneInput {...field} defaultCountry="ID" placeholder="Phone" />
+                        <PhoneInput {...field} defaultCountry="ID" placeholder="Nomor Telpon" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -186,7 +186,7 @@ const RegisterForm = () => {
                     <FormItem className="grid gap-2">
                       <FormLabel className="hidden">Confirm Password</FormLabel>
                       <FormControl>
-                        <PasswordInput id="confirmPassword" placeholder="Confirm Password" autoComplete="new-password" {...field} />
+                        <PasswordInput id="confirmPassword" placeholder="Cek Password" autoComplete="new-password" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
