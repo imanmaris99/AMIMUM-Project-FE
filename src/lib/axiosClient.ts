@@ -22,7 +22,7 @@ axiosClient.interceptors.response.use((response) => response.data, (error) => {
     if (error.response) {
         const status = error.response.status;
         let title = 'Error';
-        let text = 'An unexpected error occurred. Please try again later.';
+        let text = 'Terjadi kesalahan pada server kami. Mohon coba lagi nanti.';
         let confirmButtonText = 'OK';
         
         const token = localStorage.getItem("access_token");
