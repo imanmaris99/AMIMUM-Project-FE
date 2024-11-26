@@ -15,7 +15,7 @@ type InputProps = React.ComponentPropsWithoutRef<typeof Input>;
 
 type PhoneInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value"> &
   Omit<RPNInput.Props<typeof RPNInput.default>, "onChange"> & {
-    onChange?: (value: RPNInput.Value) => void;
+    onChange?: (value: string) => void;
   };
 
 const PhoneInput = React.forwardRef<React.ElementRef<typeof RPNInput.default>, PhoneInputProps>(
