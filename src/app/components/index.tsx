@@ -10,3 +10,6 @@ export {default as ProductionSection} from "./hompage/Production_Section"
 export {default as PromoSection} from "./hompage/Promo_Section"
 export {default as CategorySection} from "./hompage/Category_Section"
 export {default as FAQSection} from "./hompage/Article_Section"
+export { default as HeaderRegister } from "./HeaderRegister";
+export { default as RegisterForm } from "./RegisterForm";
+export {default as HeaderLogin } from "./HeaderLogin"
