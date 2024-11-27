@@ -1,4 +1,5 @@
 import axiosClient from "@/lib/axiosClient";
+import { CartResponseType } from "@/types/apiTypes";
 
 export const fetchCategories = async () => {
   try {
@@ -47,8 +48,8 @@ export const fetchArticles = async () => {
 
 export const getCart = async () => {
   try {
-    const response = await axiosClient.get("/cart/my-cart");
-    return response.data ? response.data : response;
+    const response: CartResponseType = await axiosClient.get("/cart/my-cart");
+    return response ? response : null;
   } catch (error) {
     throw error;
   }
