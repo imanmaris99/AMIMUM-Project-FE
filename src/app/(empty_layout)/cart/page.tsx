@@ -9,7 +9,9 @@ import CartSummaryBox from "@/app/components/cart/2_widgets/CartSummaryBox";
 import TopNavigation from "@/app/components/cart/2_widgets/TopNavigation";
 import CartSummary from "@/app/components/cart/3_modules/CartSummary";
 import CartItemsList from "@/app/components/cart/4_templates/CartItemsList";
+import { recalculateCartTotals } from "@/helper/cart";
 import { useCart } from "@/hooks/useCart";
+import { editCartAllActive } from "@/services/apiService";
 import { CartItemType, CartResponseType } from "@/types/apiTypes";
 import Image from "next/image";
 
@@ -98,6 +100,31 @@ const Cart = () => {
     );
   };
 
+  const handleToggleAllActivation = async () => {
+    const newSelectAll = !selectAll;
+    const updatedAllCartAct = {
+      is_active: newSelectAll,
+    };
+
+    try {
+      await editCartAllActive(updatedAllCartAct);
+      const updatedCartList = cartList.map((item) => ({
+        ...item,
+        is_active: newSelectAll,
+      }));
+      const newTotals = recalculateCartTotals(updatedCartList);
+      setCartList(updatedCartList);
+      setCartResponse((prev) => ({
+        ...prev,
+        data: updatedCartList,
+        total_prices: newTotals,
+      }));
+      setSelectAll(newSelectAll);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return (
     <>
       <div className="mx-auto min-x-[360px] max-w-[400px] relative">
@@ -134,7 +161,7 @@ const Cart = () => {
                   alt=""
                   width={24}
                   height={24}
-                  onClick={() => setSelectAll((prev) => !prev)}
+                  onClick={handleToggleAllActivation}
                   className="cursor-pointer"
                 />
               ) : (
@@ -143,7 +170,7 @@ const Cart = () => {
                   alt=""
                   width={24}
                   height={24}
-                  onClick={() => setSelectAll((prev) => !prev)}
+                  onClick={handleToggleAllActivation}
                   className="cursor-pointer"
                 />
               )}

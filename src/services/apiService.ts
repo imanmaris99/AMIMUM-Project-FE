@@ -98,15 +98,11 @@ export const editCartActive = async (updatedCartItem: CartItemActPayload) => {
   }
 };
 
-export const editCartAllActive = async ({
-  is_active,
-}: {
-  is_active: boolean;
-}) => {
+export const editCartAllActive = async (isActive: { is_active: boolean }) => {
   try {
     const response = await axiosClient.put(
       "/cart/update-activate-all",
-      is_active
+      isActive
     );
     return response ? response.data : null;
   } catch (error) {
