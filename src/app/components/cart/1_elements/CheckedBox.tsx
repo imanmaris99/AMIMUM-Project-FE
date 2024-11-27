@@ -14,6 +14,7 @@ const CheckedBox = ({ onClick }: CheckedBoxProps) => {
         width={24}
         height={24}
         onClick={onClick}
+        className="cursor-pointer"
       />
     </>
   );

@@ -1,5 +1,7 @@
 import axiosClient from "@/lib/axiosClient";
 import {
+  CartItemActPayload,
+  CartItemQtyPayload,
   CartResponseType,
   TotalCartItemsResponseType,
   TotalCartItemsType,
@@ -65,6 +67,32 @@ export const getTotalCartItems = async () => {
       "/cart/total-items"
     );
     return response ? response : null;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const editCartQty = async (updatedCartItem: CartItemQtyPayload) => {
+  try {
+    const response = await axiosClient.put(
+      `/cart/update-quantity/`,
+      updatedCartItem
+    );
+    return response ? response.data : null;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const editCartActive = async (updatedCartItem: CartItemActPayload) => {
+  try {
+    console.log("HELLO!");
+    const response = await axiosClient.put(
+      `/cart/update-activate/:cart_id`,
+      updatedCartItem
+    );
+    console.log(response);
+    return response ? response.data : null;
   } catch (error) {
     throw error;
   }

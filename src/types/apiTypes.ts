@@ -82,3 +82,21 @@ export interface TotalCartItemsResponseType {
   message: string;
   data: TotalCartItemsType;
 }
+
+export interface CartItemQtyPayload {
+  cart: {
+    cart_id: number;
+  };
+  quantity_update: {
+    quantity: number;
+  };
+}
+
+export interface CartItemActPayload {
+  cart: {
+    cart_id: number;
+  };
+  activate_update: {
+    is_active: boolean;
+  };
+}

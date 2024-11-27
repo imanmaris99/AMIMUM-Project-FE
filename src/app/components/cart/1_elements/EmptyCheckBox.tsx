@@ -14,6 +14,7 @@ const EmptyCheckBox = ({ onClick }: EmptyCheckBoxProps) => {
         width={24}
         height={24}
         onClick={onClick}
+        className="cursor-pointer"
       />
     </>
   );
