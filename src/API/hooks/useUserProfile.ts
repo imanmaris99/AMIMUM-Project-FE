@@ -1,7 +1,14 @@
 import useSWR from "swr";
-import { fetchUserProfile } from "@/services/apiService";
+import { fetchUserProfile } from "@/API/user-customers/get";
 
 export const useUserProfile = () => {
+    if (typeof window === "undefined") {
+        return {
+            userProfile: null,
+            isLoading: false,
+            isError: 401,
+        };
+    }
     const token = localStorage.getItem("access_token");
     if (!token) {
         return {

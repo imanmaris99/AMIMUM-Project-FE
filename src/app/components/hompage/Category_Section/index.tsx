@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Tag, TagSkeleton } from "@/app/components/common/Tag";
-import { useCategories } from "@/hooks/useCategories";
-import { CategoryProps } from "@/types/apiTypes";
+import { useCategories } from "@/API/hooks/useCategories";
+import { CategoryProps } from "@/API/types/apiTypes";
 
 const Category = () => {
   const [selectedCategory, setSelectedCategory] = useState("");

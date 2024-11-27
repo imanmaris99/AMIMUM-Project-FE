@@ -1,6 +1,6 @@
 import { IoBagOutline, IoNotificationsOutline } from "react-icons/io5";
 import { Search } from "@/app/components";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserProfile } from "@/API/hooks/useUserProfile";
 import { SkeletonHeader } from "./SkeletonHeader";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";

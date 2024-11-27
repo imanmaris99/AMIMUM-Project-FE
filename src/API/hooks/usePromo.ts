@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { fetchPromo } from "@/services/apiService";
+import { fetchPromo } from "@/API/production-by/get";
 
 export const usePromo = () => {
     const { data, error } = useSWR("/production/promo", fetchPromo, {
