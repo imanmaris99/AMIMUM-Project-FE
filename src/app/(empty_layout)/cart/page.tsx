@@ -9,7 +9,12 @@ import CartSummaryBox from "@/app/components/cart/2_widgets/CartSummaryBox";
 import TopNavigation from "@/app/components/cart/2_widgets/TopNavigation";
 import CartSummary from "@/app/components/cart/3_modules/CartSummary";
 import CartItemsList from "@/app/components/cart/4_templates/CartItemsList";
-import { recalculateCartTotals } from "@/helper/cart";
+import CartUI from "@/app/components/cart/5_pages/Cart";
+import {
+  recalculateCartTotals,
+  toggleSelectAll,
+  updateCartItem,
+} from "@/helper/cart";
 import { useCart } from "@/hooks/useCart";
 import { editCartAllActive } from "@/services/apiService";
 import { CartItemType, CartResponseType } from "@/types/apiTypes";
@@ -19,7 +24,6 @@ import React, { useEffect, useState } from "react";
 
 const Cart = () => {
   const [selectAll, setSelectAll] = useState(false);
-  const [cartList, setCartList] = useState<CartItemType[]>([]);
   const [cartResponse, setCartResponse] = useState<CartResponseType>({
     status_code: 0,
     message: "",
@@ -30,95 +34,37 @@ const Cart = () => {
       total_all_active_prices: 0,
     },
   });
-  const {
-    cart,
-    isLoading: isCartListLoading,
-    isError: isCartListError,
-  } = useCart();
+  const { cart, isLoading: isCartListLoading } = useCart();
 
   useEffect(() => {
-    async function getCart() {
-      if (cart) {
-        setCartList(cart.data);
-        setCartResponse(cart);
-      }
+    if (cart) {
+      const totals = recalculateCartTotals(cart.data);
+      setCartResponse({ ...cart, total_prices: totals });
     }
-    getCart();
   }, [cart]);
-
-  useEffect(() => {
-    setCartList((prev) =>
-      prev.map((item) => ({
-        ...item,
-        is_active: selectAll,
-      }))
-    );
-    setCartResponse((prev) => ({
-      ...prev,
-      data: prev.data.map((item) => ({
-        ...item,
-        is_active: selectAll,
-      })),
-    }));
-  }, [selectAll]);
 
   const handleUpdateCart = (updatedItem: CartItemType) => {
     setCartResponse((prev) => {
-      const updatedData = prev.data.map((item) =>
-        item.id === updatedItem.id ? { ...item, ...updatedItem } : item
-      );
-      const all_item_active_prices = updatedData
-        .filter((item) => item.is_active)
-        .reduce((sum, item) => sum + item.product_price * item.quantity, 0);
-      const all_promo_active_prices = updatedData
-        .filter((item) => item.is_active && item.variant_info.discount)
-        .reduce(
-          (sum, item) =>
-            sum +
-            (item.variant_info.discount / 100) *
-              item.product_price *
-              item.quantity,
-          0
-        );
-      const total_all_active_prices =
-        all_item_active_prices - all_promo_active_prices;
-
+      const updatedCartData = updateCartItem(prev.data, updatedItem);
       return {
         ...prev,
-        data: updatedData,
-        total_prices: {
-          all_item_active_prices,
-          all_promo_active_prices,
-          total_all_active_prices,
-        },
+        data: updatedCartData,
+        total_prices: recalculateCartTotals(updatedCartData),
       };
     });
-    setCartList((prev) =>
-      prev.map((item) =>
-        item.id === updatedItem.id ? { ...item, ...updatedItem } : item
-      )
-    );
   };
 
   const handleToggleAllActivation = async () => {
     const newSelectAll = !selectAll;
-    const updatedAllCartAct = {
-      is_active: newSelectAll,
-    };
-
     try {
-      await editCartAllActive(updatedAllCartAct);
-      const updatedCartList = cartList.map((item) => ({
-        ...item,
-        is_active: newSelectAll,
-      }));
+      await editCartAllActive({ is_active: newSelectAll });
+      const updatedCartList = toggleSelectAll(cartResponse.data, newSelectAll);
       const newTotals = recalculateCartTotals(updatedCartList);
-      setCartList(updatedCartList);
-      setCartResponse((prev) => ({
-        ...prev,
+      setCartResponse({
+        ...cartResponse,
         data: updatedCartList,
         total_prices: newTotals,
-      }));
+      });
       setSelectAll(newSelectAll);
     } catch (error) {
       throw error;
@@ -127,66 +73,13 @@ const Cart = () => {
 
   return (
     <>
-      <div className="mx-auto min-x-[360px] max-w-[400px] relative">
-        <TopNavigation>
-          <BackArrow />
-          <Heading1>Keranjangku</Heading1>
-          <div className="w-1/3"></div>
-        </TopNavigation>
-
-        <CartItemsList
-          isLoading={isCartListLoading}
-          cartList={cartList}
-          onUpdateCart={handleUpdateCart}
-        />
-
-        <div className="h-[200px] pt-10 bg-color-[#FAFAFA] border-t-4 border-[#E6F1ED] pb-80 px-6">
-          {isCartListLoading ? (
-            <CartSummaryBox className="flex items-center justify-center">
-              Loading...
-            </CartSummaryBox>
-          ) : (
-            <>
-              <CartSummary cartResponse={cartResponse} />
-            </>
-          )}
-        </div>
-
-        <div className="fixed bottom-0 left-0 right-0 bg-white mx-auto max-w-[400px] rounded-t-3xl">
-          <div className="flex gap-6 items-center justify-between mt-6 shadow-2xl pt-4 pb-8 px-[30px] flex-grow">
-            <div className="flex items-center gap-2">
-              {selectAll ? (
-                <Image
-                  src={"/cart/checkedbox.svg"}
-                  alt=""
-                  width={24}
-                  height={24}
-                  onClick={handleToggleAllActivation}
-                  className="cursor-pointer"
-                />
-              ) : (
-                <Image
-                  src={"/cart/checkbox.svg"}
-                  alt=""
-                  width={24}
-                  height={24}
-                  onClick={handleToggleAllActivation}
-                  className="cursor-pointer"
-                />
-              )}
-              <Heading2 className="text-[#C4C4C4]">All Item</Heading2>
-            </div>
-            <Button className="bg-[#00764F] text-[#E6F1ED] py-2 px-4 rounded-full">
-              Checkout (
-              {isCartListLoading
-                ? "..."
-                : cartList?.filter((item) => item.is_active === true).length}
-              )
-            </Button>
-          </div>
-          <BottomBar />
-        </div>
-      </div>
+      <CartUI
+        cartResponse={cartResponse}
+        isCartListLoading={isCartListLoading}
+        selectAll={selectAll}
+        onToggleAllActivation={handleToggleAllActivation}
+        onUpdateCart={handleUpdateCart}
+      />
     </>
   );
 };

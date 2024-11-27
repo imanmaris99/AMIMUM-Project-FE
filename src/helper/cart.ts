@@ -21,3 +21,19 @@ export const recalculateCartTotals = (cartList: CartItemType[]) => {
     total_all_active_prices,
   };
 };
+
+export const updateCartItem = (
+  cartItems: CartItemType[],
+  updatedItem: CartItemType
+): CartItemType[] => {
+  return cartItems.map((item) =>
+    item.id === updatedItem.id ? { ...item, ...updatedItem } : item
+  );
+};
+
+export const toggleSelectAll = (
+  cartItems: CartItemType[],
+  isActive: boolean
+): CartItemType[] => {
+  return cartItems.map((item) => ({ ...item, is_active: isActive }));
+};
