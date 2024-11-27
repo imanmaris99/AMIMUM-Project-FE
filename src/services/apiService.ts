@@ -1,5 +1,9 @@
 import axiosClient from "@/lib/axiosClient";
-import { CartResponseType } from "@/types/apiTypes";
+import {
+  CartResponseType,
+  TotalCartItemsResponseType,
+  TotalCartItemsType,
+} from "@/types/apiTypes";
 
 export const fetchCategories = async () => {
   try {
@@ -49,6 +53,17 @@ export const fetchArticles = async () => {
 export const getCart = async () => {
   try {
     const response: CartResponseType = await axiosClient.get("/cart/my-cart");
+    return response ? response : null;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getTotalCartItems = async () => {
+  try {
+    const response: TotalCartItemsResponseType = await axiosClient.get(
+      "/cart/total-items"
+    );
     return response ? response : null;
   } catch (error) {
     throw error;

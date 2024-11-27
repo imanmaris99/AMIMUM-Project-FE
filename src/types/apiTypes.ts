@@ -72,3 +72,13 @@ export interface CartResponseType {
   data: CartItemType[];
   total_prices: CartTotalPricesType;
 }
+
+export interface TotalCartItemsType {
+  total_items: number;
+}
+
+export interface TotalCartItemsResponseType {
+  status_code: number;
+  message: string;
+  data: TotalCartItemsType;
+}
