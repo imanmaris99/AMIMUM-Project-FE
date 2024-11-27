@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProductImage from "../1_elements/ProductImage";
 import Button from "../1_elements/Button";
 import Heading3 from "../1_elements/Heading3";
@@ -10,22 +10,38 @@ import CheckBox from "../2_widgets/CheckBox";
 
 interface CartItemProps {
   cartItem: CartItemType;
+  onUpdateCart: (updatedItem: CartItemType) => void;
 }
 
-const CartItem = ({ cartItem }: CartItemProps) => {
-  const [quantity, setQuantity] = useState(1);
+const CartItem = ({ cartItem, onUpdateCart }: CartItemProps) => {
+  const [quantity, setQuantity] = useState(cartItem.quantity || 1);
+
+  // useEffect(() => {
+  //   onUpdateCart({ ...cartItem, quantity });
+  // }, [quantity, cartItem, onUpdateCart]);
 
   function handleDecrement() {
-    if (quantity >= 2) setQuantity((prev) => prev - 1);
+    if (quantity > 1) {
+      const newQty = quantity - 1;
+      setQuantity(newQty);
+      onUpdateCart({ ...cartItem, quantity: newQty });
+    }
   }
 
   function handleIncrement() {
-    setQuantity((prev) => prev + 1);
+    const newQty = quantity + 1;
+    setQuantity(newQty);
+    onUpdateCart({ ...cartItem, quantity: newQty });
   }
+
+  const handleCheckBoxChange = (isChecked: boolean) => {
+    onUpdateCart({ ...cartItem, is_active: isChecked });
+  };
+
   return (
     <>
       <li className="flex py-2 items-center">
-        <CheckBox cartItem={cartItem} />
+        <CheckBox cartItem={cartItem} onChange={handleCheckBoxChange} />
 
         <ProductImage src={cartItem.variant_info.img} />
 

@@ -10,23 +10,93 @@ import TopNavigation from "@/app/components/cart/2_widgets/TopNavigation";
 import CartSummary from "@/app/components/cart/3_modules/CartSummary";
 import CartItemsList from "@/app/components/cart/4_templates/CartItemsList";
 import { useCart } from "@/hooks/useCart";
-import { useTotalCartItems } from "@/hooks/useTotalCartItems";
+import { CartItemType, CartResponseType } from "@/types/apiTypes";
 import Image from "next/image";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const Cart = () => {
   const [selectAll, setSelectAll] = useState(false);
+  const [cartList, setCartList] = useState<CartItemType[]>([]);
+  const [cartResponse, setCartResponse] = useState<CartResponseType>({
+    status_code: 0,
+    message: "",
+    data: [],
+    total_prices: {
+      all_item_active_prices: 0,
+      all_promo_active_prices: 0,
+      total_all_active_prices: 0,
+    },
+  });
   const {
-    cart: cartResponse,
+    cart,
     isLoading: isCartListLoading,
     isError: isCartListError,
   } = useCart();
-  const {
-    totalCartItems,
-    isLoading: isTotalCartItemsLoading,
-    isError: isTotalCartItemsError,
-  } = useTotalCartItems();
+
+  useEffect(() => {
+    async function getCart() {
+      if (cart) {
+        setCartList(cart.data);
+        setCartResponse(cart);
+      }
+    }
+    getCart();
+  }, [cart]);
+
+  useEffect(() => {
+    setCartList((prev) =>
+      prev.map((item) => ({
+        ...item,
+        is_active: selectAll,
+      }))
+    );
+    setCartResponse((prev) => ({
+      ...prev,
+      data: prev.data.map((item) => ({
+        ...item,
+        is_active: selectAll,
+      })),
+    }));
+  }, [selectAll]);
+
+  const handleUpdateCart = (updatedItem: CartItemType) => {
+    setCartResponse((prev) => {
+      const updatedData = prev.data.map((item) =>
+        item.id === updatedItem.id ? { ...item, ...updatedItem } : item
+      );
+      const all_item_active_prices = updatedData
+        .filter((item) => item.is_active)
+        .reduce((sum, item) => sum + item.product_price * item.quantity, 0);
+      const all_promo_active_prices = updatedData
+        .filter((item) => item.is_active && item.variant_info.discount)
+        .reduce(
+          (sum, item) =>
+            sum +
+            (item.variant_info.discount / 100) *
+              item.product_price *
+              item.quantity,
+          0
+        );
+      const total_all_active_prices =
+        all_item_active_prices - all_promo_active_prices;
+
+      return {
+        ...prev,
+        data: updatedData,
+        total_prices: {
+          all_item_active_prices,
+          all_promo_active_prices,
+          total_all_active_prices,
+        },
+      };
+    });
+    setCartList((prev) =>
+      prev.map((item) =>
+        item.id === updatedItem.id ? { ...item, ...updatedItem } : item
+      )
+    );
+  };
 
   return (
     <>
@@ -39,7 +109,8 @@ const Cart = () => {
 
         <CartItemsList
           isLoading={isCartListLoading}
-          cartResponse={cartResponse}
+          cartList={cartList}
+          onUpdateCart={handleUpdateCart}
         />
 
         <div className="h-[200px] pt-10 bg-color-[#FAFAFA] border-t-4 border-[#E6F1ED] pb-80 px-6">
@@ -80,9 +151,9 @@ const Cart = () => {
             </div>
             <Button className="bg-[#00764F] text-[#E6F1ED] py-2 px-4 rounded-full">
               Checkout (
-              {isTotalCartItemsLoading
+              {isCartListLoading
                 ? "..."
-                : totalCartItems?.data.total_items}
+                : cartList?.filter((item) => item.is_active === true).length}
               )
             </Button>
           </div>

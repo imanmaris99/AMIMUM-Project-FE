@@ -8,34 +8,40 @@ import { editCartActive } from "@/services/apiService";
 
 interface CheckBoxProps {
   cartItem: CartItemType;
+  onChange: (isChecked: boolean) => void;
 }
 
-const CheckBox = ({ cartItem }: CheckBoxProps) => {
-  const [isActive, setIsActive] = useState(cartItem.is_active);
+const CheckBox = ({ cartItem, onChange }: CheckBoxProps) => {
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleToggleActivation() {
-    const state = !isActive;
+    setIsLoading(true);
+    const newIsActive = !cartItem.is_active;
     const updatedCartAct = {
       cart: {
         cart_id: cartItem.id,
       },
       activate_update: {
-        is_active: state,
+        is_active: newIsActive,
       },
     };
 
     try {
       await editCartActive(updatedCartAct);
-      setIsActive(state);
+      onChange(newIsActive);
     } catch (error) {
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   }
 
   return (
     <>
       <div className="w-[53px] flex items-center justify-center">
-        {isActive === true ? (
+        {isLoading ? (
+          "..."
+        ) : cartItem.is_active === true ? (
           <CheckedBox onClick={handleToggleActivation} />
         ) : (
           <EmptyCheckBox onClick={handleToggleActivation} />

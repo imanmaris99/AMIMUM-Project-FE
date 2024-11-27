@@ -55,7 +55,7 @@ export const fetchArticles = async () => {
 export const getCart = async () => {
   try {
     const response: CartResponseType = await axiosClient.get("/cart/my-cart");
-    return response ? response : null;
+    if (response) return response;
   } catch (error) {
     throw error;
   }
@@ -86,12 +86,28 @@ export const editCartQty = async (updatedCartItem: CartItemQtyPayload) => {
 
 export const editCartActive = async (updatedCartItem: CartItemActPayload) => {
   try {
-    console.log("HELLO!");
+    // console.log("HELLO!");
     const response = await axiosClient.put(
       `/cart/update-activate/:cart_id`,
       updatedCartItem
     );
-    console.log(response);
+    // console.log(response);
+    return response ? response.data : null;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const editCartAllActive = async ({
+  is_active,
+}: {
+  is_active: boolean;
+}) => {
+  try {
+    const response = await axiosClient.put(
+      "/cart/update-activate-all",
+      is_active
+    );
     return response ? response.data : null;
   } catch (error) {
     throw error;

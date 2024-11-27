@@ -1,10 +1,10 @@
 import React from "react";
 import CartSummaryBox from "../2_widgets/CartSummaryBox";
 import Heading1 from "../1_elements/Heading1";
-import { CartResponseType } from "@/types/apiTypes";
+import { CartItemType, CartResponseType } from "@/types/apiTypes";
 
 interface CartSummaryProps {
-  cartResponse: CartResponseType | null | undefined;
+  cartResponse: CartResponseType | null;
 }
 
 const CartSummary = ({ cartResponse }: CartSummaryProps) => {
