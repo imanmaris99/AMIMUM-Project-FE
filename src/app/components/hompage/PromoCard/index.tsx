@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { PromoProps } from "@/API/types/apiTypes";
+import { PromoProps } from "@/API/production-by/types";
 import styles from "./PromoCard.module.css";
 
 const PromoCard = ({ promo }: { promo: PromoProps }) => {
