@@ -1,37 +1,69 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ProductImage from "../1_elements/ProductImage";
 import Button from "../1_elements/Button";
 import Heading3 from "../1_elements/Heading3";
 import { CartItemType } from "@/types/apiTypes";
 import ItemSummary from "../2_widgets/ItemSummary";
 import CheckBox from "../2_widgets/CheckBox";
+import { editCartQty } from "@/services/apiService";
 
 interface CartItemProps {
   cartItem: CartItemType;
   onUpdateCart: (updatedItem: CartItemType) => void;
+  onRemoveItem: (id: number) => void;
 }
 
-const CartItem = ({ cartItem, onUpdateCart }: CartItemProps) => {
+const CartItem = ({ cartItem, onUpdateCart, onRemoveItem }: CartItemProps) => {
   const [quantity, setQuantity] = useState(cartItem.quantity || 1);
+  const [decrementIsLoading, setDecrementIsLoading] = useState(false);
+  const [incrementIsLoading, setIncrementIsLoading] = useState(false);
 
-  // useEffect(() => {
-  //   onUpdateCart({ ...cartItem, quantity });
-  // }, [quantity, cartItem, onUpdateCart]);
-
-  function handleDecrement() {
-    if (quantity > 1) {
-      const newQty = quantity - 1;
-      setQuantity(newQty);
-      onUpdateCart({ ...cartItem, quantity: newQty });
+  async function handleDecrement() {
+    if (quantity > 1 && incrementIsLoading === false) {
+      setDecrementIsLoading(true);
+      try {
+        const newQty = quantity - 1;
+        await editCartQty({
+          cart: {
+            cart_id: cartItem.id,
+          },
+          quantity_update: {
+            quantity: newQty,
+          },
+        });
+        setQuantity(newQty);
+        onUpdateCart({ ...cartItem, quantity: newQty });
+      } catch (error) {
+        throw error;
+      } finally {
+        setDecrementIsLoading(false);
+      }
     }
   }
 
-  function handleIncrement() {
-    const newQty = quantity + 1;
-    setQuantity(newQty);
-    onUpdateCart({ ...cartItem, quantity: newQty });
+  async function handleIncrement() {
+    if (decrementIsLoading === false) {
+      setIncrementIsLoading(true);
+      try {
+        const newQty = quantity + 1;
+        await editCartQty({
+          cart: {
+            cart_id: cartItem.id,
+          },
+          quantity_update: {
+            quantity: newQty,
+          },
+        });
+        setQuantity(newQty);
+        onUpdateCart({ ...cartItem, quantity: newQty });
+      } catch (error) {
+        throw error;
+      } finally {
+        setIncrementIsLoading(false);
+      }
+    }
   }
 
   const handleCheckBoxChange = (isChecked: boolean) => {
@@ -45,14 +77,24 @@ const CartItem = ({ cartItem, onUpdateCart }: CartItemProps) => {
 
         <ProductImage src={cartItem.variant_info.img} />
 
-        <ItemSummary cartItem={cartItem}>
-          <Button onClick={handleDecrement} className="text-[#C4C4C4]">
+        <ItemSummary onRemoveItem={onRemoveItem} cartItem={cartItem}>
+          <Button
+            onClick={handleDecrement}
+            className="text-[#C4C4C4] w-5 h-5 flex items-center justify-center pb-0 border"
+          >
             -
           </Button>
 
-          <Heading3 className="pt-0.5">{quantity}</Heading3>
+          <Heading3 className="pt-0.5 w-[26px] h-5 text-center border">
+            {decrementIsLoading === true || incrementIsLoading === true
+              ? "..."
+              : quantity}
+          </Heading3>
 
-          <Button onClick={handleIncrement} className="text-[#C4C4C4]">
+          <Button
+            onClick={handleIncrement}
+            className="text-[#C4C4C4] w-5 h-5 flex items-center justify-center pb-0.5 border"
+          >
             +
           </Button>
         </ItemSummary>

@@ -1,29 +1,21 @@
 "use client";
 
-import BackArrow from "@/app/components/cart/1_elements/BackArrow";
-import Button from "@/app/components/cart/1_elements/Button";
-import Heading1 from "@/app/components/cart/1_elements/Heading1";
-import Heading2 from "@/app/components/cart/1_elements/Heading2";
-import BottomBar from "@/app/components/cart/2_widgets/BottomBar";
-import CartSummaryBox from "@/app/components/cart/2_widgets/CartSummaryBox";
-import TopNavigation from "@/app/components/cart/2_widgets/TopNavigation";
-import CartSummary from "@/app/components/cart/3_modules/CartSummary";
-import CartItemsList from "@/app/components/cart/4_templates/CartItemsList";
-import CartUI from "@/app/components/cart/5_pages/Cart";
+import CartUI from "@/app/components/cart/5_pages/CartUI";
 import {
   recalculateCartTotals,
+  removeCartItem,
   toggleSelectAll,
   updateCartItem,
 } from "@/helper/cart";
 import { useCart } from "@/hooks/useCart";
 import { editCartAllActive } from "@/services/apiService";
 import { CartItemType, CartResponseType } from "@/types/apiTypes";
-import Image from "next/image";
 
 import React, { useEffect, useState } from "react";
 
 const Cart = () => {
   const [selectAll, setSelectAll] = useState(false);
+  const [isSelectAllLoading, setIsSelectAllLoading] = useState(false);
   const [cartResponse, setCartResponse] = useState<CartResponseType>({
     status_code: 0,
     message: "",
@@ -55,6 +47,7 @@ const Cart = () => {
   };
 
   const handleToggleAllActivation = async () => {
+    setIsSelectAllLoading(true);
     const newSelectAll = !selectAll;
     try {
       await editCartAllActive({ is_active: newSelectAll });
@@ -68,7 +61,20 @@ const Cart = () => {
       setSelectAll(newSelectAll);
     } catch (error) {
       throw error;
+    } finally {
+      setIsSelectAllLoading(false);
     }
+  };
+
+  const handleRemoveItem = (id: number) => {
+    setCartResponse((prev) => {
+      const updatedCartData = removeCartItem(prev.data, id);
+      return {
+        ...prev,
+        data: updatedCartData,
+        total_prices: recalculateCartTotals(updatedCartData),
+      };
+    });
   };
 
   return (
@@ -79,6 +85,8 @@ const Cart = () => {
         selectAll={selectAll}
         onToggleAllActivation={handleToggleAllActivation}
         onUpdateCart={handleUpdateCart}
+        isSelectAllLoading={isSelectAllLoading}
+        onRemoveItem={handleRemoveItem}
       />
     </>
   );

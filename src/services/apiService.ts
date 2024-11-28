@@ -4,7 +4,6 @@ import {
   CartItemQtyPayload,
   CartResponseType,
   TotalCartItemsResponseType,
-  TotalCartItemsType,
 } from "@/types/apiTypes";
 
 export const fetchCategories = async () => {
@@ -75,7 +74,7 @@ export const getTotalCartItems = async () => {
 export const editCartQty = async (updatedCartItem: CartItemQtyPayload) => {
   try {
     const response = await axiosClient.put(
-      `/cart/update-quantity/`,
+      `/cart/update-quantity/:cart_id`,
       updatedCartItem
     );
     return response ? response.data : null;
@@ -104,6 +103,17 @@ export const editCartAllActive = async (isActive: { is_active: boolean }) => {
       "/cart/update-activate-all",
       isActive
     );
+    return response ? response.data : null;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteCartItem = async (cartId: { cart_id: number }) => {
+  try {
+    const response = await axiosClient.delete("/cart/delete/:cart_id", {
+      data: cartId,
+    });
     return response ? response.data : null;
   } catch (error) {
     throw error;

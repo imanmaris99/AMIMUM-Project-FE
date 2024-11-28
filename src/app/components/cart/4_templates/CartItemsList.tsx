@@ -6,12 +6,14 @@ interface CartItemsListProps {
   isLoading: boolean;
   cartList: CartItemType[] | null | undefined;
   onUpdateCart: (updatedItem: CartItemType) => void;
+  onRemoveItem: (id: number) => void;
 }
 
 const CartItemsList = ({
   isLoading,
   cartList,
   onUpdateCart,
+  onRemoveItem,
 }: CartItemsListProps) => {
   return (
     <>
@@ -24,6 +26,7 @@ const CartItemsList = ({
                   key={cartItem.id}
                   cartItem={cartItem}
                   onUpdateCart={onUpdateCart}
+                  onRemoveItem={onRemoveItem}
                 />
               ))}
         </ol>

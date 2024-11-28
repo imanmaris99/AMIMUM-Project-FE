@@ -37,3 +37,10 @@ export const toggleSelectAll = (
 ): CartItemType[] => {
   return cartItems.map((item) => ({ ...item, is_active: isActive }));
 };
+
+export const removeCartItem = (
+  cartItems: CartItemType[],
+  cartItemId: number
+): CartItemType[] => {
+  return cartItems.filter((item) => item.id !== cartItemId);
+};
