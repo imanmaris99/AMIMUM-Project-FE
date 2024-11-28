@@ -6,7 +6,7 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { ArticleProps } from "@/API/articles/types";
+import { ArticleProps } from "./types";
 
 export default function AccordionExpandDefault({ article }: { article: ArticleProps }) {
   const [isExpanded, setIsExpanded] = useState(false);

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ProductionProps } from "@/API/production-by/types";
+import { ProductionProps } from "./types";
 import styles from "./ProductionCard.module.css";
 
 const ProductionCard = ({ production }: { production: ProductionProps }) => {

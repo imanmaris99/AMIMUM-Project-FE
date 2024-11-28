@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { ProductionCard } from "@/app/components";
 import { GoChevronDown } from "react-icons/go";
-import { useProductions } from "@/API/hooks/useProductions";
-import { ProductionProps } from "@/API/production-by/types";
+import { useProductions } from "@/app/hooks/useProductions";
+import { ProductionProps } from "@/app/components/hompage/ProductionCard/types";
 import ProductionCardSkeleton from "@/app/components/hompage/ProductionCard/ProductionCardSkeleton";
 
 const Production = () => {

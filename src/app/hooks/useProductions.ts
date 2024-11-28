@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { fetchProduction } from "@/API/production-by/get";
+import { fetchProduction } from "@/API/production-by";
 
 export const useProductions = () => {
     const { data, error } = useSWR("/production/all", fetchProduction, {
