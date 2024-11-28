@@ -4,12 +4,12 @@ import BackArrow from "@/app/components/cart/1_elements/BackArrow";
 import Heading1 from "@/app/components/cart/1_elements/Heading1";
 import Heading2 from "@/app/components/cart/1_elements/Heading2";
 import CartItemsList from "@/app/components/cart/4_templates/CartItemsList";
-import CartSummaryBox from "@/app/components/cart/2_widgets/CartSummaryBox";
 import CartSummary from "@/app/components/cart/3_modules/CartSummary";
 import Button from "@/app/components/cart/1_elements/Button";
 import BottomBar from "@/app/components/cart/2_widgets/BottomBar";
 import Image from "next/image";
 import { CartResponseType, CartItemType } from "@/types/apiTypes";
+import CartSummarySkeleton from "../3_modules/CartSummarySkeleton";
 
 interface CartUIProps {
   cartResponse: CartResponseType;
@@ -47,9 +47,7 @@ const CartUI: React.FC<CartUIProps> = ({
 
       <div className="h-[200px] pt-10 bg-color-[#FAFAFA] border-t-4 border-[#E6F1ED] pb-80 px-6">
         {isCartListLoading ? (
-          <CartSummaryBox className="flex items-center justify-center">
-            Loading...
-          </CartSummaryBox>
+          <CartSummarySkeleton />
         ) : (
           <CartSummary cartResponse={cartResponse} />
         )}
@@ -72,13 +70,19 @@ const CartUI: React.FC<CartUIProps> = ({
             )}
             <Heading2 className="text-[#C4C4C4]">All Item</Heading2>
           </div>
-          <Button className="bg-[#00764F] text-[#E6F1ED] py-2 px-4 rounded-full">
-            Checkout (
-            {isCartListLoading
-              ? "..."
-              : cartResponse.data.filter((item) => item.is_active).length}
-            )
-          </Button>
+          {isCartListLoading ? (
+            <Button
+              disabled={true}
+              className="bg-gray-400 text-[#E6F1ED] py-2 px-4 rounded-full"
+            >
+              Checkout (...)
+            </Button>
+          ) : (
+            <Button className="bg-[#00764F] text-[#E6F1ED] py-2 px-4 rounded-full">
+              Checkout (
+              {cartResponse.data.filter((item) => item.is_active).length})
+            </Button>
+          )}
         </div>
         <BottomBar />
       </div>

@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 
 interface EmptyCheckBoxProps {
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 const EmptyCheckBox = ({ onClick }: EmptyCheckBoxProps) => {
