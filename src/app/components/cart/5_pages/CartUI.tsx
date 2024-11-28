@@ -55,7 +55,7 @@ const CartUI: React.FC<CartUIProps> = ({
         )}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white mx-auto max-w-[400px] rounded-t-3xl">
+      <div className="fixed bottom-0 left-0 right-0 bg-white mx-auto max-w-[400px] w-full rounded-t-3xl">
         <div className="flex gap-6 items-center justify-between mt-6 shadow-2xl pt-4 pb-8 px-[30px] flex-grow">
           <div className="flex items-center gap-2">
             {isSelectAllLoading ? (
