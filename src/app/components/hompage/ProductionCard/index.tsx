@@ -6,7 +6,7 @@ const ProductionCard = ({ production }: { production: ProductionProps }) => {
   return (
     <div className="bg-white rounded-lg h-36 flex flex-col items-center justify-center w-24 shadow-md">
       <div className="bg-gray-100 rounded-lg px-3 py-2 flex flex-col justify-center items-center w-20 h-20">
-        <Image src={production.photo_url || "/default-image.jpg"} alt={production.name} width={50} height={50} />
+        <Image src={production.photo_url || "/default-image.jpg"} alt={production.name} width={50} height={50} style={{ width: '100%', height: 'auto' }} />
       </div>
 
       <div className="flex flex-col justify-center items-center mt-2 gap-1">

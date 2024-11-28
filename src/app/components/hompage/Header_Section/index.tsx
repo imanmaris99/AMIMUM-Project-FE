@@ -57,7 +57,7 @@ const Header = () => {
 
           <div className="flex justify-center items-center gap-3">
             {!userProfile ? (
-              <Image src="/logo_toko.png" alt="logo" width={100} height={100} />
+              <Image src="/logo_toko.png" alt="logo" width={100} height={125} priority />
             ) : (
               <>
                 <IoBagOutline size={32} />
