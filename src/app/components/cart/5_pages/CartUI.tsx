@@ -10,6 +10,7 @@ import BottomBar from "@/app/components/cart/2_widgets/BottomBar";
 import Image from "next/image";
 import { CartResponseType, CartItemType } from "@/types/apiTypes";
 import CartSummarySkeleton from "../3_modules/CartSummarySkeleton";
+import { useRouter } from "next/navigation";
 
 interface CartUIProps {
   cartResponse: CartResponseType;
@@ -30,6 +31,7 @@ const CartUI: React.FC<CartUIProps> = ({
   isSelectAllLoading,
   onRemoveItem,
 }) => {
+  const router = useRouter();
   return (
     <div className="mx-auto min-x-[360px] max-w-[400px] relative">
       <TopNavigation>
@@ -78,7 +80,10 @@ const CartUI: React.FC<CartUIProps> = ({
               Checkout (...)
             </Button>
           ) : (
-            <Button className="bg-[#00764F] text-[#E6F1ED] py-2 px-4 rounded-full">
+            <Button
+              onClick={() => router.push("/order")}
+              className="bg-[#00764F] text-[#E6F1ED] py-2 px-4 rounded-full"
+            >
               Checkout (
               {cartResponse.data.filter((item) => item.is_active).length})
             </Button>

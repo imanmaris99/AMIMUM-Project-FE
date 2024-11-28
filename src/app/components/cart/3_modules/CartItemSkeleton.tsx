@@ -18,8 +18,8 @@ const CartItemSkeleton = () => {
       <div className="flex flex-col flex-grow pr-3.5">
         <div className="flex items-center justify-between">
           <div>
-            <div className="h-[14px] w-24 bg-gray-300 animate-pulse"></div>
-            <div className="h-3 w-20 bg-gray-200 animate-pulse mb-3"></div>
+            <div className="h-[14px] w-24 bg-gray-300 rounded animate-pulse"></div>
+            <div className="h-3 w-20 bg-gray-200 rounded animate-pulse mb-3"></div>
           </div>
           <Image
             src={"/cart/trash.svg"}
@@ -30,7 +30,7 @@ const CartItemSkeleton = () => {
           />
         </div>
         <div className="flex w-full justify-between items-center">
-          <div className="h-4 w-16 bg-gray-300 animate-pulse"></div>
+          <div className="h-4 w-16 bg-gray-300 rounded animate-pulse"></div>
           <div className="flex items-center mr-0">
             <Button className="text-[#C4C4C4] w-5 h-5 flex items-center justify-center pb-0 border">
               -

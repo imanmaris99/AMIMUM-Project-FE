@@ -6,7 +6,11 @@ interface Heading3Props {
 }
 
 const Heading3 = ({ children, className }: Heading3Props) => {
-  return <h3 className={`${className} text-xs`}>{children}</h3>;
+  return (
+    <>
+      <h3 className={`${className} text-xs`}>{children}</h3>
+    </>
+  );
 };
 
 export default Heading3;

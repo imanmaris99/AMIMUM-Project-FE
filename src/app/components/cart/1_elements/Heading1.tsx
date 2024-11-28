@@ -6,7 +6,11 @@ interface Heading1Props {
 }
 
 const Heading1 = ({ children, className }: Heading1Props) => {
-  return <h1 className={`${className} text-base`}>{children}</h1>;
+  return (
+    <>
+      <h1 className={`${className} text-base`}>{children}</h1>
+    </>
+  );
 };
 
 export default Heading1;
