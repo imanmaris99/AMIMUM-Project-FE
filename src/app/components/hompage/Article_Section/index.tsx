@@ -1,6 +1,6 @@
 import { AccordionExpandDefault } from "@/app/components";
-import { useArticles } from "@/hooks/useArticles";
-import { ArticleProps } from "@/types/apiTypes";
+import { useArticles } from "@/app/hooks/useArticles";
+import { ArticleProps } from "./types";
 import AccordionSkeleton from "@/components/ui/AccordionExpandDefault/AccordionSkeleton";
 import Footer from "../../layout/Footer";
 
