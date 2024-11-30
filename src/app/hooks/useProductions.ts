@@ -2,7 +2,7 @@ import useSWR from "swr";
 import { fetchProduction } from "@/API/brand";
 
 export const useProductions = () => {
-    const { data, error } = useSWR("/production/all", fetchProduction, {
+    const { data, error } = useSWR("/brand/all", fetchProduction, {
         errorRetryCount: 0,
     });
 
