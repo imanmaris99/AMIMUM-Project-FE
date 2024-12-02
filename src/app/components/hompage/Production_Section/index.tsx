@@ -32,7 +32,7 @@ const Production = () => {
         <h6 className="font-semibold font-jakarta">Produksi oleh</h6>
       </div>
 
-      <div className="mx-6 mt-6 mb-6 grid grid-cols-3 gap-4">
+      <div className="mx-6 mt-6 mb-6 grid grid-cols-3 gap-4 justify-items-center">
         {isLoading ? (
           [...Array(9)].map((_, index) => <ProductionCardSkeleton key={index} />)
         ) : (
