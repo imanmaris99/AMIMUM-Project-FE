@@ -1,6 +1,4 @@
-"use client";
-
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode } from "react";
 import Heading2 from "../1_elements/Heading2";
 import Heading3 from "../1_elements/Heading3";
 import Heading1 from "../1_elements/Heading1";

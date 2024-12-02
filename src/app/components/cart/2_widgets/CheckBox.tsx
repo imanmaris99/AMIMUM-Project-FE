@@ -1,7 +1,5 @@
-"use Client";
-
 import { CartItemType } from "@/types/apiTypes";
-import React, { useState } from "react";
+import React from "react";
 import CheckedBox from "../1_elements/CheckedBox";
 import EmptyCheckBox from "../1_elements/EmptyCheckBox";
 import { editCartActive } from "@/services/apiService";
