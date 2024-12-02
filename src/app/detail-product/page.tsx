@@ -14,9 +14,6 @@ const DetailProduct = () => {
         <ProductImage />
       </div>
       <div>
-        <h1 style={{ color: "white" }}>Detail Product</h1>
-      </div>
-      <div>
         <TitleProduct />
       </div>
       <div>
