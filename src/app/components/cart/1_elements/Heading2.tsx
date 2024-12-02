@@ -8,7 +8,7 @@ interface Heading2Props {
 const Heading2 = ({ children, className }: Heading2Props) => {
   return (
     <>
-      <h2 className={`${className} text-sm`}>{children}</h2>
+      <p className={`${className} text-sm`}>{children}</p>
     </>
   );
 };

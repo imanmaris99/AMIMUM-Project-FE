@@ -12,10 +12,10 @@ interface CheckBoxProps {
 }
 
 const CheckBox = ({ cartItem, onChange }: CheckBoxProps) => {
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
 
   async function handleToggleActivation() {
-    setIsLoading(true);
+    // setIsLoading(true);
     const newIsActive = !cartItem.is_active;
     const updatedCartAct = {
       cart: {
@@ -27,21 +27,22 @@ const CheckBox = ({ cartItem, onChange }: CheckBoxProps) => {
     };
 
     try {
-      await editCartActive(updatedCartAct);
       onChange(newIsActive);
+      await editCartActive(updatedCartAct);
     } catch (error) {
       throw error;
     } finally {
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   }
 
   return (
     <>
       <div className="w-[53px] flex items-center justify-center">
-        {isLoading ? (
+        {/* {isLoading ? (
           "..."
-        ) : cartItem.is_active === true ? (
+        ) :  */}
+        {cartItem.is_active === true ? (
           <CheckedBox onClick={handleToggleActivation} />
         ) : (
           <EmptyCheckBox onClick={handleToggleActivation} />

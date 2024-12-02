@@ -1,7 +1,5 @@
 import React from "react";
 import TopNavigation from "@/app/components/cart/2_widgets/TopNavigation";
-import BackArrow from "@/app/components/cart/1_elements/BackArrow";
-import Heading1 from "@/app/components/cart/1_elements/Heading1";
 import Heading2 from "@/app/components/cart/1_elements/Heading2";
 import CartItemsList from "@/app/components/cart/4_templates/CartItemsList";
 import CartSummary from "@/app/components/cart/3_modules/CartSummary";
@@ -18,7 +16,7 @@ interface CartUIProps {
   selectAll: boolean;
   onToggleAllActivation: () => void;
   onUpdateCart: (updatedItem: CartItemType) => void;
-  isSelectAllLoading: boolean;
+  isSelectAllLoading?: boolean;
   onRemoveItem: (id: number) => void;
 }
 
@@ -28,17 +26,13 @@ const CartUI: React.FC<CartUIProps> = ({
   selectAll,
   onToggleAllActivation,
   onUpdateCart,
-  isSelectAllLoading,
+  // isSelectAllLoading,
   onRemoveItem,
 }) => {
   const router = useRouter();
   return (
     <div className="mx-auto min-x-[360px] max-w-[400px] relative">
-      <TopNavigation>
-        <BackArrow />
-        <Heading1>Keranjangku</Heading1>
-        <div className="w-1/3"></div>
-      </TopNavigation>
+      <TopNavigation>Keranjangku</TopNavigation>
 
       <CartItemsList
         isLoading={isCartListLoading}
@@ -58,18 +52,18 @@ const CartUI: React.FC<CartUIProps> = ({
       <div className="fixed bottom-0 left-0 right-0 bg-white mx-auto max-w-[400px] w-full rounded-t-3xl">
         <div className="flex gap-6 items-center justify-between mt-6 shadow-2xl pt-4 pb-8 px-[30px] flex-grow">
           <div className="flex items-center gap-2">
-            {isSelectAllLoading ? (
+            {/* {isSelectAllLoading ? (
               "..."
-            ) : (
-              <Image
-                src={selectAll ? "/cart/checkedbox.svg" : "/cart/checkbox.svg"}
-                alt="Select All"
-                width={24}
-                height={24}
-                onClick={onToggleAllActivation}
-                className="cursor-pointer"
-              />
-            )}
+            ) : ( */}
+            <Image
+              src={selectAll ? "/cart/checkedbox.svg" : "/cart/checkbox.svg"}
+              alt="Select All"
+              width={24}
+              height={24}
+              onClick={onToggleAllActivation}
+              className="cursor-pointer"
+            />
+            {/* )} */}
             <Heading2 className="text-[#C4C4C4]">All Item</Heading2>
           </div>
           {isCartListLoading ? (

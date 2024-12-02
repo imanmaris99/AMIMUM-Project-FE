@@ -17,14 +17,16 @@ interface CartItemProps {
 
 const CartItem = ({ cartItem, onUpdateCart, onRemoveItem }: CartItemProps) => {
   const [quantity, setQuantity] = useState(cartItem.quantity || 1);
-  const [decrementIsLoading, setDecrementIsLoading] = useState(false);
-  const [incrementIsLoading, setIncrementIsLoading] = useState(false);
+  // const [decrementIsLoading, setDecrementIsLoading] = useState(false);
+  // const [incrementIsLoading, setIncrementIsLoading] = useState(false);
 
   async function handleDecrement() {
-    if (quantity > 1 && incrementIsLoading === false) {
-      setDecrementIsLoading(true);
+    if (quantity > 1) {
+      // setDecrementIsLoading(true);
       try {
         const newQty = quantity - 1;
+        setQuantity(newQty);
+        onUpdateCart({ ...cartItem, quantity: newQty });
         await editCartQty({
           cart: {
             cart_id: cartItem.id,
@@ -33,36 +35,32 @@ const CartItem = ({ cartItem, onUpdateCart, onRemoveItem }: CartItemProps) => {
             quantity: newQty,
           },
         });
-        setQuantity(newQty);
-        onUpdateCart({ ...cartItem, quantity: newQty });
       } catch (error) {
         throw error;
       } finally {
-        setDecrementIsLoading(false);
+        // setDecrementIsLoading(false);
       }
     }
   }
 
   async function handleIncrement() {
-    if (decrementIsLoading === false) {
-      setIncrementIsLoading(true);
-      try {
-        const newQty = quantity + 1;
-        await editCartQty({
-          cart: {
-            cart_id: cartItem.id,
-          },
-          quantity_update: {
-            quantity: newQty,
-          },
-        });
-        setQuantity(newQty);
-        onUpdateCart({ ...cartItem, quantity: newQty });
-      } catch (error) {
-        throw error;
-      } finally {
-        setIncrementIsLoading(false);
-      }
+    // setIncrementIsLoading(true);
+    try {
+      const newQty = quantity + 1;
+      setQuantity(newQty);
+      onUpdateCart({ ...cartItem, quantity: newQty });
+      await editCartQty({
+        cart: {
+          cart_id: cartItem.id,
+        },
+        quantity_update: {
+          quantity: newQty,
+        },
+      });
+    } catch (error) {
+      throw error;
+    } finally {
+      // setIncrementIsLoading(false);
     }
   }
 
@@ -86,9 +84,10 @@ const CartItem = ({ cartItem, onUpdateCart, onRemoveItem }: CartItemProps) => {
           </Button>
 
           <Heading3 className="pt-0.5 w-[26px] h-5 text-center border">
-            {decrementIsLoading === true || incrementIsLoading === true
+            {/* {decrementIsLoading === true || incrementIsLoading === true
               ? "..."
-              : quantity}
+              :  */}
+            {quantity}
           </Heading3>
 
           <Button

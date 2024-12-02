@@ -15,7 +15,7 @@ import React, { useEffect, useState } from "react";
 
 const Cart = () => {
   const [selectAll, setSelectAll] = useState(false);
-  const [isSelectAllLoading, setIsSelectAllLoading] = useState(false);
+  // const [isSelectAllLoading, setIsSelectAllLoading] = useState(false);
   const [cartResponse, setCartResponse] = useState<CartResponseType>({
     status_code: 0,
     message: "",
@@ -47,10 +47,9 @@ const Cart = () => {
   };
 
   const handleToggleAllActivation = async () => {
-    setIsSelectAllLoading(true);
+    // setIsSelectAllLoading(true);
     const newSelectAll = !selectAll;
     try {
-      await editCartAllActive({ is_active: newSelectAll });
       const updatedCartList = toggleSelectAll(cartResponse.data, newSelectAll);
       const newTotals = recalculateCartTotals(updatedCartList);
       setCartResponse({
@@ -59,10 +58,11 @@ const Cart = () => {
         total_prices: newTotals,
       });
       setSelectAll(newSelectAll);
+      await editCartAllActive({ is_active: newSelectAll });
     } catch (error) {
       throw error;
     } finally {
-      setIsSelectAllLoading(false);
+      // setIsSelectAllLoading(false);
     }
   };
 
@@ -85,7 +85,7 @@ const Cart = () => {
         selectAll={selectAll}
         onToggleAllActivation={handleToggleAllActivation}
         onUpdateCart={handleUpdateCart}
-        isSelectAllLoading={isSelectAllLoading}
+        // isSelectAllLoading={isSelectAllLoading}
         onRemoveItem={handleRemoveItem}
       />
     </>
