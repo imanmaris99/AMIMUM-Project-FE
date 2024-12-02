@@ -9,25 +9,13 @@ import ProductPrice from "@/app/components/detailproduct/ProductPrice";
 
 const DetailProduct = () => {
   return (
-    <main>
-      <div>
-        <ProductImage />
-      </div>
-      <div>
-        <TitleProduct />
-      </div>
-      <div>
-        <ProductVariants />
-      </div>
-      <div>
-        <ProductInformation />
-      </div>
-      <div>
-        <ProductDescription />
-      </div>
-      <div>
-        <ProductPrice />
-      </div>
+    <main className="pb-20">
+      <ProductImage />
+      <TitleProduct />
+      <ProductVariants />
+      <ProductInformation />
+      <ProductDescription />
+      <ProductPrice />
     </main>
   );
 };
