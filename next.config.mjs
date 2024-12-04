@@ -22,6 +22,10 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'milagros.co.id',
             },
+            {
+                protocol: 'https',
+                hostname: 'www.sunhope.co.id',
+            },
         ],
     },
 };
