@@ -8,7 +8,6 @@ import ArticleSection from "../components/hompage/Article_Section";
 // import ListProductSection from "../components/hompage/List_Product_Section";
 
 const Home = () => {
-
   return (
     <main className="pb-20">
       <Header />
