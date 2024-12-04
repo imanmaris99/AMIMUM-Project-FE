@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 
-const ProductDescription: React.FC = () => {
+const ProductDescription = () => {
   // State untuk mengontrol apakah teks tambahan ditampilkan
   const [showFullDescription, setShowFullDescription] = useState(false);
 
