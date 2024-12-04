@@ -1,8 +1,8 @@
 import useSWR from "swr";
-import { fetchPromo } from "@/services/apiService";
+import { fetchPromo } from "@/API/brand";
 
 export const usePromo = () => {
-    const { data, error } = useSWR("/production/promo", fetchPromo, {
+    const { data, error } = useSWR("/brand/promo", fetchPromo, {
         errorRetryCount: 0,
     });
 

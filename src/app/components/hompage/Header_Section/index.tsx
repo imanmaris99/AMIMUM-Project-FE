@@ -1,12 +1,13 @@
 import { IoBagOutline, IoNotificationsOutline } from "react-icons/io5";
 import { Search } from "@/app/components";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserProfile } from "@/app/hooks/useUserProfile";
 import { SkeletonHeader } from "./SkeletonHeader";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+
 const Header = () => {
-  const { userProfile, isLoading, isError } = useUserProfile();
+  const { user, isLoading, isError } = useUserProfile();
 
   if (isError) {
     switch (isError) {
@@ -26,9 +27,9 @@ const Header = () => {
       <header>
         <div className="flex justify-between items-center mt-14 mx-6">
           <div className="flex flex-col justify-center gap-2">
-            {isLoading && userProfile ? (
+            {isLoading && user ? (
               <SkeletonHeader />
-            ) : !userProfile ? (
+            ) : !user ? (
               <div className="flex flex-col justify-center gap-2">
                 <p>Selamat Datang,</p>
                 <h4 className="font-bold text-xl font-jakarta">
@@ -49,15 +50,15 @@ const Header = () => {
               <>
                 <p>Selamat Datang,</p>
                 <h4 className="font-bold text-xl font-jakarta">
-                  {userProfile.firstname} {userProfile.lastname}
+                  {user.firstname} {user.lastname}
                 </h4>
               </>
             )}
           </div>
 
           <div className="flex justify-center items-center gap-3">
-            {!userProfile ? (
-              <Image src="/logo_toko.png" alt="logo" width={100} height={100} />
+            {!user ? (
+              <Image src="/logo_toko.png" alt="logo" width={100} height={125} priority />
             ) : (
               <>
                 <IoBagOutline size={32} />

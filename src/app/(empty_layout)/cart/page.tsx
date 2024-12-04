@@ -7,7 +7,7 @@ import {
   toggleSelectAll,
   updateCartItem,
 } from "@/helper/cart";
-import { useCart } from "@/hooks/useCart";
+import { useCart } from "@/app/hooks/useCart";
 import { editCartAllActive } from "@/services/apiService";
 import { CartItemType, CartResponseType } from "@/types/apiTypes";
 
