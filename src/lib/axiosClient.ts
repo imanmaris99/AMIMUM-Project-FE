@@ -21,6 +21,11 @@ axiosClient.interceptors.request.use((config) => {
 axiosClient.interceptors.response.use((response) => response.data, (error) => {
     if (error.response) {
         const status = error.response.status;
+
+        if (status === 404) {
+            return Promise.reject(error);
+        }
+
         let title = 'Error';
         let text = 'Terjadi kesalahan pada server kami. Mohon coba lagi nanti.';
         let confirmButtonText = 'OK';
@@ -39,10 +44,6 @@ axiosClient.interceptors.response.use((response) => response.data, (error) => {
             case 403:
                 title = 'Tidak Dapat Mengakses';
                 text = 'Anda tidak memiliki izin untuk mengakses sumber daya ini. Mohon periksa izin Anda dan coba lagi.';
-                break;
-            case 404:
-                title = 'Tidak Ditemukan';
-                text = 'Sumber daya yang Anda minta tidak dapat ditemukan. Mohon periksa kembali URL atau hubungi dukungan.';
                 break;
             case 409:
                 title = 'Konflik';
