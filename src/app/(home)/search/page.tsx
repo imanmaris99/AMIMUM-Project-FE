@@ -23,8 +23,8 @@ const SearchPage = () => {
             <PulseLoader color="hsl(var(--primary))" size={10} />
           </div>
         ) : isError ? (
-          <p className="text-red-500">{isError}</p>
-        ) : products?.length > 0 ? (
+          <p className="text-gray-500 text-center mt-4">{isError}</p>
+        ) : products && products.length > 0 ? (
           <div className="mx-6">
             <ListProductSection products={products} />
           </div>

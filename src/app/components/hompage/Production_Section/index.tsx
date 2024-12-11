@@ -4,9 +4,9 @@ import { useState } from "react";
 import { ProductionCard } from "@/app/components";
 import { GoChevronDown } from "react-icons/go";
 import { useProductions } from "@/app/hooks/useProductions";
-import { ProductionProps } from "@/app/components/hompage/ProductionCard/types";
+import { ProductionProps } from "@/app/components/hompage/Production_Section/types";
 import ProductionCardSkeleton from "@/app/components/hompage/ProductionCard/ProductionCardSkeleton";
-import { CategoryProps } from "../Category_Section/types";
+
 
 const Production = ({
   selectedCategory,
@@ -75,7 +75,7 @@ const Production = ({
 
               <div>
                 <button className="text-sm">
-                  Muat Lainnya ({filteredProductions?.length - visibleItems})
+                  Muat Lainnya ({filteredProductions ? filteredProductions.length - visibleItems : 0})
                 </button>
               </div>
             </div>
