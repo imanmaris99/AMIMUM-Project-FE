@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { CiSearch } from "react-icons/ci";
 import { Button } from "@/components/ui/button";
 import { useSearchProduct } from "@/app/hooks/useSearchProduct";
@@ -14,6 +14,7 @@ const Search = () => {
   const { products, isError, isLoading } = useSearchProduct(search);
   const [showDropdown, setShowDropdown] = useState(false);
   const router = useRouter();
+  const searchRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = () => {
     if (search.trim()) {
@@ -30,8 +31,21 @@ const Search = () => {
     setShowDropdown(e.target.value.length > 0);
   };
 
+  const handleClickOutside = (event: MouseEvent) => {
+    if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      setShowDropdown(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="relative">
+    <div className="relative" ref={searchRef}>
       <div className="flex items-center justify-center border border-gray-200 rounded-lg px-2 py-2">
         <CiSearch className="w-8 h-8 text-gray-500 ml-2" />
         <input
