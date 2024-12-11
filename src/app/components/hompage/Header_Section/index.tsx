@@ -1,4 +1,5 @@
-import { IoBagOutline, IoNotificationsOutline } from "react-icons/io5";
+import { IoNotificationsOutline } from "react-icons/io5";
+import { FiShoppingCart } from "react-icons/fi";
 import { Search } from "@/app/components";
 import { useUserProfile } from "@/app/hooks/useUserProfile";
 import { SkeletonHeader } from "./SkeletonHeader";
@@ -61,7 +62,7 @@ const Header = () => {
               <Image src="/logo_toko.png" alt="logo" width={100} height={125} priority />
             ) : (
               <>
-                <IoBagOutline size={32} />
+                <FiShoppingCart size={32} style={{ strokeWidth: 1.5 }} />
                 <IoNotificationsOutline size={32} />
               </>
             )}
