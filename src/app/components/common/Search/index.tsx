@@ -67,7 +67,7 @@ const Search = () => {
               <PulseLoader color="hsl(var(--primary))" size={10} />
             </li>
           ) : isError ? (
-            <li className="p-2 text-red-500 flex justify-center">{isError}</li>
+            <li className="p-2 text-gray-500 flex justify-center">{isError}</li>
           ) : (
             products?.map((product: CardProductProps) => (
               <li
