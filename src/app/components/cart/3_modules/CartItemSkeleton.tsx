@@ -1,14 +1,24 @@
 import React from "react";
-import Image from "next/image";
-import EmptyCheckBox from "../1_elements/EmptyCheckBox";
+import { cn } from "@/lib/utils";
 import Button from "../1_elements/Button";
 import Heading3 from "../1_elements/Heading3";
+import { Checkbox } from "@radix-ui/react-checkbox";
+import { FaRegTrashCan } from "react-icons/fa6";
 
 const CartItemSkeleton = () => {
   return (
     <li className="flex py-2 items-center">
       <div className="w-[53px] flex items-center justify-center">
-        <EmptyCheckBox />
+      <Checkbox
+        className={cn(
+          "h-5 w-5 border-2",
+          "bg-white",
+          "focus-visible:ring-0 focus-visible:ring-offset-0",
+          "cursor-pointer",
+          "data-[state=checked]:bg-white data-[state=checked]:border-primary",
+          "data-[state=checked]:text-primary"
+        )}
+      />
       </div>
       <div className="w-[100px]">
         <div className="w-[100px] h-[100px] rounded animate-pulse flex items-center justify-center">
@@ -21,13 +31,7 @@ const CartItemSkeleton = () => {
             <div className="h-[14px] w-24 bg-gray-300 rounded animate-pulse"></div>
             <div className="h-3 w-20 bg-gray-200 rounded animate-pulse mb-3"></div>
           </div>
-          <Image
-            src={"/cart/trash.svg"}
-            alt=""
-            width={16}
-            height={20}
-            className="mr-3 pb-2"
-          />
+          <FaRegTrashCan className="text-3xl pb-2 cursor-pointer" />
         </div>
         <div className="flex w-full justify-between items-center">
           <div className="h-4 w-16 bg-gray-300 rounded animate-pulse"></div>

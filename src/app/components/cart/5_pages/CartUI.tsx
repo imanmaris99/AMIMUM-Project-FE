@@ -5,18 +5,18 @@ import CartItemsList from "@/app/components/cart/4_templates/CartItemsList";
 import CartSummary from "@/app/components/cart/3_modules/CartSummary";
 import Button from "@/app/components/cart/1_elements/Button";
 import BottomBar from "@/app/components/cart/2_widgets/BottomBar";
-import Image from "next/image";
 import { CartResponseType, CartItemType } from "@/types/apiTypes";
 import CartSummarySkeleton from "../3_modules/CartSummarySkeleton";
 import { useRouter } from "next/navigation";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 
 interface CartUIProps {
   cartResponse: CartResponseType;
   isCartListLoading: boolean;
   selectAll: boolean;
-  onToggleAllActivation: () => void;
+  onToggleAllActivation: (checked: boolean) => void;
   onUpdateCart: (updatedItem: CartItemType) => void;
-  isSelectAllLoading?: boolean;
   onRemoveItem: (id: number) => void;
 }
 
@@ -26,7 +26,6 @@ const CartUI: React.FC<CartUIProps> = ({
   selectAll,
   onToggleAllActivation,
   onUpdateCart,
-  // isSelectAllLoading,
   onRemoveItem,
 }) => {
   const router = useRouter();
@@ -52,18 +51,21 @@ const CartUI: React.FC<CartUIProps> = ({
       <div className="fixed bottom-0 left-0 right-0 bg-white mx-auto max-w-[400px] w-full rounded-t-3xl">
         <div className="flex gap-6 items-center justify-between mt-6 shadow-2xl pt-4 pb-8 px-[30px] flex-grow">
           <div className="flex items-center gap-2">
-            {/* {isSelectAllLoading ? (
-              "..."
-            ) : ( */}
-            <Image
-              src={selectAll ? "/cart/checkedbox.svg" : "/cart/checkbox.svg"}
-              alt="Select All"
-              width={24}
-              height={24}
-              onClick={onToggleAllActivation}
-              className="cursor-pointer"
+            
+            <Checkbox
+              checked={selectAll}
+              onCheckedChange={onToggleAllActivation}
+              disabled={isCartListLoading}
+              className={cn(
+                "h-5 w-5 border-2",
+                "bg-white",
+                "focus-visible:ring-0 focus-visible:ring-offset-0",
+                "cursor-pointer",
+                "data-[state=checked]:bg-white data-[state=checked]:border-primary",
+                "data-[state=checked]:text-primary",
+                isCartListLoading && "border-gray-300 data-[state=checked]:border-gray-300 data-[state=checked]:text-gray-300 cursor-not-allowed"
+              )}
             />
-            {/* )} */}
             <Heading2 className="text-[#C4C4C4]">All Item</Heading2>
           </div>
           {isCartListLoading ? (

@@ -1,8 +1,8 @@
 import { CartItemType } from "@/types/apiTypes";
 import React from "react";
-import CheckedBox from "../1_elements/CheckedBox";
-import EmptyCheckBox from "../1_elements/EmptyCheckBox";
 import { editCartActive } from "@/services/apiService";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 
 interface CheckBoxProps {
   cartItem: CartItemType;
@@ -10,11 +10,8 @@ interface CheckBoxProps {
 }
 
 const CheckBox = ({ cartItem, onChange }: CheckBoxProps) => {
-  // const [isLoading, setIsLoading] = useState(false);
-
-  async function handleToggleActivation() {
-    // setIsLoading(true);
-    const newIsActive = !cartItem.is_active;
+  async function handleToggleActivation(checked: boolean) {
+    const newIsActive = checked;
     const updatedCartAct = {
       cart: {
         cart_id: cartItem.id,
@@ -29,24 +26,24 @@ const CheckBox = ({ cartItem, onChange }: CheckBoxProps) => {
       await editCartActive(updatedCartAct);
     } catch (error) {
       throw error;
-    } finally {
-      // setIsLoading(false);
     }
   }
 
   return (
-    <>
-      <div className="w-[53px] flex items-center justify-center">
-        {/* {isLoading ? (
-          "..."
-        ) :  */}
-        {cartItem.is_active === true ? (
-          <CheckedBox onClick={handleToggleActivation} />
-        ) : (
-          <EmptyCheckBox onClick={handleToggleActivation} />
+    <div className="w-[53px] flex items-center justify-center">
+      <Checkbox
+        checked={cartItem.is_active}
+        onCheckedChange={handleToggleActivation}
+        className={cn(
+          "h-5 w-5 border-2",
+          "bg-white",
+          "focus-visible:ring-0 focus-visible:ring-offset-0",
+          "cursor-pointer",
+          "data-[state=checked]:bg-white data-[state=checked]:border-primary",
+          "data-[state=checked]:text-primary"
         )}
-      </div>
-    </>
+      />
+    </div>
   );
 };
 
