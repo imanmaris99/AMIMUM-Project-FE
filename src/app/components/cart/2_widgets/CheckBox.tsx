@@ -39,6 +39,7 @@ const CheckBox = ({ cartItem, onChange }: CheckBoxProps) => {
           "bg-white",
           "focus-visible:ring-0 focus-visible:ring-offset-0",
           "cursor-pointer",
+          "border-black",
           "data-[state=checked]:bg-white data-[state=checked]:border-primary",
           "data-[state=checked]:text-primary"
         )}

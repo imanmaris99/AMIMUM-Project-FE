@@ -61,6 +61,7 @@ const CartUI: React.FC<CartUIProps> = ({
                 "bg-white",
                 "focus-visible:ring-0 focus-visible:ring-offset-0",
                 "cursor-pointer",
+                "border-black",
                 "data-[state=checked]:bg-white data-[state=checked]:border-primary",
                 "data-[state=checked]:text-primary",
                 isCartListLoading && "border-gray-300 data-[state=checked]:border-gray-300 data-[state=checked]:text-gray-300 cursor-not-allowed"
