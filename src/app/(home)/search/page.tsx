@@ -8,7 +8,7 @@ import Header from "@/app/components/hompage/Header_Section";
 
 const SearchPage = () => {
   const searchParams = useSearchParams();
-  const query = searchParams.get("q") || "";
+  const query = searchParams?.get("q") || "";
   const { products, isError, isLoading, errorMessage } = useSearchProduct(query);
 
   return (
