@@ -17,7 +17,7 @@ const SearchPage = () => {
         <div>
           <Header />
         </div>
-        <p className="mt-4 mx-6">Hasil pencarian untuk kata kunci <span className="font-bold">"{query}"</span></p>
+        <p className="mt-4 mx-6">Hasil pencarian untuk kata kunci <span className="font-bold">&quot;{query}&quot;</span></p>
         {isLoading ? (
           <div className="flex justify-center items-center h-32">
             <PulseLoader color="hsl(var(--primary))" size={10} />
@@ -30,7 +30,7 @@ const SearchPage = () => {
           </div>
         ) : (
           <p className="text-gray-600">
-            Tidak ada produk ditemukan untuk "{query}"
+            Tidak ada produk ditemukan untuk &quot;{query}&quot;
           </p>
         )}
       </div>
