@@ -17,12 +17,9 @@ interface CartItemProps {
 
 const CartItem = ({ cartItem, onUpdateCart, onRemoveItem }: CartItemProps) => {
   const [quantity, setQuantity] = useState(cartItem.quantity || 1);
-  // const [decrementIsLoading, setDecrementIsLoading] = useState(false);
-  // const [incrementIsLoading, setIncrementIsLoading] = useState(false);
 
   async function handleDecrement() {
     if (quantity > 1) {
-      // setDecrementIsLoading(true);
       try {
         const newQty = quantity - 1;
         setQuantity(newQty);
@@ -37,14 +34,11 @@ const CartItem = ({ cartItem, onUpdateCart, onRemoveItem }: CartItemProps) => {
         });
       } catch (error) {
         throw error;
-      } finally {
-        // setDecrementIsLoading(false);
       }
     }
   }
 
   async function handleIncrement() {
-    // setIncrementIsLoading(true);
     try {
       const newQty = quantity + 1;
       setQuantity(newQty);
@@ -59,8 +53,6 @@ const CartItem = ({ cartItem, onUpdateCart, onRemoveItem }: CartItemProps) => {
       });
     } catch (error) {
       throw error;
-    } finally {
-      // setIncrementIsLoading(false);
     }
   }
 
@@ -84,9 +76,6 @@ const CartItem = ({ cartItem, onUpdateCart, onRemoveItem }: CartItemProps) => {
           </Button>
 
           <Heading3 className="pt-0.5 w-[26px] h-5 text-center border">
-            {/* {decrementIsLoading === true || incrementIsLoading === true
-              ? "..."
-              :  */}
             {quantity}
           </Heading3>
 

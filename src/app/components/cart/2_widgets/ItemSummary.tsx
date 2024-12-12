@@ -3,8 +3,8 @@ import Heading2 from "../1_elements/Heading2";
 import Heading3 from "../1_elements/Heading3";
 import Heading1 from "../1_elements/Heading1";
 import { CartItemType } from "@/types/apiTypes";
-import Image from "next/image";
 import { deleteCartItem } from "@/services/apiService";
+import { FaRegTrashCan } from "react-icons/fa6";
 
 interface ItemSummaryProps {
   children: ReactNode;
@@ -17,16 +17,12 @@ const ItemSummary = ({
   cartItem,
   onRemoveItem,
 }: ItemSummaryProps) => {
-  // const [removeIsLoading, setRemoveIsLoading] = useState(false);
   const handleRemoveItem = async () => {
-    // setRemoveIsLoading(true);
     try {
       onRemoveItem(cartItem.id);
       await deleteCartItem({ cart_id: cartItem.id });
     } catch (error) {
       throw error;
-    } finally {
-      // setRemoveIsLoading(false);
     }
   };
   return (
@@ -38,18 +34,7 @@ const ItemSummary = ({
             {cartItem.variant_info.variant} • {cartItem.variant_info.name}
           </Heading3>
         </div>
-        {/* {removeIsLoading ? (
-          <p className="mr-3 pb-2">...</p>
-        ) : ( */}
-        <Image
-          src={"/cart/trash.svg"}
-          alt="Trash icon"
-          width={17}
-          height={20}
-          className="mr-3 pb-2 cursor-pointer"
-          onClick={handleRemoveItem}
-        />
-        {/* )} */}
+        <FaRegTrashCan className="text-3xl pb-2 cursor-pointer" onClick={handleRemoveItem} />
       </div>
       <div className="flex w-full justify-between items-center">
         <Heading1>Rp {cartItem.product_price}</Heading1>
