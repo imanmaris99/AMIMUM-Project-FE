@@ -77,7 +77,7 @@ const Search = () => {
               >
                 <div>
                   {product.all_variants.map((variant) => (
-                    <div className="flex items-center gap-2">
+                    <div key={variant.id} className="flex items-center gap-2">
                       <div className="w-10 h-10 rounded-lg flex justify-center items-center bg-gray-100 p-1">
                         <Image
                           src={variant.img || "/default-image.jpg"}
