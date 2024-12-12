@@ -5,17 +5,19 @@ import AccordionSkeleton from "@/components/ui/AccordionExpandDefault/AccordionS
 import Footer from "../../layout/Footer";
 
 const ArticleSection = () => {
-  const { articles, isLoading, isError } = useArticles();
+  const { articles, isLoading, isError, errorMessage } = useArticles();
 
-  switch (isError) {
-    case 404:
-      return <div>Data tidak ditemukan. Silakan coba lagi nanti.</div>;
-    case 409:
-      return <div>Terjadi konflik data. Silakan coba lagi nanti.</div>;
-    case 500:
-      return <div>Terjadi kesalahan server. Silakan coba lagi nanti.</div>;
-    default:
-      break;
+  if (isError) {
+    return (
+      <>
+        <div className="mx-6 mt-6">
+          <h6 className="font-semibold font-jakarta">Artikel</h6>
+        </div>
+        <div className="mx-6 mt-6 text-red-500 font-semibold">
+          {errorMessage}
+        </div>
+      </>
+    );
   }
 
   return (
@@ -26,11 +28,14 @@ const ArticleSection = () => {
 
       <div className="mx-6 mt-6 flex flex-col gap-2">
         {isLoading
-          ? Array.from({ length: 4 }, (_, index) => (
+          ? Array.from({ length: articles?.length || 4 }, (_, index) => (
               <AccordionSkeleton key={index} />
             ))
-          : articles?.map((article: ArticleProps, index: number) => (
-              <AccordionExpandDefault key={index} article={article} />
+          : articles?.map((article: ArticleProps) => (
+              <AccordionExpandDefault
+                key={article.display_id}
+                article={article}
+              />
             ))}
       </div>
 

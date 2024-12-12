@@ -7,9 +7,21 @@ export const useProductions = () => {
         errorRetryCount: 0,
     });
 
+    let errorMessage: string | null = null;
+
+    if (error) {
+        const status = error.response?.status;
+        if (status === 404) {
+            errorMessage = "Produk tidak ditemukan";
+        } else {
+            errorMessage = "Terjadi kesalahan yang tidak diketahui";
+        }
+    }
+
     return {
         productions: data || null,
         isLoading: !error && !data,
-        isError: error?.response?.status,
+        isError: !!error,
+        errorMessage,
     }
 };

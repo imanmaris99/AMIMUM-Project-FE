@@ -11,7 +11,7 @@ import Image from "next/image";
 
 const Search = () => {
   const [search, setSearch] = useState("");
-  const { products, isError, isLoading } = useSearchProduct(search);
+  const { products, isError, isLoading, errorMessage } = useSearchProduct(search);
   const [showDropdown, setShowDropdown] = useState(false);
   const router = useRouter();
   const searchRef = useRef<HTMLDivElement>(null);
@@ -67,7 +67,7 @@ const Search = () => {
               <PulseLoader color="hsl(var(--primary))" size={10} />
             </li>
           ) : isError ? (
-            <li className="p-2 text-gray-500 flex justify-center">{isError}</li>
+            <li className="p-2 text-gray-500 flex justify-center">{errorMessage}</li>
           ) : (
             products?.map((product: CardProductProps) => (
               <li

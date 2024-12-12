@@ -9,7 +9,7 @@ import Header from "@/app/components/hompage/Header_Section";
 const SearchPage = () => {
   const searchParams = useSearchParams();
   const query = searchParams.get("q" || "");
-  const { products, isError, isLoading } = useSearchProduct(query || "");
+  const { products, isError, isLoading, errorMessage } = useSearchProduct(query || "");
 
   return (
     <main>
@@ -23,7 +23,7 @@ const SearchPage = () => {
             <PulseLoader color="hsl(var(--primary))" size={10} />
           </div>
         ) : isError ? (
-          <p className="text-gray-500 text-center mt-4">{isError}</p>
+          <p className="text-gray-500 text-center mt-4">{errorMessage}</p>
         ) : products && products.length > 0 ? (
           <div className="mx-6">
             <ListProductSection products={products} />

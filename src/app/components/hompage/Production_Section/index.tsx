@@ -7,13 +7,12 @@ import { useProductions } from "@/app/hooks/useProductions";
 import { ProductionProps } from "@/app/components/hompage/Production_Section/types";
 import ProductionCardSkeleton from "@/app/components/hompage/ProductionCard/ProductionCardSkeleton";
 
-
 const Production = ({
   selectedCategory,
 }: {
   selectedCategory: string | null;
 }) => {
-  const { productions, isLoading, isError } = useProductions();
+  const { productions, isLoading, isError, errorMessage } = useProductions();
   const [visibleItems, setVisibleItems] = useState(8);
 
   const filteredProductions = selectedCategory
@@ -27,15 +26,17 @@ const Production = ({
     setVisibleItems((prevVisibleItems) => prevVisibleItems + 9);
   };
 
-  switch (isError) {
-    case 404:
-      return <div>Data tidak ditemukan. Silakan coba lagi nanti.</div>;
-    case 409:
-      return <div>Terjadi konflik data. Silakan coba lagi nanti.</div>;
-    case 500:
-      return <div>Terjadi kesalahan server. Silakan coba lagi nanti.</div>;
-    default:
-      break;
+  if (isError) {
+    return (
+      <>
+        <div className="mx-6 mt-6">
+          <h6 className="font-semibold font-jakarta">Produksi oleh</h6>
+        </div>
+        <div className="mx-6 mt-6 text-red-500 font-semibold">
+          {errorMessage}
+        </div>
+      </>
+    );
   }
 
   return (
@@ -75,7 +76,11 @@ const Production = ({
 
               <div>
                 <button className="text-sm">
-                  Muat Lainnya ({filteredProductions ? filteredProductions.length - visibleItems : 0})
+                  Muat Lainnya (
+                  {filteredProductions
+                    ? filteredProductions.length - visibleItems
+                    : 0}
+                  )
                 </button>
               </div>
             </div>
