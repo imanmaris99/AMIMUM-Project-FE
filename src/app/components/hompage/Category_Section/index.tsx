@@ -1,25 +1,31 @@
 "use client";
 
-import { useState } from "react";
 import { Tag, TagSkeleton } from "@/app/components/common/Tag";
 import { useCategories } from "@/app/hooks/useCategories";
 import { CategoryProps } from "@/app/components/hompage/Category_Section/types";
 
-const Category = () => {
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const { categories, isLoading, isError } = useCategories();
+const Category = ({
+  selectedCategory,
+  setSelectedCategory,
+}: {
+  selectedCategory: string | null;
+  setSelectedCategory: (category: string | null) => void;
+}) => {
+  const { categories, isLoading, isError, errorMessage } = useCategories();
 
   if (isLoading) return <TagSkeleton />;
 
-  switch (isError) {
-    case 404:
-      return <div>Data tidak ditemukan. Silakan coba lagi nanti.</div>;
-    case 409:
-      return <div>Terjadi konflik data. Silakan coba lagi nanti.</div>;
-    case 500:
-      return <div>Terjadi kesalahan server. Silakan coba lagi nanti.</div>;
-    default:
-      break;
+  if (isError) {
+    return (
+      <>
+        <div className="mx-6 mt-6">
+          <h6 className="font-semibold font-jakarta">Kategori</h6>
+        </div>
+        <div className="mx-6 mt-6 text-red-500 font-semibold">
+          {errorMessage}
+        </div>
+      </>
+    );
   }
 
   return (
@@ -34,7 +40,11 @@ const Category = () => {
             key={index}
             title={category.name}
             isSelected={selectedCategory === category.name}
-            onClick={() => setSelectedCategory(category.name)}
+            onClick={() =>
+              setSelectedCategory(
+                selectedCategory === category.name ? null : category.name
+              )
+            }
           />
         ))}
       </div>
