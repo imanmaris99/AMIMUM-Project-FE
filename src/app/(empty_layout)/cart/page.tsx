@@ -15,7 +15,6 @@ import React, { useEffect, useState } from "react";
 
 const Cart = () => {
   const [selectAll, setSelectAll] = useState(false);
-  // const [isSelectAllLoading, setIsSelectAllLoading] = useState(false);
   const [cartResponse, setCartResponse] = useState<CartResponseType>({
     status_code: 0,
     message: "",
@@ -47,7 +46,6 @@ const Cart = () => {
   };
 
   const handleToggleAllActivation = async () => {
-    // setIsSelectAllLoading(true);
     const newSelectAll = !selectAll;
     try {
       const updatedCartList = toggleSelectAll(cartResponse.data, newSelectAll);
@@ -62,7 +60,6 @@ const Cart = () => {
     } catch (error) {
       throw error;
     } finally {
-      // setIsSelectAllLoading(false);
     }
   };
 
@@ -85,7 +82,6 @@ const Cart = () => {
         selectAll={selectAll}
         onToggleAllActivation={handleToggleAllActivation}
         onUpdateCart={handleUpdateCart}
-        // isSelectAllLoading={isSelectAllLoading}
         onRemoveItem={handleRemoveItem}
       />
     </>

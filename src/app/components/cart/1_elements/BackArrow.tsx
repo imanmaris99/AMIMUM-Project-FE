@@ -1,19 +1,15 @@
 import React from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { IoChevronBack } from "react-icons/io5";
 
 const BackArrow = () => {
   const router = useRouter();
 
   return (
     <div className="w-1/3 flex self-end pl-5">
-      <Image
-        src={"/cart/leftarrow.svg"}
-        alt="Back to the previous page"
-        width={32}
-        height={32}
+      <IoChevronBack
+        className="text-3xl cursor-pointer"
         onClick={router.back}
-        className="cursor-pointer"
       />
     </div>
   );
