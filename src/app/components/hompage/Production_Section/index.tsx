@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { ProductionCard } from "@/app/components";
 import { GoChevronDown } from "react-icons/go";
-import { useProductions } from "@/hooks/useProductions";
-import { ProductionProps } from "@/types/apiTypes";
+import { useProductions } from "@/app/hooks/useProductions";
+import { ProductionProps } from "@/app/components/hompage/ProductionCard/types";
 import ProductionCardSkeleton from "@/app/components/hompage/ProductionCard/ProductionCardSkeleton";
 
 const Production = () => {
@@ -32,7 +32,7 @@ const Production = () => {
         <h6 className="font-semibold font-jakarta">Produksi oleh</h6>
       </div>
 
-      <div className="mx-6 mt-6 mb-6 grid grid-cols-3 gap-4">
+      <div className="mx-6 mt-6 mb-6 grid grid-cols-3 gap-4 justify-items-center">
         {isLoading ? (
           [...Array(9)].map((_, index) => <ProductionCardSkeleton key={index} />)
         ) : (
