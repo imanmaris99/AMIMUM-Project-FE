@@ -1,3 +1,5 @@
+"use client";
+
 import useSWR from "swr";
 import { getTotalCartItems } from "@/lib/api/cart";
 

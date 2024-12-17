@@ -1,3 +1,5 @@
+"use client";
+
 import useSWR from "swr";
 import { fetchPromo } from "@/lib/api/brand";
 

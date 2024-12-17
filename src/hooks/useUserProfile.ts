@@ -1,3 +1,5 @@
+"use client";
+
 import useSWR from "swr";
 import { fetchUserProfile } from "@/lib/api/user-customers";
 
