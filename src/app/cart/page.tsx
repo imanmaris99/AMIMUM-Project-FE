@@ -8,8 +8,8 @@ import {
   updateCartItem,
 } from "@/helper/cart";
 import { useCart } from "@/hooks/useCart";
-import { editCartAllActive } from "@/services/apiService";
-import { CartItemType, CartResponseType } from "@/types/apiTypes";
+import { editCartAllActive } from "@/lib/api/cart";
+import { CartItemType, CartResponseType } from "@/interfaces/cart";
 
 import React, { useEffect, useState } from "react";
 

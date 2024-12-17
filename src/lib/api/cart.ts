@@ -4,52 +4,7 @@ import {
   CartItemQtyPayload,
   CartResponseType,
   TotalCartItemsResponseType,
-} from "@/types/apiTypes";
-
-export const fetchCategories = async () => {
-  try {
-    const response = await axiosClient.get("/categories/all");
-    return response.data ? response.data : response;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const fetchUserProfile = async () => {
-  try {
-    const response = await axiosClient.get("/user/profile");
-    return response.data ? response.data : response;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const fetchPromo = async () => {
-  try {
-    const response = await axiosClient.get("/production/promo");
-    return response.data ? response.data : response;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const fetchProduction = async () => {
-  try {
-    const response = await axiosClient.get("/production/all");
-    return response.data ? response.data : response;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const fetchArticles = async () => {
-  try {
-    const response = await axiosClient.get("/articles/all");
-    return response.data ? response.data : response;
-  } catch (error) {
-    throw error;
-  }
-};
+} from "@/interfaces/cart";
 
 export const getCart = async () => {
   try {
@@ -85,12 +40,10 @@ export const editCartQty = async (updatedCartItem: CartItemQtyPayload) => {
 
 export const editCartActive = async (updatedCartItem: CartItemActPayload) => {
   try {
-    // console.log("HELLO!");
     const response = await axiosClient.put(
       `/cart/update-activate/:cart_id`,
       updatedCartItem
     );
-    // console.log(response);
     return response ? response.data : null;
   } catch (error) {
     throw error;

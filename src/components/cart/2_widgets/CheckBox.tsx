@@ -1,6 +1,6 @@
-import { CartItemType } from "@/types/apiTypes";
+import { CartItemType } from "@/interfaces/home";
 import React from "react";
-import { editCartActive } from "@/services/apiService";
+import { editCartActive } from "@/lib/api/cart";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 

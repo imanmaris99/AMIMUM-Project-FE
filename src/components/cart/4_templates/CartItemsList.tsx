@@ -1,4 +1,4 @@
-import { CartItemType } from "@/types/apiTypes";
+import { CartItemType } from "@/interfaces/cart";
 import React from "react";
 import CartItem from "../3_modules/CartItem";
 import CartItemSkeleton from "../3_modules/CartItemSkeleton";

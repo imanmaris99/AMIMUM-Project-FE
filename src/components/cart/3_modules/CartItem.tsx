@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import ProductImage from "../1_elements/ProductImage";
 import Button from "../1_elements/Button";
 import Heading3 from "../1_elements/Heading3";
-import { CartItemType } from "@/types/apiTypes";
+import { CartItemType } from "@/interfaces/home";
 import ItemSummary from "../2_widgets/ItemSummary";
 import CheckBox from "../2_widgets/CheckBox";
-import { editCartQty } from "@/services/apiService";
+import { editCartQty } from "@/lib/api/cart";
 
 interface CartItemProps {
   cartItem: CartItemType;

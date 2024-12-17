@@ -5,7 +5,7 @@ import CartItemsList from "@/components/cart/4_templates/CartItemsList";
 import CartSummary from "@/components/cart/3_modules/CartSummary";
 import Button from "@/components/cart/1_elements/Button";
 import BottomBar from "@/components/cart/2_widgets/BottomBar";
-import { CartResponseType, CartItemType } from "@/types/apiTypes";
+import { CartResponseType, CartItemType } from "@/interfaces/cart";
 import CartSummarySkeleton from "../3_modules/CartSummarySkeleton";
 import { useRouter } from "next/navigation";
 import { Checkbox } from "@/components/ui/checkbox";

@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { fetchUserProfile } from "@/API/user-customers";
+import { fetchUserProfile } from "@/lib/api/user-customers";
 
 export const useUserProfile = () => {
     const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null

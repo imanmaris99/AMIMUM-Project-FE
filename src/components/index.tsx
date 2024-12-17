@@ -12,4 +12,4 @@ export {default as CategorySection} from "./hompage/Category_Section"
 export {default as FAQSection} from "./hompage/Article_Section"
 export { default as HeaderRegister } from "./register/HeaderRegister";
 export { default as RegisterForm } from "./register/RegisterForm";
-export {default as HeaderLogin } from "./HeaderLogin"
+export {default as HeaderLogin } from "./register/HeaderLogin"

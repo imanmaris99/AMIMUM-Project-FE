@@ -2,7 +2,7 @@
 import "../globals.css";
 import { Navbar } from "../../components";
 
-export default function RootLayout({
+export default function NavbarLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

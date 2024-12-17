@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { PhoneInput } from "@/components/ui/phone-input";
-import { postRegister } from "@/API/register";
+import { postRegister } from "@/lib/api/register";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import toast, { Toaster } from 'react-hot-toast';

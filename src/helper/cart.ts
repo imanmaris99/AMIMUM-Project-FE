@@ -1,4 +1,4 @@
-import { CartItemType } from "@/types/apiTypes";
+import { CartItemType } from "@/interfaces/cart";
 
 export const recalculateCartTotals = (cartList: CartItemType[]) => {
   const all_item_active_prices = cartList

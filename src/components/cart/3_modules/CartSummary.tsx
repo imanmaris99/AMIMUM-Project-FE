@@ -1,7 +1,7 @@
 import React from "react";
 import CartSummaryBox from "../2_widgets/CartSummaryBox";
 import Heading1 from "../1_elements/Heading1";
-import { CartResponseType } from "@/types/apiTypes";
+import { CartResponseType } from "@/interfaces/home";
 
 interface CartSummaryProps {
   cartResponse: CartResponseType | null;
