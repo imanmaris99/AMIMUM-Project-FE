@@ -1,4 +1,4 @@
-import { CartItemType } from "@/interfaces/home";
+import { CartItemType } from "@/interfaces/cart";
 import React from "react";
 import { editCartActive } from "@/lib/api/cart";
 import { Checkbox } from "@/components/ui/checkbox";
