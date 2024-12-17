@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+
 import styles from "./Carousel.module.css";
 
 interface CarouselProps {
@@ -48,7 +49,9 @@ const Carousel = ({ items, itemsToShow, interval = 4000 }: CarouselProps) => {
           {Array.from({ length: Math.ceil(items.length / itemsToShow) }).map(
             (_, index) => (
               <button
+                type="button"
                 key={index}
+                aria-label={`Go to slide ${index + 1}`}
                 className={`w-2 h-2 rounded-full mx-1 mt-2 ${
                   index === Math.floor(currentIndex / itemsToShow)
                     ? "bg-primary"
