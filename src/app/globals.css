@@ -2,13 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-.font-jakarta {
+/* .font-jakarta {
   font-family: "Plus Jakarta Sans", sans-serif;
 }
 
 .font-inter {
   font-family: "Inter", sans-serif;
-}
+} */
 
 body {
   display: flex;
