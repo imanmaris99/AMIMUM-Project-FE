@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import Heading2 from "../1_elements/Heading2";
 import Heading3 from "../1_elements/Heading3";
 import Heading1 from "../1_elements/Heading1";
-import { CartItemType } from "@/interfaces/home";
+import { CartItemType } from "@/interfaces/cart";
 import { deleteCartItem } from "@/lib/api/cart";
 import { FaRegTrashCan } from "react-icons/fa6";
 
