@@ -2,7 +2,7 @@ import { FiPackage, FiLayers, FiAlertCircle } from "react-icons/fi";
 import { VariantType } from "@/types/detailProduct";
 
 interface ProductInformationProps {
-  data: VariantType | undefined;
+  datavariant: VariantType | undefined;
   isError: number;
   isLoading: boolean;
 }
@@ -10,7 +10,7 @@ interface ProductInformationProps {
 const ProductInformation = ({
   isError,
   isLoading,
-  data,
+  datavariant,
 }: ProductInformationProps) => {
   if (isLoading) {
     return <div>Loading...</div>;
@@ -54,11 +54,11 @@ const ProductInformation = ({
         </div>
         <div className="flex items-center space-x-2">
           <FiLayers className="text-gray-500" />
-          <span>Stock: {data?.stock} pack</span>
+          <span>Stock: {datavariant?.stock} pack</span>
         </div>
         <div className="flex items-center space-x-2">
           <FiAlertCircle className="text-gray-500" />
-          <span>Baik dikonsumsi hingga {data?.expiration}</span>
+          <span>Baik dikonsumsi hingga {datavariant?.expiration}</span>
         </div>
       </div>
       <hr className="mt-4" />

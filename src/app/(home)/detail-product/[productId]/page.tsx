@@ -23,14 +23,19 @@ const DetailProduct = ({ params }: { params: { productId: string } }) => {
       <ProductInformation
         isLoading={isLoading}
         isError={isError}
-        data={detailProduct?.variants_list[0]}
+        datavariant={detailProduct?.variants_list[0]}
       />
       <ProductDescription
         isLoading={isLoading}
         isError={isError}
         data={detailProduct}
       />
-      <ProductPrice />
+      <ProductPrice
+        isLoading={isLoading}
+        isError={isError}
+        data={detailProduct}
+        datavariant={detailProduct?.variants_list[0]}
+      />
     </main>
   );
 };
