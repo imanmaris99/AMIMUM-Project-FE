@@ -31,7 +31,7 @@ const Header = () => {
                 <h4 className="font-bold text-xl font-jakarta">
                   di Toko Herbal <span className="text-primary">AmImUm</span>
                 </h4>
-                <div className="w-full">
+                <div className="w-full mt-4">
                   <Link href="/login">
                     <Button
                       variant="secondary"
