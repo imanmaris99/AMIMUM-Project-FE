@@ -1,4 +1,5 @@
-import { IoBagOutline, IoNotificationsOutline } from "react-icons/io5";
+import { IoNotificationsOutline } from "react-icons/io5";
+import { FiShoppingCart } from "react-icons/fi";
 import { Search } from "@/app/components";
 import { useUserProfile } from "@/app/hooks/useUserProfile";
 import { SkeletonHeader } from "./SkeletonHeader";
@@ -7,19 +8,14 @@ import Image from "next/image";
 import Link from "next/link";
 
 const Header = () => {
-  const { user, isLoading, isError } = useUserProfile();
+  const { user, isLoading, isError, errorMessage } = useUserProfile();
 
   if (isError) {
-    switch (isError) {
-      case 404:
-        return <div>Data tidak ditemukan. Silakan coba lagi nanti.</div>;
-      case 409:
-        return <div>Terjadi konflik data. Silakan coba lagi nanti.</div>;
-      case 500:
-        return <div>Terjadi kesalahan server. Silakan coba lagi nanti.</div>;
-      default:
-        break;
-    }
+    return (
+      <div className="mt-14 mx-6 text-red-500 font-semibold">
+        {errorMessage}
+      </div>
+    );
   }
 
   return (
@@ -35,7 +31,7 @@ const Header = () => {
                 <h4 className="font-bold text-xl font-jakarta">
                   di Toko Herbal <span className="text-primary">AmImUm</span>
                 </h4>
-                <div className="w-full">
+                <div className="w-full mt-4">
                   <Link href="/login">
                     <Button
                       variant="secondary"
@@ -58,17 +54,17 @@ const Header = () => {
 
           <div className="flex justify-center items-center gap-3">
             {!user ? (
-              <Image src="/logo_toko.png" alt="logo" width={100} height={125} priority />
+              <Image src="/Logo_toko.png" alt="logo" width={100} height={125} priority />
             ) : (
               <>
-                <IoBagOutline size={32} />
+                <FiShoppingCart size={32} style={{ strokeWidth: 1.5 }} />
                 <IoNotificationsOutline size={32} />
               </>
             )}
           </div>
         </div>
 
-        <div className="mx-6 mt-6">
+        <div className="mx-6 mt-3">
           <Search />
         </div>
       </header>

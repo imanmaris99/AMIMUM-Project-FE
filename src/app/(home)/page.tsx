@@ -5,18 +5,18 @@ import Promo from "../components/hompage/Promo_Section";
 import Category from "../components/hompage/Category_Section";
 import Production from "../components/hompage/Production_Section";
 import ArticleSection from "../components/hompage/Article_Section";
-// import ListProductSection from "../components/hompage/List_Product_Section";
+import { useState } from "react";
 
 const Home = () => {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   return (
-    <main className="pb-20">
+    <div className="pb-20">
       <Header />
       <Promo />
-      <Category />
-      {/* <ListProductSection /> */}
-      <Production />
+      <Category selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
+      <Production selectedCategory={selectedCategory} />
       <ArticleSection />
-    </main>
+    </div>
   );
 };
 
