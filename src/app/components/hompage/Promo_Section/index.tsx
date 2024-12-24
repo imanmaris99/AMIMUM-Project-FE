@@ -4,21 +4,23 @@ import PromoCardSkeleton from "@/app/components/hompage/PromoCard/PromoCardSkele
 import { PromoProps } from "./types";
 
 const Promo = () => {
-  const { promo, isLoading, isError } = usePromo();
+  const { promo, isLoading, isError, errorMessage } = usePromo();
 
   if (!promo || promo.length === 0) {
     return null;
   }
 
-  switch (isError) {
-    case 404:
-      return <div>Data tidak ditemukan. Silakan coba lagi nanti.</div>;
-    case 409:
-      return <div>Terjadi konflik data. Silakan coba lagi nanti.</div>;
-    case 500:
-      return <div>Terjadi kesalahan server. Silakan coba lagi nanti.</div>;
-    default:
-      break;
+  if (isError) {
+    return (
+      <>
+        <div className="mx-6 mt-6">
+          <h6 className="font-semibold font-jakarta">Promo spesial</h6>
+        </div>
+        <div className="mx-6 mt-6 text-red-500 font-semibold">
+          {errorMessage}
+        </div>
+      </>
+    );
   }
 
   return (
