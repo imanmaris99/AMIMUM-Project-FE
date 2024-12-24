@@ -54,7 +54,7 @@ const Header = () => {
 
           <div className="flex justify-center items-center gap-3">
             {!user ? (
-              <Image src="/logo_toko.png" alt="logo" width={100} height={125} priority />
+              <Image src="/Logo_toko.png" alt="logo" width={100} height={125} priority />
             ) : (
               <>
                 <FiShoppingCart size={32} style={{ strokeWidth: 1.5 }} />
@@ -64,7 +64,7 @@ const Header = () => {
           </div>
         </div>
 
-        <div className="mx-6 mt-6">
+        <div className="mx-6 mt-3">
           <Search />
         </div>
       </header>
