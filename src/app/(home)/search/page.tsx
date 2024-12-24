@@ -12,11 +12,8 @@ const SearchPage = () => {
   const { products, isError, isLoading, errorMessage } = useSearchProduct(query);
 
   return (
-    <main>
-      <div>
-        <div>
-          <Header />
-        </div>
+    <div className="pb-20">
+      <Header />
         <p className="mt-4 mx-6">Hasil pencarian untuk kata kunci <span className="font-bold">&quot;{query}&quot;</span></p>
         {isLoading ? (
           <div className="flex justify-center items-center h-32">
@@ -33,8 +30,7 @@ const SearchPage = () => {
             Tidak ada produk ditemukan untuk &quot;{query}&quot;
           </p>
         )}
-      </div>
-    </main>
+    </div>
   );
 };
 
