@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import FormVerifyAccount from "@/app/components/FormVerifyAccount";
 
 const VerifyAccount = () => {
   return (
-    <div>VerifyAccount</div>
-  )
-}
+    <div>
+      <FormVerifyAccount />
+    </div>
+  );
+};
 
-export default VerifyAccount
+export default VerifyAccount;
