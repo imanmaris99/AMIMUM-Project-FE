@@ -8,7 +8,7 @@ interface SearchDropdownProps {
   isLoading: boolean;
   isError: boolean;
   errorMessage: string;
-  handleSelectProduct: (productId: string) => void;
+  handleSelectProduct: (productName: string) => void;
 }
 
 const SearchDropdown: React.FC<SearchDropdownProps> = ({
@@ -33,7 +33,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
           <li
             key={product.id}
             className="p-2 hover:bg-gray-100 cursor-pointer"
-            onClick={() => handleSelectProduct(product.id)}
+            onClick={() => handleSelectProduct(product.name)}
           >
             <div>
               {product.all_variants.map((variant) => (

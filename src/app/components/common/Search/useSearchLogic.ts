@@ -15,8 +15,8 @@ const useSearchLogic = () => {
     }
   };
 
-  const handleSelectProduct = (productId: string) => {
-    router.push(`/detail-product/${productId}`);
+  const handleSelectProduct = (productName: string) => {
+    router.push(`/product/${productName}`);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

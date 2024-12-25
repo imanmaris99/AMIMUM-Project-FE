@@ -2,13 +2,10 @@ import Image from "next/image";
 import { GoHeart } from "react-icons/go";
 import { CardProductProps } from "./types";
 import rupiahFormater from "@/utils/rupiahFormater";
-import useSearchLogic from '../useSearchLogic';
 
 const CardProduct = ({product}: {product: CardProductProps}) => {
-  const { handleSelectProduct } = useSearchLogic();
-
   return (
-    <div onClick={() => handleSelectProduct(product.id)} className="w-40 h-56 rounded-lg shadow-md flex flex-col justify-center items-center gap-2 relative cursor-pointer">
+    <div className="w-40 h-56 rounded-lg shadow-md flex flex-col justify-center items-center gap-2 relative">
       <div className="absolute top-2 right-2">
         <GoHeart size={25} className="bg-white rounded-full" />
       </div>
