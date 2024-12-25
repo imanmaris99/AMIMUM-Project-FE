@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { useBrandDetailById } from "@/app/hooks/useBrandDetailById";
 import SkeletonLoader from "./SkeletonLoader";
-import Button from "@mui/material/Button";
 
 const DetailBrand = ({ brandDetailId }: { brandDetailId: number }) => {
   const { brandDetailById, isLoading } = useBrandDetailById(brandDetailId);
