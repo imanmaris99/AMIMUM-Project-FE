@@ -1,6 +1,5 @@
 import { IoNotificationsOutline } from "react-icons/io5";
 import { FiShoppingCart } from "react-icons/fi";
-import { Search } from "@/app/components";
 import { useUserProfile } from "@/app/hooks/useUserProfile";
 import { SkeletonHeader } from "./SkeletonHeader";
 import { Button } from "@/components/ui/button";
@@ -54,7 +53,13 @@ const Header = () => {
 
           <div className="flex justify-center items-center gap-3">
             {!user ? (
-              <Image src="/Logo_toko.png" alt="logo" width={100} height={125} priority />
+              <Image
+                src="/Logo_toko.png"
+                alt="logo"
+                width={100}
+                height={125}
+                priority
+              />
             ) : (
               <>
                 <FiShoppingCart size={32} style={{ strokeWidth: 1.5 }} />
@@ -62,10 +67,6 @@ const Header = () => {
               </>
             )}
           </div>
-        </div>
-
-        <div className="mx-6 mt-3">
-          <Search />
         </div>
       </header>
     </>
