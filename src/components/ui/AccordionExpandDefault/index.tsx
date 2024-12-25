@@ -28,7 +28,7 @@ export default function AccordionExpandDefault({ article }: { article: ArticlePr
           aria-controls="panel1-content"
           id="panel1-header"
         >
-          <Typography style={{ fontWeight: 'bold' }} className="font-jakarta">{article.title}</Typography>
+          <Typography className="font-bold font-jakarta">{article.title}</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Typography
