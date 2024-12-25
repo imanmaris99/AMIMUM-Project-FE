@@ -64,9 +64,9 @@ const Header = () => {
           </div>
         </div>
 
-        <div className="mx-6 mt-3">
+        {/* <div className="mx-6 mt-3">
           <Search />
-        </div>
+        </div> */}
       </header>
     </>
   );
