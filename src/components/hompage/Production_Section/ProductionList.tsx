@@ -1,6 +1,6 @@
 import React from "react";
 import { ProductionCard } from "@/components";
-import { ProductionProps } from "@/onents/hompage/Production_Section/types";
+import { ProductionProps } from "./types";
 
 const ProductionList = ({ productions, visibleItems }: { productions: ProductionProps[] | undefined; visibleItems: number }) => (
   <>
