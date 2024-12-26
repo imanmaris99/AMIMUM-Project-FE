@@ -1,8 +1,9 @@
 import useSWR from "swr";
 import { GetProductByBrandId } from "@/API/product";
+import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 
 export const useProductByBrandId = (brandId: number) => {
-    const { data, error } = useSWR(`/product/production/${brandId}`, () => GetProductByBrandId(brandId), {
+    const { data, error } = useSWR<CardProductProps[]>(`/product/production/${brandId}`, () => GetProductByBrandId(brandId), {
         errorRetryCount: 0,
     });
     let errorMessage: string | null = null;

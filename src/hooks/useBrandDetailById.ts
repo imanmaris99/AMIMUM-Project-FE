@@ -9,7 +9,7 @@ export const useBrandDetailById = (brandDetailId: number) => {
     if (error) {
         const status = error.response?.status;
         if (status === 404) {
-            errorMessage = "Detail brand tidak ditemukan.";
+            errorMessage = "Detail merek tidak ditemukan.";
         } else {
             errorMessage = "Terjadi kesalahan yang tidak diketahui";
         }

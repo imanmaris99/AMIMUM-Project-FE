@@ -1,6 +1,6 @@
 import useSWR from "swr";
 import { fetchProduction } from "@/API/brand";
-import { ProductionProps } from "../components/hompage/Production_Section/types";
+import { ProductionProps } from "@/components/homepage/Production_Section/types";
 
 export const useProductions = () => {
   const { data, error } = useSWR<ProductionProps[]>("/brand/all", fetchProduction, {
