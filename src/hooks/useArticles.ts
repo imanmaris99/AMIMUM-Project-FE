@@ -1,6 +1,6 @@
 import useSWR from "swr";
 import { fetchArticles } from "@/API/articles";
-import { ArticleProps } from "../components/hompage/Article_Section/types";
+import { ArticleProps } from "@/components/homepage/Article_Section/types";
 
 export const useArticles = () => {
   const { data, error } = useSWR<ArticleProps[]>("/articles/all", fetchArticles, {
