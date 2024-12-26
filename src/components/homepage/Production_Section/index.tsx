@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useProductions } from "@/hooks/useProductions";
-import ProductionCardSkeleton from "@/components/hompage/ProductionCard/ProductionCardSkeleton";
+import ProductionCardSkeleton from "@/components/homepage/ProductionCard/ProductionCardSkeleton";
 import getFilteredProductions from "@/utils/getFilteredProductions";
 import LoadMoreButton from "./LoadMoreButton";
 import ProductionList from "./ProductionList";

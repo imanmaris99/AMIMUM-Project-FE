@@ -2,10 +2,13 @@ import Image from "next/image";
 import { GoHeart } from "react-icons/go";
 import { CardProductProps } from "./types";
 import rupiahFormater from "@/utils/rupiahFormater";
+import useSearchLogic from "../useSearchLogic";
 
-const CardProduct = ({product}: {product: CardProductProps}) => {
+const CardProduct = ({ product }: { product: CardProductProps }) => {
+  const { handleSelectProduct } = useSearchLogic();
+
   return (
-    <div className="w-40 h-56 rounded-lg shadow-md flex flex-col justify-center items-center gap-2 relative">
+    <div onClick={() => handleSelectProduct(product.id)} className="w-40 h-56 rounded-lg shadow-md flex flex-col justify-center items-center gap-2 relative">
       <div className="absolute top-2 right-2">
         <GoHeart size={25} className="bg-white rounded-full" />
       </div>
@@ -25,7 +28,9 @@ const CardProduct = ({product}: {product: CardProductProps}) => {
       </div>
       <div className="flex flex-col justify-center w-32 min-h-20">
         <div className="space-y-1">
-          <p className="font-bold text-xs whitespace-nowrap overflow-hidden text-ellipsis">{product.name}</p>
+          <p className="font-bold text-xs whitespace-nowrap overflow-hidden text-ellipsis">
+            {product.name}
+          </p>
           {product.all_variants.map((variant) => (
             <div key={variant.id} className="space-y-1">
               <p className="text-gray-500 text-[10px]">{variant.variant}</p>
@@ -46,7 +51,11 @@ const CardProduct = ({product}: {product: CardProductProps}) => {
                 )}
               </div>
               <p className="font-bold text-sm mt-2">
-                {rupiahFormater(variant.discount > 0 ? variant.discounted_price : product.price)}
+                {rupiahFormater(
+                  variant.discount > 0
+                    ? variant.discounted_price
+                    : product.price
+                )}
               </p>
             </div>
           ))}

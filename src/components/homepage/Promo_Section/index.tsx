@@ -1,6 +1,6 @@
 import { Carousel, PromoCard } from "@/components";
 import { usePromo } from "@/hooks/usePromo";
-import PromoCardSkeleton from "@/components/hompage/PromoCard/PromoCardSkeleton";
+import PromoCardSkeleton from "@/components/homepage/PromoCard/PromoCardSkeleton";
 import { PromoProps } from "./types";
 
 const Promo = () => {
