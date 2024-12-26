@@ -30,7 +30,7 @@ const Search = () => {
           value={search}
           onChange={handleInputChange}
         />
-        <Button onClick={handleSearch} variant="default">
+        <Button onClick={handleSearch} variant="default" disabled={!search}>
           Cari
         </Button>
       </div>

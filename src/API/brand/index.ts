@@ -18,9 +18,9 @@ export const fetchProduction = async () => {
     }
 };
 
-export const GetBrandDetailByID = async (BrandId: number) => {
+export const GetBrandDetailByID = async (BrandDetailId: number) => {
     try {
-        const response = await axiosClient.get(`/brand/detail/${BrandId}`);
+        const response = await axiosClient.get(`/brand/detail/${BrandDetailId}`);
         return response.data ? response.data : response;
     } catch (error) {
         throw error;

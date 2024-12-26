@@ -10,12 +10,16 @@ import Search from "@/components/common/Search";
 
 const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
   return (
     <div className="pb-20">
       <Header />
       <Search />
       <Promo />
-      <Category selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
+      <Category
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+      />
       <Production selectedCategory={selectedCategory} />
       <ArticleSection />
     </div>

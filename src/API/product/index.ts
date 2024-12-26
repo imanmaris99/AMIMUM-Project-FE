@@ -17,3 +17,12 @@ export const GetProductByBrandId = async (brandId: number) => {
         throw error;
     }
 }
+
+export const GetProductDiscountByBrandId = async (brandDiscountId: number) => {
+    try {
+        const response = await axiosClient.get(`/product/discount/production/${brandDiscountId}`);
+        return response.data ? response.data : response;
+    } catch (error) {
+        throw error;
+    }
+}

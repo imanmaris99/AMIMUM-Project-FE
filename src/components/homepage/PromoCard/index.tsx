@@ -1,11 +1,20 @@
+"use client"
+
 import Image from "next/image";
 import { PromoProps } from "./types";
 import styles from "./PromoCard.module.css";
+import { useRouter } from "next/navigation";
 
 const PromoCard = ({ promo }: { promo: PromoProps }) => {
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    router.push(`/promo/${promo.id}`);
+  };
+
   return (
     <>
-      <div className="bg-customGreen5 rounded-lg h-36 flex flex-col items-center justify-center w-24">
+      <div onClick={handleCardClick} className="bg-customGreen5 rounded-lg h-36 flex flex-col items-center justify-center w-24 cursor-pointer">
         <div className="bg-white rounded-lg px-3 py-2 flex flex-col justify-center items-center w-20 h-20">
           <Image src={promo.photo_url || "/default-image.jpg"} alt="promo" width={50} height={50} style={{ width: '100%', height: 'auto' }} />
         </div>
