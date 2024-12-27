@@ -38,7 +38,7 @@ const Production = ({ selectedCategory }: { selectedCategory: string | null }) =
 
       <div className="mx-6 mt-6 mb-6 grid grid-cols-3 gap-4 justify-items-center">
         {isLoading ? [...Array(9)].map((_, index) => <ProductionCardSkeleton key={index} />) : <ProductionList productions={filteredProductions} visibleItems={visibleItems} />}
-        {productions && productions.length > 6 && visibleItems < productions.length && <LoadMoreButton onClick={loadMoreItems} remainingItems={filteredProductions ? filteredProductions.length - visibleItems : 0} />}
+        {productions && filteredProductions && filteredProductions.length > 8 && visibleItems < filteredProductions.length && <LoadMoreButton onClick={loadMoreItems} remainingItems={filteredProductions.length - visibleItems} />}
       </div>
     </>
   );
