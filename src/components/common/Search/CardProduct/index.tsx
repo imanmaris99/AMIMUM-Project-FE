@@ -8,7 +8,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
   const { handleSelectProduct } = useSearchLogic();
 
   return (
-    <div onClick={() => handleSelectProduct(product.id)} className="w-40 h-56 rounded-lg shadow-md flex flex-col justify-center items-center gap-2 relative">
+    <div onClick={() => handleSelectProduct(product.id)} className="w-40 h-56 rounded-lg shadow-md flex flex-col justify-center items-center gap-2 relative cursor-pointer">
       <div className="absolute top-2 right-2">
         <GoHeart size={25} className="bg-white rounded-full" />
       </div>
