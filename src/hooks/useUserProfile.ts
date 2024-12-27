@@ -1,6 +1,6 @@
 import useSWR from "swr";
 import { fetchUserProfile } from "@/API/user-customers";
-import { UserProfileProps } from "../components/hompage/Header_Section/types";
+import { UserProfileProps } from "@/components/homepage/Header_Section/types";
 
 export const useUserProfile = () => {
   const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;

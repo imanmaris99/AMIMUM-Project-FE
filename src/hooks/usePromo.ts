@@ -1,6 +1,6 @@
 import useSWR from "swr";
 import { fetchPromo } from "@/API/brand";
-import { PromoProps } from "../components/hompage/Promo_Section/types";
+import { PromoProps } from "@/components/homepage/Promo_Section/types";
 
 export const usePromo = () => {
   const { data, error } = useSWR<PromoProps[]>("/brand/promo", fetchPromo, {

@@ -2,7 +2,7 @@
 
 import { Tag, TagSkeleton } from "@/components/common/Tag";
 import { useCategories } from "@/hooks/useCategories";
-import { CategoryProps } from "@/components/hompage/Category_Section/types";
+import { CategoryProps } from "./types";
 
 const Category = ({ selectedCategory, setSelectedCategory }: { selectedCategory: string | null; setSelectedCategory: (category: string | null) => void }) => {
   const { categories, isLoading, isError, errorMessage } = useCategories();
