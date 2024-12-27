@@ -9,12 +9,12 @@ import ProductionList from "./ProductionList";
 
 const Production = ({ selectedCategory }: { selectedCategory: string | null }) => {
   const { data: productions, loading: isLoading, errorMessage } = useBrandLoader();
-  const [visibleItems, setVisibleItems] = useState(5);
+  const [visibleItems, setVisibleItems] = useState(8);
 
   const filteredProductions = getFilteredProductions(productions || [], selectedCategory);
 
   const loadMoreItems = () => {
-    setVisibleItems((prevVisibleItems) => prevVisibleItems + 6);
+    setVisibleItems((prevVisibleItems) => prevVisibleItems + 9);
   };
 
   if (errorMessage) {
