@@ -1,26 +1,33 @@
 import useSWR from 'swr';
 import { GetBrandLoader } from '@/API/brand';
 
-const useBrandLoader = (initialSkip = 0, initialLimit = 9) => {
-    const { data, error, isLoading } = useSWR(['/brand/loader', initialSkip, initialLimit], () => GetBrandLoader(initialSkip, initialLimit));
+const useBrandLoader = (skip = 0, limit = 8) => {
+  const {
+    data: brandLoaderData,
+    error,
+    isLoading
+  } = useSWR(['/brand/loader', skip, limit], () => GetBrandLoader(skip, limit), {
+    errorRetryCount: 0,
+  });
 
-    let errorMessage: string | null = null;
+  let errorMessage: string | null = null;
 
-    if (error) {
-        const status = error.response?.status;
-        if (status === 404) {
-            errorMessage = "Merek tidak ditemukan";
-        } else {
-            errorMessage = "Terjadi kesalahan yang tidak diketahui";
-        }
+  if (error) {
+    const status = error.response?.status;
+    if (status === 404) {
+      errorMessage = 'Merek tidak ditemukan';
+    } else {
+      errorMessage = 'Terjadi kesalahan yang tidak diketahui';
     }
-    return {
-        data: data ? data.data : [],
-        remainingRecords: data ? data.data.remaining_records : 0,
-        hasMore: data ? data.data.has_more : false,
-        loading: isLoading,
-        errorMessage
-    };
+  }
+
+  return {
+    data: brandLoaderData?.data ?? [],
+    remainingRecords: brandLoaderData?.remaining_records ?? 0,
+    hasMore: brandLoaderData?.has_more ?? false,
+    loading: isLoading,
+    errorMessage
+  };
 };
 
-export default useBrandLoader; 
+export default useBrandLoader;
