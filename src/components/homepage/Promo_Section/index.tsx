@@ -16,7 +16,9 @@ const Promo = () => {
         <div className="mx-6 mt-6">
           <h6 className="font-semibold font-jakarta">Promo spesial</h6>
         </div>
-        <div className="mx-6 mt-6 text-red-500 font-semibold">{errorMessage}</div>
+        <div className="mx-6 mt-6 text-red-500 font-semibold">
+          {errorMessage}
+        </div>
       </>
     );
   }

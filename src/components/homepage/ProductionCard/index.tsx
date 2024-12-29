@@ -13,7 +13,10 @@ const ProductionCard = ({ production }: { production: ProductionProps }) => {
   };
 
   return (
-    <div onClick={handleCardClick} className="bg-white rounded-lg h-36 flex flex-col items-center justify-center w-24 shadow-md cursor-pointer">
+    <div
+      onClick={handleCardClick}
+      className="bg-white rounded-lg h-36 flex flex-col items-center justify-center w-24 shadow-md cursor-pointer"
+    >
       <div className="bg-gray-100 rounded-lg px-3 py-2 flex flex-col justify-center items-center w-20 h-20">
         <Image
           src={production.photo_url || "/default-image.jpg"}
