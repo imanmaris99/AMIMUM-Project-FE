@@ -7,7 +7,6 @@ import getFilteredProductions from "@/utils/getFilteredProductions";
 import LoadMoreButton from "./LoadMoreButton";
 import ProductionList from "./ProductionList";
 import { PulseLoader } from "react-spinners";
-
 interface ProductionProps {
   selectedCategory: string | null;
 }
@@ -28,9 +27,12 @@ const Production = ({ selectedCategory }: ProductionProps) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   useEffect(() => {
+    setProductions([]);
+  }, []);
+
+  useEffect(() => {
     if (fetchedData.length > 0) {
       setProductions((prev) => [...prev, ...fetchedData]);
-      
     }
   }, [fetchedData]);
 
@@ -43,7 +45,7 @@ const Production = ({ selectedCategory }: ProductionProps) => {
     if (!isLoading && isLoadingMore) {
       setIsLoadingMore(false);
     }
-  }, [isLoading]);
+  }, [isLoading, isLoadingMore]);
 
   const filteredProductions = getFilteredProductions(productions, selectedCategory);
 
