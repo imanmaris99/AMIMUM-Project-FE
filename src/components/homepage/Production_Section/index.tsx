@@ -1,57 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import useBrandLoader from "@/hooks/useBrandLoader";
-import ProductionCardSkeleton from "@/components/homepage/ProductionCard/ProductionCardSkeleton";
-import getFilteredProductions from "@/utils/getFilteredProductions";
-import LoadMoreButton from "./LoadMoreButton";
-import ProductionList from "./ProductionList";
-import { PulseLoader } from "react-spinners";
-import { ProductionProps } from "./types";
-import { useGetAllProductions } from '@/hooks/useProductions';
+import Productions from "./Productions";
+import LoadMoreButtonComponent from "./LoadMoreButtonComponent";
+import LoadingMore from "./LoadingMore";
+import useProductionLogic from "./useProductionLogic";
 
-const Production = ({selectedCategory}: {selectedCategory: string | null}) => {
-  const [skip, setSkip] = useState(0);
-  const limit = 8;
-
+const Production = ({
+  selectedCategory,
+}: {
+  selectedCategory: string | null;
+}) => {
   const {
-    data: fetchedData,
-    loading: isLoading,
+    productions,
+    isLoading,
     errorMessage,
     hasMore,
-    remainingRecords
-  } = useBrandLoader(skip, limit);
-
-  const [productions, setProductions] = useState<ProductionProps[]>([]);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  const { AllProductions } = useGetAllProductions();
-
-  useEffect(() => {
-    setProductions([]);
-  }, []);
-
-  useEffect(() => {
-    if (fetchedData.length > 0) {
-      setProductions((prev) => [...prev, ...fetchedData]);
-    }
-  }, [fetchedData]);
-
-  const loadMoreItems = () => {
-    setIsLoadingMore(true);
-    setSkip((prevSkip) => prevSkip + limit);
-  };
-
-  useEffect(() => {
-    if (!isLoading && isLoadingMore) {
-      setIsLoadingMore(false);
-    }
-  }, [isLoading, isLoadingMore]);
-
-  const filteredProductions = getFilteredProductions(AllProductions || [], selectedCategory);
-
-  useEffect(() => {
-  }, [productions, selectedCategory, filteredProductions]);
+    remainingRecords,
+    isLoadingMore,
+    loadMoreItems,
+    filteredProductions,
+  } = useProductionLogic(selectedCategory);
 
   if (errorMessage) {
     return (
@@ -73,37 +41,30 @@ const Production = ({selectedCategory}: {selectedCategory: string | null}) => {
       </div>
 
       <div className="mx-6 mt-6 mb-6 text-gray-500">
-        {!isLoading && filteredProductions && filteredProductions.length === 0 && (
-          <div className="text-center text-sm">
-            Tidak ada merek yang sesuai dengan kategori ini.
-          </div>
-        )}
+        {!isLoading &&
+          filteredProductions &&
+          filteredProductions.length === 0 && (
+            <div className="text-center text-sm">
+              Tidak ada merek yang sesuai dengan kategori ini.
+            </div>
+          )}
       </div>
 
       <div className="mx-6 mt-6 mb-6 grid grid-cols-3 gap-4 justify-items-center">
-        {isLoading && productions.length === 0 ? (
-          [...Array(9)].map((_, index) => (
-            <ProductionCardSkeleton key={index} />
-          ))
-        ) : (
-          <ProductionList
-            productions={filteredProductions}
-            visibleItems={productions?.length ?? 0} 
-          />
-        )}
-
-        {!isLoading && hasMore && filteredProductions && filteredProductions.length >= limit && (
-          <LoadMoreButton
-            onClick={loadMoreItems}
-            remainingItems={remainingRecords}
-          />
-        )}
-
-        {isLoadingMore && (
-          <div className="flex justify-center items-center">
-            <PulseLoader size={10} color="hsl(var(--primary))" />
-          </div>
-        )}
+        <Productions
+          isLoading={isLoading}
+          productions={productions}
+          filteredProductions={filteredProductions || []}
+        />
+        <LoadMoreButtonComponent
+          isLoading={isLoading}
+          hasMore={hasMore}
+          filteredProductions={filteredProductions || []}
+          limit={8}
+          loadMoreItems={loadMoreItems}
+          remainingRecords={remainingRecords}
+        />
+        <LoadingMore isLoadingMore={isLoadingMore} />
       </div>
     </>
   );

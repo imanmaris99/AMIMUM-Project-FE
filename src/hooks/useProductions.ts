@@ -19,7 +19,7 @@ export const useGetAllProductions = () => {
   }
 
   return {
-    AllProductions: data || null,
+    allProductions: data || null,
     isLoading: !error && !data,
     isError: !!error,
     errorMessage,
