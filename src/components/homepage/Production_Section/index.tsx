@@ -7,11 +7,10 @@ import getFilteredProductions from "@/utils/getFilteredProductions";
 import LoadMoreButton from "./LoadMoreButton";
 import ProductionList from "./ProductionList";
 import { PulseLoader } from "react-spinners";
-interface ProductionProps {
-  selectedCategory: string | null;
-}
+import { ProductionProps } from "./types";
+import { useGetAllProductions } from '@/hooks/useProductions';
 
-const Production = ({ selectedCategory }: ProductionProps) => {
+const Production = ({selectedCategory}: {selectedCategory: string | null}) => {
   const [skip, setSkip] = useState(0);
   const limit = 8;
 
@@ -23,8 +22,10 @@ const Production = ({ selectedCategory }: ProductionProps) => {
     remainingRecords
   } = useBrandLoader(skip, limit);
 
-  const [productions, setProductions] = useState<any[]>([]);
+  const [productions, setProductions] = useState<ProductionProps[]>([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const { AllProductions } = useGetAllProductions();
 
   useEffect(() => {
     setProductions([]);
@@ -47,7 +48,10 @@ const Production = ({ selectedCategory }: ProductionProps) => {
     }
   }, [isLoading, isLoadingMore]);
 
-  const filteredProductions = getFilteredProductions(productions, selectedCategory);
+  const filteredProductions = getFilteredProductions(AllProductions || [], selectedCategory);
+
+  useEffect(() => {
+  }, [productions, selectedCategory, filteredProductions]);
 
   if (errorMessage) {
     return (
@@ -84,7 +88,7 @@ const Production = ({ selectedCategory }: ProductionProps) => {
         ) : (
           <ProductionList
             productions={filteredProductions}
-            visibleItems={filteredProductions?.length ?? 0} 
+            visibleItems={productions?.length ?? 0} 
           />
         )}
 

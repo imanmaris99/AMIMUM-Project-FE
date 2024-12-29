@@ -1,6 +1,6 @@
 import axiosClient from "@/lib/axiosClient";
 
-export const fetchPromo = async () => {
+export const GetAllPromo = async () => {
     try {
         const response = await axiosClient.get("/brand/promo");
         return response.data ? response.data : response;
@@ -9,7 +9,7 @@ export const fetchPromo = async () => {
     }
 };
 
-export const fetchProduction = async () => {
+export const GetAllBrand = async () => {
     try {
         const response = await axiosClient.get("/brand/all");
         return response.data ? response.data : response;
