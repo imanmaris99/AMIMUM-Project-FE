@@ -1,6 +1,6 @@
 "use client";
 
-import { Tag, TagSkeleton } from "@/components/common/Tag";
+import { Tag, TagSkeleton } from "@/components";
 import { useCategories } from "@/hooks/useCategories";
 import { CategoryProps } from "./types";
 
