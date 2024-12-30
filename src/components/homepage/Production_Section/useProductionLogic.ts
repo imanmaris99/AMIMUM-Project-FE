@@ -3,10 +3,13 @@ import useBrandLoader from "@/hooks/useBrandLoader";
 import { useGetAllProductions } from "@/hooks/useProductions";
 import getFilteredProductions from "@/utils/getFilteredProductions";
 import { ProductionProps } from "@/components/homepage/Production_Section/types";
+import { useBrandFilteredLoader } from "@/hooks/useBrandFilteredLoader";
 
-const useProductionLogic = (selectedCategory: string | null) => {
-    const [skip, setSkip] = useState(0);
-    const limit = 8;
+const useProductionLogic = (selectedCategory: number | null) => {
+    const [brandSkip, setBrandSkip] = useState(0);
+    const [filteredSkip, setFilteredSkip] = useState(0);
+    const brandLimit = 8;
+    const filteredLimit = 8;
 
     const {
         data: fetchedData,
@@ -14,12 +17,14 @@ const useProductionLogic = (selectedCategory: string | null) => {
         errorMessage,
         hasMore,
         remainingRecords,
-    } = useBrandLoader(skip, limit);
+    } = useBrandLoader(brandSkip, brandLimit);
 
     const [productions, setProductions] = useState<ProductionProps[]>([]);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
 
     const { allProductions } = useGetAllProductions();
+
+    const { brandFilteredLoader } = useBrandFilteredLoader(selectedCategory ?? 0, filteredSkip, filteredLimit);
 
     useEffect(() => {
         setProductions([]);
@@ -33,7 +38,7 @@ const useProductionLogic = (selectedCategory: string | null) => {
 
     const loadMoreItems = () => {
         setIsLoadingMore(true);
-        setSkip((prevSkip) => prevSkip + limit);
+        setBrandSkip((prevSkip) => prevSkip + brandLimit);
     };
 
     useEffect(() => {
@@ -42,10 +47,11 @@ const useProductionLogic = (selectedCategory: string | null) => {
         }
     }, [isLoading, isLoadingMore]);
 
-    const filteredProductions = getFilteredProductions(
-        allProductions || [],
-        selectedCategory
-    );
+    const filteredProductions = selectedCategory === null
+        ? productions
+        : getFilteredProductions(
+            brandFilteredLoader || { data: [], remaining_records: 0, has_more: false },
+        );
 
     return {
         productions,

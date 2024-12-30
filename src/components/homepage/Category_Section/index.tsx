@@ -8,8 +8,8 @@ const Category = ({
   selectedCategory,
   setSelectedCategory,
 }: {
-  selectedCategory: string | null;
-  setSelectedCategory: (category: string | null) => void;
+  selectedCategory: number | null;
+  setSelectedCategory: (category: number | null) => void;
 }) => {
   const { categories, isLoading, isError, errorMessage } = useCategories();
 
@@ -39,12 +39,13 @@ const Category = ({
           <Tag
             key={index}
             title={category.name}
-            isSelected={selectedCategory === category.name}
-            onClick={() =>
-              setSelectedCategory(
-                selectedCategory === category.name ? null : category.name
-              )
-            }
+            isSelected={selectedCategory === category.id}
+            onClick={() => {
+              const newSelectedCategory =
+                selectedCategory === category.id ? null : category.id;
+              setSelectedCategory(newSelectedCategory);
+              console.log("newSelectedCategory", newSelectedCategory);
+            }}
           />
         ))}
       </div>

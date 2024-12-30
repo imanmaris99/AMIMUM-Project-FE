@@ -46,3 +46,21 @@ export const GetBrandLoader = async (skip = 0, limit = 8) => {
     }
 }
 
+export const GetBrandFilterLoader = async (categoryId: number, skip = 0, limit = 8) => {
+    try {
+        const response = await axiosClient.get(`/brand/loader/categories/${categoryId}`, {
+            params: {
+                skip,
+                limit
+            },
+        });
+        const { data, remaining_records, has_more } = response.data ? response : response.data;
+        return {
+            data,
+            remaining_records,
+            has_more
+        }
+    } catch (error) {
+        throw error;
+    }
+}

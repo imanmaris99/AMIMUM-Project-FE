@@ -4,11 +4,12 @@ import Productions from "./Productions";
 import LoadMoreButtonComponent from "./LoadMoreButtonComponent";
 import LoadingMore from "./LoadingMore";
 import useProductionLogic from "./useProductionLogic";
+import { ProductionProps } from "@/types/apiTypes";
 
 const Production = ({
   selectedCategory,
 }: {
-  selectedCategory: string | null;
+  selectedCategory: number | null;
 }) => {
   const {
     productions,
@@ -54,12 +55,12 @@ const Production = ({
         <Productions
           isLoading={isLoading}
           productions={productions}
-          filteredProductions={filteredProductions || []}
+          filteredProductions={filteredProductions as ProductionProps[]}
         />
         <LoadMoreButtonComponent
           isLoading={isLoading}
           hasMore={hasMore}
-          filteredProductions={filteredProductions || []}
+          filteredProductions={filteredProductions as ProductionProps[]}
           limit={8}
           loadMoreItems={loadMoreItems}
           remainingRecords={remainingRecords}
