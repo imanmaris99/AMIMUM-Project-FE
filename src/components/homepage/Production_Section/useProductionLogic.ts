@@ -24,7 +24,7 @@ const useProductionLogic = (selectedCategory: number | null) => {
 
     const { allProductions } = useGetAllProductions();
 
-    const { brandFilteredLoader } = useBrandFilteredLoader(selectedCategory ?? 0, filteredSkip, filteredLimit);
+    const { brandFilteredLoader } = useBrandFilteredLoader(selectedCategory ?? 1, filteredSkip, filteredLimit);
 
     useEffect(() => {
         setProductions([]);
