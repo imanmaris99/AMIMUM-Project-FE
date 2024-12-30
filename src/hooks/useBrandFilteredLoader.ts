@@ -16,7 +16,7 @@ export const useBrandFilteredLoader = (categoryId: number, skip = 0, limit = 8) 
             errorMessage = "Terjadi kesalahan yang tidak diketahui";
         }
     }
-    console.log("useBrandFilteredLoader", data);
+
     return {
         brandFilteredLoader: data,
         remainingRecords: data?.remaining_records ?? 0,
