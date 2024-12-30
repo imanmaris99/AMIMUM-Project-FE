@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import useBrandLoader from "@/hooks/useBrandLoader";
-import { useGetAllProductions } from "@/hooks/useProductions";
 import getFilteredProductions from "@/utils/getFilteredProductions";
 import { ProductionProps } from "@/components/homepage/Production_Section/types";
 import { useBrandFilteredLoader } from "@/hooks/useBrandFilteredLoader";
@@ -21,9 +20,6 @@ const useProductionLogic = (selectedCategory: number | null) => {
 
     const [productions, setProductions] = useState<ProductionProps[]>([]);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-    const { allProductions } = useGetAllProductions();
-
     const { brandFilteredLoader } = useBrandFilteredLoader(selectedCategory ?? 1, filteredSkip, filteredLimit);
 
     useEffect(() => {
