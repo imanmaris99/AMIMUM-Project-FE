@@ -41,8 +41,9 @@ const Category = ({
             title={category.name}
             isSelected={selectedCategory === category.id}
             onClick={() => {
-              selectedCategory === category.id ? null : category.id;
-              setSelectedCategory(category.id);
+              const newSelectedCategory =
+                selectedCategory === category.id ? null : category.id;
+              setSelectedCategory(newSelectedCategory);
             }}
           />
         ))}
