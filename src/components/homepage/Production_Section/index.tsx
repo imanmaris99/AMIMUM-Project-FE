@@ -5,6 +5,7 @@ import LoadMoreButtonComponent from "./LoadMoreButtonComponent";
 import LoadingMore from "./LoadingMore";
 import useProductionLogic from "./useProductionLogic";
 import { ProductionProps } from "@/types/apiTypes";
+import PulseLoader from "react-spinners/PulseLoader";
 
 const Production = ({
   selectedCategory,
@@ -14,22 +15,24 @@ const Production = ({
   const {
     productions,
     isLoading,
-    errorMessage,
     hasMore,
     remainingRecords,
     isLoadingMore,
     loadMoreItems,
     filteredProductions,
+    showError,
+    showLoading,
+    filteredErrorMessage,
   } = useProductionLogic(selectedCategory);
 
-  if (errorMessage) {
+  if (showError) {
     return (
       <>
         <div className="mx-6 mt-6">
           <h6 className="font-semibold font-jakarta">Produksi oleh</h6>
         </div>
-        <div className="mx-6 mt-6 text-red-500 font-semibold">
-          {errorMessage}
+        <div className="mx-6 mt-6 text-gray-500 text-sm flex justify-center items-center">
+          {filteredErrorMessage}
         </div>
       </>
     );
@@ -42,13 +45,11 @@ const Production = ({
       </div>
 
       <div className="mx-6 mt-6 mb-6 text-gray-500">
-        {!isLoading &&
-          filteredProductions &&
-          filteredProductions.length === 0 && (
-            <div className="text-center text-sm">
-              Tidak ada merek yang sesuai dengan kategori ini.
-            </div>
-          )}
+        {showLoading ? (
+          <div className="text-center text-sm">
+            <PulseLoader color="hsl(var(--primary))" size={10} />
+          </div>
+        ) : null}
       </div>
 
       <div className="mx-6 mt-6 mb-6 grid grid-cols-3 gap-4 justify-items-center">

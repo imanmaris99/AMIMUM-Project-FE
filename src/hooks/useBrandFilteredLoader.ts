@@ -11,7 +11,7 @@ export const useBrandFilteredLoader = (categoryId: number, skip = 0, limit = 8) 
     if (error) {
         const status = error.response?.status;
         if (status === 404) {
-            errorMessage = "Detail merek tidak ditemukan.";
+            errorMessage = "Tidak ada merek yang sesuai dengan kategori ini.";
         } else {
             errorMessage = "Terjadi kesalahan yang tidak diketahui";
         }

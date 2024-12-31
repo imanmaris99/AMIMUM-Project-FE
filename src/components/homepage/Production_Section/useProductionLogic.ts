@@ -18,7 +18,7 @@ const useProductionLogic = (selectedCategory: number | null) => {
 
     const [productions, setProductions] = useState<ProductionProps[]>([]);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const { brandFilteredLoader } = useBrandFilteredLoader(selectedCategory ?? 1, skip, limit);
+    const { errorMessage: filteredErrorMessage, brandFilteredLoader } = useBrandFilteredLoader(selectedCategory ?? 0, skip, limit);
 
     useEffect(() => {
         setProductions([]);
@@ -47,6 +47,9 @@ const useProductionLogic = (selectedCategory: number | null) => {
             brandFilteredLoader || { data: [], remaining_records: 0, has_more: false },
         );
 
+    const showError = selectedCategory !== null && (filteredErrorMessage || errorMessage);
+    const showLoading = selectedCategory !== null && (isLoading || (filteredProductions && filteredProductions.length === 0));
+
     return {
         productions,
         isLoading,
@@ -56,6 +59,9 @@ const useProductionLogic = (selectedCategory: number | null) => {
         isLoadingMore,
         loadMoreItems,
         filteredProductions,
+        showError,
+        showLoading,
+        filteredErrorMessage,
     };
 };
 
