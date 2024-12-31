@@ -9,7 +9,7 @@ import { useState } from "react";
 import Search from "@/components/common/Search";
 
 const Home = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
   return (
     <div className="pb-20">

@@ -1,6 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useCallback } from "react";
 import styles from "./Carousel.module.css";
+import useCarousel from "./useCarousel";
+import Indicator from "./Indicator";
+import CarouselItem from "./CarouselItem";
 
 interface CarouselProps {
   items: React.ReactNode[];
@@ -9,56 +13,38 @@ interface CarouselProps {
 }
 
 const Carousel = ({ items, itemsToShow, interval = 4000 }: CarouselProps) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const { activeIndex, setActiveIndex } = useCarousel(
+    items,
+    itemsToShow,
+    interval
+  );
 
-  useEffect(() => {
-    const slideInterval = setInterval(() => {
-      setCurrentIndex((prevIndex) => {
-        const nextIndex = prevIndex + itemsToShow;
-        if (nextIndex >= items.length) {
-          return 0;
-        }
-        return nextIndex;
-      });
-    }, interval);
-
-    return () => clearInterval(slideInterval);
-  }, [itemsToShow, items.length, interval]);
-
-  const handleIndicatorClick = (index: number) => {
-    setCurrentIndex(index * itemsToShow);
-  };
+  const handleIndicatorClick = useCallback(
+    (index: number) => {
+      setActiveIndex(index * itemsToShow);
+    },
+    [itemsToShow]
+  );
 
   return (
     <div className={styles.carousel}>
       <div
         className={styles.carouselItems}
         style={{
-          transform: `translateX(-${(currentIndex / itemsToShow) * 100}%)`,
+          transform: `translateX(-${(activeIndex / itemsToShow) * 100}%)`,
         }}
       >
         {items.map((item, index) => (
-          <div key={index} className={styles.carouselItem} style={{ flex: `0 0 ${100 / itemsToShow}%` }}>
-            {item}
-          </div>
+          <CarouselItem key={index} item={item} itemsToShow={itemsToShow} />
         ))}
       </div>
       {items.length > itemsToShow && (
-        <div className="flex justify-center mt-2">
-          {Array.from({ length: Math.ceil(items.length / itemsToShow) }).map(
-            (_, index) => (
-              <button
-                key={index}
-                className={`w-2 h-2 rounded-full mx-1 mt-2 ${
-                  index === Math.floor(currentIndex / itemsToShow)
-                    ? "bg-primary"
-                    : "bg-gray-300"
-                }`}
-                onClick={() => handleIndicatorClick(index)}
-              />
-            )
-          )}
-        </div>
+        <Indicator
+          totalItems={items.length}
+          itemsToShow={itemsToShow}
+          activeIndex={activeIndex}
+          onIndicatorClick={handleIndicatorClick}
+        />
       )}
     </div>
   );

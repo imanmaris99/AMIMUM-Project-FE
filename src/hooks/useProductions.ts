@@ -1,9 +1,9 @@
 import useSWR from "swr";
-import { fetchProduction } from "@/API/brand";
+import { GetAllBrand } from "@/API/brand";
 import { ProductionProps } from "@/components/homepage/Production_Section/types";
 
-export const useProductions = () => {
-  const { data, error } = useSWR<ProductionProps[]>("/brand/all", fetchProduction, {
+export const useGetAllProductions = () => {
+  const { data, error } = useSWR<ProductionProps[]>("/brand/all", GetAllBrand, {
     errorRetryCount: 0,
   });
 
@@ -19,7 +19,7 @@ export const useProductions = () => {
   }
 
   return {
-    productions: data || null,
+    allProductions: data || null,
     isLoading: !error && !data,
     isError: !!error,
     errorMessage,

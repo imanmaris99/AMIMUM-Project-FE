@@ -1,6 +1,6 @@
 import axiosClient from "@/lib/axiosClient";
 
-export const fetchPromo = async () => {
+export const GetAllPromo = async () => {
     try {
         const response = await axiosClient.get("/brand/promo");
         return response.data ? response.data : response;
@@ -9,7 +9,7 @@ export const fetchPromo = async () => {
     }
 };
 
-export const fetchProduction = async () => {
+export const GetAllBrand = async () => {
     try {
         const response = await axiosClient.get("/brand/all");
         return response.data ? response.data : response;
@@ -27,21 +27,40 @@ export const GetBrandDetailByID = async (BrandDetailId: number) => {
     }
 }
 
-export const GetBrandLoader = async (skip = 0, limit = 9) => {
+export const GetBrandLoader = async (skip = 0, limit = 8) => {
     try {
-        const response = await axiosClient.get(`/brand/loader`, {
+        const response = await axiosClient.get("/brand/loader", {
             params: {
                 skip,
                 limit
-            }
+            },
         });
-        return response.data ? {
-            data: response.data,
-            remaining_records: response.data.remaining_records,
-            has_more: response.data.has_more
-        } : response;
+        const { data, remaining_records, has_more } = response.data ? response : response.data;
+        return {
+            data,
+            remaining_records,
+            has_more
+        }
     } catch (error) {
         throw error;
     }
-};
+}
 
+export const GetBrandFilterLoader = async (categoryId: number, skip = 0, limit = 8) => {
+    try {
+        const response = await axiosClient.get(`/brand/loader/categories/${categoryId}`, {
+            params: {
+                skip,
+                limit
+            },
+        });
+        const { data, remaining_records, has_more } = response.data ? response : response.data;
+        return {
+            data,
+            remaining_records,
+            has_more
+        }
+    } catch (error) {
+        throw error;
+    }
+}
