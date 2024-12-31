@@ -5,8 +5,10 @@ import { ProductionProps } from "@/components/homepage/Production_Section/types"
 import { useBrandFilteredLoader } from "@/hooks/useBrandFilteredLoader";
 
 const useProductionLogic = (selectedCategory: number | null) => {
-    const [skip, setSkip] = useState(0);
-    const limit = 8;
+    const [brandSkip, setBrandSkip] = useState(0);
+    const [brandFilteredSkip, setBrandFilteredSkip] = useState(0);
+    const brandLimit = 8;
+    const brandFilteredLimit = 8;
 
     const {
         data: fetchedData,
@@ -14,11 +16,11 @@ const useProductionLogic = (selectedCategory: number | null) => {
         errorMessage,
         hasMore,
         remainingRecords,
-    } = useBrandLoader(skip, limit);
+    } = useBrandLoader(brandSkip, brandLimit);
 
     const [productions, setProductions] = useState<ProductionProps[]>([]);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const { errorMessage: filteredErrorMessage, brandFilteredLoader } = useBrandFilteredLoader(selectedCategory ?? 0, skip, limit);
+    const { errorMessage: filteredErrorMessage, brandFilteredLoader } = useBrandFilteredLoader(selectedCategory ?? 0, brandFilteredSkip, brandFilteredLimit);
 
     useEffect(() => {
         setProductions([]);
@@ -32,7 +34,7 @@ const useProductionLogic = (selectedCategory: number | null) => {
 
     const loadMoreItems = () => {
         setIsLoadingMore(true);
-        setSkip((prevSkip) => prevSkip + limit);
+        setBrandSkip((prevSkip) => prevSkip + brandLimit);
     };
 
     useEffect(() => {
