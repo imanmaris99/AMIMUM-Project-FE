@@ -4,7 +4,8 @@ import { useSearchParams } from "next/navigation";
 import { useSearchProduct } from "../../../hooks/useSearchProduct";
 import { PulseLoader } from "react-spinners";
 import ListProductSection from "@/components/common/Search/List_Product_Section";
-import Header from "@/components/hompage/Header_Section";
+import Header from "@/components/homepage/Header_Section";
+import Search from "@/components/common/Search";
 
 const SearchPage = () => {
   const searchParams = useSearchParams();
@@ -14,6 +15,7 @@ const SearchPage = () => {
   return (
     <div className="pb-20">
       <Header />
+      <Search />
       <p className="mt-4 mx-6">
         Hasil pencarian untuk kata kunci <span className="font-bold">&quot;{query}&quot;</span>
       </p>

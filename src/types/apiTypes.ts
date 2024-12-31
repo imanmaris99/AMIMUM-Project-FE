@@ -100,3 +100,9 @@ export interface CartItemActPayload {
     is_active: boolean;
   };
 }
+
+export interface BrandFilteredLoader {
+  data: ProductionProps[];
+  remaining_records: number;
+  has_more: boolean;
+}

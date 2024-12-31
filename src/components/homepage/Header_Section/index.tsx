@@ -1,6 +1,5 @@
 import { IoNotificationsOutline } from "react-icons/io5";
 import { FiShoppingCart } from "react-icons/fi";
-import { Search } from "@/components";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { SkeletonHeader } from "./SkeletonHeader";
 import { Button } from "@/components/ui/button";
@@ -55,10 +54,6 @@ const Header = () => {
               </>
             )}
           </div>
-        </div>
-
-        <div className="mx-6 mt-3">
-          <Search />
         </div>
       </header>
     </>

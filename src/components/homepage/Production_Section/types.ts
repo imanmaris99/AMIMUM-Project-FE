@@ -6,3 +6,9 @@ export interface ProductionProps {
     category: string;
     created_at: string;
 }
+
+export interface BrandLoaderProps {
+  data: ProductionProps[];
+  remaining_records: number;
+  has_more: boolean;
+}

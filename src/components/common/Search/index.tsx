@@ -20,7 +20,7 @@ const Search = () => {
   } = useSearchLogic();
 
   return (
-    <div className="relative" ref={searchRef}>
+    <div className="relative mt-4 mx-6" ref={searchRef}>
       <div className="flex items-center justify-center border border-gray-200 rounded-lg px-2 py-2">
         <CiSearch className="w-8 h-8 text-gray-500 ml-2" />
         <input
@@ -30,7 +30,7 @@ const Search = () => {
           value={search}
           onChange={handleInputChange}
         />
-        <Button onClick={handleSearch} variant="default">
+        <Button onClick={handleSearch} variant="default" disabled={!search}>
           Cari
         </Button>
       </div>

@@ -17,7 +17,7 @@ const AccordionSkeleton = () => {
           aria-controls="panel1-content"
           id="panel1-header"
         >
-          <Typography component="div" className="font-bold font-jakarta bg-gray-300 w-1/2 h-6 rounded"></Typography>
+          <Typography component="div" style={{ fontWeight: "bold" }} className="font-jakarta bg-gray-300 w-1/2 h-6 rounded"></Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Typography component="div" className="font-jakarta">
