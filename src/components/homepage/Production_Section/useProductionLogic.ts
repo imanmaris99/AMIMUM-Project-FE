@@ -6,7 +6,7 @@ import { useBrandFilteredLoader } from "@/hooks/useBrandFilteredLoader";
 
 const useProductionLogic = (selectedCategory: number | null) => {
     const [brandSkip, setBrandSkip] = useState(0);
-    const [brandFilteredSkip, setBrandFilteredSkip] = useState(0);
+    const [brandFilteredSkip] = useState(0);
     const brandLimit = 8;
     const brandFilteredLimit = 8;
 
