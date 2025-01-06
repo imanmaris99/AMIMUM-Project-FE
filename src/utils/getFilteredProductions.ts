@@ -1,7 +1,7 @@
-import { ProductionProps } from "@/components/hompage/Production_Section/types";
+import { BrandFilteredLoader } from "@/types/apiTypes";
 
-const getFilteredProductions = (productions: ProductionProps[] | undefined, selectedCategory: string | null) => {
-  return selectedCategory ? productions?.filter((production) => production.category === selectedCategory) : productions;
+const getFilteredProductions = (brandFilteredLoader: BrandFilteredLoader) => {
+  return brandFilteredLoader.data;
 };
 
 export default getFilteredProductions;
