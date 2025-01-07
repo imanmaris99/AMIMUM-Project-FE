@@ -23,7 +23,7 @@ const Shipment = () => {
     <div className="flex flex-col justify-between min-h-screen">
       <div className="flex justify-center items-center relative mt-16">
         <div className="absolute left-10">
-          <GoChevronLeft className="text-3xl" />
+          <GoChevronLeft className="text-3xl cursor-pointer" />
         </div>
         <div>
           <h1 className="text-[16px] font-semibold">Alamat Pengirimanku</h1>
