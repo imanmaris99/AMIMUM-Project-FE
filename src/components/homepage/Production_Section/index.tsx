@@ -6,6 +6,7 @@ import LoadingMore from "./LoadingMore";
 import useProductionLogic from "./useProductionLogic";
 import { ProductionProps } from "@/types/apiTypes";
 import PulseLoader from "react-spinners/PulseLoader";
+import useBrandLoader from "@/hooks/useBrandLoader";
 
 const Production = ({
   selectedCategory,
@@ -24,6 +25,21 @@ const Production = ({
     showLoading,
     filteredErrorMessage,
   } = useProductionLogic(selectedCategory);
+
+  const { errorMessage, isError } = useBrandLoader();
+
+  if (isError) {
+    return (
+      <>
+        <div className="mx-6 mt-6">
+          <h6 className="font-semibold font-jakarta">Produksi oleh</h6>
+        </div>
+        <div className="mx-6 mt-6 text-red-500 font-semibold flex justify-center items-center">
+          {errorMessage}
+        </div>
+      </>
+    );
+  }
 
   if (showError) {
     return (

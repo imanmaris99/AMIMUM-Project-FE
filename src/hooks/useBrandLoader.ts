@@ -26,6 +26,7 @@ const useBrandLoader = (skip = 0, limit = 8) => {
     remainingRecords: brandLoaderData?.remaining_records ?? 0,
     hasMore: brandLoaderData?.has_more ?? false,
     loading: isLoading,
+    isError: !!error,
     errorMessage
   };
 };

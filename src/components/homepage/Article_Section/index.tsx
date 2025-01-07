@@ -13,7 +13,7 @@ const ArticleSection = () => {
         <div className="mx-6 mt-6">
           <h6 className="font-semibold font-jakarta">Artikel</h6>
         </div>
-        <div className="mx-6 mt-6 text-red-500 font-semibold">
+        <div className="mx-6 mt-6 text-red-500 font-semibold flex justify-center items-center">
           {errorMessage}
         </div>
       </>
