@@ -6,9 +6,9 @@ const BackArrow = () => {
   const router = useRouter();
 
   return (
-    <div className="w-1/3 flex self-end pl-5">
+    <div className="w-1/3 flex self-end pb-1 pl-4">
       <IoChevronBack
-        className="text-3xl cursor-pointer"
+        className="text-2xl cursor-pointer"
         onClick={router.back}
       />
     </div>

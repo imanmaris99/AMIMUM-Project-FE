@@ -18,7 +18,7 @@ const CartItemsList = ({
 }: CartItemsListProps) => {
   return (
     <>
-      <div className="p-4 pt-[106px]">
+      <div className="p-4 pt-[133px]">
         <ol>
           {isLoading
             ? [...Array(3)].map((_, index) => <CartItemSkeleton key={index} />)
