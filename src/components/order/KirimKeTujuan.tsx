@@ -41,7 +41,7 @@ const KirimKeTujuan = () => {
 
       <hr className="bg-[#E5E5E5] h-[1px] w-full my-3" />
 
-      <div className="my-2 p-2 bg-gray-50 rounded-lg leading-7">
+      <div className="my-2 p-2 bg-white rounded-lg leading-7">
         <h3 className="text-[15px]">Pilihan layanan</h3>
 
         <p className="text-[#A2A2A2] font-normal text-xs">Layanan - Estimasi</p>

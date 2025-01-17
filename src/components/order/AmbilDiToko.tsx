@@ -13,10 +13,10 @@ const AmbilDiToko = () => {
 
       <hr className="bg-[#E5E5E5] h-[1px] w-full my-3" />
 
-      <div className="my-2 p-2 bg-gray-50 rounded-lg leading-7">
+      <div className="my-2 p-2 bg-white rounded-lg leading-7">
         <h3 className="text-sm">Catatan Tambahan</h3>
 
-        <div className="p-2 text-xs leading-5 bg-gray-200 rounded-md mt-2">
+        <div className="p-2 text-xs leading-5 bg-[#D9D9D9] rounded-md mt-2 bg-opacity-30">
           <p className="font-normal">
             Saya rencana mau ambil pesanan jam 3 sore ya
           </p>

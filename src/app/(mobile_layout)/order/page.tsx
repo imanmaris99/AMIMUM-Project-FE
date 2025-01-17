@@ -11,7 +11,7 @@ const Order = () => {
 
   return (
     <div className="bg-black">
-      <main className="flex flex-col w-[375px] mx-auto bg-white">
+      <main className="flex flex-col w-[375px] mx-auto bg-[#FAFAFA]">
         <TopNavigation>Order</TopNavigation>
         <div className="pt-[133px] w-[324px] mx-auto">
           <h2 className="bg-[#00764F] text-[#F2F8F6] text-center text-base py-1.5 rounded-lg">
@@ -35,11 +35,11 @@ const Order = () => {
               <label htmlFor="b">Ambil di toko</label>
               <input
                 onClick={() => setOrderMethod(2)}
+                className="accent-[#00764F] scale-125"
                 type="radio"
                 name="order"
                 id="b"
                 value={"b"}
-                className="accent-[#00764F] scale-125"
               />
             </div>
           </div>
@@ -49,8 +49,7 @@ const Order = () => {
 
         {orderMethod === 2 && <AmbilDiToko />}
 
-        <div className="h-[264px] bg-white"></div>
-        <footer className="border-t-4 border-[#E6F1ED] pb-60 px-6 fixed bottom-0 left-0 right-0 bg-white h-[264px] w-[375px] mx-auto">
+        <div className="border-t-4 border-[#E6F1ED] px-6">
           <div className="py-7">
             <h2 className="font-semibold">Payment Summary</h2>
 
@@ -68,7 +67,11 @@ const Order = () => {
               </div>
             </div>
           </div>
-          <button className="bg-[#00764F] w-full text-white py-4 rounded-2xl">
+        </div>
+
+        <div className="h-28 bg-white"></div>
+        <footer className="pb-28 px-6 fixed bottom-0 left-0 right-0 bg-white h-16 w-[375px] mx-auto">
+          <button className="bg-[#00764F] w-full text-white py-4 rounded-2xl mt-4">
             Order
           </button>
           <BottomBar />

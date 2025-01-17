@@ -8,7 +8,7 @@ interface TopNavigationProps {
 
 const TopNavigation = ({ children }: TopNavigationProps) => {
   return (
-    <div className="fixed top-0 right-0 left-0 w-[375px] max-w-[400px] mx-auto bg-white h-[106px] flex p-4 z-40 pt-[104px]">
+    <div className="fixed top-0 right-0 left-0 w-[375px] max-w-[400px] mx-auto bg-[#FAFAFA] h-[106px] flex p-4 z-40 pt-[104px]">
       <BackArrow />
 
       <Heading1Nav>{children}</Heading1Nav>
