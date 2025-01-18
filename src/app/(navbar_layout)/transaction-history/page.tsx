@@ -1,24 +1,28 @@
 import TransactionHistoryCard from "@/components/transaction-history/TransactionHistoryCard";
 import React from "react";
 
-const dummyData = [
+const dummyData: {
+  id: string;
+  date: string;
+  status: "Batal" | "Lunas" | "Pending" | "Refund";
+}[] = [
   {
-    id: 456789351,
+    id: "456789351",
     date: "Sep 9, 2024, 04:30pm",
     status: "Batal",
   },
   {
-    id: 456789351,
+    id: "456789351",
     date: "Sep 9, 2024, 04:30pm",
     status: "Lunas",
   },
   {
-    id: 456789351,
+    id: "456789351",
     date: "Sep 9, 2024, 04:30pm",
     status: "Pending",
   },
   {
-    id: 456789351,
+    id: "456789351",
     date: "Sep 9, 2024, 04:30pm",
     status: "Refund",
   },
