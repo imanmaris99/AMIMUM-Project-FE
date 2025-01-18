@@ -48,13 +48,13 @@ const KirimKeTujuan = () => {
       </div>
 
       <div className="grid grid-cols-2 space-x-2 mt-4">
-        <button className="text-xs font-normal border border-[#A2A2A2] rounded-full flex items-center pl-3 space-x-1 py-1">
+        <button className="text-xs justify-center pr-3 font-normal border border-[#A2A2A2] rounded-full flex items-center pl-3 space-x-1 py-1">
           <PencilIcon />
 
           <p>Lengkapi data</p>
         </button>
 
-        <button className="text-xs font-normal border border-[#A2A2A2] rounded-full flex items-center pl-3 space-x-1 py-1">
+        <button className="text-xs justify-center pr-3 font-normal border border-[#A2A2A2] rounded-full flex items-center pl-3 space-x-1 py-1">
           <NoteIcon />
 
           <p>Add Note</p>
