@@ -1,3 +1,5 @@
+"use client";
+
 import React, { ReactNode } from "react";
 import BackArrow from "../1_elements/BackArrow";
 import Heading1Nav from "../1_elements/Heading1Nav";
