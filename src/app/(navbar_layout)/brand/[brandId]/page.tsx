@@ -1,38 +1,31 @@
-"use client";
-import Header from "@/components/homepage/Header_Section";
 import DetailBrand from "@/components/DetailBrand";
 import ProductList from "@/components/DetailBrand/ProductList";
 import SearchProductByBrand from "@/components/DetailBrand/SearchProductByBrand";
-import { useProductByBrandId } from "@/hooks/useProductByBrandId";
-import { PulseLoader } from "react-spinners";
+import { GetBrandDetailByID } from "@/API/brand";
+import { GetProductByBrandId } from "@/API/product";
+import { BrandDetailResponseType, ProductType } from "@/types/detailProduct";
 
-const BrandPage = ({ params }: { params: { brandId: string } }) => {
-  const { isLoading, errorMessage } = useProductByBrandId(
-    Number(params.brandId)
-  );
-
-  if (isLoading)
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <PulseLoader color="hsl(var(--primary))" size={10} />
-      </div>
-    );
-  if (errorMessage)
-    return (
-      <div>
-        <Header />
-        <DetailBrand brandDetailId={Number(params.brandId)} />
-        <ProductList brandId={Number(params.brandId)} />
-      </div>
-    );
-
+export default async function BrandPage({ params }: { params: Promise<{ brandId: string }> }) {
+  const { brandId } = await params;
+  let brandDetail: BrandDetailResponseType | null = null;
+  let products: ProductType[] = [];
+  let errorMessage: string | null = null;
+  try {
+    brandDetail = await GetBrandDetailByID(Number(brandId));
+  } catch (err) {
+    errorMessage = err instanceof Error ? err.message : String(err);
+  }
+  try {
+    const res = await GetProductByBrandId(Number(brandId));
+    products = Array.isArray(res?.data) ? res.data : [];
+  } catch {
+    // error produk tidak fatal
+  }
   return (
-    <div className="pb-20">
-      <Header />
-      <DetailBrand brandDetailId={Number(params.brandId)} />
-      <SearchProductByBrand />
-      <ProductList brandId={Number(params.brandId)} />
-    </div>
+    <main className="pb-20">
+      <DetailBrand brandDetail={brandDetail?.data || null} errorMessage={errorMessage} />
+      <ProductList products={products} />
+      <SearchProductByBrand brandId={Number(brandId)} />
+    </main>
   );
-};
-export default BrandPage;
+}

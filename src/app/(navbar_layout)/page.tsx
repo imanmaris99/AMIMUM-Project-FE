@@ -1,29 +1,48 @@
-"use client";
+import { fetchArticlesServer } from "@/API/articles";
+import { GetAllPromoServer } from "@/API/brand";
+import { fetchCategoriesServer } from "@/API/tag-categories";
+import { GetAllBrandServer } from "@/API/brand";
+import HomeClient from "./HomeClient";
 
-import Header from "@/components/homepage/Header_Section";
-import Promo from "@/components/homepage/Promo_Section";
-import Category from "@/components/homepage/Category_Section";
-import Production from "@/components/homepage/Production_Section";
-import ArticleSection from "@/components/homepage/Article_Section";
-import { useState } from "react";
-import Search from "@/components/common/Search";
-
-const Home = () => {
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-
+export default async function Home() {
+  let articles = null;
+  let articleError = null;
+  let promo = null;
+  let promoError = null;
+  let categories = null;
+  let categoryError = null;
+  let productions = null;
+  let productionError = null;
+  try {
+    articles = await fetchArticlesServer();
+  } catch (err: unknown) {
+    articleError = err instanceof Error ? err.message : "Gagal mengambil data artikel.";
+  }
+  try {
+    promo = await GetAllPromoServer();
+  } catch (err: unknown) {
+    promoError = err instanceof Error ? err.message : "Gagal mengambil data promo.";
+  }
+  try {
+    categories = await fetchCategoriesServer();
+  } catch (err: unknown) {
+    categoryError = err instanceof Error ? err.message : "Gagal mengambil data kategori.";
+  }
+  try {
+    productions = await GetAllBrandServer();
+  } catch (err: unknown) {
+    productionError = err instanceof Error ? err.message : "Gagal mengambil data brand.";
+  }
   return (
-    <div className="pb-20">
-      <Header />
-      <Search />
-      <Promo />
-      <Category
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-      />
-      <Production selectedCategory={selectedCategory} />
-      <ArticleSection />
-    </div>
+    <HomeClient
+      categories={Array.isArray(categories?.data) ? categories.data : []}
+      productions={Array.isArray(productions?.data) ? productions.data : []}
+      categoryError={categoryError}
+      productionError={productionError}
+      promo={Array.isArray(promo?.data) ? promo.data : []}
+      promoError={promoError}
+      articles={Array.isArray(articles?.data) ? articles.data : []}
+      articleError={articleError}
+    />
   );
-};
-
-export default Home;
+}

@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { GoHeart } from "react-icons/go";
 import { CardProductProps } from "./types";

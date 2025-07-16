@@ -22,6 +22,7 @@ export interface DetailProductType {
     company: string;
     avg_rating: number;
     total_rater: number;
+    image_url?: string; // tambahkan agar konsisten dengan kebutuhan frontend
 }
 
 export interface DetailProductResponseType {
@@ -32,4 +33,29 @@ export interface DetailProductResponseType {
 
 export interface DetailProductRequestType {
     product_id: string;
+}
+
+export interface ProductType {
+    id: number;
+    name: string;
+    image_url: string;
+    price: number;
+    is_active: boolean;
+    // tambahkan field lain sesuai kebutuhan
+}
+
+export interface BrandDetailType {
+    id: number;
+    name: string;
+    image_url: string;
+    category: string;
+    description: string;
+    product_count: number;
+    // tambahkan field lain sesuai kebutuhan
+}
+
+export interface BrandDetailResponseType {
+    status_code: number;
+    message: string;
+    data: BrandDetailType;
 }

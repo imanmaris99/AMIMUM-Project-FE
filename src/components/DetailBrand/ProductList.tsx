@@ -1,27 +1,20 @@
-import { useProductByBrandId } from "@/hooks/useProductByBrandId";
-import { PulseLoader } from "react-spinners";
 import ListProductSection from "@/components/common/Search/List_Product_Section";
+import { ProductType } from "@/types/detailProduct";
 
-const ProductList = ({ brandId }: { brandId: number }) => {
-  const { productByBrandId, isError, isLoading, errorMessage } =
-    useProductByBrandId(brandId);
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-32">
-        <PulseLoader color="hsl(var(--primary))" size={10} />
-      </div>
-    );
-  }
-  if (isError) {
-    return <p className="text-gray-500 text-center mt-4">{errorMessage}</p>;
-  }
-  if (productByBrandId && productByBrandId.length > 0) {
-    return (
-      <div className="mx-6">
-        <ListProductSection products={productByBrandId} />
-      </div>
-    );
-  }
-  return <p className="text-gray-600">{errorMessage}</p>;
+interface ProductListProps {
+  products: ProductType[];
+}
+
+const ProductList = ({ products }: ProductListProps) => {
+  return (
+    <div className="mt-4">
+      <h6 className="font-semibold font-jakarta">Daftar Produk Brand</h6>
+      {products && products.length > 0 ? (
+        <ListProductSection products={products} />
+      ) : (
+        <div className="text-gray-500">Produk belum tersedia.</div>
+      )}
+    </div>
+  );
 };
 export default ProductList;

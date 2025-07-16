@@ -1,21 +1,27 @@
 "use client";
 
+import { useState } from "react";
 import { Tag, TagSkeleton } from "@/components";
-import { useCategories } from "@/hooks/useCategories";
 import { CategoryProps } from "./types";
 
+interface CategorySectionProps {
+  categories: CategoryProps[] | null;
+  errorMessage?: string | null;
+  selectedCategory: number | null;
+  setSelectedCategory: (id: number | null) => void;
+}
+
 const Category = ({
+  categories,
+  errorMessage,
   selectedCategory,
   setSelectedCategory,
-}: {
-  selectedCategory: number | null;
-  setSelectedCategory: (category: number | null) => void;
-}) => {
-  const { categories, isLoading, isError, errorMessage } = useCategories();
+}: CategorySectionProps) => {
+  // Hapus useState, gunakan props
 
-  if (isLoading) return <TagSkeleton />;
+  if (!categories && !errorMessage) return <TagSkeleton />;
 
-  if (isError) {
+  if (errorMessage) {
     return (
       <>
         <div className="mx-6 mt-6">
