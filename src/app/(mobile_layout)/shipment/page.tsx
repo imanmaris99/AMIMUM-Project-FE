@@ -8,6 +8,37 @@ import { RiCheckboxBlankCircleLine } from "react-icons/ri";
 import { RiCheckboxCircleLine } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
 
+const ShipmentSkeleton = () => (
+  <div className="flex flex-col justify-between min-h-screen animate-pulse">
+    <div className="flex justify-center items-center relative mt-16">
+      <div className="absolute left-10">
+        <div className="h-8 w-8 bg-gray-300 rounded-full" />
+      </div>
+      <div>
+        <div className="h-6 w-40 bg-gray-300 rounded" />
+      </div>
+    </div>
+    <div className="flex flex-col justify-center items-center gap-4 mt-20 mb-8 w-full">
+      {[...Array(2)].map((_, index) => (
+        <div key={index} className="flex justify-center items-center gap-4 w-80 border-b border-gray-300 pb-4">
+          <div className="h-6 w-6 bg-gray-300 rounded-full" />
+          <div className="flex flex-col justify-center gap-1 flex-1">
+            <div className="h-4 w-32 bg-gray-300 rounded mb-2" />
+            <div className="h-4 w-64 bg-gray-300 rounded" />
+          </div>
+          <div className="flex flex-col justify-center items-center gap-2">
+            <div className="h-5 w-5 bg-gray-300 rounded-full" />
+            <div className="h-5 w-5 bg-gray-300 rounded-full" />
+          </div>
+        </div>
+      ))}
+    </div>
+    <div className="flex justify-center items-center mt-auto mb-10">
+      <div className="h-14 w-80 bg-gray-300 rounded-lg" />
+    </div>
+  </div>
+);
+
 const Shipment = () => {
   const [activeStates, setActiveStates] = useState([false, false]);
 

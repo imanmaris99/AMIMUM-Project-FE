@@ -15,6 +15,8 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import toast, { Toaster } from 'react-hot-toast';
 import { useRouter } from "next/navigation";
+import Spinner from "@/components/ui/Spinner";
+import React from "react";
 
 const formSchema = z
   .object({
@@ -36,6 +38,7 @@ const formSchema = z
 
 const RegisterForm = () => {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,6 +54,7 @@ const RegisterForm = () => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
     try {
       console.log(values);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -68,6 +72,8 @@ const RegisterForm = () => {
       } else {
         toast.error("An unexpected error occurred.");
       }
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -192,7 +198,16 @@ const RegisterForm = () => {
                     </FormItem>
                   )}
                 />
-               <Button type="submit" className="w-full my-5"> Submit</Button>
+               <Button type="submit" className="w-full my-5" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Spinner className="mr-2 align-middle inline-block" size={20} label="Mendaftar..." />
+                    <span>Mendaftar...</span>
+                  </>
+                ) : (
+                  "Submit"
+                )}
+              </Button>
                <Toaster
                 position="bottom-center"
                 reverseOrder={false}

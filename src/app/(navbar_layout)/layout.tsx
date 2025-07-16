@@ -21,7 +21,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased font-jakarta">
         <main>
-          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+          <Suspense>{children}</Suspense>
         </main>
         <Navbar />
       </body>

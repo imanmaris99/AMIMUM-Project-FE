@@ -1,5 +1,6 @@
 import { FiPackage, FiLayers, FiAlertCircle } from "react-icons/fi";
 import { VariantType } from "@/types/detailProduct";
+import Spinner from "@/components/ui/Spinner";
 
 interface ProductInformationProps {
   datavariant: VariantType | undefined;
@@ -7,13 +8,38 @@ interface ProductInformationProps {
   isLoading: boolean;
 }
 
+const ProductInformationSkeleton = () => (
+  <div className="mt-2 mx-4 animate-pulse">
+    <div className="space-y-2 text-gray-500 text-sm">
+      <div className="flex items-center space-x-2">
+        <div className="w-5 h-5 bg-gray-300 rounded-full" />
+        <div className="h-4 w-32 bg-gray-300 rounded" />
+      </div>
+      <div className="flex items-center space-x-2">
+        <div className="w-5 h-5 bg-gray-300 rounded-full" />
+        <div className="h-4 w-24 bg-gray-300 rounded" />
+      </div>
+      <div className="flex items-center space-x-2">
+        <div className="w-5 h-5 bg-gray-300 rounded-full" />
+        <div className="h-4 w-40 bg-gray-300 rounded" />
+      </div>
+    </div>
+    <hr className="mt-4" />
+  </div>
+);
+
 const ProductInformation = ({
   isError,
   isLoading,
   datavariant,
 }: ProductInformationProps) => {
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[120px]">
+        <Spinner className="mb-2" size={32} label="Memuat informasi produk..." />
+        <p className="text-gray-600 text-sm">Memuat informasi produk...</p>
+      </div>
+    );
   }
 
   if (isError) {

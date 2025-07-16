@@ -7,6 +7,7 @@ import Button from "@/components/cart/1_elements/Button";
 import BottomBar from "@/components/cart/2_widgets/BottomBar";
 import { CartResponseType } from "@/types/apiTypes";
 import CartSummarySkeleton from "../3_modules/CartSummarySkeleton";
+import Spinner from "@/components/ui/Spinner";
 
 interface CartUIProps {
   cartResponse: CartResponseType;
@@ -18,12 +19,24 @@ const CartUI: React.FC<CartUIProps> = ({ cartResponse, errorMessage }) => {
     return <div className="text-red-500 text-center mt-4">{errorMessage}</div>;
   }
   if (!cartResponse) {
-    return <CartSummarySkeleton />;
+    // Tambahkan fungsi dummy agar CartItemsList tidak error jika dipakai
+    const noop = () => {};
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px]">
+        <Spinner className="mb-4" />
+        <p className="text-gray-600 text-base">Memuat data keranjang...</p>
+      </div>
+    );
   }
   return (
     <div className="mx-auto min-x-[360px] max-w-[400px] relative">
       <TopNavigation>Keranjangku</TopNavigation>
-      <CartItemsList isLoading={false} cartList={cartResponse.data} />
+      <CartItemsList
+        isLoading={false}
+        cartList={cartResponse.data}
+        onUpdateCart={() => {}}
+        onRemoveItem={() => {}}
+      />
       <div className="h-[200px] pt-10 bg-color-[#FAFAFA] border-t-4 border-[#E6F1ED] pb-80 px-6">
         <CartSummary cartResponse={cartResponse} />
       </div>

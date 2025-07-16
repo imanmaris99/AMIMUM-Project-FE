@@ -1,6 +1,7 @@
 import Image from "next/image";
 import SkeletonLoader from "./SkeletonLoader";
 import { BrandDetailType } from "@/types/detailProduct";
+import Spinner from "@/components/ui/Spinner";
 
 interface DetailBrandProps {
   brandDetail: BrandDetailType | null;
@@ -12,7 +13,12 @@ const DetailBrand = ({ brandDetail, errorMessage }: DetailBrandProps) => {
     return <div className="text-red-500 text-center mt-4">{errorMessage}</div>;
   }
   if (!brandDetail) {
-    return <SkeletonLoader />;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[200px]">
+        <Spinner className="mb-2" size={40} label="Memuat detail brand..." />
+        <p className="text-gray-600 text-base">Memuat detail brand...</p>
+      </div>
+    );
   }
   // Gunakan fallback untuk description dan product_count
   const descriptionArr = Array.isArray(brandDetail.description)

@@ -9,6 +9,8 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { postVerifyAccount } from "@/API/verify-account";
 import { useRouter } from "next/navigation";
+import Spinner from "@/components/ui/Spinner";
+import React from "react";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -17,6 +19,7 @@ const formSchema = z.object({
 
 const FormVerifyAccount = () => {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -27,9 +30,11 @@ const FormVerifyAccount = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsSubmitting(true);
     await postVerifyAccount(values, () => {
       router.push("/login");
     });
+    setIsSubmitting(false);
   };
 
   return (
@@ -81,8 +86,15 @@ const FormVerifyAccount = () => {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full my-5">
-                  Kirim Permintaan
+                <Button type="submit" className="w-full my-5" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Spinner className="mr-2 align-middle inline-block" size={20} label="Memverifikasi..." />
+                      <span>Memverifikasi...</span>
+                    </>
+                  ) : (
+                    "Kirim Permintaan"
+                  )}
                 </Button>
               </div>
             </form>

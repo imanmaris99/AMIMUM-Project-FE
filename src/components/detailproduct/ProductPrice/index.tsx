@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { DetailProductType, VariantType } from "@/types/detailProduct";
+import Spinner from "@/components/ui/Spinner";
 
 interface ProductPriceProps {
   data: DetailProductType | undefined;
@@ -12,6 +13,22 @@ interface ProductPriceProps {
   isError: number;
   isLoading: boolean;
 }
+const ProductPriceSkeleton = () => (
+  <div className="p-4 flex items-center justify-between mb-20 animate-pulse">
+    <div>
+      <div className="h-4 w-32 bg-gray-300 rounded mb-2" />
+      <div className="flex items-center mt-1 space-x-2">
+        <div className="h-4 w-10 bg-gray-300 rounded" />
+        <div className="h-4 w-16 bg-gray-300 rounded" />
+      </div>
+      <div className="h-6 w-24 bg-gray-300 rounded mt-1" />
+    </div>
+    <div>
+      <div className="h-10 w-32 bg-gray-300 rounded" />
+    </div>
+  </div>
+);
+
 const ProductPrice = ({
   isError,
   isLoading,
@@ -19,7 +36,12 @@ const ProductPrice = ({
   datavariant,
 }: ProductPriceProps) => {
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[120px]">
+        <Spinner className="mb-2" size={32} label="Memuat harga produk..." />
+        <p className="text-gray-600 text-sm">Memuat harga produk...</p>
+      </div>
+    );
   }
 
   if (isError) {

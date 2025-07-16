@@ -1,12 +1,24 @@
 "use client";
 import React, { useState } from "react";
 import { DetailProductType } from "@/types/detailProduct";
+import Spinner from "@/components/ui/Spinner";
 
 interface ProductDescriptionProps {
   data: DetailProductType | undefined;
   isError: number;
   isLoading: boolean;
 }
+
+const ProductDescriptionSkeleton = () => (
+  <div className="border border-gray-300 p-4 rounded-lg shadow-sm animate-pulse">
+    <div className="h-6 w-1/3 bg-gray-300 rounded mb-2" />
+    <div className="space-y-2">
+      <div className="h-4 w-full bg-gray-300 rounded" />
+      <div className="h-4 w-5/6 bg-gray-300 rounded" />
+      <div className="h-4 w-2/3 bg-gray-300 rounded" />
+    </div>
+  </div>
+);
 
 const ProductDescription = ({
   isError,
@@ -25,7 +37,12 @@ const ProductDescription = ({
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[120px]">
+        <Spinner className="mb-2" size={32} label="Memuat deskripsi produk..." />
+        <p className="text-gray-600 text-sm">Memuat deskripsi produk...</p>
+      </div>
+    );
   }
 
   if (isError) {

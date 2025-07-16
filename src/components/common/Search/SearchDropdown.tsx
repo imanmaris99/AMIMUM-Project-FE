@@ -21,8 +21,9 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
   return (
     <ul className="absolute w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg z-10">
       {isLoading ? (
-        <li className="p-2 flex justify-center">
+        <li className="p-2 flex flex-col items-center justify-center">
           <PulseLoader color="hsl(var(--primary))" size={10} />
+          <span className="text-gray-500 text-xs mt-2">Mencari produk...</span>
         </li>
       ) : isError ? (
         <li className="p-2 text-gray-500 flex justify-center">
