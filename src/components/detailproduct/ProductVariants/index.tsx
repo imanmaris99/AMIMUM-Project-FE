@@ -1,41 +1,35 @@
 "use client";
 
 import { useState } from "react";
+import { VariantType } from "@/types/detailProduct";
 
-const ProductVariants = () => {
+interface ProductVariantsProps {
+  variants: VariantType[];
+}
+
+const ProductVariants = ({ variants }: ProductVariantsProps) => {
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
-
-  const variants = [
-    "Anggur",
-    "Strawberry",
-    "Cokelat",
-    "Vanilla",
-    "Melon",
-    "Jeruk",
-    "Susu",
-    "Mocca",
-  ];
 
   return (
     <div className="p-4">
       <p className="text-gray-500 text-sm font-medium mb-2">Varian produk :</p>
       <div className="grid grid-cols-4 gap-3">
-        {variants.map((variant) => (
-          <label key={variant} className="flex items-center space-x-2">
+        {(variants || []).map((variant) => (
+          <label key={variant.id} className="flex items-center space-x-2">
             <input
               type="radio"
               name="variant"
-              value={variant}
-              checked={selectedVariant === variant}
-              onChange={() => setSelectedVariant(variant)}
+              value={variant.name}
+              checked={selectedVariant === variant.name}
+              onChange={() => setSelectedVariant(variant.name)}
               className="form-radio text-green-600 focus:ring-green-500 text-sm"
             />
             <span
               className={`${
-                selectedVariant === variant ? "text-gray-900" : "text-gray-400"
+                selectedVariant === variant.name ? "text-gray-900" : "text-gray-400"
               } font-medium text-sm`}
             >
-              {variant}
+              {variant.name}
             </span>
           </label>
         ))}
