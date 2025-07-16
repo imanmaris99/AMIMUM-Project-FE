@@ -14,6 +14,11 @@ const DetailBrand = ({ brandDetail, errorMessage }: DetailBrandProps) => {
   if (!brandDetail) {
     return <SkeletonLoader />;
   }
+  // Gunakan fallback untuk description dan product_count
+  const descriptionArr = Array.isArray(brandDetail.description)
+    ? brandDetail.description
+    : brandDetail.description_list || [];
+  const productCount = brandDetail.product_count ?? brandDetail.total_product_with_promo ?? brandDetail.total_product ?? 0;
   return (
     <div className="mt-4 mx-6">
       <div>
@@ -22,7 +27,7 @@ const DetailBrand = ({ brandDetail, errorMessage }: DetailBrandProps) => {
       <div className="bg-customGreen4 p-4 rounded-lg mt-4 min-h-24 flex items-center">
         <div className="flex items-center gap-4">
           <Image
-            src={brandDetail.image_url || "/default-image.jpg"}
+            src={brandDetail.image_url || brandDetail.photo_url || "/default-image.jpg"}
             alt={brandDetail.name || "brand"}
             width={70}
             height={70}
@@ -34,18 +39,18 @@ const DetailBrand = ({ brandDetail, errorMessage }: DetailBrandProps) => {
         </div>
       </div>
       <div className="mt-4">
-        {Array.isArray(brandDetail.description) ? (
-          brandDetail.description.map((desc: string, idx: number) => (
+        {descriptionArr.length > 0 ? (
+          descriptionArr.map((desc: string, idx: number) => (
             <p key={idx} className="text-xs px-2 mb-2">{desc}</p>
           ))
         ) : (
-          <p className="text-xs px-2">{brandDetail.description || "Deskripsi brand belum tersedia."}</p>
+          <p className="text-xs px-2">Deskripsi brand belum tersedia.</p>
         )}
       </div>
       <div className="mt-4 pb-4 pt-4 flex flex-col gap-2">
         <div className="flex justify-between border-b border-t border-gray-300 py-3">
           <p className="text-gray-500">Jumlah Produk</p>
-          <p>{brandDetail.product_count || 0} Produk</p>
+          <p>{productCount} Produk</p>
         </div>
       </div>
     </div>

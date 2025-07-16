@@ -1,8 +1,6 @@
 import Header from "@/components/homepage/Header_Section";
 import ProductList from "@/components/DetailBrand/ProductList";
 import DetailBrand from "@/components/DetailBrand";
-import { GetBrandDetailByIDServer } from "@/API/brand";
-import { GetProductDiscountByBrandIdServer } from "@/API/product";
 import { BrandDetailResponseType, ProductType } from "@/types/detailProduct";
 
 export default async function PromoDetailPage({ params }: { params: Promise<{ promoId: string }> }) {
@@ -11,7 +9,12 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
   let products: ProductType[] = [];
   let errorMessage: string | null = null;
   try {
-    brandDetail = await GetBrandDetailByIDServer(Number(promoId));
+    const res = await fetch(`https://amimumprojectbe-production.up.railway.app/brand/detail/${promoId}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error(`Gagal mengambil data brand: ${res.status}`);
+    brandDetail = await res.json();
   } catch (err) {
     errorMessage = err instanceof Error ? err.message : String(err);
   }
@@ -25,17 +28,22 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
       }
     : null;
   try {
-    const res = await GetProductDiscountByBrandIdServer(Number(promoId));
-    // Mapping produk agar sesuai dengan CardProductProps
-    products = Array.isArray(res?.data)
-      ? res.data.map((prod: any) => ({
-          id: prod.id,
-          name: prod.name,
-          price: prod.price,
-          all_variants: prod.all_variants,
-          created_at: prod.created_at,
-        }))
-      : [];
+    const res = await fetch(`https://amimumprojectbe-production.up.railway.app/product/discount/production/${promoId}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      products = Array.isArray(data?.data)
+        ? data.data.map((prod: any) => ({
+            id: prod.id,
+            name: prod.name,
+            price: prod.price,
+            all_variants: prod.all_variants,
+            created_at: prod.created_at,
+          }))
+        : [];
+    }
   } catch {
     // error produk tidak fatal
   }

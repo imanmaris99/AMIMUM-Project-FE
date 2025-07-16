@@ -47,10 +47,15 @@ export interface ProductType {
 export interface BrandDetailType {
     id: number;
     name: string;
-    image_url: string;
+    image_url?: string;
+    photo_url?: string;
     category: string;
-    description: string;
-    product_count: number;
+    description?: string | string[];
+    description_list?: string[];
+    product_count?: number;
+    total_product?: number;
+    total_product_with_promo?: number;
+    created_at?: string;
     // tambahkan field lain sesuai kebutuhan
 }
 
