@@ -61,4 +61,4 @@ const Production = ({ productions, errorMessage }: ProductionSectionProps) => {
   );
 };
 
-export default Production;
+export default React.memo(Production);

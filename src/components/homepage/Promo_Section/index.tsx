@@ -1,6 +1,7 @@
 import { Carousel, PromoCard } from "@/components";
 import PromoCardSkeleton from "@/components/homepage/PromoCard/PromoCardSkeleton";
 import { PromoProps } from "./types";
+import React from "react";
 
 interface PromoSectionProps {
   promo: PromoProps[] | null;
@@ -50,4 +51,4 @@ const Promo = ({ promo, errorMessage }: PromoSectionProps) => {
   );
 };
 
-export default Promo;
+export default React.memo(Promo);

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Tag, TagSkeleton } from "@/components";
 import { CategoryProps } from "./types";
+import React from "react";
 
 interface CategorySectionProps {
   categories: CategoryProps[] | null;
@@ -58,4 +59,4 @@ const Category = ({
   );
 };
 
-export default Category;
+export default React.memo(Category);

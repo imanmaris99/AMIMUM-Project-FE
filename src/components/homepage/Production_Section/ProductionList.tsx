@@ -28,4 +28,4 @@ const ProductionList = ({
   </>
 );
 
-export default ProductionList;
+export default React.memo(ProductionList);

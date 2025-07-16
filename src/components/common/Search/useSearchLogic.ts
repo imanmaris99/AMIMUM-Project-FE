@@ -2,6 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
+function debounce<T extends (...args: any[]) => void>(fn: T, delay: number): T {
+  let timeout: ReturnType<typeof setTimeout>;
+  return function(this: any, ...args: any[]) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn.apply(this, args), delay);
+  } as T;
+}
+
 const useSearchLogic = () => {
   const [search, setSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
@@ -22,24 +30,29 @@ const useSearchLogic = () => {
     router.push(`/detail-product/${productId}`);
   };
 
-  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Ganti handleInputChange dengan versi debounce
+  const debouncedFetch = debounce(async (value: string) => {
+    setIsLoading(true);
+    setIsError(false);
+    setErrorMessage("");
+    try {
+      const res = await axios.get(`/api/product/search?name=${encodeURIComponent(value)}`);
+      setProducts(Array.isArray(res.data?.data) ? res.data.data : []);
+    } catch (err: any) {
+      setIsError(true);
+      setErrorMessage(err?.response?.data?.message || "Gagal mengambil data produk.");
+      setProducts([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, 400);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearch(value);
     setShowDropdown(value.length > 0);
     if (value.length > 0) {
-      setIsLoading(true);
-      setIsError(false);
-      setErrorMessage("");
-      try {
-        const res = await axios.get(`/api/product/search?name=${encodeURIComponent(value)}`);
-        setProducts(Array.isArray(res.data?.data) ? res.data.data : []);
-      } catch (err: any) {
-        setIsError(true);
-        setErrorMessage(err?.response?.data?.message || "Gagal mengambil data produk.");
-        setProducts([]);
-      } finally {
-        setIsLoading(false);
-      }
+      debouncedFetch(value);
     } else {
       setProducts([]);
     }

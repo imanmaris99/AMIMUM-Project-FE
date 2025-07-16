@@ -2,6 +2,7 @@ import { AccordionExpandDefault } from "@/components";
 import { ArticleProps } from "./types";
 import AccordionSkeleton from "@/components/ui/AccordionExpandDefault/AccordionSkeleton";
 import Footer from "../../layout/Footer";
+import React from "react";
 
 interface ArticleSectionProps {
   articles: ArticleProps[] | null;
@@ -48,4 +49,4 @@ const ArticleSection = ({ articles, errorMessage }: ArticleSectionProps) => {
   );
 };
 
-export default ArticleSection;
+export default React.memo(ArticleSection);

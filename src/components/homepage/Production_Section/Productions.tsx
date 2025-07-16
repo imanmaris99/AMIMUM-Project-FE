@@ -36,4 +36,4 @@ const Productions = ({
   );
 };
 
-export default Productions;
+export default React.memo(Productions);

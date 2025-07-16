@@ -1,11 +1,13 @@
 "use client";
 import { useState } from "react";
 import Header from "@/components/homepage/Header_Section";
-import Promo from "@/components/homepage/Promo_Section";
-import Category from "@/components/homepage/Category_Section";
-import Production from "@/components/homepage/Production_Section";
-import ArticleSection from "@/components/homepage/Article_Section";
-import Search from "@/components/common/Search";
+import dynamic from "next/dynamic";
+
+const Promo = dynamic(() => import("@/components/homepage/Promo_Section"), { ssr: false });
+const Category = dynamic(() => import("@/components/homepage/Category_Section"), { ssr: false });
+const Production = dynamic(() => import("@/components/homepage/Production_Section"), { ssr: false });
+const ArticleSection = dynamic(() => import("@/components/homepage/Article_Section"), { ssr: false });
+const Search = dynamic(() => import("@/components/common/Search"), { ssr: false });
 
 interface HomeClientProps {
   categories: any[];
@@ -36,7 +38,7 @@ export default function HomeClient({
   return (
     <div className="pb-20">
       <Header />
-      <Search products={productions} />
+      <Search />
       <Promo promo={promo} errorMessage={promoError} />
       <Category
         categories={categories}
