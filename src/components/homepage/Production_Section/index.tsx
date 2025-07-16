@@ -1,4 +1,6 @@
+'use client';
 
+import React, { useState } from "react";
 import Productions from "./Productions";
 import { ProductionProps } from "@/types/apiTypes";
 
@@ -7,7 +9,11 @@ interface ProductionSectionProps {
   errorMessage?: string | null;
 }
 
+const PAGE_SIZE = 8;
+
 const Production = ({ productions, errorMessage }: ProductionSectionProps) => {
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
   if (errorMessage) {
     return (
       <>
@@ -20,6 +26,14 @@ const Production = ({ productions, errorMessage }: ProductionSectionProps) => {
       </>
     );
   }
+
+  const total = productions?.length ?? 0;
+  const hasMore = total > visibleCount;
+  const remaining = hasMore ? total - visibleCount : 0;
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, total));
+  };
 
   return (
     <>
@@ -35,8 +49,11 @@ const Production = ({ productions, errorMessage }: ProductionSectionProps) => {
         ) : (
           <Productions
             isLoading={!productions}
-            productions={productions || []}
-            filteredProductions={productions || []}
+            productions={productions.slice(0, visibleCount) || []}
+            filteredProductions={productions.slice(0, visibleCount) || []}
+            showLoadMoreCard={hasMore}
+            onLoadMore={handleLoadMore}
+            remainingItems={remaining}
           />
         )}
       </div>

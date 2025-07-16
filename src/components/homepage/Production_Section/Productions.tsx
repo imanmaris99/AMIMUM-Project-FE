@@ -3,15 +3,23 @@ import ProductionCardSkeleton from "@/components/homepage/ProductionCard/Product
 import ProductionList from "./ProductionList";
 import { ProductionProps } from "./types";
 
+interface ProductionsProps {
+  isLoading: boolean;
+  productions: ProductionProps[];
+  filteredProductions: ProductionProps[];
+  showLoadMoreCard?: boolean;
+  onLoadMore?: () => void;
+  remainingItems?: number;
+}
+
 const Productions = ({
   isLoading,
   productions,
   filteredProductions,
-}: {
-  isLoading: boolean;
-  productions: ProductionProps[];
-  filteredProductions: ProductionProps[];
-}) => {
+  showLoadMoreCard = false,
+  onLoadMore,
+  remainingItems = 0,
+}: ProductionsProps) => {
   if (isLoading && productions.length === 0) {
     return [...Array(9)].map((_, index) => (
       <ProductionCardSkeleton key={index} />
@@ -21,6 +29,9 @@ const Productions = ({
     <ProductionList
       productions={filteredProductions}
       visibleItems={productions?.length ?? 0}
+      showLoadMoreCard={showLoadMoreCard}
+      onLoadMore={onLoadMore}
+      remainingItems={remainingItems}
     />
   );
 };
