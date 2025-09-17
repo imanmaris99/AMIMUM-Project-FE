@@ -12,7 +12,7 @@ export const dummyShipmentAddresses: ShipmentAddress[] = [
     state: "Jawa Tengah",
     country: "Indonesia",
     zipCode: "59191",
-    isActive: true,
+    isActive: true, // Hanya 1 yang aktif sebagai default
     createdAt: "2024-01-15T10:30:00Z"
   },
   {
@@ -38,7 +38,7 @@ export const dummyShipmentAddresses: ShipmentAddress[] = [
     state: "Jawa Timur",
     country: "Indonesia",
     zipCode: "60217",
-    isActive: true,
+    isActive: false, // Diubah ke false
     createdAt: "2024-02-01T09:45:00Z"
   }
 ];
@@ -101,7 +101,7 @@ export const dummyShipments: ShipmentData[] = [
     id: "ship-001",
     address: dummyShipmentAddresses[0],
     courier: dummyCouriers[0],
-    isActive: true,
+    isActive: true, // Hanya 1 yang aktif sebagai default
     createdAt: "2024-01-15T10:30:00Z"
   },
   {
@@ -115,7 +115,7 @@ export const dummyShipments: ShipmentData[] = [
     id: "ship-003",
     address: dummyShipmentAddresses[2],
     courier: dummyCouriers[4],
-    isActive: true,
+    isActive: false, // Diubah ke false
     createdAt: "2024-02-01T09:45:00Z"
   }
 ];

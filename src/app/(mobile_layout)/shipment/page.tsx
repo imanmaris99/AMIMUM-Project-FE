@@ -47,6 +47,7 @@ const Shipment = () => {
   const [shipments, setShipments] = useState<ShipmentData[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeStates, setActiveStates] = useState<boolean[]>([]);
+  const [savingIndex, setSavingIndex] = useState<number | null>(null);
 
   // Simulasi loading data
   useEffect(() => {
@@ -55,19 +56,63 @@ const Shipment = () => {
       // Simulasi delay API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       setShipments(dummyShipments);
-      setActiveStates(dummyShipments.map(shipment => shipment.isActive));
+      
+      // Memastikan hanya 1 alamat yang aktif
+      const activeStates = dummyShipments.map(shipment => shipment.isActive);
+      const activeCount = activeStates.filter(state => state).length;
+      
+      // Jika lebih dari 1 yang aktif, reset ke hanya yang pertama
+      if (activeCount > 1) {
+        const resetStates = new Array(activeStates.length).fill(false);
+        resetStates[0] = true; // Set hanya yang pertama sebagai aktif
+        setActiveStates(resetStates);
+      } else {
+        setActiveStates(activeStates);
+      }
+      
       setLoading(false);
     };
     
     loadData();
   }, []);
 
-  const handleIconClick = (index: number) => {
+  const handleIconClick = async (index: number) => {
+    // Jika sudah aktif, tidak perlu melakukan apa-apa
+    if (activeStates[index]) return;
+    
     setActiveStates((prevStates) => {
-      const newStates = [...prevStates];
-      newStates[index] = !newStates[index];
+      // Reset semua ke false, lalu set yang dipilih ke true
+      const newStates = new Array(prevStates.length).fill(false);
+      newStates[index] = true;
       return newStates;
     });
+    
+    // Set loading state untuk alamat yang sedang disimpan
+    setSavingIndex(index);
+    
+    // Simulasi save preferensi alamat otomatis
+    const selectedShipment = shipments[index];
+    if (selectedShipment) {
+      console.log("Alamat utama dipilih:", selectedShipment.address);
+      
+      // Simulasi API call untuk menyimpan preferensi
+      try {
+        // Simulasi delay API call
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Update data shipment untuk mencerminkan perubahan
+        setShipments(prev => prev.map((shipment, idx) => ({
+          ...shipment,
+          isActive: idx === index
+        })));
+        
+        console.log("Alamat utama berhasil disimpan:", selectedShipment.address.city, selectedShipment.address.state);
+      } catch (error) {
+        console.error("Gagal menyimpan alamat utama:", error);
+      } finally {
+        setSavingIndex(null);
+      }
+    }
   };
 
   const handleEdit = (shipmentId: string) => {
@@ -76,10 +121,23 @@ const Shipment = () => {
 
   const handleDelete = (shipmentId: string) => {
     if (confirm("Apakah Anda yakin ingin menghapus alamat pengiriman ini?")) {
+      const deletedIndex = shipments.findIndex(s => s.id === shipmentId);
+      const wasActive = activeStates[deletedIndex];
+      
       setShipments(prev => prev.filter(shipment => shipment.id !== shipmentId));
-      setActiveStates(prev => prev.filter((_, index) => 
-        shipments.findIndex(s => s.id === shipmentId) !== index
-      ));
+      setActiveStates(prev => {
+        const newStates = prev.filter((_, index) => index !== deletedIndex);
+        
+        // Jika yang dihapus adalah alamat aktif, set alamat pertama sebagai aktif
+        if (wasActive && newStates.length > 0) {
+          const hasActive = newStates.some(state => state);
+          if (!hasActive) {
+            newStates[0] = true;
+          }
+        }
+        
+        return newStates;
+      });
     }
   };
 
@@ -91,6 +149,7 @@ const Shipment = () => {
     router.back();
   };
 
+
   if (loading) {
     return <ShipmentSkeleton />;
   }
@@ -101,12 +160,13 @@ const Shipment = () => {
         <div className="absolute left-10">
           <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
         </div>
-        <div>
+        <div className="text-center">
           <h1 className="text-[16px] font-semibold">Alamat Pengirimanku</h1>
+          <p className="text-xs text-gray-500 mt-1">Pilih 1 alamat sebagai alamat utama</p>
         </div>
       </div>
 
-      <div className="flex flex-col justify-center items-center gap-4 mt-20 mb-8">
+      <div className="flex flex-col justify-center items-center gap-4 mt-20 mb-8 px-4">
         {shipments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10">
             <p className="text-gray-500 text-sm mb-4">Belum ada alamat pengiriman</p>
@@ -119,18 +179,43 @@ const Shipment = () => {
           </div>
         ) : (
           shipments.map((shipment, index) => (
-            <div key={shipment.id} className="flex justify-center items-center gap-4 w-80 border-b border-gray-300 pb-4">
-              <div onClick={() => handleIconClick(index)}>
-                {activeStates[index] ? (
-                  <RiCheckboxCircleLine className="text-2xl cursor-pointer text-primary" />
+            <div 
+              key={shipment.id} 
+              className={`flex items-start gap-3 w-full max-w-sm border-b border-gray-300 pb-4 transition-all duration-300 ease-in-out transform ${
+                activeStates[index] ? 'bg-blue-50 rounded-lg p-3 scale-[1.02]' : 'p-1 scale-100'
+              }`}
+              style={{ minHeight: '120px' }}
+            >
+              <div onClick={() => handleIconClick(index)} className="flex-shrink-0 mt-1">
+                {savingIndex === index ? (
+                  <div className="text-2xl text-primary animate-spin">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </div>
+                ) : activeStates[index] ? (
+                  <RiCheckboxCircleLine className="text-2xl cursor-pointer text-primary transition-colors duration-200" />
                 ) : (
-                  <RiCheckboxBlankCircleLine className="text-2xl cursor-pointer" />
+                  <RiCheckboxBlankCircleLine className="text-2xl cursor-pointer hover:text-primary transition-colors duration-200" />
                 )}
               </div>
 
-              <div className="flex flex-col justify-center gap-1 flex-1">
-                <p className="text-xs font-semibold">{shipment.address.city}, {shipment.address.state}</p>
-                <p className="text-xs text-gray-500">
+              <div className="flex flex-col justify-start gap-1 flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-nowrap min-h-[20px]">
+                  <p className="text-xs font-semibold text-gray-800 flex-shrink-0">
+                    {shipment.address.city}, {shipment.address.state}
+                  </p>
+                  {savingIndex === index ? (
+                    <span className="text-xs bg-yellow-500 text-white px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0 animate-pulse">
+                      Menyimpan...
+                    </span>
+                  ) : activeStates[index] && (
+                    <span className="text-xs bg-primary text-white px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0">
+                      Alamat Utama
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 leading-relaxed">
                   {shipment.address.address}, {shipment.address.city}, Kode Pos {shipment.address.zipCode}, {shipment.address.state}, {shipment.address.country}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
@@ -138,13 +223,13 @@ const Shipment = () => {
                 </p>
               </div>
 
-              <div className="flex flex-col justify-center items-center gap-2">
+              <div className="flex flex-col justify-start items-center gap-2 flex-shrink-0">
                 <BsTrash 
-                  className="text-lg cursor-pointer text-red-500 hover:text-red-700" 
+                  className="text-lg cursor-pointer text-red-500 hover:text-red-700 transition-colors duration-200" 
                   onClick={() => handleDelete(shipment.id)}
                 />
                 <FiEdit 
-                  className="text-lg cursor-pointer text-blue-500 hover:text-blue-700" 
+                  className="text-lg cursor-pointer text-blue-500 hover:text-blue-700 transition-colors duration-200" 
                   onClick={() => handleEdit(shipment.id)}
                 />
               </div>
@@ -153,10 +238,10 @@ const Shipment = () => {
         )}
       </div>
 
-      <div className="flex justify-center items-center mt-auto mb-10">
+      <div className="flex justify-center items-center mt-auto mb-10 px-4">
         <Button 
           onClick={handleAddNew}
-          className="bg-primary text-white px-4 py-2 rounded-lg w-80 h-14 text-lg"
+          className="bg-primary text-white px-4 py-2 rounded-lg w-full max-w-sm h-14 text-lg"
         >
           {shipments.length === 0 ? 'Tambah Alamat' : 'Tambah Alamat Baru'}
         </Button>
