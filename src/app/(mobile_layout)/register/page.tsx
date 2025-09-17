@@ -46,7 +46,7 @@ const Register = () => {
       <div className="mx-auto max-w-[440px] min-w-[360px] bg-[#e6f1ed] h-screen relative flex flex-col">
         <div className="flex-1 px-6 py-6 overflow-y-auto">
           <div className="w-full max-w-sm mx-auto">
-            <h1 className="text-3xl font-bold text-[#00764f] text-center mb-8">
+            <h1 className="text-3xl font-bold text-primary text-center mb-8">
               Registrasi
             </h1>
 
@@ -172,7 +172,7 @@ const Register = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-[#00764f] text-white py-3 rounded font-medium hover:bg-[#005a3c] transition-colors mt-6"
+                className="w-full bg-primary text-white py-3 rounded font-medium hover:bg-primary/90 transition-colors mt-6"
               >
                 Submit
               </button>
@@ -181,7 +181,7 @@ const Register = () => {
               <div className="text-center mt-4">
                 <p className="text-sm text-gray-600">
                   Sudah memiliki akun? 
-                  <span className="text-[#00764f] font-medium ml-1 cursor-pointer hover:underline">
+                  <span className="text-primary font-medium ml-1 cursor-pointer hover:underline">
                     Log in disini
                   </span>
                 </p>

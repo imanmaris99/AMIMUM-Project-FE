@@ -40,7 +40,7 @@ const Login = () => {
       <HeaderLogin />
       <div className="px-6 py-4 h-full flex flex-col">
         <div className="w-full max-w-sm mx-auto mt-20">
-          <h1 className="text-3xl font-bold text-[#00764f] text-center mb-6">
+          <h1 className="text-3xl font-bold text-primary text-center mb-6">
             Login
           </h1>
 
@@ -75,7 +75,7 @@ const Login = () => {
                   <button
                     type="button"
                     onClick={handleForgotPassword}
-                    className="text-[#00764f] text-xs font-medium hover:underline"
+                    className="text-primary text-xs font-medium hover:underline"
                   >
                     Lupa Password?
                   </button>
@@ -93,7 +93,7 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-full bg-[#00764f] text-white py-3 rounded font-medium hover:bg-[#005a3c] transition-colors mt-4"
+              className="w-full bg-primary text-white py-3 rounded font-medium hover:bg-primary/90 transition-colors mt-4"
             >
               Log In
             </button>
@@ -123,7 +123,7 @@ const Login = () => {
           <div className="text-center">
             <p className="text-sm text-gray-600">
               Belum memiliki akun? 
-              <span className="text-[#00764f] font-medium ml-1 cursor-pointer hover:underline">
+              <span className="text-primary font-medium ml-1 cursor-pointer hover:underline">
                 Buat akun
               </span>
             </p>
