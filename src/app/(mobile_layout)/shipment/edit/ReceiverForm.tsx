@@ -1,59 +1,290 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { LuContact, LuPhone, LuMapPin } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
+import { ReceiverFormData } from "@/types/shipment";
+import { dummyShipmentAddresses } from "@/data/shipmentDummyData";
 
 interface ReceiverFormProps {
-  onSubmit: (event: React.FormEvent) => void;
+  onSubmit: (data: ReceiverFormData) => void;
   onBack: () => void;
+  initialData?: ReceiverFormData;
 }
 
-const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack }) => {
+const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialData }) => {
+  const [formData, setFormData] = useState<ReceiverFormData>({
+    receiverName: "",
+    phoneNumber: "",
+    country: "",
+    province: "",
+    city: "",
+    cityId: "",
+    postalCode: "",
+    fullAddress: ""
+  });
+  const [errors, setErrors] = useState<Partial<ReceiverFormData>>({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Load data dummy atau initial data
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    } else {
+      // Load data dummy dari alamat pengiriman pertama
+      const dummyAddress = dummyShipmentAddresses[0];
+      setFormData({
+        receiverName: dummyAddress.name,
+        phoneNumber: dummyAddress.phone,
+        country: dummyAddress.country,
+        province: dummyAddress.state,
+        city: dummyAddress.city,
+        cityId: dummyAddress.cityId.toString(),
+        postalCode: dummyAddress.zipCode,
+        fullAddress: dummyAddress.address
+      });
+    }
+  }, [initialData]);
+
+  const validateForm = (): boolean => {
+    const newErrors: Partial<ReceiverFormData> = {};
+
+    if (!formData.receiverName.trim()) {
+      newErrors.receiverName = "Nama penerima harus diisi";
+    }
+
+    if (!formData.phoneNumber.trim()) {
+      newErrors.phoneNumber = "Nomor handphone harus diisi";
+    } else if (!/^\+62\d{10,11}$/.test(formData.phoneNumber)) {
+      newErrors.phoneNumber = "Format nomor handphone tidak valid (contoh: +6281234567890)";
+    }
+
+    if (!formData.country.trim()) {
+      newErrors.country = "Negara harus diisi";
+    }
+
+    if (!formData.province.trim()) {
+      newErrors.province = "Provinsi harus diisi";
+    }
+
+    if (!formData.city.trim()) {
+      newErrors.city = "Kota/Kabupaten harus diisi";
+    }
+
+    if (!formData.cityId.trim()) {
+      newErrors.cityId = "ID Kota/Kabupaten harus diisi";
+    }
+
+    if (!formData.postalCode.trim()) {
+      newErrors.postalCode = "Kode pos harus diisi";
+    }
+
+    if (!formData.fullAddress.trim()) {
+      newErrors.fullAddress = "Alamat lengkap harus diisi";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Clear error when user starts typing
+    if (errors[name as keyof ReceiverFormData]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: undefined
+      }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    
+    // Simulasi delay API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    onSubmit(formData);
+    setIsLoading(false);
+  };
+
   return (
-    <form onSubmit={onSubmit} className="bg-gray-100 px-10 py-4 w-full flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="bg-gray-100 px-10 py-4 w-full flex flex-col gap-4">
       <div className="flex flex-col gap-2 relative">
         <label htmlFor="receiverName" className="text-[14px] font-semibold">Nama Penerima</label>
         <LuContact className="text-xl absolute left-2 top-9 stroke-1" />
-        <input type="text" id="receiverName" name="receiverName" className="border border-gray-300 rounded-md outline-none px-2 py-1 bg-gray-200 pl-10" />
+        <input 
+          type="text" 
+          id="receiverName" 
+          name="receiverName" 
+          value={formData.receiverName}
+          onChange={handleInputChange}
+          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
+            errors.receiverName ? 'border-red-500' : 'border-gray-300'
+          }`}
+          placeholder="Masukkan nama penerima"
+        />
+        {errors.receiverName && (
+          <p className="text-red-500 text-xs mt-1">{errors.receiverName}</p>
+        )}
       </div>
+
       <div className="flex flex-col gap-2 relative">
         <label htmlFor="phoneNumber" className="text-[14px] font-semibold">Nomor Handphone</label>
         <LuPhone className="text-xl absolute left-2 top-9 stroke-1" />
-        <input type="text" id="phoneNumber" name="phoneNumber" className="border border-gray-300 rounded-md outline-none px-2 py-1 bg-gray-200 pl-10" />
+        <input 
+          type="text" 
+          id="phoneNumber" 
+          name="phoneNumber" 
+          value={formData.phoneNumber}
+          onChange={handleInputChange}
+          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
+            errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
+          }`}
+          placeholder="+6281234567890"
+        />
+        {errors.phoneNumber && (
+          <p className="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>
+        )}
       </div>
+
       <div className="flex flex-col gap-2 relative">
         <label htmlFor="country" className="text-[14px] font-semibold">Negara</label>
         <LuMapPin className="text-xl absolute left-2 top-9 stroke-1" />
-        <input type="text" id="country" name="country" className="border border-gray-300 rounded-md outline-none px-2 py-1 bg-gray-200 pl-10" />
+        <input 
+          type="text" 
+          id="country" 
+          name="country" 
+          value={formData.country}
+          onChange={handleInputChange}
+          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
+            errors.country ? 'border-red-500' : 'border-gray-300'
+          }`}
+          placeholder="Indonesia"
+        />
+        {errors.country && (
+          <p className="text-red-500 text-xs mt-1">{errors.country}</p>
+        )}
       </div>
+
       <div className="flex flex-col gap-2 relative">
         <label htmlFor="province" className="text-[14px] font-semibold">Provinsi</label>
         <LuMapPin className="text-xl absolute left-2 top-9 stroke-1" />
-        <input type="text" id="province" name="province" className="border border-gray-300 rounded-md outline-none px-2 py-1 bg-gray-200 pl-10" />
+        <input 
+          type="text" 
+          id="province" 
+          name="province" 
+          value={formData.province}
+          onChange={handleInputChange}
+          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
+            errors.province ? 'border-red-500' : 'border-gray-300'
+          }`}
+          placeholder="Jawa Tengah"
+        />
+        {errors.province && (
+          <p className="text-red-500 text-xs mt-1">{errors.province}</p>
+        )}
       </div>
+
       <div className="flex flex-col gap-2 relative">
         <label htmlFor="city" className="text-[14px] font-semibold">Kota/Kabupaten</label>
         <LuMapPin className="text-xl absolute left-2 top-9 stroke-1" />
-        <input type="text" id="city" name="city" className="border border-gray-300 rounded-md outline-none px-2 py-1 bg-gray-200 pl-10" />
+        <input 
+          type="text" 
+          id="city" 
+          name="city" 
+          value={formData.city}
+          onChange={handleInputChange}
+          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
+            errors.city ? 'border-red-500' : 'border-gray-300'
+          }`}
+          placeholder="Wonogiri"
+        />
+        {errors.city && (
+          <p className="text-red-500 text-xs mt-1">{errors.city}</p>
+        )}
       </div>
+
       <div className="flex flex-col gap-2 relative">
         <label htmlFor="cityId" className="text-[14px] font-semibold">ID.Kota/Kabupaten</label>
         <LuMapPin className="text-xl absolute left-2 top-9 stroke-1" />
-        <input type="text" id="cityId" name="cityId" className="border border-gray-300 rounded-md outline-none px-2 py-1 bg-gray-200 pl-10" />
+        <input 
+          type="text" 
+          id="cityId" 
+          name="cityId" 
+          value={formData.cityId}
+          onChange={handleInputChange}
+          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
+            errors.cityId ? 'border-red-500' : 'border-gray-300'
+          }`}
+          placeholder="123"
+        />
+        {errors.cityId && (
+          <p className="text-red-500 text-xs mt-1">{errors.cityId}</p>
+        )}
       </div>
+
       <div className="flex flex-col gap-2 relative">
         <label htmlFor="postalCode" className="text-[14px] font-semibold">Kode Pos</label>
         <LuMapPin className="text-xl absolute left-2 top-9 stroke-1" />
-        <input type="text" id="postalCode" name="postalCode" className="border border-gray-300 rounded-md outline-none px-2 py-1 bg-gray-200 pl-10" />
+        <input 
+          type="text" 
+          id="postalCode" 
+          name="postalCode" 
+          value={formData.postalCode}
+          onChange={handleInputChange}
+          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
+            errors.postalCode ? 'border-red-500' : 'border-gray-300'
+          }`}
+          placeholder="59191"
+        />
+        {errors.postalCode && (
+          <p className="text-red-500 text-xs mt-1">{errors.postalCode}</p>
+        )}
       </div>
+
       <div className="flex flex-col gap-2 relative">
         <label htmlFor="fullAddress" className="text-[14px] font-semibold">Alamat Lengkap</label>
         <LuMapPin className="text-xl absolute left-2 top-9 stroke-1" />
-        <textarea id="fullAddress" name="fullAddress" className="border border-gray-300 rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 min-h-[100px] resize-none" />
+        <textarea 
+          id="fullAddress" 
+          name="fullAddress" 
+          value={formData.fullAddress}
+          onChange={handleInputChange}
+          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 min-h-[100px] resize-none ${
+            errors.fullAddress ? 'border-red-500' : 'border-gray-300'
+          }`}
+          placeholder="Jalan Patriot No. 15, Kecamatan Bayat"
+        />
+        {errors.fullAddress && (
+          <p className="text-red-500 text-xs mt-1">{errors.fullAddress}</p>
+        )}
       </div>
 
-      <div className="flex justify-center items-center mt-auto mb-10">
-        <Button type="button" onClick={onBack} className="bg-primary text-white px-4 py-2 rounded-lg w-96 mt-10 h-14 text-lg mr-2">Kembali</Button>
-        <Button type="submit" className="bg-primary text-white px-4 py-2 rounded-lg w-96 mt-10 h-14 text-lg">Selanjutnya</Button>
+      <div className="flex justify-center items-center mt-auto mb-10 gap-2">
+        <Button 
+          type="button" 
+          onClick={onBack} 
+          className="bg-gray-500 text-white px-4 py-2 rounded-lg w-48 mt-10 h-14 text-lg"
+        >
+          Kembali
+        </Button>
+        <Button 
+          type="submit" 
+          disabled={isLoading}
+          className="bg-primary text-white px-4 py-2 rounded-lg w-48 mt-10 h-14 text-lg disabled:opacity-50"
+        >
+          {isLoading ? "Memproses..." : "Selanjutnya"}
+        </Button>
       </div>
     </form>
   );
