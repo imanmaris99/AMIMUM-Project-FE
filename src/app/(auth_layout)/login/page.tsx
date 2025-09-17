@@ -4,8 +4,10 @@ import React, { useState } from "react";
 import { HeaderLogin } from "@/components";
 import { Eye } from "../register/Eye";
 import { EyeOff } from "../register/EyeOff";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "raziul.cse@gmail.com",
     password: "",
@@ -25,7 +27,7 @@ const Login = () => {
   };
 
   const handleForgotPassword = () => {
-    console.log("Forgot password clicked");
+    router.push("/forgot-password");
   };
 
 
