@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { HeaderRegister } from "@/components";
+import { HeaderLogin } from "@/components";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -37,7 +37,7 @@ const Login = () => {
 
   return (
     <div className="mx-auto max-w-[440px] min-w-[360px] h-screen relative flex flex-col overflow-hidden">
-      <HeaderRegister />
+      <HeaderLogin />
       <div className="px-6 py-4 h-full flex flex-col">
         <div className="w-full max-w-sm mx-auto mt-20">
           <h1 className="text-3xl font-bold text-[#00764f] text-center mb-6">
