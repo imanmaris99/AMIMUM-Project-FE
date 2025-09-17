@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { GoChevronLeft } from "react-icons/go";
 import { BsTrash } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
@@ -44,10 +44,13 @@ const ShipmentSkeleton = () => (
 
 const Shipment = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [shipments, setShipments] = useState<ShipmentData[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeStates, setActiveStates] = useState<boolean[]>([]);
   const [savingIndex, setSavingIndex] = useState<number | null>(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   // Simulasi loading data
   useEffect(() => {
@@ -75,6 +78,30 @@ const Shipment = () => {
     
     loadData();
   }, []);
+
+  // Handle success message dari create/edit page
+  useEffect(() => {
+    const created = searchParams?.get('created') === 'true';
+    const updated = searchParams?.get('updated') === 'true';
+    
+    if (created) {
+      setSuccessMessage("Alamat pengiriman berhasil dibuat!");
+      setShowSuccessMessage(true);
+    } else if (updated) {
+      setSuccessMessage("Alamat pengiriman berhasil diupdate!");
+      setShowSuccessMessage(true);
+    }
+    
+    if (created || updated) {
+      // Hide message setelah 3 detik
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+        setSuccessMessage("");
+        // Remove query parameter
+        router.replace('/shipment');
+      }, 3000);
+    }
+  }, [searchParams, router]);
 
   const handleIconClick = async (index: number) => {
     // Jika sudah aktif, tidak perlu melakukan apa-apa
@@ -142,7 +169,7 @@ const Shipment = () => {
   };
 
   const handleAddNew = () => {
-    router.push("/shipment/edit");
+    router.push("/shipment/create");
   };
 
   const handleBack = () => {
@@ -156,6 +183,17 @@ const Shipment = () => {
 
   return (
     <div className="flex flex-col justify-between min-h-screen">
+      {/* Success Message */}
+      {showSuccessMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-bounce">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span className="text-sm font-medium">{successMessage}</span>
+          </div>
+        </div>
+      )}
       <div className="flex justify-center items-center relative mt-16">
         <div className="absolute left-10">
           <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />

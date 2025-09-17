@@ -5,12 +5,13 @@ import SenderForm from "./SenderForm";
 import ReceiverForm from "./ReceiverForm";
 import PackageSpecificationForm from "./PackageSpecificationForm";
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { SenderFormData, ReceiverFormData, PackageFormData } from "@/types/shipment";
 import { dummyShipments } from "@/data/shipmentDummyData";
 
 const EditShipment = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const shipmentId = searchParams.get('shipmentId');
   
   const [currentStep, setCurrentStep] = useState(0);
@@ -18,6 +19,7 @@ const EditShipment = () => {
   const [receiverData, setReceiverData] = useState<ReceiverFormData | null>(null);
   const [packageData, setPackageData] = useState<PackageFormData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   // Load data existing jika edit
   useEffect(() => {
@@ -71,15 +73,39 @@ const EditShipment = () => {
     setCurrentStep(2);
   };
 
-  const handlePackageSubmit = (data: PackageFormData) => {
+  const handlePackageSubmit = async (data: PackageFormData) => {
     setPackageData(data);
-    // Simulasi save data
-    console.log("Shipment Data:", {
-      sender: senderData,
-      receiver: receiverData,
-      package: data
-    });
-    // Redirect ke halaman shipment
+    setIsLoading(true);
+    
+    try {
+      // Simulasi API call untuk update shipment
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Simulasi data shipment yang diupdate
+      const updatedShipment = {
+        id: shipmentId,
+        sender: senderData,
+        receiver: receiverData,
+        package: data,
+        updatedAt: new Date().toISOString()
+      };
+      
+      console.log("Shipment Data Updated:", updatedShipment);
+      
+      // Show success message
+      setShowSuccessMessage(true);
+      
+      // Redirect ke halaman shipment setelah 2 detik
+      setTimeout(() => {
+        router.push("/shipment?updated=true");
+      }, 2000);
+      
+    } catch (error) {
+      console.error("Gagal mengupdate shipment:", error);
+      alert("Gagal mengupdate alamat pengiriman. Silakan coba lagi.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleNextStep = (event: React.FormEvent) => {
@@ -91,12 +117,41 @@ const EditShipment = () => {
     setCurrentStep((prevStep) => prevStep - 1);
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   return (
     <div>
+      {/* Success Message */}
+      {showSuccessMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-bounce">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span className="text-sm font-medium">Alamat pengiriman berhasil diupdate!</span>
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-center items-center relative mt-16">
-        <h1 className="text-[16px] font-semibold">
-          {shipmentId ? 'Edit Alamat Pengiriman' : 'Tambah Alamat Pengiriman'}
-        </h1>
+        <div className="absolute left-10">
+          <button 
+            onClick={handleBack}
+            className="text-3xl cursor-pointer hover:text-primary transition-colors"
+          >
+            ←
+          </button>
+        </div>
+        <div className="text-center">
+          <h1 className="text-[16px] font-semibold">
+            {shipmentId ? 'Edit Alamat Pengiriman' : 'Tambah Alamat Pengiriman'}
+          </h1>
+          <p className="text-xs text-gray-500 mt-1">
+            {shipmentId ? 'Edit alamat pengiriman existing' : 'Buat alamat pengiriman baru'}
+          </p>
+        </div>
       </div>
 
       <div className="flex justify-center items-center mt-10 pb-4">
@@ -125,6 +180,16 @@ const EditShipment = () => {
           />
         )}
       </div>
+
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 flex flex-col items-center gap-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <p className="text-sm text-gray-600">Mengupdate alamat pengiriman...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
