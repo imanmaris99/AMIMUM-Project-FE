@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [showLogoutMessage, setShowLogoutMessage] = useState(false);
 
   useEffect(() => {
     // Check if user is logged in (dummy implementation)
@@ -37,12 +38,31 @@ const Header = () => {
     localStorage.removeItem('userEmail');
     setIsLoggedIn(false);
     setUserEmail("");
-    // Redirect to login page
-    window.location.href = '/login';
+    
+    // Show success message
+    setShowLogoutMessage(true);
+    setTimeout(() => {
+      setShowLogoutMessage(false);
+    }, 3000);
+    
+    // Stay on homepage - no redirect needed
+    // Homepage is accessible without login
   };
 
   return (
     <>
+      {/* Logout Success Message */}
+      {showLogoutMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-bounce">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span className="text-sm font-medium">Berhasil keluar! Anda masih bisa menjelajahi toko.</span>
+          </div>
+        </div>
+      )}
+
       <header>
         <div className="flex justify-between items-center mt-14 mx-6">
           <div className="flex flex-col justify-center gap-2">
