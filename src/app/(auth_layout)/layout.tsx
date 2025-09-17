@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "../globals.css";
-import { HeaderLogin } from "@/components";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -21,7 +20,6 @@ export default function RootLayout({
       <body className="antialiased font-jakarta font-inter">
         <main>
           <div className="bg-[url('/bg-image.png')] bg-cover  w-full h-full">
-            <HeaderLogin />
             {children}
           </div>
         </main>
