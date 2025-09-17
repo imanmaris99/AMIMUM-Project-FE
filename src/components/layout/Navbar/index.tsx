@@ -34,7 +34,7 @@ const Navbar = () => {
           <div className={`${getIconClass("/transaction")} rounded-full p-2 cursor-pointer`} onClick={() => handleClick("/transaction")}>
             <HiOutlineDocumentText size={32} />
           </div>
-          <div className={`${getIconClass("/account")} rounded-full p-2 cursor-pointer`} onClick={() => handleClick("/account")}>
+          <div className={`${getIconClass("/profile")} rounded-full p-2 cursor-pointer`} onClick={() => handleClick("/profile")}>
             <VscAccount size={32} />
           </div>
         </div>
