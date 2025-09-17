@@ -2,8 +2,9 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import { GoHome, GoHeart } from "react-icons/go";
-import { HiOutlineWallet } from "react-icons/hi2";
+import { HiOutlineDocumentText } from "react-icons/hi2";
 import { VscAccount } from "react-icons/vsc";
+import { HiOutlineTruck } from "react-icons/hi2";
 
 const Navbar = () => {
   const router = useRouter();
@@ -20,17 +21,20 @@ const Navbar = () => {
   return (
     <div className="flex flex-col gap-4 fixed bottom-0 right-0 left-0 bg-white mx-auto" style={{ maxWidth: '440px', width: '100%' }}>
       <div className="shadow-box">
-        <div className="flex justify-center items-center gap-12 h-14">
-          <div className={`${getIconClass("/")} rounded-full p-2`} onClick={() => handleClick("/")}>
+        <div className="flex justify-center items-center gap-8 h-14">
+          <div className={`${getIconClass("/")} rounded-full p-2 cursor-pointer`} onClick={() => handleClick("/")}>
             <GoHome size={32} />
           </div>
-          <div className={`${getIconClass("/wishlist")} rounded-full p-2`} onClick={() => handleClick("/wishlist")}>
+          <div className={`${getIconClass("/wishlist")} rounded-full p-2 cursor-pointer`} onClick={() => handleClick("/wishlist")}>
             <GoHeart size={32} />
           </div>
-          <div className={`${getIconClass("/wallet")} rounded-full p-2`} onClick={() => handleClick("/wallet")}>
-            <HiOutlineWallet size={32} />
+          <div className={`${getIconClass("/track-order")} rounded-full p-2 cursor-pointer`} onClick={() => handleClick("/track-order")}>
+            <HiOutlineTruck size={32} />
           </div>
-          <div className={`${getIconClass("/account")} rounded-full p-2`} onClick={() => handleClick("/account")}>
+          <div className={`${getIconClass("/transaction")} rounded-full p-2 cursor-pointer`} onClick={() => handleClick("/transaction")}>
+            <HiOutlineDocumentText size={32} />
+          </div>
+          <div className={`${getIconClass("/account")} rounded-full p-2 cursor-pointer`} onClick={() => handleClick("/account")}>
             <VscAccount size={32} />
           </div>
         </div>

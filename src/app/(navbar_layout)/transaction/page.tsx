@@ -4,16 +4,16 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import WishlistList from "@/components/wishlist/molecules/WishlistList";
-import { WishlistItem } from "@/types/wishlist";
-import { dummyWishlistData } from "@/data/wishlistDummyData";
+import TransactionList from "@/components/transaction/molecules/TransactionList";
+import { Transaction } from "@/types/transaction";
+import { dummyTransactionData } from "@/data/transactionDummyData";
 
-const Wishlist = () => {
+const TransactionPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [showLogoutMessage, setShowLogoutMessage] = useState(false);
-  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
-  const [totalItems, setTotalItems] = useState(0);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [totalTransactions, setTotalTransactions] = useState(0);
 
   useEffect(() => {
     // Check if user is logged in (dummy implementation)
@@ -37,11 +37,11 @@ const Wishlist = () => {
     };
   }, []);
 
-  // Load wishlist data
+  // Load transaction data
   useEffect(() => {
-    // Simulate loading wishlist data
-    setWishlistItems(dummyWishlistData.items);
-    setTotalItems(dummyWishlistData.totalItems);
+    // Simulate loading transaction data
+    setTransactions(dummyTransactionData.transactions);
+    setTotalTransactions(dummyTransactionData.totalTransactions);
   }, []);
 
   const handleLogout = () => {
@@ -60,9 +60,9 @@ const Wishlist = () => {
     // Homepage is accessible without login
   };
 
-  const handleRemoveItem = (itemId: string) => {
-    setWishlistItems(prev => prev.filter(item => item.id !== itemId));
-    setTotalItems(prev => prev - 1);
+  const handleViewDetails = (transactionId: string) => {
+    console.log("View details for transaction:", transactionId);
+    // TODO: Navigate to transaction details page
   };
 
   return (
@@ -165,37 +165,26 @@ const Wishlist = () => {
           </div>
         </header>
 
-        {/* Wishlist Content - Based on Figma Design */}
+        {/* Transaction Content - Based on Figma Design */}
         <div className="px-6 flex-1 flex flex-col">
-          {/* Produk Idamanku Header */}
-          <div className="mb-4 mt-10">
-            <h1 className="text-[#0D0E09] text-lg font-semibold mb-4">
-              Produk Idamanku
+          {/* Riwayat Transaksi Header */}
+          <div className="mb-10 mt-10">
+            <h1 className="text-[#0D0E09] text-lg font-semibold">
+              Riwayat Transaksi
             </h1>
-            
-            {/* Total Produk Info */}
-            <div className="flex items-center gap-4 mb-6">
-              <span className="text-[#999999] text-sm">
-                Total Produk Idaman :
-              </span>
-              <span className="text-[#0D0E09] text-sm font-bold">
-                {totalItems} Produk
-              </span>
-            </div>
           </div>
 
-          {/* Wishlist Items - Scrollable */}
+          {/* Transaction List - Scrollable */}
           <div className="flex-1 overflow-y-auto">
-            <WishlistList 
-              items={wishlistItems} 
-              onRemoveItem={handleRemoveItem}
+            <TransactionList 
+              transactions={transactions} 
+              onViewDetails={handleViewDetails}
             />
           </div>
         </div>
 
         {/* Footer - Fixed at bottom */}
-        <footer className="flex-shrink-0 mb-20
-        ">
+        <footer className="flex-shrink-0 mb-20">
           <div className="flex justify-center items-center gap-1">
             <span className="text-xs font-bold text-black">©2025</span>
             <span className="text-xs text-gray-500">by</span>
@@ -207,5 +196,4 @@ const Wishlist = () => {
   );
 };
 
-export default Wishlist;
-
+export default TransactionPage;

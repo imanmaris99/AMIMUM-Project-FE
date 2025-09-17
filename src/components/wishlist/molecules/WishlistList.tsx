@@ -61,7 +61,7 @@ const WishlistList: React.FC<WishlistListProps> = ({ items, onRemoveItem }) => {
   return (
     <div className="space-y-3">
       {items.map((item) => (
-        <div key={item.id} className="bg-white rounded-lg shadow-sm border-0 overflow-hidden">
+        <div key={item.id} className="bg-white rounded-lg shadow-md border-0 overflow-hidden">
           <WishlistItem
             item={item}
             onRemove={handleRemoveItem}

@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { WishlistItem as WishlistItemType } from "@/types/wishlist";
 import rupiahFormater from "@/utils/rupiahFormater";
 
@@ -16,8 +17,18 @@ const WishlistItem: React.FC<WishlistItemProps> = ({
   onRemove, 
   isRemoving = false 
 }) => {
+  const router = useRouter();
+
+  const handleItemClick = () => {
+    // Navigate to track order page with product details
+    router.push(`/track-order?productId=${item.id}`);
+  };
+
   return (
-    <div className="flex items-center gap-4 p-4 bg-white border-b border-gray-200 hover:bg-gray-50 transition-colors">
+    <div 
+      className="flex items-center gap-4 p-4 bg-white border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+      onClick={handleItemClick}
+    >
       {/* Product Image */}
       <div className="flex-shrink-0">
         <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden">
@@ -54,7 +65,10 @@ const WishlistItem: React.FC<WishlistItemProps> = ({
       {/* Remove Button */}
       <div className="flex-shrink-0">
         <button
-          onClick={() => onRemove(item.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(item.id);
+          }}
           disabled={isRemoving}
           className="p-3 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
