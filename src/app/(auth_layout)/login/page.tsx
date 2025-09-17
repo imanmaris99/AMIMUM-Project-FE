@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { HeaderLogin } from "@/components";
+import { Eye } from "../register/Eye";
+import { EyeOff } from "../register/EyeOff";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -84,7 +86,11 @@ const Login = () => {
                     onClick={togglePasswordVisibility}
                     className="text-gray-400 hover:text-gray-600"
                   >
-                    {showPassword ? "👁️" : "👁️‍🗨️"}
+                    {showPassword ? (
+                      <Eye className="w-5 h-5" />
+                    ) : (
+                      <EyeOff className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
               </div>
