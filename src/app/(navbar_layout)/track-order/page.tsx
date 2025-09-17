@@ -49,7 +49,7 @@ const TrackOrderPage: React.FC = () => {
         </div>
         
         {/* Border Separator */}
-        <div className="w-full max-w-sm border-b-2 border-gray-300"></div>
+        <div className="w-full max-w-sm py-2 border-b-2 border-gray-300"></div>
         
         {/* Delivery Address */}
         <div className="w-full max-w-sm">
@@ -57,7 +57,7 @@ const TrackOrderPage: React.FC = () => {
         </div>
         
         {/* Border Separator */}
-        <div className="w-full max-w-sm border-b-2 border-gray-300"></div>
+        <div className="w-full max-w-sm py-2 border-b-2 border-gray-300"></div>
         
         {/* Status Order */}
         <div className="w-full max-w-sm">
