@@ -135,9 +135,9 @@ const Register = () => {
                 aria-label="Toggle password visibility"
               >
                 {showPassword ? (
-                  <EyeOff className="w-5 h-5 text-gray-400" />
-                ) : (
                   <Eye className="w-5 h-5 text-gray-400" />
+                ) : (
+                  <EyeOff className="w-5 h-5 text-gray-400" />
                 )}
               </button>
               <div className="w-full h-px bg-gray-300 absolute bottom-0 left-0"></div>
@@ -160,9 +160,9 @@ const Register = () => {
                 aria-label="Toggle confirm password visibility"
               >
                 {showConfirmPassword ? (
-                  <EyeOff className="w-5 h-5 text-gray-400" />
-                ) : (
                   <Eye className="w-5 h-5 text-gray-400" />
+                ) : (
+                  <EyeOff className="w-5 h-5 text-gray-400" />
                 )}
               </button>
               <div className="w-full h-px bg-gray-300 absolute bottom-0 left-0"></div>
