@@ -47,40 +47,83 @@ const Header = () => {
         <div className="flex justify-between items-center mt-14 mx-6">
           <div className="flex flex-col justify-center gap-2">
             <div className="flex flex-col justify-center gap-2">
-              <p>Selamat Datang,</p>
-              <h4 className="font-bold text-xl font-jakarta">
-                di Toko Herbal <span className="text-primary">AmImUm</span>
-              </h4>
               {isLoggedIn ? (
-                <div className="w-full mt-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex flex-col">
-                      <p className="text-sm text-gray-600">Halo, {userEmail}</p>
-                      <Button 
-                        variant="outline" 
-                        className="w-1/2 text-primary border-primary hover:bg-primary hover:text-white"
-                        onClick={handleLogout}
-                      >
-                        Keluar
-                      </Button>
-                    </div>
+                // Logged in state - only show welcome message
+                <div>
+                  <p>Selamat Datang,</p>
+                  <h4 className="font-bold text-2xl font-jakarta">
+                    {userEmail}
+                  </h4>
+                  <div className="w-full mt-4">
+                    <Button 
+                      variant="outline" 
+                      className="w-1/2 text-primary border-primary hover:bg-primary hover:text-white"
+                      onClick={handleLogout}
+                    >
+                      Keluar
+                    </Button>
                   </div>
                 </div>
               ) : (
-                <div className="w-full mt-4">
-                  <Link href="/login">
-                    <Button variant="secondary" className="w-1/2 text-primary bg-customGreen4 hover:bg-primary hover:text-white">
-                      Silahkan masuk
-                    </Button>
-                  </Link>
+                // Not logged in state - show full welcome message
+                <div>
+                  <p>Selamat Datang,</p>
+                  <h4 className="font-bold text-2xl font-jakarta">
+                    di Toko Herbal <span className="text-primary">AmImUm</span>
+                  </h4>
+                  <div className="w-full mt-4">
+                    <Link href="/login">
+                      <Button variant="secondary" className="w-1/2 text-primary bg-customGreen4 hover:bg-primary hover:text-white">
+                        Silahkan masuk
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="flex justify-center items-center gap-3">
-            <Image src="/Logo_toko.png" alt="logo" width={100} height={125} priority />
-          </div>
+          {/* Logo - only show when not logged in */}
+          {!isLoggedIn && (
+            <div className="flex justify-center items-center gap-3">
+              <Image src="/logo_toko.svg" alt="logo" width={100} height={125} priority />
+            </div>
+          )}
+
+          {/* Icons Section - Only show when logged in */}
+          {isLoggedIn && (
+            <div className="flex items-center gap-4">
+              {/* Cart Icon */}
+              <Link href="/cart" className="relative">
+                <Image 
+                  src="/bag-2.svg" 
+                  alt="cart" 
+                  width={32} 
+                  height={32} 
+                  className="hover:opacity-70 transition-opacity cursor-pointer"
+                />
+                {/* Cart Badge */}
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                  2
+                </div>
+              </Link>
+
+              {/* Notification Icon */}
+              <Link href="/notifications" className="relative">
+                <Image 
+                  src="/notification.svg" 
+                  alt="notification" 
+                  width={32} 
+                  height={32} 
+                  className="hover:opacity-70 transition-opacity cursor-pointer"
+                />
+                {/* Notification Badge */}
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                  3
+                </div>
+              </Link>
+            </div>
+          )}
         </div>
       </header>
     </>
