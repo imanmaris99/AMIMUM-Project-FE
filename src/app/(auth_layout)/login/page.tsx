@@ -80,6 +80,10 @@ const Login = () => {
     );
     
     if (isValid) {
+      // Save login status to localStorage
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('userEmail', formData.email);
+      
       setIsSuccess(true);
       // Auto redirect after 3 seconds
       setTimeout(() => {
