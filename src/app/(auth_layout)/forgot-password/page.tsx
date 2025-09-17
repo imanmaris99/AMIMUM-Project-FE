@@ -9,14 +9,14 @@ const ForgotPassword = () => {
       <HeaderLogin />
       
       {/* Konten utama */}
-      <div className="px-6 py-4 h-full flex flex-col">
+      <div className="px-6 py-4 h-full flex flex-col relative z-10">
         <div className="w-full max-w-sm mx-auto mt-8">
           <FormForgotPassword />
         </div>
       </div>
 
       {/* Logo brand di bagian bawah */}
-      <div className="absolute bottom-0 right-0 w-[220px] h-[242px] transform rotate-[20deg] opacity-25">
+      <div className="absolute bottom-0 right-0 w-[220px] h-[242px] transform rotate-[20deg] opacity-25 z-0">
         <div className="relative w-full h-full">
           <div className="absolute top-[49px] left-[1.75px] w-[200px] h-[200px] bg-[#B0D5C7] bg-opacity-25 rounded-full"></div>
           <div className="relative z-10 w-[175px] h-[200px] mx-auto mt-[-4px]">

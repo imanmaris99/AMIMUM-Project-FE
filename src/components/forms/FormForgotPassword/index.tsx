@@ -181,12 +181,15 @@ const FormForgotPassword = () => {
       </button>
 
       {/* Register Link */}
-      <div className="bg-white bg-opacity-40 rounded-[10px] px-4 py-3">
-        <p className="text-center text-sm text-[#475569]">
-          Belum memiliki akun? <span 
-            className="text-[#00764F] font-medium cursor-pointer hover:underline"
+      <div className="text-center">
+        <p className="text-sm text-gray-600">
+          Belum memiliki akun? 
+          <span 
+            className="text-primary font-medium ml-1 cursor-pointer hover:underline"
             onClick={() => router.push("/register")}
-          >Buat akun</span>
+          >
+            Buat akun
+          </span>
         </p>
       </div>
     </div>

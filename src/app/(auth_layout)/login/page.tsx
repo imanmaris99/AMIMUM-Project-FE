@@ -5,6 +5,7 @@ import { HeaderLogin } from "@/components";
 import { Eye } from "../register/Eye";
 import { EyeOff } from "../register/EyeOff";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const Login = () => {
   const router = useRouter();
@@ -42,7 +43,7 @@ const Login = () => {
   return (
     <div className="mx-auto max-w-[440px] min-w-[360px] h-screen relative flex flex-col overflow-hidden">
       <HeaderLogin />
-      <div className="px-6 py-4 h-full flex flex-col">
+      <div className="px-6 py-4 h-full flex flex-col relative z-10">
         <div className="w-full max-w-sm mx-auto mt-20">
           <h1 className="text-3xl font-bold text-primary text-center mb-6">
             Login
@@ -131,10 +132,29 @@ const Login = () => {
           <div className="text-center">
             <p className="text-sm text-gray-600">
               Belum memiliki akun? 
-              <span className="text-primary font-medium ml-1 cursor-pointer hover:underline">
+              <span 
+                className="text-primary font-medium ml-1 cursor-pointer hover:underline"
+                onClick={() => router.push("/register")}
+              >
                 Buat akun
               </span>
             </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Logo brand di bagian bawah */}
+      <div className="absolute bottom-0 right-0 w-[220px] h-[242px] transform rotate-[20deg] opacity-25 z-0">
+        <div className="relative w-full h-full">
+          <div className="absolute top-[49px] left-[1.75px] w-[200px] h-[200px] bg-[#B0D5C7] bg-opacity-25 rounded-full"></div>
+          <div className="relative z-10 w-[175px] h-[200px] mx-auto mt-[-4px]">
+            <Image
+              src="/logo_toko.svg"
+              alt="Logo Toko"
+              width={175}
+              height={200}
+              className="object-contain"
+            />
           </div>
         </div>
       </div>

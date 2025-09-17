@@ -4,13 +4,16 @@ import React, { useState } from "react";
 import { Eye } from "./Eye";
 import { EyeOff } from "./EyeOff";
 import { HeaderRegister } from "@/components";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const Register = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     namaDepan: "",
     namaBelakang: "",
     jenisKelamin: "",
-    email: "raziul.cse@gmail.com",
+    email: "",
     nomorHp: "",
     password: "",
     cekPassword: "",
@@ -18,17 +21,105 @@ const Register = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
+
+  // Dummy data untuk simulasi
+  const existingEmails = [
+    "admin@amimum.com",
+    "user@amimum.com", 
+    "test@amimum.com",
+    "demo@amimum.com"
+  ];
+
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+
+    // Validasi nama depan
+    if (!formData.namaDepan.trim()) {
+      newErrors.namaDepan = "Nama depan harus diisi";
+    }
+
+    // Validasi nama belakang
+    if (!formData.namaBelakang.trim()) {
+      newErrors.namaBelakang = "Nama belakang harus diisi";
+    }
+
+    // Validasi jenis kelamin
+    if (!formData.jenisKelamin) {
+      newErrors.jenisKelamin = "Jenis kelamin harus dipilih";
+    }
+
+    // Validasi email
+    if (!formData.email.trim()) {
+      newErrors.email = "Email harus diisi";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Format email tidak valid";
+    } else if (existingEmails.includes(formData.email.toLowerCase())) {
+      newErrors.email = "Email sudah terdaftar";
+    }
+
+    // Validasi nomor HP
+    if (!formData.nomorHp.trim()) {
+      newErrors.nomorHp = "Nomor HP harus diisi";
+    } else if (!/^[0-9+\-\s()]+$/.test(formData.nomorHp)) {
+      newErrors.nomorHp = "Format nomor HP tidak valid";
+    }
+
+    // Validasi password
+    if (!formData.password) {
+      newErrors.password = "Password harus diisi";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password minimal 6 karakter";
+    }
+
+    // Validasi konfirmasi password
+    if (!formData.cekPassword) {
+      newErrors.cekPassword = "Konfirmasi password harus diisi";
+    } else if (formData.password !== formData.cekPassword) {
+      newErrors.cekPassword = "Password tidak sama";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ""
+      }));
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setIsSuccess(true);
+    
+    // Auto redirect after 3 seconds
+    setTimeout(() => {
+      router.push("/login");
+    }, 3000);
+    
+    setIsSubmitting(false);
   };
 
   const togglePasswordVisibility = () => {
@@ -39,10 +130,42 @@ const Register = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
+  // Show success message if registration was successful
+  if (isSuccess) {
+    return (
+      <div className="mx-auto max-w-[440px] min-w-[360px] h-screen relative flex flex-col overflow-hidden">
+        <HeaderRegister />
+        <div className="px-6 py-4 h-full flex flex-col relative z-10">
+          <div className="w-full max-w-sm mx-auto mt-20">
+            <div className="text-center">
+              <h1 className="text-3xl font-bold text-primary mb-6">Registrasi Berhasil!</h1>
+            </div>
+            
+            <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-green-800 mb-2">Akun Berhasil Dibuat</h3>
+              <p className="text-green-700 text-sm mb-3">
+                Selamat! Akun Anda telah berhasil dibuat. 
+                Silakan login dengan email dan password yang telah Anda daftarkan.
+              </p>
+              <p className="text-green-600 text-xs">
+                Anda akan diarahkan ke halaman login dalam beberapa detik...
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-[440px] min-w-[360px] h-screen relative flex flex-col overflow-hidden">
       <HeaderRegister />
-      <div className="px-6 py-4 h-full flex flex-col">
+      <div className="px-6 py-4 h-full flex flex-col relative z-10">
         <div className="w-full max-w-sm mx-auto mt-20">
           <h1 className="text-3xl font-bold text-primary text-center mb-6">
             Registrasi
@@ -56,10 +179,13 @@ const Register = () => {
                 value={formData.namaDepan}
                 onChange={(e) => handleInputChange("namaDepan", e.target.value)}
                 placeholder="Nama Depan"
-                className="w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1"
+                className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1 ${errors.namaDepan ? 'text-red-500' : ''}`}
                 aria-label="First Name"
               />
-              <div className="w-full h-px bg-gray-300 absolute bottom-0 left-0"></div>
+              <div className={`w-full h-px absolute bottom-0 left-0 ${errors.namaDepan ? 'bg-red-500' : 'bg-gray-300'}`}></div>
+              {errors.namaDepan && (
+                <p className="text-red-500 text-xs mt-1">{errors.namaDepan}</p>
+              )}
             </div>
 
             {/* Nama Belakang */}
@@ -69,10 +195,13 @@ const Register = () => {
                 value={formData.namaBelakang}
                 onChange={(e) => handleInputChange("namaBelakang", e.target.value)}
                 placeholder="Nama Belakang"
-                className="w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1"
+                className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1 ${errors.namaBelakang ? 'text-red-500' : ''}`}
                 aria-label="Last Name"
               />
-              <div className="w-full h-px bg-gray-300 absolute bottom-0 left-0"></div>
+              <div className={`w-full h-px absolute bottom-0 left-0 ${errors.namaBelakang ? 'bg-red-500' : 'bg-gray-300'}`}></div>
+              {errors.namaBelakang && (
+                <p className="text-red-500 text-xs mt-1">{errors.namaBelakang}</p>
+              )}
             </div>
 
             {/* Jenis Kelamin */}
@@ -80,7 +209,7 @@ const Register = () => {
               <select
                 value={formData.jenisKelamin}
                 onChange={(e) => handleInputChange("jenisKelamin", e.target.value)}
-                className="w-full bg-transparent border-none outline-none text-slate-600 text-sm appearance-none py-3 pb-1"
+                className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm appearance-none py-3 pb-1 ${errors.jenisKelamin ? 'text-red-500' : ''}`}
                 aria-label="Gender"
               >
                 <option value="" disabled>
@@ -89,7 +218,10 @@ const Register = () => {
                 <option value="laki-laki">Laki-laki</option>
                 <option value="perempuan">Perempuan</option>
               </select>
-              <div className="w-full h-px bg-gray-300 absolute bottom-0 left-0"></div>
+              <div className={`w-full h-px absolute bottom-0 left-0 ${errors.jenisKelamin ? 'bg-red-500' : 'bg-gray-300'}`}></div>
+              {errors.jenisKelamin && (
+                <p className="text-red-500 text-xs mt-1">{errors.jenisKelamin}</p>
+              )}
             </div>
 
             {/* Email */}
@@ -99,10 +231,13 @@ const Register = () => {
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 placeholder="Email"
-                className="w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1"
+                className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1 ${errors.email ? 'text-red-500' : ''}`}
                 aria-label="Email"
               />
-              <div className="w-full h-px bg-gray-300 absolute bottom-0 left-0"></div>
+              <div className={`w-full h-px absolute bottom-0 left-0 ${errors.email ? 'bg-red-500' : 'bg-gray-300'}`}></div>
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
             </div>
 
             {/* Nomor HP */}
@@ -112,10 +247,13 @@ const Register = () => {
                 value={formData.nomorHp}
                 onChange={(e) => handleInputChange("nomorHp", e.target.value)}
                 placeholder="Nomor Hp"
-                className="w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1"
+                className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1 ${errors.nomorHp ? 'text-red-500' : ''}`}
                 aria-label="Phone Number"
               />
-              <div className="w-full h-px bg-gray-300 absolute bottom-0 left-0"></div>
+              <div className={`w-full h-px absolute bottom-0 left-0 ${errors.nomorHp ? 'bg-red-500' : 'bg-gray-300'}`}></div>
+              {errors.nomorHp && (
+                <p className="text-red-500 text-xs mt-1">{errors.nomorHp}</p>
+              )}
             </div>
 
             {/* Password */}
@@ -125,7 +263,7 @@ const Register = () => {
                 value={formData.password}
                 onChange={(e) => handleInputChange("password", e.target.value)}
                 placeholder="Password"
-                className="w-full bg-transparent border-none outline-none text-slate-600 text-sm pr-10 py-3 pb-1"
+                className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm pr-10 py-3 pb-1 ${errors.password ? 'text-red-500' : ''}`}
                 aria-label="Password"
               />
               <button
@@ -140,7 +278,10 @@ const Register = () => {
                   <EyeOff className="w-5 h-5 text-gray-400" />
                 )}
               </button>
-              <div className="w-full h-px bg-gray-300 absolute bottom-0 left-0"></div>
+              <div className={`w-full h-px absolute bottom-0 left-0 ${errors.password ? 'bg-red-500' : 'bg-gray-300'}`}></div>
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+              )}
             </div>
 
             {/* Konfirmasi Password */}
@@ -150,7 +291,7 @@ const Register = () => {
                 value={formData.cekPassword}
                 onChange={(e) => handleInputChange("cekPassword", e.target.value)}
                 placeholder="Cek Password"
-                className="w-full bg-transparent border-none outline-none text-slate-600 text-sm pr-10 py-3 pb-1"
+                className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm pr-10 py-3 pb-1 ${errors.cekPassword ? 'text-red-500' : ''}`}
                 aria-label="Confirm Password"
               />
               <button
@@ -165,27 +306,60 @@ const Register = () => {
                   <EyeOff className="w-5 h-5 text-gray-400" />
                 )}
               </button>
-              <div className="w-full h-px bg-gray-300 absolute bottom-0 left-0"></div>
+              <div className={`w-full h-px absolute bottom-0 left-0 ${errors.cekPassword ? 'bg-red-500' : 'bg-gray-300'}`}></div>
+              {errors.cekPassword && (
+                <p className="text-red-500 text-xs mt-1">{errors.cekPassword}</p>
+              )}
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-primary text-white py-3 rounded font-medium hover:bg-primary/90 transition-colors mt-4"
+              disabled={isSubmitting}
+              className="w-full bg-primary text-white py-3 rounded font-medium hover:bg-primary/90 transition-colors mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              Submit
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Mendaftar...
+                </>
+              ) : (
+                "Submit"
+              )}
             </button>
 
             {/* Login Link */}
             <div className="text-center mt-4">
               <p className="text-sm text-gray-600">
                 Sudah memiliki akun? 
-                <span className="text-primary font-medium ml-1 cursor-pointer hover:underline">
+                <span 
+                  className="text-primary font-medium ml-1 cursor-pointer hover:underline"
+                  onClick={() => router.push("/login")}
+                >
                   Log in disini
                 </span>
               </p>
             </div>
           </form>
+        </div>
+      </div>
+
+      {/* Logo brand di bagian bawah */}
+      <div className="absolute bottom-0 right-0 w-[220px] h-[242px] transform rotate-[20deg] opacity-25 z-0">
+        <div className="relative w-full h-full">
+          <div className="absolute top-[49px] left-[1.75px] w-[200px] h-[200px] bg-[#B0D5C7] bg-opacity-25 rounded-full"></div>
+          <div className="relative z-10 w-[175px] h-[200px] mx-auto mt-[-4px]">
+            <Image
+              src="/logo_toko.svg"
+              alt="Logo Toko"
+              width={175}
+              height={200}
+              className="object-contain"
+            />
+          </div>
         </div>
       </div>
     </div>
