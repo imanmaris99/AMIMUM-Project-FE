@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { GoChevronLeft } from "react-icons/go";
 import CartList from "@/components/cart/CartList";
 import CartSummary from "@/components/cart/CartSummary";
+import CartFooter from "@/components/cart/CartFooter";
 import { useCart } from "@/contexts/CartContext";
 
 export default function CartPage() {
@@ -34,7 +35,7 @@ export default function CartPage() {
       </div>
 
       {/* Content */}
-      <div className="px-4 py-6 pb-32">
+      <div className="px-4 py-6 pb-40">
         <div className="max-w-sm mx-auto">
           <CartList />
         </div>
@@ -42,6 +43,9 @@ export default function CartPage() {
 
       {/* Cart Summary */}
       <CartSummary />
+      
+      {/* Cart Footer */}
+      <CartFooter />
     </div>
   );
 }

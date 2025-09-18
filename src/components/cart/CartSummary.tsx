@@ -16,8 +16,9 @@ export default function CartSummary() {
   const total = totalPrices.total_all_active_prices;
 
   return (
-    <div className="px-6 py-4">
-      <div className="bg-white rounded-2xl shadow-lg p-4">
+    <div className="px-4 py-4 pb-32">
+      <div className="max-w-sm mx-auto">
+        <div className="bg-white rounded-2xl shadow-lg p-4">
         <div className="space-y-6">
           {/* Items Section - Always show */}
           <div className="space-y-2">
@@ -50,6 +51,7 @@ export default function CartSummary() {
               {rupiahFormater(total)}
             </span>
           </div>
+        </div>
         </div>
       </div>
     </div>
