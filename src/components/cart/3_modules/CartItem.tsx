@@ -7,7 +7,7 @@ import Heading3 from "../1_elements/Heading3";
 import { CartItemType } from "@/types/apiTypes";
 import ItemSummary from "../2_widgets/ItemSummary";
 import CheckBox from "../2_widgets/CheckBox";
-import { editCartQty } from "@/services/apiService";
+// import { editCartQty } from "@/services/apiService"; // API call dinonaktifkan sementara
 
 interface CartItemProps {
   cartItem: CartItemType;
@@ -24,14 +24,16 @@ const CartItem = ({ cartItem, onUpdateCart, onRemoveItem }: CartItemProps) => {
         const newQty = quantity - 1;
         setQuantity(newQty);
         onUpdateCart({ ...cartItem, quantity: newQty });
-        await editCartQty({
-          cart: {
-            cart_id: cartItem.id,
-          },
-          quantity_update: {
-            quantity: newQty,
-          },
-        });
+        
+        // API call dinonaktifkan sementara karena server sedang down
+        // await editCartQty({
+        //   cart: {
+        //     cart_id: cartItem.id,
+        //   },
+        //   quantity_update: {
+        //     quantity: newQty,
+        //   },
+        // });
       } catch (error) {
         throw error;
       }
@@ -43,14 +45,16 @@ const CartItem = ({ cartItem, onUpdateCart, onRemoveItem }: CartItemProps) => {
       const newQty = quantity + 1;
       setQuantity(newQty);
       onUpdateCart({ ...cartItem, quantity: newQty });
-      await editCartQty({
-        cart: {
-          cart_id: cartItem.id,
-        },
-        quantity_update: {
-          quantity: newQty,
-        },
-      });
+      
+      // API call dinonaktifkan sementara karena server sedang down
+      // await editCartQty({
+      //   cart: {
+      //     cart_id: cartItem.id,
+      //   },
+      //   quantity_update: {
+      //     quantity: newQty,
+      //   },
+      // });
     } catch (error) {
       throw error;
     }

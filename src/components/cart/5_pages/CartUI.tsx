@@ -1,26 +1,48 @@
-import React from "react";
-import TopNavigation from "@/components/cart/2_widgets/TopNavigation";
-import Heading2 from "@/components/cart/1_elements/Heading2";
-import CartItemsList from "@/components/cart/4_templates/CartItemsList";
-import CartSummary from "@/components/cart/3_modules/CartSummary";
-import Button from "@/components/cart/1_elements/Button";
-import BottomBar from "@/components/cart/2_widgets/BottomBar";
+"use client";
+
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { GoChevronLeft } from "react-icons/go";
 import { CartResponseType } from "@/types/apiTypes";
-import CartSummarySkeleton from "../3_modules/CartSummarySkeleton";
 import Spinner from "@/components/ui/Spinner";
+import TotalPrice from "../3_modules/TotalPrice";
+import Checkout from "../3_modules/Checkout";
+import CartItemInteractive from "../3_modules/CartItemInteractive";
+import { useCart } from "@/contexts/CartContext";
 
 interface CartUIProps {
-  cartResponse: CartResponseType;
+  cartResponse: CartResponseType | null;
   errorMessage?: string | null;
 }
 
 const CartUI: React.FC<CartUIProps> = ({ cartResponse, errorMessage }) => {
+  const { cartItems, totalPrices, selectAllItems, getCartItemCount } = useCart();
+  const [isAllSelected, setIsAllSelected] = useState(false);
+  const router = useRouter();
+
+  const handleSelectAll = (selected: boolean) => {
+    setIsAllSelected(selected);
+    selectAllItems(selected);
+  };
+
+  const handleCheckout = () => {
+    const activeItems = cartItems.filter(item => item.is_active);
+    if (activeItems.length === 0) {
+      alert("Pilih minimal satu item untuk checkout");
+      return;
+    }
+    console.log("Checkout clicked with items:", activeItems);
+    // TODO: Implement actual checkout logic
+  };
+
+  const handleBack = () => {
+    router.back();
+  };
+
   if (errorMessage) {
     return <div className="text-red-500 text-center mt-4">{errorMessage}</div>;
   }
   if (!cartResponse) {
-    // Tambahkan fungsi dummy agar CartItemsList tidak error jika dipakai
-    const noop = () => {};
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
         <Spinner className="mb-4" />
@@ -29,25 +51,56 @@ const CartUI: React.FC<CartUIProps> = ({ cartResponse, errorMessage }) => {
     );
   }
   return (
-    <div className="mx-auto min-x-[360px] max-w-[400px] relative">
-      <TopNavigation>Keranjangku</TopNavigation>
-      <CartItemsList
-        isLoading={false}
-        cartList={cartResponse.data}
-        onUpdateCart={() => {}}
-        onRemoveItem={() => {}}
-      />
-      <div className="h-[200px] pt-10 bg-color-[#FAFAFA] border-t-4 border-[#E6F1ED] pb-80 px-6">
-        <CartSummary cartResponse={cartResponse} />
-      </div>
-      <div className="fixed bottom-0 left-0 right-0 bg-white mx-auto max-w-[400px] w-full rounded-t-3xl">
-        <div className="flex gap-6 items-center justify-between mt-6 shadow-2xl pt-4 pb-8 px-[30px] flex-grow">
-          <Heading2 className="text-[#C4C4C4]">All Item</Heading2>
-          <Button className="bg-[#00764F] text-[#E6F1ED] py-2 px-4 rounded-full">
-            Checkout
-          </Button>
+    <div className="min-h-screen bg-white">
+      {/* Header - Same style as track order */}
+      <div className="bg-white">
+        <div className="flex justify-center items-center relative pt-16 pb-4">
+          <div className="absolute left-4">
+            <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
+          </div>
+          <div className="text-center">
+            <h1 className="text-[16px] font-semibold">Keranjangku</h1>
+            <p className="text-xs text-gray-500 mt-1">{cartItems.length} item di keranjang</p>
+          </div>
         </div>
-        <BottomBar />
+      </div>
+
+      {/* Content */}
+      <div className="px-4 py-6 pb-32">
+        <div className="max-w-sm mx-auto">
+          <h2 className="text-lg font-semibold mb-4">Cart Items ({cartItems.length})</h2>
+          {cartItems.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 mb-4">Keranjang kosong</p>
+              <p className="text-sm text-gray-400">Tambahkan produk untuk memulai belanja</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {cartItems.map((item) => (
+                <CartItemInteractive key={item.id} cartItem={item} />
+              ))}
+            </div>
+          )}
+          
+          {/* Total Price Component */}
+          {cartItems.length > 0 && (
+            <div className="mt-6">
+              <TotalPrice totalPrices={totalPrices} />
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* Checkout Component - Fixed like ecommerce */}
+      <div className="fixed bottom-0 left-0 right-0 z-50">
+        <div className="max-w-sm mx-auto">
+          <Checkout
+            totalPrice={totalPrices.total_all_active_prices}
+            onCheckout={handleCheckout}
+            onSelectAll={handleSelectAll}
+            isAllSelected={isAllSelected}
+          />
+        </div>
       </div>
     </div>
   );
