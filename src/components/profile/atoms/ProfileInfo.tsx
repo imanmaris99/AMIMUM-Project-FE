@@ -115,8 +115,8 @@ const ProfileInfo: React.FC = () => {
             className="bg-[#E6F2F0] text-[#0D0E09] px-4 py-2 rounded-2xl text-sm font-medium border border-[#A2A2A2] flex items-center gap-2 hover:bg-[#D4E8E0] transition-colors"
           >
             <Image
-              src="/note.svg"
-              alt="Note"
+              src="/gallery-export.svg"
+              alt="Gallery"
               width={14}
               height={14}
               className="text-[#0D0E09]"
