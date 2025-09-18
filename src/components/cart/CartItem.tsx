@@ -90,12 +90,16 @@ const CartItem: React.FC<CartItemProps> = ({
 
       {/* Text */}
       <div className="flex-1 min-w-0">
-        <h2 className="font-bold text-base mb-1">{item.product_name}</h2>
-        <p className="text-gray-500 text-xs m-0">{item.variant_info.variant} • {item.variant_info.name}</p>
-        <div className="mt-2 text-base font-bold text-green-800" data-unit={displayPrice}>
+        <h2 className="font-bold text-sm mb-1 line-clamp-2 leading-tight">
+          {item.product_name}
+        </h2>
+        <p className="text-gray-500 text-xs m-0 truncate">
+          {item.variant_info.variant}
+        </p>
+        <div className="mt-2 text-sm font-bold text-green-800" data-unit={displayPrice}>
           Rp {displayPrice.toLocaleString('id-ID')}
           {item.variant_info.discount > 0 && (
-            <span className="text-xs text-red-500 ml-2">
+            <span className="bg-red-100 text-red-600 px-1 py-0.5 rounded text-[10px] font-bold ml-2">
               -{item.variant_info.discount}%
             </span>
           )}
@@ -103,19 +107,19 @@ const CartItem: React.FC<CartItemProps> = ({
       </div>
 
       {/* Controls */}
-      <div className="flex flex-col items-center gap-2 flex-shrink-0">
+      <div className="flex flex-col items-end gap-2 flex-shrink-0">
         <button 
-          className="w-7 h-7 border-none bg-transparent cursor-pointer opacity-80 hover:opacity-100" 
+          className="w-6 h-6 border-none bg-transparent cursor-pointer opacity-80 hover:opacity-100 p-1" 
           title="Hapus" 
           onClick={handleDelete}
         >
-          <img src="/Trush_Icon_UIA.svg" alt="Hapus" width="20" height="20" />
+          <img src="/Trush_Icon_UIA.svg" alt="Hapus" width="16" height="16" />
         </button>
 
-        <div className="flex items-center border border-gray-200 rounded-md h-8 overflow-hidden" role="group" aria-label="Pengatur jumlah">
+        <div className="flex items-center border border-gray-200 rounded-md h-7 overflow-hidden" role="group" aria-label="Pengatur jumlah">
           <button 
             type="button" 
-            className="w-8 h-8 border-0 bg-gray-100 cursor-pointer text-base" 
+            className="w-7 h-7 border-0 bg-gray-100 cursor-pointer text-sm hover:bg-gray-200" 
             aria-label="Kurangi" 
             onClick={handleMinus}
           >
@@ -123,7 +127,7 @@ const CartItem: React.FC<CartItemProps> = ({
           </button>
           <input 
             type="number" 
-            className="w-10 h-8 border-0 text-center text-sm outline-none" 
+            className="w-8 h-7 border-0 text-center text-xs outline-none" 
             value={quantity} 
             min="1" 
             inputMode="numeric" 
@@ -132,7 +136,7 @@ const CartItem: React.FC<CartItemProps> = ({
           />
           <button 
             type="button" 
-            className="w-8 h-8 border-0 bg-gray-100 cursor-pointer text-base" 
+            className="w-7 h-7 border-0 bg-gray-100 cursor-pointer text-sm hover:bg-gray-200" 
             aria-label="Tambah" 
             onClick={handlePlus}
           >
