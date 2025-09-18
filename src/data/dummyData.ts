@@ -506,36 +506,26 @@ const PRODUCT_IMAGES = {
 function createVariants(basePrice: number, discount: number, stock: number[], hasDiscount: boolean, template: string): any[] {
   const actualDiscount = hasDiscount ? discount : 0;
   const discountedPrice = hasDiscount ? calculateDiscountedPrice(basePrice, discount) : basePrice;
-  const doublePrice = basePrice * 2;
-  const doubleDiscountedPrice = hasDiscount ? calculateDiscountedPrice(doublePrice, discount) : doublePrice;
   const productImage = PRODUCT_IMAGES[template as keyof typeof PRODUCT_IMAGES] || "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop&crop=center";
   
-  return [
-    {
-      id: 1,
-      product: "1",
-      name: "60ml",
-      img: productImage,
-      variant: "60ml",
-      expiration: "2025-12-31",
-      stock: stock[0],
-      discount: actualDiscount,
-      discounted_price: discountedPrice,
-      updated_at: "2024-01-01T00:00:00Z"
-    },
-    {
-      id: 2,
-      product: "1",
-      name: "120ml",
-      img: productImage,
-      variant: "120ml",
-      expiration: "2025-12-31",
-      stock: stock[1],
-      discount: actualDiscount,
-      discounted_price: doubleDiscountedPrice,
-      updated_at: "2024-01-01T00:00:00Z"
-    }
+  // Data variant rasa yang konsisten
+  const flavorVariants = [
+    "Anggur", "Strawberry", "Cokelat", "Vanilla", 
+    "Melon", "Jeruk", "Susu", "Mocca"
   ];
+  
+  return flavorVariants.map((flavor, index) => ({
+    id: index + 1,
+    product: "1",
+    name: flavor,
+    img: productImage,
+    variant: flavor,
+    expiration: "2025-12-31",
+    stock: stock[index % stock.length] || Math.floor(Math.random() * 50) + 20,
+    discount: actualDiscount,
+    discounted_price: discountedPrice,
+    updated_at: "2024-01-01T00:00:00Z"
+  }));
 }
 
 
@@ -700,11 +690,15 @@ function createAllProductInfo(
   basePrice: number,
   hasDiscount: boolean = false
 ): AllProductInfoType {
-  const variants = [
-    createVariantAllProduct(1, "Original", hasDiscount),
-    createVariantAllProduct(2, "Madu", hasDiscount),
-    createVariantAllProduct(3, "Jahe", hasDiscount)
+  // Data variant rasa yang konsisten
+  const flavorVariants = [
+    "Anggur", "Strawberry", "Cokelat", "Vanilla", 
+    "Melon", "Jeruk", "Susu", "Mocca"
   ];
+  
+  const variants = flavorVariants.map((flavor, index) => 
+    createVariantAllProduct(index + 1, flavor, hasDiscount)
+  );
 
   return {
     id: productId,
