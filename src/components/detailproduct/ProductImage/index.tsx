@@ -7,10 +7,18 @@ interface ProductImageProps {
 }
 
 const ProductImage = ({ detailProduct }: ProductImageProps) => {
-  const imageUrl = detailProduct?.image_url || "/default-image.jpg";
+  const imageUrl = detailProduct?.variants_list?.[0]?.img || detailProduct?.image_url || "/buyungupik_agr-1.svg";
   return (
     <div className="w-full h-64 relative">
-      <Image src={imageUrl} alt={detailProduct?.name || "Product Image"} layout="fill" objectFit="cover" />
+      <Image 
+        src={imageUrl} 
+        alt={detailProduct?.name || "Product Image"} 
+        layout="fill" 
+        objectFit="contain"
+        onError={(e) => {
+          e.currentTarget.src = "/buyungupik_agr-1.svg";
+        }}
+      />
     </div>
   );
 };

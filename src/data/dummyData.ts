@@ -485,18 +485,36 @@ function generateProductId(brandId: string, productIndex: number): string {
   return `${brandId}${String(productIndex).padStart(2, '0')}`;
 }
 
-function createVariants(basePrice: number, discount: number, stock: number[], hasDiscount: boolean): any[] {
+// ==================== IMAGE MAPPING ====================
+const PRODUCT_IMAGES = {
+  "beras-kencur": "/buyungupik_agr-1.svg",
+  "kunyit-asam": "/buyungupik_agr-1.svg",
+  "galian-singset": "/buyungupik_agr-1.svg",
+  "temulawak": "/buyungupik_agr-1.svg",
+  "jahe-merah": "/buyungupik_agr-1.svg",
+  "asam-urat": "/buyungupik_agr-1.svg",
+  "sirih-merah": "/buyungupik_agr-1.svg",
+  "kumis-kucing": "/buyungupik_agr-1.svg",
+  "sambiloto": "/buyungupik_agr-1.svg",
+  "daun-dewa": "/buyungupik_agr-1.svg",
+  "pegagan": "/buyungupik_agr-1.svg",
+  "lidah-buaya": "/buyungupik_agr-1.svg",
+  "mahkota-dewa": "/buyungupik_agr-1.svg"
+} as const;
+
+function createVariants(basePrice: number, discount: number, stock: number[], hasDiscount: boolean, template: string): any[] {
   const actualDiscount = hasDiscount ? discount : 0;
   const discountedPrice = hasDiscount ? calculateDiscountedPrice(basePrice, discount) : basePrice;
   const doublePrice = basePrice * 2;
   const doubleDiscountedPrice = hasDiscount ? calculateDiscountedPrice(doublePrice, discount) : doublePrice;
+  const productImage = PRODUCT_IMAGES[template as keyof typeof PRODUCT_IMAGES] || "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop&crop=center";
   
   return [
     {
       id: 1,
       product: "1",
       name: "60ml",
-      img: "/default-image.jpg",
+      img: productImage,
       variant: "60ml",
       expiration: "2025-12-31",
       stock: stock[0],
@@ -508,7 +526,7 @@ function createVariants(basePrice: number, discount: number, stock: number[], ha
       id: 2,
       product: "1",
       name: "120ml",
-      img: "/default-image.jpg",
+      img: productImage,
       variant: "120ml",
       expiration: "2025-12-31",
       stock: stock[1],
@@ -543,7 +561,7 @@ export function generateDetailProductData(): { [key: string]: DetailProductType 
         company: brand.name,
         avg_rating: template.avg_rating,
         total_rater: template.total_rater,
-        variants_list: createVariants(config.basePrice, discount, config.stock, config.hasDiscount),
+        variants_list: createVariants(config.basePrice, discount, config.stock, config.hasDiscount, config.template),
         created_at: "2024-01-01T00:00:00Z",
         updated_at: "2024-01-01T00:00:00Z"
       };

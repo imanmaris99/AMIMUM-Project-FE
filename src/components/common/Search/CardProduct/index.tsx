@@ -41,11 +41,14 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
       <div className="flex flex-col justify-center items-center">
         <div className="bg-gray-100 w-32 h-28 rounded-lg flex justify-center items-center">
           <Image
-            src="/default-image.jpg"
+            src={product.all_variants[0]?.img || "/buyungupik_agr-1.svg"}
             alt={product.name}
             width={100}
             height={100}
             className="rounded-lg"
+            onError={(e) => {
+              e.currentTarget.src = "/buyungupik_agr-1.svg";
+            }}
           />
         </div>
       </div>

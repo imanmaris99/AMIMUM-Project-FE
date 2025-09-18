@@ -4,6 +4,7 @@ import ProductVariants from "@/components/detailproduct/ProductVariants";
 import ProductInformation from "@/components/detailproduct/ProductInformation";
 import ProductDescription from "@/components/detailproduct/ProductDescription";
 import ProductPrice from "@/components/detailproduct/ProductPrice";
+import DetailProductHeader from "@/components/detailproduct/DetailProductHeader";
 // import { getDetailProductServer } from "@/API/detail-product";
 import { DetailProductType } from "@/types/detailProduct";
 import { getDetailProduct } from "@/data/dataUtils";
@@ -32,13 +33,19 @@ export default async function DetailProduct({ params }: { params: Promise<{ prod
   // isError harus number
   const isError = errorMessage ? 500 : 0;
   return (
-    <main className="pb-20">
-      <ProductImage detailProduct={detailProduct} />
-      <TitleProduct isLoading={false} isError={isError} data={detailProduct} />
-      <ProductVariants variants={detailProduct?.variants_list ?? []} />
-      <ProductInformation isLoading={false} isError={isError} datavariant={detailProduct?.variants_list?.[0]} />
-      <ProductDescription isLoading={false} isError={isError} data={detailProduct} />
-      <ProductPrice isLoading={false} isError={isError} data={detailProduct} datavariant={detailProduct?.variants_list?.[0]} />
-    </main>
+    <div className="flex flex-col justify-between min-h-screen bg-white">
+      {/* Header */}
+      <DetailProductHeader title="Detail Item" />
+      
+      {/* Content */}
+      <main className="pb-20 mt-20">
+        <ProductImage detailProduct={detailProduct} />
+        <TitleProduct isLoading={false} isError={isError} data={detailProduct} />
+        <ProductVariants variants={detailProduct?.variants_list ?? []} />
+        <ProductInformation isLoading={false} isError={isError} datavariant={detailProduct?.variants_list?.[0]} />
+        <ProductDescription isLoading={false} isError={isError} data={detailProduct} />
+        <ProductPrice isLoading={false} isError={isError} data={detailProduct} datavariant={detailProduct?.variants_list?.[0]} />
+      </main>
+    </div>
   );
 }
