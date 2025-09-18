@@ -11,7 +11,6 @@ import ProductDescription from "@/components/detailproduct/ProductDescription";
 import ProductPrice from "@/components/detailproduct/ProductPrice";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 import { getDetailProduct } from "@/data/dataUtils";
-import { CartProvider } from "@/contexts/CartContext";
 import { validateDetailProductData } from "@/utils/dataValidation";
 
 export default function DetailProduct() {
@@ -52,7 +51,10 @@ export default function DetailProduct() {
         // Set default selected variant to first variant
         if (product.variants_list && product.variants_list.length > 0) {
           setSelectedVariant(product.variants_list[0]);
-          console.log(`Default variant selected: ${product.variants_list[0].variant}`);
+          console.log(`✅ Default variant selected: ${product.variants_list[0].variant}`);
+          console.log("🎯 Selected variant data:", product.variants_list[0]);
+        } else {
+          console.warn("❌ No variants available for product");
         }
       } catch (err) {
         console.error(`Error loading product ${productId}:`, err);
@@ -68,6 +70,7 @@ export default function DetailProduct() {
   }, [productId]);
   
   const handleVariantChange = (variant: VariantProductType) => {
+    console.log("🎯 Variant changed to:", variant);
     setSelectedVariant(variant);
   };
   
@@ -79,8 +82,7 @@ export default function DetailProduct() {
   const isError = errorMessage ? 500 : 0;
   
   return (
-    <CartProvider>
-      <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white">
         {/* Header - Same style as track order with white background */}
         <div className="flex justify-center items-center relative mt-16">
           <div className="absolute left-10">
@@ -108,6 +110,5 @@ export default function DetailProduct() {
           </div>
         </div>
       </div>
-    </CartProvider>
   );
 }
