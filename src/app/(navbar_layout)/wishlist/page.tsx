@@ -6,13 +6,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import WishlistList from "@/components/wishlist/molecules/WishlistList";
 import { WishlistItem } from "@/types/wishlist";
-import { dummyWishlistData } from "@/data/wishlistDummyData";
+import { useWishlist } from "@/contexts/WishlistContext";
 
 const Wishlist = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [showLogoutMessage, setShowLogoutMessage] = useState(false);
-  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
+  const { wishlistItems, removeFromWishlist } = useWishlist();
   const [totalItems, setTotalItems] = useState(0);
 
   useEffect(() => {
@@ -37,12 +37,10 @@ const Wishlist = () => {
     };
   }, []);
 
-  // Load wishlist data
+  // Update total items when wishlist changes
   useEffect(() => {
-    // Simulate loading wishlist data
-    setWishlistItems(dummyWishlistData.items);
-    setTotalItems(dummyWishlistData.totalItems);
-  }, []);
+    setTotalItems(wishlistItems.length);
+  }, [wishlistItems]);
 
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
@@ -61,8 +59,8 @@ const Wishlist = () => {
   };
 
   const handleRemoveItem = (itemId: string) => {
-    setWishlistItems(prev => prev.filter(item => item.id !== itemId));
-    setTotalItems(prev => prev - 1);
+    // This function is now handled by the context
+    // We keep it for backward compatibility with WishlistList
   };
 
   return (

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "../globals.css";
 import { Navbar } from "../../components";
 import { Suspense } from "react";
+import { WishlistProvider } from "@/contexts/WishlistContext";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -20,10 +21,12 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;700;900&display=swap" rel="stylesheet" />
       </head>
       <body className="antialiased font-jakarta">
-        <main>
-          <Suspense>{children}</Suspense>
-        </main>
-        <Navbar />
+        <WishlistProvider>
+          <main>
+            <Suspense>{children}</Suspense>
+          </main>
+          <Navbar />
+        </WishlistProvider>
       </body>
     </html>
   );

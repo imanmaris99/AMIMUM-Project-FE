@@ -12,23 +12,26 @@ const ProductVariants = ({ variants }: ProductVariantsProps) => {
 
   return (
     <div className="p-4">
-      <p className="text-gray-500 text-sm font-medium mb-2">Varian produk :</p>
-      <div className="grid grid-cols-4 gap-3">
+      <p className="text-gray-500 text-sm font-medium mb-3">Varian produk :</p>
+      <div className="flex flex-wrap gap-3">
         {(variants || []).map((variant) => (
-          <label key={variant.id} className="flex items-center space-x-2">
+          <label 
+            key={variant.id} 
+            className={`flex items-center justify-center space-x-2 px-4 py-3 rounded-lg border-2 cursor-pointer transition-all duration-200 min-w-[120px] h-12 ${
+              selectedVariant === variant.name 
+                ? "border-primary bg-primary/5 text-primary" 
+                : "border-gray-200 hover:border-gray-300 text-gray-600"
+            }`}
+          >
             <input
               type="radio"
               name="variant"
               value={variant.name}
               checked={selectedVariant === variant.name}
               onChange={() => setSelectedVariant(variant.name)}
-              className="form-radio text-green-600 focus:ring-green-500 text-sm"
+              className="form-radio text-primary focus:ring-primary text-sm"
             />
-            <span
-              className={`${
-                selectedVariant === variant.name ? "text-gray-900" : "text-gray-400"
-              } font-medium text-sm`}
-            >
+            <span className="font-medium text-sm whitespace-nowrap text-center">
               {variant.name}
             </span>
           </label>

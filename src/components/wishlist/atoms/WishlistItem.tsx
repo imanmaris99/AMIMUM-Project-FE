@@ -20,8 +20,8 @@ const WishlistItem: React.FC<WishlistItemProps> = ({
   const router = useRouter();
 
   const handleItemClick = () => {
-    // Navigate to track order page with product details
-    router.push(`/track-order?productId=${item.id}`);
+    // Navigate to product detail page using productId
+    router.push(`/detail-product/${item.productId}`);
   };
 
   return (

@@ -19,7 +19,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 fixed bottom-0 right-0 left-0 bg-white mx-auto" style={{ maxWidth: '440px', width: '100%' }}>
+    <div className="flex flex-col gap-4 fixed bottom-0 right-0 left-0 bg-white mx-auto z-50" style={{ maxWidth: '440px', width: '100%' }}>
       <div className="shadow-box">
         <div className="flex justify-center items-center gap-8 h-14">
           <div className={`${getIconClass("/")} rounded-full p-2 cursor-pointer`} onClick={() => handleClick("/")}>

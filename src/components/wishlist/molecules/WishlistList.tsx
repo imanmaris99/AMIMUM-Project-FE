@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import WishlistItem from "../atoms/WishlistItem";
 import { WishlistItem as WishlistItemType } from "@/types/wishlist";
+import { useWishlist } from "@/contexts/WishlistContext";
 
 interface WishlistListProps {
   items: WishlistItemType[];
@@ -11,6 +12,7 @@ interface WishlistListProps {
 
 const WishlistList: React.FC<WishlistListProps> = ({ items, onRemoveItem }) => {
   const [removingItems, setRemovingItems] = useState<Set<string>>(new Set());
+  const { removeFromWishlist } = useWishlist();
 
   const handleRemoveItem = async (id: string) => {
     setRemovingItems(prev => new Set(prev).add(id));
@@ -18,6 +20,12 @@ const WishlistList: React.FC<WishlistListProps> = ({ items, onRemoveItem }) => {
     try {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
+      // Remove from context using productId
+      const item = items.find(item => item.id === id);
+      if (item) {
+        removeFromWishlist(item.productId);
+      }
+      // Also call the passed onRemoveItem for backward compatibility
       onRemoveItem(id);
     } catch (error) {
       console.error("Failed to remove item:", error);
