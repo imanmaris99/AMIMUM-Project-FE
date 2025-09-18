@@ -23,7 +23,7 @@ const ProfileInfo: React.FC = () => {
     
     // Show success message
     const successMessage = document.createElement("div");
-    successMessage.className = "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg";
+    successMessage.className = "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-primary text-white px-4 py-2 rounded-lg shadow-lg";
     successMessage.textContent = "Profile berhasil diperbarui!";
     document.body.appendChild(successMessage);
     
@@ -46,7 +46,7 @@ const ProfileInfo: React.FC = () => {
     
     // Show success message
     const successMessage = document.createElement("div");
-    successMessage.className = "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg";
+    successMessage.className = "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-primary text-white px-4 py-2 rounded-lg shadow-lg";
     successMessage.textContent = "Foto berhasil diunggah!";
     document.body.appendChild(successMessage);
     
