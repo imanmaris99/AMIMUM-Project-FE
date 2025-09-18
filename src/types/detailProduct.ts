@@ -11,11 +11,25 @@ export interface VariantType {
     updated_at: string;
 }
 
+// Tipe data yang sesuai dengan backend VariantProductDto
+export interface VariantProductType {
+    id: number;
+    product: string;
+    name: string;
+    img?: string;
+    variant?: string;
+    expiration?: string;
+    stock: number;
+    discount?: number;
+    discounted_price?: number;
+    updated_at: string;
+}
+
 export interface DetailProductType {
     id: string;
     name: string;
     info?: string;
-    variants_list: VariantType[];
+    variants_list: VariantProductType[];
     description_list: string[];
     instructions_list: string[];
     price: number;  
@@ -49,16 +63,12 @@ export interface ProductType {
 export interface BrandDetailType {
     id: number;
     name: string;
-    image_url?: string;
     photo_url?: string;
-    category: string;
-    description?: string | string[];
-    description_list?: string[];
-    product_count?: number;
+    description_list: string[];
+    category?: string;
     total_product?: number;
     total_product_with_promo?: number;
-    created_at?: string;
-    // tambahkan field lain sesuai kebutuhan
+    created_at: string;
 }
 
 export interface BrandDetailResponseType {

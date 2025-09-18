@@ -2,13 +2,14 @@ import Header from "@/components/homepage/Header_Section";
 import DetailBrand from "@/components/DetailBrand";
 import ProductList from "@/components/DetailBrand/ProductList";
 import SearchProductByBrand from "@/components/DetailBrand/SearchProductByBrand";
-import { BrandDetailResponseType, ProductType } from "@/types/detailProduct";
+import { BrandDetailResponseType } from "@/types/detailProduct";
+import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 import { getBrandData, getCardProductsByBrand } from "@/data/dataUtils";
 
 export default async function BrandPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params;
   let brandDetail: BrandDetailResponseType | null = null;
-  let products: ProductType[] = [];
+  let products: CardProductProps[] = [];
   const errorMessage: string | null = null;
   
   // API calls dinonaktifkan sementara karena server sedang down
@@ -35,9 +36,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   const brandData = brandDetail?.data
     ? {
         ...brandDetail.data,
-        image_url: brandDetail.data.photo_url,
-        description: brandDetail.data.description_list || [],
-        product_count: brandDetail.data.total_product, // Menggunakan total_product yang akurat
+        // Tidak perlu mapping karena sudah sesuai dengan backend DTO
       }
     : null;
     

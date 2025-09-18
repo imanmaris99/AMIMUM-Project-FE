@@ -46,16 +46,27 @@ export function getCardProductsByBrand(brandId: string): CardProductProps[] {
   return generateBrandProducts(brandId);
 }
 
-export function getCardProductsBySearch(query: string, brandId?: string): CardProductProps[] {
+export function getCardProductsBySearch(query: string, brandFilter?: string): CardProductProps[] {
   const allProducts = getAllCardProducts();
   let filteredProducts = allProducts;
   
-  // Filter by brand if specified
-  if (brandId) {
-    const brand = BRAND_DATA[brandId as keyof typeof BRAND_DATA];
+  // Filter by brand if specified (brandFilter can be brandId or brandName)
+  if (brandFilter) {
+    // First try to find by brandId
+    let brand = BRAND_DATA[brandFilter as keyof typeof BRAND_DATA];
+    
+    // If not found by ID, try to find by name
+    if (!brand) {
+      brand = Object.values(BRAND_DATA).find(b => 
+        b.name.toLowerCase().includes(brandFilter.toLowerCase())
+      );
+    }
+    
     if (brand) {
       filteredProducts = allProducts.filter(product => 
-        product.name.includes(brand.name)
+        product.brand_info?.id === brand.id || 
+        product.name?.toLowerCase().includes(brand.name.toLowerCase()) ||
+        product.brand_info?.name?.toLowerCase().includes(brand.name.toLowerCase())
       );
     }
   }
@@ -63,7 +74,8 @@ export function getCardProductsBySearch(query: string, brandId?: string): CardPr
   // Filter by search query
   if (query.trim()) {
     filteredProducts = filteredProducts.filter(product =>
-      product.name.toLowerCase().includes(query.toLowerCase())
+      product.name?.toLowerCase().includes(query.toLowerCase()) ||
+      product.brand_info?.name?.toLowerCase().includes(query.toLowerCase())
     );
   }
   
@@ -86,9 +98,7 @@ export function getBrandForPromo(promoId: string) {
   return {
     data: {
       ...brand,
-      image_url: brand.photo_url,
-      description: brand.description_list,
-      product_count: brand.total_product_with_promo ?? brand.total_product,
+      // Tidak perlu mapping karena sudah sesuai dengan backend DTO
     }
   };
 }
@@ -128,8 +138,8 @@ export function getHomepageData() {
 }
 
 // ==================== SEARCH UTILITIES ====================
-export function searchProducts(query: string, brandId?: string): CardProductProps[] {
-  return getCardProductsBySearch(query, brandId);
+export function searchProducts(query: string, brandFilter?: string): CardProductProps[] {
+  return getCardProductsBySearch(query, brandFilter);
 }
 
 // ==================== CACHE MANAGEMENT ====================

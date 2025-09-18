@@ -1,14 +1,3 @@
-export interface CardProductProps {
-    id: string;
-    name: string;
-    price: number;
-    all_variants: {
-        id?: number;
-        variant?: string;
-        img?: string;
-        discount?: number;
-        discounted_price?: number;
-        updated_at: string;
-    }[];
-    created_at: string;
-}
+import { AllProductInfoType } from "@/types/apiTypes";
+
+export type CardProductProps = AllProductInfoType;

@@ -1,5 +1,4 @@
 import Image from "next/image";
-import SkeletonLoader from "./SkeletonLoader";
 import { BrandDetailType } from "@/types/detailProduct";
 import Spinner from "@/components/ui/Spinner";
 
@@ -20,11 +19,9 @@ const DetailBrand = ({ brandDetail, errorMessage }: DetailBrandProps) => {
       </div>
     );
   }
-  // Gunakan fallback untuk description dan product_count
-  const descriptionArr = Array.isArray(brandDetail.description)
-    ? brandDetail.description
-    : brandDetail.description_list || [];
-  const productCount = brandDetail.product_count ?? brandDetail.total_product_with_promo ?? brandDetail.total_product ?? 0;
+  // Gunakan description_list sesuai dengan backend DTO
+  const descriptionArr = brandDetail.description_list || [];
+  const productCount = brandDetail.total_product ?? 0;
   return (
     <div className="mt-4 mx-6">
       <div>
@@ -33,7 +30,7 @@ const DetailBrand = ({ brandDetail, errorMessage }: DetailBrandProps) => {
       <div className="bg-customGreen4 p-4 rounded-lg mt-4 min-h-24 flex items-center">
         <div className="flex items-center gap-4">
           <Image
-            src={brandDetail.image_url || brandDetail.photo_url || "/default-image.jpg"}
+            src={brandDetail.photo_url || "/default-image.jpg"}
             alt={brandDetail.name || "brand"}
             width={70}
             height={70}

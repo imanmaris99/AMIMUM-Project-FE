@@ -3,6 +3,7 @@
 
 import { DetailProductType } from "@/types/detailProduct";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
+import { AllProductInfoType, BrandInfoType, VariantAllProductType } from "@/types/apiTypes";
 
 // ==================== BRAND DATA ====================
 export const BRAND_DATA = {
@@ -537,87 +538,9 @@ function createVariants(basePrice: number, discount: number, stock: number[], ha
   ];
 }
 
-// ==================== GENERATED DATA ====================
-export function generateDetailProductData(): { [key: string]: DetailProductType } {
-  const products: { [key: string]: DetailProductType } = {};
-  let globalProductId = 1;
 
-  Object.entries(PRODUCT_CONFIG).forEach(([brandId, configs]) => {
-    const brand = BRAND_DATA[brandId as keyof typeof BRAND_DATA];
-    const discount = brand.promo_special;
 
-    configs.forEach((config, index) => {
-      const template = PRODUCT_TEMPLATES[config.template as keyof typeof PRODUCT_TEMPLATES];
-      const productId = String(globalProductId);
-      
-      products[productId] = {
-        id: productId,
-        name: `${template.baseName} ${brand.name}`,
-        info: template.info,
-        description_list: template.description_list,
-        instructions_list: template.instructions_list,
-        price: config.basePrice,
-        is_active: true,
-        company: brand.name,
-        avg_rating: template.avg_rating,
-        total_rater: template.total_rater,
-        variants_list: createVariants(config.basePrice, discount, config.stock, config.hasDiscount, config.template),
-        created_at: "2024-01-01T00:00:00Z",
-        updated_at: "2024-01-01T00:00:00Z"
-      };
-      
-      globalProductId++;
-    });
-  });
 
-  return products;
-}
-
-export function generateCardProductData(): CardProductProps[] {
-  const detailProducts = generateDetailProductData();
-  
-  return Object.values(detailProducts).map(product => ({
-    id: product.id,
-    name: product.name,
-    price: product.price,
-    all_variants: product.variants_list.map(variant => ({
-      id: variant.id,
-      variant: variant.variant,
-      img: variant.img,
-      discount: variant.discount,
-      discounted_price: variant.discounted_price,
-      updated_at: variant.updated_at
-    })),
-    created_at: product.created_at
-  }));
-}
-
-export function generateBrandProducts(brandId: string): CardProductProps[] {
-  const allProducts = generateCardProductData();
-  const brand = BRAND_DATA[brandId as keyof typeof BRAND_DATA];
-  
-  if (!brand) return [];
-  
-  // Filter products by brand name
-  return allProducts.filter(product => 
-    product.name.includes(brand.name)
-  );
-}
-
-export function generatePromoProducts(brandId: string): CardProductProps[] {
-  // Promo products should only include products with discount
-  const allProducts = generateCardProductData();
-  const brand = BRAND_DATA[brandId as keyof typeof BRAND_DATA];
-  
-  if (!brand) return [];
-  
-  // Filter products by brand name and only include those with discount
-  return allProducts.filter(product => {
-    const isFromBrand = product.name.includes(brand.name);
-    const hasDiscount = product.all_variants.some(variant => variant.discount > 0);
-    return isFromBrand && hasDiscount;
-  });
-}
 
 // ==================== CATEGORY DATA ====================
 export const CATEGORY_DATA = {
@@ -736,3 +659,174 @@ export const PROMO_DATA = {
     promo_special: brand.promo_special
   }))
 };
+
+// ==================== PRODUCT GENERATION FUNCTIONS ====================
+
+// Fungsi untuk membuat brand info sesuai dengan backend DTO
+function createBrandInfo(brandId: number): BrandInfoType {
+  const brand = BRAND_DATA[brandId.toString() as keyof typeof BRAND_DATA];
+  return {
+    id: brand.id,
+    name: brand.name,
+    photo_url: brand.photo_url
+  };
+}
+
+// Fungsi untuk membuat variant sesuai dengan backend DTO
+function createVariantAllProduct(
+  variantId: number, 
+  variant: string, 
+  hasDiscount: boolean = false
+): VariantAllProductType {
+  const basePrice = Math.floor(Math.random() * 50000) + 10000; // 10k-60k
+  const discount = hasDiscount ? Math.floor(Math.random() * 30) + 5 : 0; // 5-35%
+  const discountedPrice = hasDiscount ? Math.floor(basePrice * (1 - discount / 100)) : basePrice;
+  
+  return {
+    id: variantId,
+    variant: variant,
+    img: "/buyungupik_agr-1.svg",
+    discount: hasDiscount ? discount : undefined,
+    discounted_price: hasDiscount ? discountedPrice : undefined,
+    updated_at: new Date().toISOString()
+  };
+}
+
+// Fungsi untuk membuat produk sesuai dengan backend DTO
+function createAllProductInfo(
+  productId: string,
+  productName: string,
+  brandId: number,
+  basePrice: number,
+  hasDiscount: boolean = false
+): AllProductInfoType {
+  const variants = [
+    createVariantAllProduct(1, "Original", hasDiscount),
+    createVariantAllProduct(2, "Madu", hasDiscount),
+    createVariantAllProduct(3, "Jahe", hasDiscount)
+  ];
+
+  return {
+    id: productId,
+    name: productName,
+    price: basePrice,
+    brand_info: createBrandInfo(brandId),
+    all_variants: variants,
+    created_at: new Date().toISOString()
+  };
+}
+
+// Fungsi untuk menghasilkan data produk card sesuai dengan backend DTO
+export function generateCardProductData(): CardProductProps[] {
+  const products: CardProductProps[] = [];
+  let productId = 1;
+  
+  // Convert PRODUCT_TEMPLATES object to array for easier access
+  const templateKeys = Object.keys(PRODUCT_TEMPLATES);
+  const templateArray = templateKeys.map(key => PRODUCT_TEMPLATES[key as keyof typeof PRODUCT_TEMPLATES]);
+
+  // Generate products for each brand
+  Object.values(BRAND_DATA).forEach(brand => {
+    const productCount = brand.total_product;
+    const promoCount = brand.total_product_with_promo;
+    
+    // Generate products with random discount distribution
+    for (let i = 0; i < productCount; i++) {
+      const hasDiscount = i < promoCount;
+      const basePrice = Math.floor(Math.random() * 50000) + 10000; // 10k-60k
+      
+      const product = createAllProductInfo(
+        `prod-${brand.id}-${productId}`,
+        `${brand.name} ${templateArray[i % templateArray.length].baseName}`,
+        brand.id,
+        basePrice,
+        hasDiscount
+      );
+      
+      products.push(product);
+      productId++;
+    }
+  });
+
+  return products;
+}
+
+// Fungsi untuk menghasilkan produk berdasarkan brand
+export function generateBrandProducts(brandId: string): CardProductProps[] {
+  const allProducts = generateCardProductData();
+  const brand = BRAND_DATA[brandId as keyof typeof BRAND_DATA];
+  
+  if (!brand) return [];
+  
+  // Filter products by brand ID
+  return allProducts.filter(product => 
+    product.brand_info?.id === brand.id
+  );
+}
+
+// Fungsi untuk menghasilkan produk promo (hanya yang ada discount)
+export function generatePromoProducts(brandId: string): CardProductProps[] {
+  const allProducts = generateCardProductData();
+  const brand = BRAND_DATA[brandId as keyof typeof BRAND_DATA];
+  
+  if (!brand) return [];
+  
+  // Filter products by brand ID and only include those with discount
+  return allProducts.filter(product => {
+    const isFromBrand = product.brand_info?.id === brand.id;
+    const hasDiscount = product.all_variants.some(variant => variant.discount && variant.discount > 0);
+    return isFromBrand && hasDiscount;
+  });
+}
+
+// Fungsi untuk menghasilkan detail produk sesuai dengan backend DTO
+export function generateDetailProductData(): { [key: string]: DetailProductType } {
+  const detailProducts: { [key: string]: DetailProductType } = {};
+  const cardProducts = generateCardProductData();
+  
+  cardProducts.forEach(cardProduct => {
+    if (cardProduct.id && cardProduct.name) {
+      const variants = cardProduct.all_variants.map(variant => ({
+        id: variant.id || 0,
+        product: cardProduct.name || "",
+        name: `${cardProduct.name} ${variant.variant || "Original"}`,
+        img: variant.img,
+        variant: variant.variant,
+        expiration: "12/25/2025",
+        stock: Math.floor(Math.random() * 100) + 50,
+        discount: variant.discount,
+        discounted_price: variant.discounted_price,
+        updated_at: variant.updated_at
+      }));
+
+      detailProducts[cardProduct.id] = {
+        id: cardProduct.id,
+        name: cardProduct.name,
+        info: "1pack isi 11sachet dengan berat ± 5gram",
+        variants_list: variants,
+        description_list: [
+          "Jamu tradisional berkualitas tinggi",
+          "Menggunakan bahan-bahan alami pilihan",
+          "Proses produksi higienis dan modern",
+          "Baik untuk kesehatan tubuh",
+          "Cocok dikonsumsi secara rutin"
+        ],
+        instructions_list: [
+          "Simpan di tempat yang kering dan sejuk",
+          "Hindari paparan sinar matahari langsung",
+          "Gunakan dalam 12 bulan setelah dibuka",
+          "Kocok sebelum diminum untuk hasil terbaik"
+        ],
+        price: cardProduct.price,
+        is_active: true,
+        company: cardProduct.brand_info?.name || "Unknown Brand",
+        avg_rating: Math.random() * 2 + 3, // 3-5
+        total_rater: Math.floor(Math.random() * 100) + 20,
+        created_at: cardProduct.created_at,
+        updated_at: new Date().toISOString()
+      };
+    }
+  });
+
+  return detailProducts;
+}

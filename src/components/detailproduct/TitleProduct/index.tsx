@@ -45,7 +45,7 @@ const TitleProduct = ({ isError, isLoading, data }: TitleProductProps) => {
       <div className="flex items-center gap-1 bg-orange-100 px-2 py-1 rounded-full">
         <AiFillStar className="text-orange-500" />
         <span className="text-orange-500 font-semibold text-sm">
-          {data.avg_rating}
+          {data.avg_rating?.toFixed(1)}
         </span>
       </div>
     </div>

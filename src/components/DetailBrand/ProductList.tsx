@@ -1,8 +1,8 @@
 import ListProductSection from "@/components/common/Search/List_Product_Section";
-import { ProductType } from "@/types/detailProduct";
+import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 
 interface ProductListProps {
-  products: ProductType[];
+  products: CardProductProps[];
 }
 
 const ProductList = ({ products }: ProductListProps) => {

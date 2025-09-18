@@ -1,5 +1,5 @@
 import Header from "@/components/homepage/Header_Section";
-import Search from "@/components/common/Search";
+import SearchResults from "@/components/common/Search/SearchResults";
 // import { SearchGetProduct } from "@/API/product";
 import { notFound } from "next/navigation";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
@@ -37,7 +37,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <main className="pb-20">
       <Header />
-      <Search 
+      <SearchResults 
         searchQuery={query}
         searchResults={products}
         errorMessage={errorMessage}

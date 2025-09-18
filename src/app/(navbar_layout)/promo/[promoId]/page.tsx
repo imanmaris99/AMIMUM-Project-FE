@@ -1,14 +1,15 @@
 import Header from "@/components/homepage/Header_Section";
 import ProductList from "@/components/DetailBrand/ProductList";
 import DetailBrand from "@/components/DetailBrand";
-import { BrandDetailResponseType, ProductType } from "@/types/detailProduct";
+import { BrandDetailResponseType } from "@/types/detailProduct";
+import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 import { getBrandForPromo, getPromoProducts } from "@/data/dataUtils";
 
 export default async function PromoDetailPage({ params }: { params: Promise<{ promoId: string }> }) {
   const { promoId } = await params;
   let brandDetail: BrandDetailResponseType | null = null;
-  let products: ProductType[] = [];
-  let errorMessage: string | null = null;
+  let products: CardProductProps[] = [];
+  const errorMessage: string | null = null;
   
   // API calls dinonaktifkan sementara karena server sedang down
   // try {
@@ -29,9 +30,7 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
   const brandData = brandDetail?.data
     ? {
         ...brandDetail.data,
-        image_url: brandDetail.data.photo_url,
-        description: brandDetail.data.description_list || [],
-        product_count: brandDetail.data.total_product_with_promo, // Hanya produk dengan promo
+        // Tidak perlu mapping karena sudah sesuai dengan backend DTO
       }
     : null;
     
