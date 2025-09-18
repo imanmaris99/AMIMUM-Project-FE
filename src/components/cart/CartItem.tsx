@@ -1,64 +1,56 @@
 "use client";
 
 import React, { useState } from "react";
+import { CartItemType } from "@/contexts/CartContext";
 
 interface CartItemProps {
-  id: string;
-  name: string;
-  variant: string;
-  unit: string;
-  price: number;
-  image: string;
-  initialQuantity?: number;
-  initialChecked?: boolean;
-  onQuantityChange?: (id: string, quantity: number) => void;
-  onCheckChange?: (id: string, checked: boolean) => void;
-  onDelete?: (id: string) => void;
+  item: CartItemType;
+  onQuantityChange?: (cartId: number, quantity: number) => void;
+  onCheckChange?: (cartId: number, checked: boolean) => void;
+  onDelete?: (cartId: number) => void;
 }
 
 const CartItem: React.FC<CartItemProps> = ({
-  id,
-  name,
-  variant,
-  unit,
-  price,
-  image,
-  initialQuantity = 1,
-  initialChecked = true,
+  item,
   onQuantityChange,
   onCheckChange,
   onDelete,
 }) => {
-  const [quantity, setQuantity] = useState(initialQuantity);
-  const [isChecked, setIsChecked] = useState(initialChecked);
+  const [quantity, setQuantity] = useState(item.quantity);
+  const [isChecked, setIsChecked] = useState(item.is_active);
 
   const handleMinus = () => {
     const newQuantity = Math.max(1, quantity - 1);
     setQuantity(newQuantity);
-    onQuantityChange?.(id, newQuantity);
+    onQuantityChange?.(item.id, newQuantity);
   };
 
   const handlePlus = () => {
     const newQuantity = Math.max(1, quantity + 1);
     setQuantity(newQuantity);
-    onQuantityChange?.(id, newQuantity);
+    onQuantityChange?.(item.id, newQuantity);
   };
 
   const handleQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newQuantity = Math.max(1, parseInt(e.target.value) || 1);
     setQuantity(newQuantity);
-    onQuantityChange?.(id, newQuantity);
+    onQuantityChange?.(item.id, newQuantity);
   };
 
   const handleCheckChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
     setIsChecked(checked);
-    onCheckChange?.(id, checked);
+    onCheckChange?.(item.id, checked);
   };
 
   const handleDelete = () => {
-    onDelete?.(id);
+    onDelete?.(item.id);
   };
+
+  // Calculate display price (use discounted price if available)
+  const displayPrice = item.variant_info.discount > 0 
+    ? item.variant_info.discounted_price 
+    : item.product_price;
 
   return (
     <article className="flex items-center gap-3 p-4 border border-gray-200 rounded-xl max-w-full mx-auto">
@@ -93,15 +85,20 @@ const CartItem: React.FC<CartItemProps> = ({
 
       {/* Image */}
       <div className="w-[70px] h-[70px] rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 bg-gray-50 grid place-items-center">
-        <img src={image} alt={name} className="w-full h-full object-cover" />
+        <img src={item.variant_info.img} alt={item.product_name} className="w-full h-full object-cover" />
       </div>
 
       {/* Text */}
       <div className="flex-1 min-w-0">
-        <h2 className="font-bold text-base mb-1">{name}</h2>
-        <p className="text-gray-500 text-xs m-0">{variant} • {unit}</p>
-        <div className="mt-2 text-base font-bold text-green-800" data-unit={price}>
-          Rp {price.toLocaleString('id-ID')}
+        <h2 className="font-bold text-base mb-1">{item.product_name}</h2>
+        <p className="text-gray-500 text-xs m-0">{item.variant_info.variant} • {item.variant_info.name}</p>
+        <div className="mt-2 text-base font-bold text-green-800" data-unit={displayPrice}>
+          Rp {displayPrice.toLocaleString('id-ID')}
+          {item.variant_info.discount > 0 && (
+            <span className="text-xs text-red-500 ml-2">
+              -{item.variant_info.discount}%
+            </span>
+          )}
         </div>
       </div>
 

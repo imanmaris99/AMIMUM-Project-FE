@@ -70,7 +70,9 @@ export default function DetailProduct() {
   }, [productId]);
   
   const handleVariantChange = (variant: VariantProductType) => {
-    console.log("🎯 Variant changed to:", variant);
+    console.log("🎯 DetailProduct: Variant changed to:", variant);
+    console.log("🎯 DetailProduct: Variant ID:", variant.id);
+    console.log("🎯 DetailProduct: Variant name:", variant.name);
     setSelectedVariant(variant);
   };
   
@@ -106,7 +108,12 @@ export default function DetailProduct() {
             />
             <ProductInformation isLoading={isLoading} isError={isError} datavariant={selectedVariant} />
             <ProductDescription isLoading={isLoading} isError={isError} data={detailProduct} />
-            <ProductPrice isLoading={isLoading} isError={isError} data={detailProduct} datavariant={selectedVariant} />
+            <ProductPrice 
+              isLoading={isLoading} 
+              isError={isError} 
+              data={detailProduct} 
+              datavariant={selectedVariant} 
+            />
           </div>
         </div>
       </div>

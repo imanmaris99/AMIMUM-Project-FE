@@ -1,35 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import { GoChevronLeft } from "react-icons/go";
 import CartList from "@/components/cart/CartList";
-
-interface CartItemData {
-  id: string;
-  name: string;
-  variant: string;
-  unit: string;
-  price: number;
-  image: string;
-  quantity: number;
-  checked: boolean;
-}
+import { useCart } from "@/contexts/CartContext";
 
 export default function CartPage() {
   const router = useRouter();
-  const [cartItems, setCartItems] = useState<CartItemData[]>([]);
+  const { totalItems } = useCart();
 
   const handleBack = () => {
     router.back();
   };
-
-  const handleItemsChange = (items: CartItemData[]) => {
-    setCartItems(items);
-  };
-
-  const totalItems = cartItems.length;
-  const checkedItems = cartItems.filter(item => item.checked).length;
 
   return (
     <div className="min-h-screen bg-white">
@@ -52,10 +35,7 @@ export default function CartPage() {
       {/* Content */}
       <div className="px-4 py-6 pb-32">
         <div className="max-w-sm mx-auto">
-          <CartList 
-            items={cartItems}
-            onItemsChange={handleItemsChange}
-          />
+          <CartList />
         </div>
       </div>
     </div>

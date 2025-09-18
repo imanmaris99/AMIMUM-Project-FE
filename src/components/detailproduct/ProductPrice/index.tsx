@@ -4,6 +4,7 @@ import Spinner from "@/components/ui/Spinner";
 import { useState } from "react";
 import { getProductRatingSummary } from "@/data/dummyData";
 import RatingDisplay from "@/components/rating/RatingDisplay";
+import { useCart } from "@/contexts/CartContext";
 
 interface ProductPriceProps {
   data: DetailProductType | undefined;
@@ -35,35 +36,51 @@ const ProductPrice = ({
 }: ProductPriceProps) => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const { addToCart, isInCart } = useCart();
+
+  // Debug logging for received props
+  console.log("🛒 ProductPrice: Props received - isLoading:", isLoading, "isError:", isError);
+  console.log("🛒 ProductPrice: Data:", data);
+  console.log("🛒 ProductPrice: Datavariant:", datavariant);
 
   const handleAddToCart = async () => {
-    console.log("🛒 Add to cart clicked");
-    console.log("📦 Data:", data);
-    console.log("🎯 Variant:", datavariant);
+    console.log("🛒 ProductPrice: Add to cart clicked");
+    console.log("📦 ProductPrice: Data:", data);
+    console.log("🎯 ProductPrice: Variant:", datavariant);
     
     if (!data || !datavariant) {
-      console.warn("❌ Missing data or variant");
+      console.warn("❌ ProductPrice: Missing data or variant");
       return;
     }
+    
+    // Validate data structure
+    console.log("🔍 ProductPrice: Product ID:", data.id);
+    console.log("🔍 ProductPrice: Variant ID:", datavariant.id);
+    console.log("🔍 ProductPrice: Product name:", data.name);
+    console.log("🔍 ProductPrice: Variant name:", datavariant.name);
     
     setIsAdding(true);
     
     try {
-      // TODO: Implement add to cart functionality
-      console.log(`✅ Would add to cart: ${data.name} ${datavariant.variant}`);
+      // Add to cart using CartContext
+      console.log("🛒 ProductPrice: Calling addToCart...");
+      addToCart(data, datavariant);
+      
+      console.log(`✅ ProductPrice: Added to cart: ${data.name} ${datavariant.variant}`);
       
       // Show feedback
       setShowFeedback(true);
       setTimeout(() => setShowFeedback(false), 3000);
       
     } catch (error) {
-      console.error("❌ Error adding to cart:", error);
+      console.error("❌ ProductPrice: Error adding to cart:", error);
     } finally {
       setIsAdding(false);
     }
   };
 
-  const isItemInCart = false; // TODO: Implement cart check
+  // Check if item is already in cart
+  const isItemInCart = data && datavariant ? isInCart(data.id, datavariant.id) : false;
 
   if (isLoading) {
     return (
