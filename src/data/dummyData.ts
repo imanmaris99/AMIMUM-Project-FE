@@ -668,8 +668,10 @@ function createVariantAllProduct(
   variant: string, 
   hasDiscount: boolean = false
 ): VariantAllProductType {
-  const basePrice = Math.floor(Math.random() * 50000) + 10000; // 10k-60k
-  const discount = hasDiscount ? Math.floor(Math.random() * 30) + 5 : 0; // 5-35%
+  // Menggunakan seed berdasarkan variantId untuk konsistensi
+  const seed = variantId * 7 + variant.length;
+  const basePrice = 15000 + (seed % 30000); // 15k-45k konsisten
+  const discount = hasDiscount ? (seed % 25) + 5 : 0; // 5-30% konsisten
   const discountedPrice = hasDiscount ? Math.floor(basePrice * (1 - discount / 100)) : basePrice;
   
   return {
@@ -724,10 +726,10 @@ export function generateCardProductData(): CardProductProps[] {
     const productCount = brand.total_product;
     const promoCount = brand.total_product_with_promo;
     
-    // Generate products with random discount distribution
+    // Generate products with consistent pricing
     for (let i = 0; i < productCount; i++) {
       const hasDiscount = i < promoCount;
-      const basePrice = Math.floor(Math.random() * 50000) + 10000; // 10k-60k
+      const basePrice = 15000 + (productId * 1000) % 30000; // 15k-45k konsisten berdasarkan productId
       
       const product = createAllProductInfo(
         `prod-${brand.id}-${productId}`,
@@ -787,7 +789,7 @@ export function generateDetailProductData(): { [key: string]: DetailProductType 
         img: variant.img,
         variant: variant.variant,
         expiration: "12/25/2025",
-        stock: Math.floor(Math.random() * 100) + 50,
+        stock: 50 + (variant.id * 3) % 50, // 50-100 konsisten berdasarkan variant.id
         discount: variant.discount,
         discounted_price: variant.discounted_price,
         updated_at: variant.updated_at
@@ -814,8 +816,8 @@ export function generateDetailProductData(): { [key: string]: DetailProductType 
         price: cardProduct.price,
         is_active: true,
         company: cardProduct.brand_info?.name || "Unknown Brand",
-        avg_rating: Math.random() * 2 + 3, // 3-5
-        total_rater: Math.floor(Math.random() * 100) + 20,
+        avg_rating: 3.5 + (cardProduct.id.charCodeAt(0) % 15) / 10, // 3.5-5.0 konsisten berdasarkan productId
+        total_rater: 20 + (cardProduct.id.charCodeAt(0) % 80), // 20-100 konsisten berdasarkan productId
         created_at: cardProduct.created_at,
         updated_at: new Date().toISOString()
       };

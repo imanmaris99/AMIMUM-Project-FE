@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { DetailProductType, VariantType } from "@/types/detailProduct";
 import Spinner from "@/components/ui/Spinner";
+import { useCart } from "@/contexts/CartContext";
+import { useState } from "react";
 
 interface ProductPriceProps {
   data: DetailProductType | undefined;
@@ -35,6 +37,50 @@ const ProductPrice = ({
   data,
   datavariant,
 }: ProductPriceProps) => {
+  const { addToCart, isInCart } = useCart();
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAddToCart = async () => {
+    if (!data || !datavariant) return;
+    
+    setIsAdding(true);
+    
+    try {
+      // Convert DetailProductType to format expected by CartContext
+      const productForCart = {
+        id: data.id,
+        name: data.name,
+        price: data.price,
+        image_url: datavariant.img || "/buyungupik_agr-1.svg",
+        brand_info: { name: data.company }
+      };
+      
+      // Convert VariantType to format expected by CartContext
+      const variantForCart = {
+        id: datavariant.id,
+        variant: datavariant.variant || datavariant.name,
+        name: datavariant.name,
+        img: datavariant.img,
+        discount: datavariant.discount || 0
+      };
+      
+      addToCart(productForCart, variantForCart);
+      
+      // Show feedback
+      setShowFeedback(true);
+      setTimeout(() => setShowFeedback(false), 3000);
+      
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  // Check if item is already in cart
+  const isItemInCart = data && datavariant ? isInCart(data.id, datavariant.id) : false;
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[120px]">
@@ -75,12 +121,14 @@ const ProductPrice = ({
   // Check if variant has discount
   const hasDiscount = datavariant?.discount && datavariant.discount > 0;
   const discountPercentage = datavariant?.discount || 0;
-  const discountedPrice = datavariant?.discounted_price || (hasDiscount ? data?.price * (1 - discountPercentage / 100) : data?.price);
-  const savings = hasDiscount ? (data?.price || 0) - (discountedPrice || 0) : 0;
+  const discountedPrice = datavariant?.discounted_price || data?.price || 0;
+  const originalPrice = hasDiscount ? Math.round(discountedPrice / (1 - discountPercentage / 100)) : discountedPrice;
+  const savings = hasDiscount ? (originalPrice || 0) - discountedPrice : 0;
 
   return (
-    <div className="p-4 mb-20">
-      {/* Rating Section */}
+    <div className="bg-white rounded-lg shadow-sm">
+      <div className="p-4">
+        {/* Rating Section */}
       <div className="flex items-center gap-2 mb-4">
         <div className="flex items-center">
           {[1, 2, 3, 4, 5].map((star) => (
@@ -106,7 +154,7 @@ const ProductPrice = ({
       {/* Price Section */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-gray-700 font-semibold mb-2">Harga Produk :</p>
+          <p className="text-gray-700 font-semibold">Harga Produk :</p>
           {hasDiscount ? (
             <div className="space-y-2">
               <div className="flex items-center gap-3">
@@ -114,7 +162,7 @@ const ProductPrice = ({
                   -{discountPercentage}%
                 </span>
                 <span className="text-gray-400 line-through text-lg">
-                  Rp {data?.price?.toLocaleString()}
+                  Rp {originalPrice?.toLocaleString()}
                 </span>
               </div>
               <p className="text-2xl font-bold text-green-600">
@@ -132,11 +180,42 @@ const ProductPrice = ({
             </div>
           )}
         </div>
-        <div>
-          <Button variant="default" className="bg-[#006A47] hover:bg-[#005A3C] text-white">
-            + Keranjang
+        <div className="relative">
+          <Button 
+            variant="default" 
+            onClick={handleAddToCart}
+            disabled={isAdding || !datavariant}
+            className={`${
+              isItemInCart 
+                ? "bg-green-600 hover:bg-green-700" 
+                : "bg-[#006A47] hover:bg-[#005A3C]"
+            } text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200`}
+          >
+            {isAdding ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Menambah...</span>
+              </div>
+            ) : isItemInCart ? (
+              "✓ Di Keranjang"
+            ) : (
+              "+ Keranjang"
+            )}
           </Button>
+          
+          {/* User Feedback Toast - Higher up and slightly to the left */}
+          {showFeedback && (
+            <div className="fixed top-7 left-[49%] transform -translate-x-1/2 bg-primary text-white px-4 py-2 rounded-lg shadow-lg z-50 max-w-[280px] mx-4">
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                <span className="text-sm font-medium">Ditambahkan ke keranjang!</span>
+              </div>
+            </div>
+          )}
         </div>
+      </div>
       </div>
     </div>
   );

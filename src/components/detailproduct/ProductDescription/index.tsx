@@ -75,8 +75,9 @@ const ProductDescription = ({
   }
 
   return (
-    <div className="border border-gray-300 p-4 rounded-lg shadow-sm">
-      <h2 className="text-lg font-semibold mb-2">Deskripsi Produk</h2>
+    <div className="border border-gray-300 rounded-lg shadow-sm">
+      <div className="p-4">
+        <h2 className="text-lg font-semibold mb-2">Deskripsi Produk</h2>
       <p className="text-gray-500 text-sm">
         {data?.description_list[0]}{" "}
         {showFullDescription && (
@@ -91,6 +92,7 @@ const ProductDescription = ({
           </span>
         )}
       </p>
+      </div>
     </div>
   );
 };

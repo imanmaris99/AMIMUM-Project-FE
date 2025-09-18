@@ -9,8 +9,8 @@ interface ProductInformationProps {
 }
 
 const ProductInformationSkeleton = () => (
-  <div className="mt-2 mx-4 animate-pulse">
-    <div className="space-y-2 text-gray-500 text-sm">
+  <div className="bg-white rounded-lg shadow-sm animate-pulse">
+    <div className="p-4 space-y-2 text-gray-500 text-sm">
       <div className="flex items-center space-x-2">
         <div className="w-5 h-5 bg-gray-300 rounded-full" />
         <div className="h-4 w-32 bg-gray-300 rounded" />
@@ -24,7 +24,6 @@ const ProductInformationSkeleton = () => (
         <div className="h-4 w-40 bg-gray-300 rounded" />
       </div>
     </div>
-    <hr className="mt-4" />
   </div>
 );
 
@@ -72,8 +71,8 @@ const ProductInformation = ({
   }
 
   return (
-    <div className="mt-2 mx-4">
-      <div className="space-y-2 text-gray-500 text-sm">
+    <div className="bg-white rounded-lg shadow-sm">
+      <div className="p-4 space-y-2 text-gray-500 text-sm">
         <div className="flex items-center space-x-2">
           <FiPackage className="text-gray-500" />
           <span>Isi: 11 sachet | 6 gram/sachet</span>
@@ -87,7 +86,6 @@ const ProductInformation = ({
           <span>Baik dikonsumsi hingga {datavariant?.expiration}</span>
         </div>
       </div>
-      <hr className="mt-4" />
     </div>
   );
 };

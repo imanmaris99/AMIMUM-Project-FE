@@ -13,23 +13,25 @@ const ProductVariants = ({ product, variants, onVariantChange }: ProductVariants
 
   // Use product.variants_list if available, otherwise fallback to static data
   const flavorVariants = product?.variants_list || [
-    { id: 1, name: "Anggur", variant: "Anggur", discount: 0, discounted_price: 0 },
-    { id: 2, name: "Strawberry", variant: "Strawberry", discount: 0, discounted_price: 0 },
-    { id: 3, name: "Cokelat", variant: "Cokelat", discount: 0, discounted_price: 0 },
-    { id: 4, name: "Vanilla", variant: "Vanilla", discount: 0, discounted_price: 0 },
-    { id: 5, name: "Melon", variant: "Melon", discount: 0, discounted_price: 0 },
-    { id: 6, name: "Jeruk", variant: "Jeruk", discount: 0, discounted_price: 0 },
-    { id: 7, name: "Susu", variant: "Susu", discount: 0, discounted_price: 0 },
-    { id: 8, name: "Mocca", variant: "Mocca", discount: 0, discounted_price: 0 }
+    { id: 1, name: "Anggur", variant: "Anggur", discount: 15, discounted_price: 12750 },
+    { id: 2, name: "Strawberry", variant: "Strawberry", discount: 0, discounted_price: 15000 },
+    { id: 3, name: "Cokelat", variant: "Cokelat", discount: 20, discounted_price: 12000 },
+    { id: 4, name: "Vanilla", variant: "Vanilla", discount: 0, discounted_price: 15000 },
+    { id: 5, name: "Melon", variant: "Melon", discount: 10, discounted_price: 13500 },
+    { id: 6, name: "Jeruk", variant: "Jeruk", discount: 0, discounted_price: 15000 },
+    { id: 7, name: "Susu", variant: "Susu", discount: 25, discounted_price: 11250 },
+    { id: 8, name: "Mocca", variant: "Mocca", discount: 0, discounted_price: 15000 }
   ];
 
   return (
-    <div className="p-4">
-      <p className="text-gray-500 text-sm font-medium mb-3">Varian produk :</p>
+    <div className="bg-white rounded-lg shadow-sm">
+      <div className="p-4">
+        <p className="text-gray-500 text-sm font-medium mb-3">Varian produk :</p>
       <div className="grid grid-cols-2 gap-3">
         {flavorVariants.map((variant) => {
           const hasDiscount = variant.discount && variant.discount > 0;
-          const discountedPrice = variant.discounted_price || (hasDiscount ? product?.price * (1 - variant.discount / 100) : product?.price);
+          const originalPrice = hasDiscount ? Math.round(variant.discounted_price / (1 - variant.discount / 100)) : (variant.discounted_price || product?.price);
+          const discountedPrice = variant.discounted_price || product?.price;
           
           return (
             <label 
@@ -74,12 +76,12 @@ const ProductVariants = ({ product, variants, onVariantChange }: ProductVariants
                       </span>
                     </div>
                     <div className="text-gray-400 line-through">
-                      {product?.price?.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
+                      {originalPrice?.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
                     </div>
                   </div>
                 ) : (
                   <div className="text-gray-600 font-medium">
-                    {product?.price?.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
+                    {discountedPrice?.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
                   </div>
                 )}
               </div>
@@ -88,6 +90,7 @@ const ProductVariants = ({ product, variants, onVariantChange }: ProductVariants
         })}
       </div>
       <hr className="mt-4" />
+      </div>
     </div>
   );
 };

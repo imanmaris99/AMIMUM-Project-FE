@@ -11,6 +11,7 @@ import ProductPrice from "@/components/detailproduct/ProductPrice";
 import DetailProductHeader from "@/components/detailproduct/DetailProductHeader";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 import { getDetailProduct } from "@/data/dataUtils";
+import { CartProvider } from "@/contexts/CartContext";
 
 export default function DetailProduct() {
   const params = useParams();
@@ -55,23 +56,38 @@ export default function DetailProduct() {
   const isError = errorMessage ? 500 : 0;
   
   return (
-    <div className="flex flex-col justify-between min-h-screen bg-white">
-      {/* Header */}
-      <DetailProductHeader title="Detail Item" />
-      
-      {/* Content */}
-      <main className="pb-20 mt-20">
-        <ProductImage detailProduct={detailProduct} />
-        <TitleProduct isLoading={isLoading} isError={isError} data={detailProduct} />
-        <ProductVariants 
-          product={detailProduct} 
-          variants={detailProduct?.variants_list ?? []} 
-          onVariantChange={handleVariantChange}
-        />
-        <ProductInformation isLoading={isLoading} isError={isError} datavariant={selectedVariant} />
-        <ProductDescription isLoading={isLoading} isError={isError} data={detailProduct} />
-        <ProductPrice isLoading={isLoading} isError={isError} data={detailProduct} datavariant={selectedVariant} />
-      </main>
-    </div>
+    <CartProvider>
+      <div className="min-h-screen bg-white">
+        {/* Header - Same style as other pages */}
+        <div className="bg-white">
+          <div className="flex justify-center items-center relative pt-16 pb-4">
+            <div className="absolute left-4">
+              <button onClick={() => window.history.back()} className="text-3xl cursor-pointer">
+                ←
+              </button>
+            </div>
+            <div className="text-center">
+              <h1 className="text-[16px] font-semibold">Detail Item</h1>
+            </div>
+          </div>
+        </div>
+        
+        {/* Content - Same structure as other pages */}
+        <div className="px-4 py-6 pb-6">
+          <div className="max-w-sm mx-auto space-y-4">
+            <ProductImage detailProduct={detailProduct} />
+            <TitleProduct isLoading={isLoading} isError={isError} data={detailProduct} />
+            <ProductVariants 
+              product={detailProduct} 
+              variants={detailProduct?.variants_list ?? []} 
+              onVariantChange={handleVariantChange}
+            />
+            <ProductInformation isLoading={isLoading} isError={isError} datavariant={selectedVariant} />
+            <ProductDescription isLoading={isLoading} isError={isError} data={detailProduct} />
+            <ProductPrice isLoading={isLoading} isError={isError} data={detailProduct} datavariant={selectedVariant} />
+          </div>
+        </div>
+      </div>
+    </CartProvider>
   );
 }

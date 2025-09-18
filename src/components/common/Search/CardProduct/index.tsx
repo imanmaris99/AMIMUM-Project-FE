@@ -27,7 +27,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
   const hasDiscount = highestDiscount > 0;
 
   return (
-    <div onClick={() => handleSelectProduct(product.id)} className="w-40 h-56 rounded-lg shadow-md flex flex-col justify-center items-center gap-2 relative cursor-pointer">
+    <div onClick={() => product.id && handleSelectProduct(product.id)} className="w-40 h-56 rounded-lg shadow-md flex flex-col justify-center items-center gap-2 relative cursor-pointer">
       <div className="absolute top-2 right-2">
         <WishlistButton 
           product={product} 
@@ -47,7 +47,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
         <div className="bg-gray-100 w-32 h-28 rounded-lg flex justify-center items-center">
           <Image
             src={product.all_variants[0]?.img || "/buyungupik_agr-1.svg"}
-            alt={product.name}
+            alt={product.name || "Product"}
             width={100}
             height={100}
             className="rounded-lg"

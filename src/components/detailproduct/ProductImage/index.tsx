@@ -9,7 +9,7 @@ interface ProductImageProps {
 const ProductImage = ({ detailProduct }: ProductImageProps) => {
   const imageUrl = detailProduct?.variants_list?.[0]?.img || detailProduct?.image_url || "/buyungupik_agr-1.svg";
   return (
-    <div className="w-full h-64 relative">
+    <div className="w-full h-48 relative bg-gray-50 rounded-lg overflow-hidden shadow-sm">
       <Image 
         src={imageUrl} 
         alt={detailProduct?.name || "Product Image"} 
