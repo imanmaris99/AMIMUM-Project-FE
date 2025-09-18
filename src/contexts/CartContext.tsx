@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 
 // Cart Item Type sesuai dengan backend DTO
@@ -67,6 +67,26 @@ interface CartProviderProps {
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItemType[]>([]);
 
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      try {
+        const parsedCart = JSON.parse(savedCart);
+        setCartItems(parsedCart);
+        console.log("🛒 Cart loaded from localStorage:", parsedCart.length, "items");
+      } catch (error) {
+        console.error('Error loading cart from localStorage:', error);
+      }
+    }
+  }, []);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+    console.log("🛒 Cart saved to localStorage:", cartItems.length, "items");
+  }, [cartItems]);
+
   // Generate unique cart ID
   const generateCartId = useCallback(() => {
     return Date.now() + Math.floor(Math.random() * 1000);
@@ -86,13 +106,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       if (item.variant_info.discount > 0) {
         const discountedPrice = item.variant_info.discounted_price * item.quantity;
         allPromoActivePrices += discountedPrice;
+      } else {
+        // If no discount, use original price
+        allPromoActivePrices += itemTotal;
       }
     });
 
     return {
       all_item_active_prices: allItemActivePrices,
       all_promo_active_prices: allPromoActivePrices,
-      total_all_active_prices: allItemActivePrices - allPromoActivePrices,
+      total_all_active_prices: allPromoActivePrices, // Total after discounts
     };
   }, []);
 

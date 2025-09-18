@@ -4,6 +4,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { GoChevronLeft } from "react-icons/go";
 import CartList from "@/components/cart/CartList";
+import CartSummary from "@/components/cart/CartSummary";
 import { useCart } from "@/contexts/CartContext";
 
 export default function CartPage() {
@@ -38,6 +39,9 @@ export default function CartPage() {
           <CartList />
         </div>
       </div>
+
+      {/* Cart Summary */}
+      <CartSummary />
     </div>
   );
 }
