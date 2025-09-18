@@ -1,7 +1,9 @@
 "use client";
 
+import React, { useState, useEffect } from 'react';
 import { CardProductProps } from "./CardProduct/types";
 import ListProductSection from "./List_Product_Section";
+import LoadMoreButton from "./LoadMoreButton";
 import { CiSearch } from "react-icons/ci";
 
 interface SearchResultsProps {
@@ -9,16 +11,40 @@ interface SearchResultsProps {
   searchResults: CardProductProps[];
   errorMessage: string | null;
   brandFilter?: string;
+  isLoading?: boolean;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
+  isLoadingMore?: boolean;
+  totalLoaded?: number;
+  totalAvailable?: number;
 }
 
 const SearchResults = ({ 
   searchQuery, 
   searchResults, 
   errorMessage, 
-  brandFilter 
+  brandFilter,
+  isLoading = false,
+  hasMore = false,
+  onLoadMore,
+  isLoadingMore = false,
+  totalLoaded = 0,
+  totalAvailable = 0
 }: SearchResultsProps) => {
   const hasResults = searchResults && searchResults.length > 0;
   const isSearching = searchQuery.trim().length > 0;
+
+  // Use provided props or fallback to internal state for backward compatibility
+  const displayHasMore = hasMore !== undefined ? hasMore : (searchResults.length > 10);
+  const displayTotalLoaded = totalLoaded > 0 ? totalLoaded : searchResults.length;
+  const displayTotalAvailable = totalAvailable > 0 ? totalAvailable : searchResults.length;
+  const displayIsLoadingMore = isLoadingMore;
+
+  const handleLoadMore = () => {
+    if (onLoadMore) {
+      onLoadMore();
+    }
+  };
 
   return (
     <div className="px-6 py-4 mt-5">
@@ -85,7 +111,7 @@ const SearchResults = ({
       {hasResults && (
         <div className="mb-4">
           <p className="text-sm text-gray-600">
-            Ditemukan <span className="font-semibold text-[#00764F]">{searchResults.length}</span> produk
+            Ditemukan <span className="font-semibold text-[#00764F]">{displayTotalAvailable}</span> produk
             {brandFilter && (
               <span> dari merek <span className="font-semibold text-[#00764F]">"{brandFilter}"</span></span>
             )}
@@ -95,6 +121,17 @@ const SearchResults = ({
 
       {/* Product List */}
       {hasResults && <ListProductSection products={searchResults} />}
+
+      {/* Load More Button */}
+      {hasResults && (
+        <LoadMoreButton
+          isLoading={displayIsLoadingMore}
+          hasMore={displayHasMore}
+          onLoadMore={handleLoadMore}
+          totalLoaded={displayTotalLoaded}
+          totalAvailable={displayTotalAvailable}
+        />
+      )}
     </div>
   );
 };
