@@ -72,6 +72,12 @@ const ProductPrice = ({
         break;
     }
   }
+  // Check if variant has discount
+  const hasDiscount = datavariant?.discount && datavariant.discount > 0;
+  const discountPercentage = datavariant?.discount || 0;
+  const discountedPrice = datavariant?.discounted_price || (hasDiscount ? data?.price * (1 - discountPercentage / 100) : data?.price);
+  const savings = hasDiscount ? (data?.price || 0) - (discountedPrice || 0) : 0;
+
   return (
     <div className="p-4 mb-20">
       {/* Rating Section */}
@@ -101,20 +107,30 @@ const ProductPrice = ({
       <div className="flex items-center justify-between">
         <div>
           <p className="text-gray-700 font-semibold mb-2">Harga Produk :</p>
-          <div className="flex items-center gap-3">
-            <span className="bg-red-500 text-white text-sm font-semibold px-2 py-1 rounded">
-              -{datavariant?.discount}%
-            </span>
-            <span className="text-gray-400 line-through text-lg">
-              Rp {data?.price?.toLocaleString()}
-            </span>
-          </div>
-          <p className="text-2xl font-bold text-green-600 mt-1">
-            Rp {datavariant?.discounted_price?.toLocaleString()}
-          </p>
-          <p className="text-sm text-gray-500 mt-1">
-            Hemat Rp {(data?.price - (datavariant?.discounted_price || 0)).toLocaleString()}
-          </p>
+          {hasDiscount ? (
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <span className="bg-red-500 text-white text-sm font-semibold px-2 py-1 rounded">
+                  -{discountPercentage}%
+                </span>
+                <span className="text-gray-400 line-through text-lg">
+                  Rp {data?.price?.toLocaleString()}
+                </span>
+              </div>
+              <p className="text-2xl font-bold text-green-600">
+                Rp {discountedPrice?.toLocaleString()}
+              </p>
+              <p className="text-sm text-gray-500">
+                Hemat Rp {savings.toLocaleString()}
+              </p>
+            </div>
+          ) : (
+            <div>
+              <p className="text-2xl font-bold text-gray-900">
+                Rp {data?.price?.toLocaleString()}
+              </p>
+            </div>
+          )}
         </div>
         <div>
           <Button variant="default" className="bg-[#006A47] hover:bg-[#005A3C] text-white">
