@@ -8,7 +8,7 @@ import ProductPrice from "@/components/detailproduct/ProductPrice";
 import { DetailProductType } from "@/types/detailProduct";
 
 // Dummy data untuk detail product sementara karena server sedang down
-// Sesuai dengan ProductDetailResponseDto dari API backend
+// Sesuai dengan ProductDetailResponseDto dari API backend dan konsisten dengan search data
 const dummyProductsData: { [key: string]: DetailProductType } = {
   "1": {
     id: "1",
@@ -34,29 +34,30 @@ const dummyProductsData: { [key: string]: DetailProductType } = {
     company: "Air Mancur",
     avg_rating: 4.5,
     total_rater: 128,
-    image_url: "/default-image.jpg",
     variants_list: [
       {
         id: 1,
         product: "1",
-        name: "100ml",
+        name: "60ml",
         img: "/default-image.jpg",
-        variant: "100ml",
+        variant: "60ml",
         expiration: "2025-12-31",
         stock: 50,
-        discount: 10,
-        discounted_price: 13500
+        discount: 0,
+        discounted_price: 15000,
+        updated_at: "2024-01-01T00:00:00Z"
       },
       {
         id: 2,
         product: "1",
-        name: "200ml",
+        name: "120ml",
         img: "/default-image.jpg",
-        variant: "200ml",
+        variant: "120ml",
         expiration: "2025-12-31",
         stock: 30,
-        discount: 15,
-        discounted_price: 25500
+        discount: 0,
+        discounted_price: 28000,
+        updated_at: "2024-01-01T00:00:00Z"
       }
     ],
     created_at: "2024-01-01T00:00:00Z",
@@ -86,29 +87,30 @@ const dummyProductsData: { [key: string]: DetailProductType } = {
     company: "Air Mancur",
     avg_rating: 4.3,
     total_rater: 95,
-    image_url: "/default-image.jpg",
     variants_list: [
       {
         id: 1,
         product: "2",
-        name: "100ml",
+        name: "60ml",
         img: "/default-image.jpg",
-        variant: "100ml",
+        variant: "60ml",
         expiration: "2025-12-31",
         stock: 40,
-        discount: 10,
-        discounted_price: 16200
+        discount: 0,
+        discounted_price: 18000,
+        updated_at: "2024-01-01T00:00:00Z"
       },
       {
         id: 2,
         product: "2",
-        name: "200ml",
+        name: "120ml",
         img: "/default-image.jpg",
-        variant: "200ml",
+        variant: "120ml",
         expiration: "2025-12-31",
         stock: 25,
-        discount: 15,
-        discounted_price: 30600
+        discount: 0,
+        discounted_price: 32000,
+        updated_at: "2024-01-01T00:00:00Z"
       }
     ],
     created_at: "2024-01-01T00:00:00Z",
@@ -116,11 +118,382 @@ const dummyProductsData: { [key: string]: DetailProductType } = {
   },
   "3": {
     id: "3",
-    name: "Jamu Temulawak Air Mancur",
-    info: "Jamu temulawak tradisional yang baik untuk kesehatan hati dan pencernaan. Mengandung kurkuminoid yang bermanfaat untuk meningkatkan nafsu makan dan menjaga kesehatan liver.",
+    name: "Jamu Galian Singset Aji Mujarab",
+    info: "Jamu galian singset tradisional yang baik untuk kesehatan wanita. Mengandung senyawa aktif yang bermanfaat untuk menjaga kesehatan reproduksi dan kebugaran tubuh.",
     description_list: [
-      "Jamu temulawak tradisional yang baik untuk kesehatan hati",
-      "Mengandung kurkuminoid yang bermanfaat untuk pencernaan",
+      "Jamu galian singset tradisional yang baik untuk kesehatan wanita",
+      "Mengandung senyawa aktif yang bermanfaat untuk reproduksi",
+      "Dapat membantu menjaga kebugaran tubuh",
+      "Baik untuk kesehatan sistem reproduksi wanita",
+      "Dapat membantu meningkatkan stamina dan vitalitas",
+      "Membantu menjaga kesehatan organ intim",
+      "Cocok dikonsumsi secara rutin untuk hasil optimal"
+    ],
+    instructions_list: [
+      "Simpan di tempat yang kering dan sejuk",
+      "Hindari paparan sinar matahari langsung",
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
+    ],
+    price: 12000,
+    is_active: true,
+    company: "Aji Mujarab",
+    avg_rating: 4.2,
+    total_rater: 87,
+    variants_list: [
+      {
+        id: 1,
+        product: "3",
+        name: "60ml",
+        img: "/default-image.jpg",
+        variant: "60ml",
+        expiration: "2025-12-31",
+        stock: 35,
+        discount: 0,
+        discounted_price: 12000,
+        updated_at: "2024-01-01T00:00:00Z"
+      },
+      {
+        id: 2,
+        product: "3",
+        name: "120ml",
+        img: "/default-image.jpg",
+        variant: "120ml",
+        expiration: "2025-12-31",
+        stock: 20,
+        discount: 0,
+        discounted_price: 22000,
+        updated_at: "2024-01-01T00:00:00Z"
+      }
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
+  },
+  "4": {
+    id: "4",
+    name: "Jamu Beras Kencur Jamu Jago",
+    info: "Jamu beras kencur premium dari Jamu Jago dengan kualitas terbaik. Mengandung bahan-bahan alami pilihan yang diolah dengan teknologi modern.",
+    description_list: [
+      "Jamu beras kencur premium dari Jamu Jago",
+      "Mengandung bahan-bahan alami pilihan berkualitas tinggi",
+      "Diolah dengan teknologi modern untuk menjaga kualitas",
+      "Dapat membantu meningkatkan nafsu makan",
+      "Baik untuk kesehatan pencernaan",
+      "Membantu meredakan perut kembung",
+      "Cocok dikonsumsi pagi atau sore hari"
+    ],
+    instructions_list: [
+      "Simpan di tempat yang kering dan sejuk",
+      "Hindari paparan sinar matahari langsung",
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
+    ],
+    price: 14000,
+    is_active: true,
+    company: "Jamu Jago",
+    avg_rating: 4.4,
+    total_rater: 112,
+    variants_list: [
+      {
+        id: 1,
+        product: "4",
+        name: "60ml",
+        img: "/default-image.jpg",
+        variant: "60ml",
+        expiration: "2025-12-31",
+        stock: 30,
+        discount: 0,
+        discounted_price: 14000,
+        updated_at: "2024-01-01T00:00:00Z"
+      },
+      {
+        id: 2,
+        product: "4",
+        name: "120ml",
+        img: "/default-image.jpg",
+        variant: "120ml",
+        expiration: "2025-12-31",
+        stock: 20,
+        discount: 0,
+        discounted_price: 26000,
+        updated_at: "2024-01-01T00:00:00Z"
+      }
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
+  },
+  "5": {
+    id: "5",
+    name: "Jamu Beras Kencur Nyonya Meneer",
+    info: "Jamu beras kencur premium dari Nyonya Meneer dengan resep tradisional yang sudah turun temurun. Mengandung bahan-bahan alami berkualitas tinggi.",
+    description_list: [
+      "Jamu beras kencur premium dari Nyonya Meneer",
+      "Resep tradisional yang sudah turun temurun",
+      "Mengandung bahan-bahan alami berkualitas tinggi",
+      "Dapat membantu meningkatkan nafsu makan",
+      "Baik untuk kesehatan pencernaan dan lambung",
+      "Membantu meredakan perut kembung dan mual",
+      "Cocok dikonsumsi pagi atau sore hari"
+    ],
+    instructions_list: [
+      "Simpan di tempat yang kering dan sejuk",
+      "Hindari paparan sinar matahari langsung",
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
+    ],
+    price: 25000,
+    is_active: true,
+    company: "Nyonya Meneer",
+    avg_rating: 4.6,
+    total_rater: 156,
+    variants_list: [
+      {
+        id: 1,
+        product: "5",
+        name: "60ml",
+        img: "/default-image.jpg",
+        variant: "60ml",
+        expiration: "2025-12-31",
+        stock: 25,
+        discount: 0,
+        discounted_price: 25000,
+        updated_at: "2024-01-01T00:00:00Z"
+      },
+      {
+        id: 2,
+        product: "5",
+        name: "120ml",
+        img: "/default-image.jpg",
+        variant: "120ml",
+        expiration: "2025-12-31",
+        stock: 15,
+        discount: 0,
+        discounted_price: 45000,
+        updated_at: "2024-01-01T00:00:00Z"
+      }
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
+  },
+  "6": {
+    id: "6",
+    name: "Jamu Beras Kencur Sabdo Palon",
+    info: "Jamu beras kencur tradisional dari Sabdo Palon dengan khasiat yang sudah terbukti. Mengandung senyawa aktif yang baik untuk kesehatan pencernaan.",
+    description_list: [
+      "Jamu beras kencur tradisional dari Sabdo Palon",
+      "Khasiat yang sudah terbukti secara turun temurun",
+      "Mengandung senyawa aktif yang baik untuk pencernaan",
+      "Dapat membantu meningkatkan nafsu makan",
+      "Baik untuk kesehatan lambung dan usus",
+      "Membantu meredakan perut kembung",
+      "Cocok dikonsumsi pagi atau sore hari"
+    ],
+    instructions_list: [
+      "Simpan di tempat yang kering dan sejuk",
+      "Hindari paparan sinar matahari langsung",
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
+    ],
+    price: 18000,
+    is_active: true,
+    company: "Sabdo Palon",
+    avg_rating: 4.1,
+    total_rater: 73,
+    variants_list: [
+      {
+        id: 1,
+        product: "6",
+        name: "60ml",
+        img: "/default-image.jpg",
+        variant: "60ml",
+        expiration: "2025-12-31",
+        stock: 40,
+        discount: 0,
+        discounted_price: 18000,
+        updated_at: "2024-01-01T00:00:00Z"
+      },
+      {
+        id: 2,
+        product: "6",
+        name: "120ml",
+        img: "/default-image.jpg",
+        variant: "120ml",
+        expiration: "2025-12-31",
+        stock: 25,
+        discount: 0,
+        discounted_price: 32000,
+        updated_at: "2024-01-01T00:00:00Z"
+      }
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
+  },
+  "7": {
+    id: "7",
+    name: "Jamu Beras Kencur Sido Muncul",
+    info: "Jamu beras kencur dari Sido Muncul dengan kualitas terjamin. Mengandung bahan-bahan alami pilihan yang diolah dengan standar farmasi.",
+    description_list: [
+      "Jamu beras kencur dari Sido Muncul dengan kualitas terjamin",
+      "Mengandung bahan-bahan alami pilihan berkualitas tinggi",
+      "Diolah dengan standar farmasi untuk keamanan dan kualitas",
+      "Dapat membantu meningkatkan nafsu makan",
+      "Baik untuk kesehatan pencernaan dan lambung",
+      "Membantu meredakan perut kembung dan mual",
+      "Cocok dikonsumsi pagi atau sore hari"
+    ],
+    instructions_list: [
+      "Simpan di tempat yang kering dan sejuk",
+      "Hindari paparan sinar matahari langsung",
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
+    ],
+    price: 16000,
+    is_active: true,
+    company: "Sido Muncul",
+    avg_rating: 4.3,
+    total_rater: 89,
+    variants_list: [
+      {
+        id: 1,
+        product: "7",
+        name: "60ml",
+        img: "/default-image.jpg",
+        variant: "60ml",
+        expiration: "2025-12-31",
+        stock: 40,
+        discount: 0,
+        discounted_price: 16000,
+        updated_at: "2024-01-01T00:00:00Z"
+      },
+      {
+        id: 2,
+        product: "7",
+        name: "120ml",
+        img: "/default-image.jpg",
+        variant: "120ml",
+        expiration: "2025-12-31",
+        stock: 30,
+        discount: 0,
+        discounted_price: 28000,
+        updated_at: "2024-01-01T00:00:00Z"
+      }
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
+  },
+  "8": {
+    id: "8",
+    name: "Jamu Kunyit Asam Sido Muncul",
+    info: "Jamu kunyit asam dari Sido Muncul dengan kualitas terjamin. Mengandung kurkumin dari kunyit dan asam jawa yang baik untuk kesehatan.",
+    description_list: [
+      "Jamu kunyit asam dari Sido Muncul dengan kualitas terjamin",
+      "Mengandung kurkumin dari kunyit dan asam jawa",
+      "Baik untuk kesehatan pencernaan dan anti-inflamasi",
+      "Dapat membantu meredakan perut kembung",
+      "Membantu meningkatkan nafsu makan",
+      "Baik untuk kesehatan lambung",
+      "Cocok dikonsumsi setelah makan"
+    ],
+    instructions_list: [
+      "Simpan di tempat yang kering dan sejuk",
+      "Hindari paparan sinar matahari langsung",
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
+    ],
+    price: 17000,
+    is_active: true,
+    company: "Sido Muncul",
+    avg_rating: 4.7,
+    total_rater: 142,
+    variants_list: [
+      {
+        id: 1,
+        product: "8",
+        name: "60ml",
+        img: "/default-image.jpg",
+        variant: "60ml",
+        expiration: "2025-12-31",
+        stock: 25,
+        discount: 0,
+        discounted_price: 17000,
+        updated_at: "2024-01-01T00:00:00Z"
+      },
+      {
+        id: 2,
+        product: "8",
+        name: "120ml",
+        img: "/default-image.jpg",
+        variant: "120ml",
+        expiration: "2025-12-31",
+        stock: 15,
+        discount: 0,
+        discounted_price: 30000,
+        updated_at: "2024-01-01T00:00:00Z"
+      }
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
+  },
+  "9": {
+    id: "9",
+    name: "Jamu Galian Singset Sido Muncul",
+    info: "Jamu galian singset dari Sido Muncul dengan kualitas terjamin. Mengandung senyawa aktif yang baik untuk kesehatan wanita.",
+    description_list: [
+      "Jamu galian singset dari Sido Muncul dengan kualitas terjamin",
+      "Mengandung senyawa aktif yang baik untuk kesehatan wanita",
+      "Dapat membantu menjaga kebugaran tubuh",
+      "Baik untuk kesehatan sistem reproduksi wanita",
+      "Dapat membantu meningkatkan stamina dan vitalitas",
+      "Membantu menjaga kesehatan organ intim",
+      "Cocok dikonsumsi secara rutin untuk hasil optimal"
+    ],
+    instructions_list: [
+      "Simpan di tempat yang kering dan sejuk",
+      "Hindari paparan sinar matahari langsung",
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
+    ],
+    price: 19000,
+    is_active: true,
+    company: "Sido Muncul",
+    avg_rating: 4.0,
+    total_rater: 65,
+    variants_list: [
+      {
+        id: 1,
+        product: "9",
+        name: "60ml",
+        img: "/default-image.jpg",
+        variant: "60ml",
+        expiration: "2025-12-31",
+        stock: 30,
+        discount: 0,
+        discounted_price: 19000,
+        updated_at: "2024-01-01T00:00:00Z"
+      },
+      {
+        id: 2,
+        product: "9",
+        name: "120ml",
+        img: "/default-image.jpg",
+        variant: "120ml",
+        expiration: "2025-12-31",
+        stock: 20,
+        discount: 0,
+        discounted_price: 35000,
+        updated_at: "2024-01-01T00:00:00Z"
+      }
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
+  },
+  "10": {
+    id: "10",
+    name: "Jamu Temulawak Sido Muncul",
+    info: "Jamu temulawak dari Sido Muncul dengan kualitas terjamin. Mengandung kurkuminoid yang bermanfaat untuk kesehatan hati dan pencernaan.",
+    description_list: [
+      "Jamu temulawak dari Sido Muncul dengan kualitas terjamin",
+      "Mengandung kurkuminoid yang bermanfaat untuk kesehatan hati",
       "Dapat membantu meningkatkan nafsu makan secara alami",
       "Baik untuk kesehatan liver dan sistem pencernaan",
       "Dapat membantu mengurangi peradangan dalam tubuh",
@@ -135,49 +508,50 @@ const dummyProductsData: { [key: string]: DetailProductType } = {
     ],
     price: 20000,
     is_active: true,
-    company: "Air Mancur",
-    avg_rating: 4.2,
-    total_rater: 87,
-    image_url: "/default-image.jpg",
+    company: "Sido Muncul",
+    avg_rating: 4.4,
+    total_rater: 98,
     variants_list: [
       {
         id: 1,
-        product: "3",
+        product: "10",
         name: "60ml",
         img: "/default-image.jpg",
         variant: "60ml",
         expiration: "2025-12-31",
         stock: 35,
-        discount: 10,
-        discounted_price: 18000
+        discount: 0,
+        discounted_price: 20000,
+        updated_at: "2024-01-01T00:00:00Z"
       },
       {
         id: 2,
-        product: "3",
+        product: "10",
         name: "120ml",
         img: "/default-image.jpg",
         variant: "120ml",
         expiration: "2025-12-31",
-        stock: 20,
-        discount: 15,
-        discounted_price: 32000
+        stock: 25,
+        discount: 0,
+        discounted_price: 36000,
+        updated_at: "2024-01-01T00:00:00Z"
       }
     ],
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z"
   },
-  "4": {
-    id: "4",
-    name: "Jamu Jahe Merah Air Mancur",
-    info: "Jamu jahe merah tradisional yang menghangatkan tubuh. Mengandung senyawa aktif yang baik untuk kesehatan pernapasan dan membantu meredakan batuk serta flu.",
+  "11": {
+    id: "11",
+    name: "Jamu Asam Urat Aji Mujarab",
+    info: "Jamu asam urat tradisional dari Aji Mujarab yang berkhasiat untuk meredakan gejala asam urat. Mengandung senyawa aktif yang membantu mengurangi kadar asam urat dalam darah.",
     description_list: [
-      "Jamu jahe merah tradisional yang menghangatkan tubuh",
-      "Mengandung senyawa aktif yang baik untuk kesehatan pernapasan",
-      "Dapat membantu meredakan batuk dan flu",
-      "Baik untuk kesehatan tenggorokan dan saluran pernapasan",
-      "Dapat membantu meningkatkan sistem kekebalan tubuh",
-      "Membantu meredakan perut kembung dan mual",
-      "Cocok dikonsumsi saat cuaca dingin atau saat sakit"
+      "Jamu asam urat tradisional dari Aji Mujarab",
+      "Berkhasiat untuk meredakan gejala asam urat",
+      "Mengandung senyawa aktif yang membantu mengurangi kadar asam urat",
+      "Dapat membantu meredakan nyeri sendi dan peradangan",
+      "Baik untuk kesehatan ginjal dan sistem ekskresi",
+      "Membantu melarutkan kristal asam urat",
+      "Cocok dikonsumsi secara rutin untuk hasil optimal"
     ],
     instructions_list: [
       "Simpan di tempat yang kering dan sejuk",
@@ -185,50 +559,51 @@ const dummyProductsData: { [key: string]: DetailProductType } = {
       "Gunakan dalam 12 bulan setelah dibuka",
       "Kocok sebelum diminum untuk hasil terbaik"
     ],
-    price: 22000,
+    price: 13000,
     is_active: true,
-    company: "Air Mancur",
-    avg_rating: 4.4,
-    total_rater: 112,
-    image_url: "/default-image.jpg",
+    company: "Aji Mujarab",
+    avg_rating: 4.3,
+    total_rater: 76,
     variants_list: [
       {
         id: 1,
-        product: "4",
+        product: "11",
         name: "60ml",
         img: "/default-image.jpg",
         variant: "60ml",
         expiration: "2025-12-31",
         stock: 30,
-        discount: 10,
-        discounted_price: 19800
+        discount: 0,
+        discounted_price: 13000,
+        updated_at: "2024-01-01T00:00:00Z"
       },
       {
         id: 2,
-        product: "4",
+        product: "11",
         name: "120ml",
         img: "/default-image.jpg",
         variant: "120ml",
         expiration: "2025-12-31",
         stock: 20,
-        discount: 15,
-        discounted_price: 35200
+        discount: 0,
+        discounted_price: 24000,
+        updated_at: "2024-01-01T00:00:00Z"
       }
     ],
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z"
   },
-  "5": {
-    id: "5",
-    name: "Jamu Sari Kurma Air Mancur",
-    info: "Jamu sari kurma tradisional yang kaya akan nutrisi. Mengandung vitamin dan mineral alami yang baik untuk kesehatan tubuh dan membantu meningkatkan energi.",
+  "12": {
+    id: "12",
+    name: "Jamu Beras Kencur Aji Mujarab",
+    info: "Jamu beras kencur dari Aji Mujarab dengan kualitas terjamin. Mengandung bahan-bahan alami pilihan yang diolah dengan standar farmasi untuk keamanan dan kualitas.",
     description_list: [
-      "Jamu sari kurma tradisional yang kaya akan nutrisi",
-      "Mengandung vitamin dan mineral alami yang baik untuk kesehatan",
-      "Dapat membantu meningkatkan energi dan stamina",
-      "Baik untuk kesehatan pencernaan dan metabolisme",
-      "Dapat membantu meningkatkan sistem kekebalan tubuh",
-      "Membantu menjaga kesehatan jantung dan pembuluh darah",
+      "Jamu beras kencur dari Aji Mujarab dengan kualitas terjamin",
+      "Mengandung bahan-bahan alami pilihan berkualitas tinggi",
+      "Diolah dengan standar farmasi untuk keamanan dan kualitas",
+      "Dapat membantu meningkatkan nafsu makan",
+      "Baik untuk kesehatan pencernaan dan lambung",
+      "Membantu meredakan perut kembung dan mual",
       "Cocok dikonsumsi pagi atau sore hari"
     ],
     instructions_list: [
@@ -237,51 +612,211 @@ const dummyProductsData: { [key: string]: DetailProductType } = {
       "Gunakan dalam 12 bulan setelah dibuka",
       "Kocok sebelum diminum untuk hasil terbaik"
     ],
-    price: 25000,
+    price: 13000,
     is_active: true,
-    company: "Air Mancur",
-    avg_rating: 4.6,
-    total_rater: 156,
-    image_url: "/default-image.jpg",
+    company: "Aji Mujarab",
+    avg_rating: 4.1,
+    total_rater: 58,
     variants_list: [
       {
         id: 1,
-        product: "5",
+        product: "12",
         name: "60ml",
         img: "/default-image.jpg",
         variant: "60ml",
         expiration: "2025-12-31",
-        stock: 25,
-        discount: 10,
-        discounted_price: 22500
+        stock: 30,
+        discount: 0,
+        discounted_price: 13000,
+        updated_at: "2024-01-01T00:00:00Z"
       },
       {
         id: 2,
-        product: "5",
+        product: "12",
         name: "120ml",
         img: "/default-image.jpg",
         variant: "120ml",
         expiration: "2025-12-31",
-        stock: 15,
-        discount: 15,
-        discounted_price: 40000
+        stock: 20,
+        discount: 0,
+        discounted_price: 24000,
+        updated_at: "2024-01-01T00:00:00Z"
       }
     ],
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z"
   },
-  "6": {
-    id: "6",
-    name: "Jamu Brotowali Air Mancur",
-    info: "Jamu brotowali tradisional yang pahit namun berkhasiat. Mengandung senyawa aktif yang baik untuk kesehatan dan membantu menjaga daya tahan tubuh.",
+  "13": {
+    id: "13",
+    name: "Jamu Kunyit Asam Aji Mujarab",
+    info: "Jamu kunyit asam dari Aji Mujarab dengan kualitas terjamin. Mengandung kurkumin dari kunyit dan asam jawa yang baik untuk kesehatan pencernaan dan anti-inflamasi.",
     description_list: [
-      "Jamu brotowali tradisional yang pahit namun berkhasiat",
-      "Mengandung senyawa aktif yang baik untuk kesehatan",
-      "Dapat membantu menjaga daya tahan tubuh",
-      "Baik untuk kesehatan kulit dan membantu meredakan gatal",
-      "Dapat membantu mengontrol kadar gula darah",
-      "Membantu meningkatkan sistem kekebalan tubuh",
-      "Cocok dikonsumsi untuk menjaga kesehatan secara rutin"
+      "Jamu kunyit asam dari Aji Mujarab dengan kualitas terjamin",
+      "Mengandung kurkumin dari kunyit dan asam jawa",
+      "Baik untuk kesehatan pencernaan dan anti-inflamasi",
+      "Dapat membantu meredakan perut kembung",
+      "Membantu meningkatkan nafsu makan",
+      "Baik untuk kesehatan lambung",
+      "Cocok dikonsumsi setelah makan"
+    ],
+    instructions_list: [
+      "Simpan di tempat yang kering dan sejuk",
+      "Hindari paparan sinar matahari langsung",
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
+    ],
+    price: 14000,
+    is_active: true,
+    company: "Aji Mujarab",
+    avg_rating: 4.2,
+    total_rater: 64,
+    variants_list: [
+      {
+        id: 1,
+        product: "13",
+        name: "60ml",
+        img: "/default-image.jpg",
+        variant: "60ml",
+        expiration: "2025-12-31",
+        stock: 25,
+        discount: 0,
+        discounted_price: 14000,
+        updated_at: "2024-01-01T00:00:00Z"
+      },
+      {
+        id: 2,
+        product: "13",
+        name: "120ml",
+        img: "/default-image.jpg",
+        variant: "120ml",
+        expiration: "2025-12-31",
+        stock: 15,
+        discount: 0,
+        discounted_price: 25000,
+        updated_at: "2024-01-01T00:00:00Z"
+      }
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
+  },
+  "14": {
+    id: "14",
+    name: "Jamu Temulawak Aji Mujarab",
+    info: "Jamu temulawak dari Aji Mujarab dengan kualitas terjamin. Mengandung kurkuminoid yang bermanfaat untuk kesehatan hati dan pencernaan serta meningkatkan nafsu makan.",
+    description_list: [
+      "Jamu temulawak dari Aji Mujarab dengan kualitas terjamin",
+      "Mengandung kurkuminoid yang bermanfaat untuk kesehatan hati",
+      "Dapat membantu meningkatkan nafsu makan secara alami",
+      "Baik untuk kesehatan liver dan sistem pencernaan",
+      "Dapat membantu mengurangi peradangan dalam tubuh",
+      "Membantu menjaga kesehatan saluran cerna",
+      "Cocok dikonsumsi pagi atau sore hari"
+    ],
+    instructions_list: [
+      "Simpan di tempat yang kering dan sejuk",
+      "Hindari paparan sinar matahari langsung",
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
+    ],
+    price: 15000,
+    is_active: true,
+    company: "Aji Mujarab",
+    avg_rating: 4.0,
+    total_rater: 42,
+    variants_list: [
+      {
+        id: 1,
+        product: "14",
+        name: "60ml",
+        img: "/default-image.jpg",
+        variant: "60ml",
+        expiration: "2025-12-31",
+        stock: 20,
+        discount: 0,
+        discounted_price: 15000,
+        updated_at: "2024-01-01T00:00:00Z"
+      },
+      {
+        id: 2,
+        product: "14",
+        name: "120ml",
+        img: "/default-image.jpg",
+        variant: "120ml",
+        expiration: "2025-12-31",
+        stock: 15,
+        discount: 0,
+        discounted_price: 27000,
+        updated_at: "2024-01-01T00:00:00Z"
+      }
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
+  },
+  "15": {
+    id: "15",
+    name: "Jamu Kunyit Asam Jamu Jago",
+    info: "Jamu kunyit asam dari Jamu Jago dengan kualitas premium. Mengandung kurkumin dari kunyit dan asam jawa yang baik untuk kesehatan pencernaan dan anti-inflamasi.",
+    description_list: [
+      "Jamu kunyit asam dari Jamu Jago dengan kualitas premium",
+      "Mengandung kurkumin dari kunyit dan asam jawa",
+      "Baik untuk kesehatan pencernaan dan anti-inflamasi",
+      "Dapat membantu meredakan perut kembung",
+      "Membantu meningkatkan nafsu makan",
+      "Baik untuk kesehatan lambung",
+      "Cocok dikonsumsi setelah makan"
+    ],
+    instructions_list: [
+      "Simpan di tempat yang kering dan sejuk",
+      "Hindari paparan sinar matahari langsung",
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
+    ],
+    price: 15000,
+    is_active: true,
+    company: "Jamu Jago",
+    avg_rating: 4.3,
+    total_rater: 89,
+    variants_list: [
+      {
+        id: 1,
+        product: "15",
+        name: "60ml",
+        img: "/default-image.jpg",
+        variant: "60ml",
+        expiration: "2025-12-31",
+        stock: 15,
+        discount: 0,
+        discounted_price: 15000,
+        updated_at: "2024-01-01T00:00:00Z"
+      },
+      {
+        id: 2,
+        product: "15",
+        name: "120ml",
+        img: "/default-image.jpg",
+        variant: "120ml",
+        expiration: "2025-12-31",
+        stock: 10,
+        discount: 0,
+        discounted_price: 27000,
+        updated_at: "2024-01-01T00:00:00Z"
+      }
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
+  },
+  "16": {
+    id: "16",
+    name: "Jamu Galian Singset Jamu Jago",
+    info: "Jamu galian singset dari Jamu Jago dengan kualitas premium. Mengandung senyawa aktif yang baik untuk kesehatan wanita dan membantu menjaga kebugaran tubuh.",
+    description_list: [
+      "Jamu galian singset dari Jamu Jago dengan kualitas premium",
+      "Mengandung senyawa aktif yang baik untuk kesehatan wanita",
+      "Dapat membantu menjaga kebugaran tubuh",
+      "Baik untuk kesehatan sistem reproduksi wanita",
+      "Dapat membantu meningkatkan stamina dan vitalitas",
+      "Membantu menjaga kesehatan organ intim",
+      "Cocok dikonsumsi secara rutin untuk hasil optimal"
     ],
     instructions_list: [
       "Simpan di tempat yang kering dan sejuk",
@@ -291,236 +826,249 @@ const dummyProductsData: { [key: string]: DetailProductType } = {
     ],
     price: 16000,
     is_active: true,
-    company: "Air Mancur",
+    company: "Jamu Jago",
     avg_rating: 4.1,
-    total_rater: 73,
-    image_url: "/default-image.jpg",
+    total_rater: 67,
     variants_list: [
       {
         id: 1,
-        product: "6",
+        product: "16",
         name: "60ml",
         img: "/default-image.jpg",
         variant: "60ml",
         expiration: "2025-12-31",
         stock: 40,
-        discount: 10,
-        discounted_price: 14400
+        discount: 0,
+        discounted_price: 16000,
+        updated_at: "2024-01-01T00:00:00Z"
       },
       {
         id: 2,
-        product: "6",
+        product: "16",
         name: "120ml",
         img: "/default-image.jpg",
         variant: "120ml",
         expiration: "2025-12-31",
         stock: 25,
-        discount: 15,
-        discounted_price: 25600
+        discount: 0,
+        discounted_price: 28000,
+        updated_at: "2024-01-01T00:00:00Z"
       }
     ],
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z"
   },
-  "7": {
-    id: "7",
-    name: "Teh Hitam Pucuk",
-    info: "Teh hitam pucuk premium yang dipetik dari pucuk daun teh terbaik. Mengandung kafein alami dan antioksidan yang baik untuk kesehatan.",
+  "17": {
+    id: "17",
+    name: "Jamu Temulawak Jamu Jago",
+    info: "Jamu temulawak dari Jamu Jago dengan kualitas premium. Mengandung kurkuminoid yang bermanfaat untuk kesehatan hati dan pencernaan serta meningkatkan nafsu makan.",
     description_list: [
-      "Teh hitam pucuk premium dari pucuk daun terbaik",
-      "Mengandung kafein alami dan antioksidan",
-      "Dapat membantu meningkatkan energi dan fokus",
-      "Baik untuk kesehatan jantung",
-      "Dapat membantu mengurangi stres",
-      "Membantu meningkatkan konsentrasi",
-      "Cocok untuk diminum pagi atau sore hari"
+      "Jamu temulawak dari Jamu Jago dengan kualitas premium",
+      "Mengandung kurkuminoid yang bermanfaat untuk kesehatan hati",
+      "Dapat membantu meningkatkan nafsu makan secara alami",
+      "Baik untuk kesehatan liver dan sistem pencernaan",
+      "Dapat membantu mengurangi peradangan dalam tubuh",
+      "Membantu menjaga kesehatan saluran cerna",
+      "Cocok dikonsumsi pagi atau sore hari"
     ],
     instructions_list: [
       "Simpan di tempat yang kering dan sejuk",
       "Hindari paparan sinar matahari langsung",
-      "Gunakan dalam 18 bulan setelah dibuka",
-      "Bisa disimpan di kulkas untuk menjaga kesegaran"
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
     ],
-    price: 22000,
+    price: 17000,
     is_active: true,
-    company: "Amimum Herbal",
-    avg_rating: 4.3,
-    total_rater: 89,
-    image_url: "/default-image.jpg",
+    company: "Jamu Jago",
+    avg_rating: 4.2,
+    total_rater: 73,
     variants_list: [
       {
         id: 1,
-        product: "7",
-        name: "25gr",
+        product: "17",
+        name: "60ml",
         img: "/default-image.jpg",
-        variant: "25gr",
+        variant: "60ml",
         expiration: "2025-12-31",
-        stock: 40,
-        discount: 8,
-        discounted_price: 20240
+        stock: 50,
+        discount: 0,
+        discounted_price: 17000,
+        updated_at: "2024-01-01T00:00:00Z"
       },
       {
         id: 2,
-        product: "7",
-        name: "50gr",
+        product: "17",
+        name: "120ml",
         img: "/default-image.jpg",
-        variant: "50gr",
-        expiration: "2025-12-31",
-        stock: 30,
-        discount: 12,
-        discounted_price: 38720
-      }
-    ]
-  },
-  "8": {
-    id: "8",
-    name: "Madu Hutan Liar",
-    info: "Madu hutan liar asli yang dikumpulkan dari lebah liar di hutan alami. Mengandung nutrisi dan enzim alami yang lebih kaya.",
-    description_list: [
-      "Madu hutan liar asli dari lebah liar di hutan alami",
-      "Mengandung nutrisi dan enzim alami yang lebih kaya",
-      "Dapat membantu meningkatkan sistem kekebalan tubuh",
-      "Baik untuk kesehatan tenggorokan dan pernapasan",
-      "Dapat membantu meredakan batuk dan flu",
-      "Membantu meningkatkan energi dan stamina",
-      "Cocok untuk diminum pagi atau sebelum tidur"
-    ],
-    instructions_list: [
-      "Simpan di tempat yang kering dan sejuk",
-      "Hindari paparan sinar matahari langsung",
-      "Gunakan dalam 36 bulan setelah dibuka",
-      "Bisa disimpan di kulkas untuk menjaga kesegaran"
-    ],
-    price: 55000,
-    is_active: true,
-    company: "Amimum Herbal",
-    avg_rating: 4.7,
-    total_rater: 142,
-    image_url: "/default-image.jpg",
-    variants_list: [
-      {
-        id: 1,
-        product: "8",
-        name: "250ml",
-        img: "/default-image.jpg",
-        variant: "250ml",
-        expiration: "2025-12-31",
-        stock: 25,
-        discount: 18,
-        discounted_price: 45100
-      },
-      {
-        id: 2,
-        product: "8",
-        name: "500ml",
-        img: "/default-image.jpg",
-        variant: "500ml",
-        expiration: "2025-12-31",
-        stock: 15,
-        discount: 22,
-        discounted_price: 108900
-      }
-    ]
-  },
-  "9": {
-    id: "9",
-    name: "Kencur Segar",
-    info: "Kencur segar berkualitas tinggi yang dipanen langsung dari perkebunan terbaik. Mengandung minyak atsiri yang memberikan aroma khas.",
-    description_list: [
-      "Kencur segar berkualitas tinggi dari perkebunan terbaik",
-      "Mengandung minyak atsiri yang memberikan aroma khas",
-      "Dapat membantu meredakan batuk dan flu",
-      "Baik untuk kesehatan tenggorokan",
-      "Dapat membantu meningkatkan nafsu makan",
-      "Membantu meningkatkan sistem kekebalan tubuh",
-      "Cocok untuk dibuat jamu atau minuman kesehatan"
-    ],
-    instructions_list: [
-      "Simpan di tempat yang kering dan sejuk",
-      "Hindari paparan sinar matahari langsung",
-      "Gunakan dalam 3 bulan setelah dibuka",
-      "Bisa disimpan di kulkas untuk menjaga kesegaran"
-    ],
-    price: 18000,
-    is_active: true,
-    company: "Amimum Herbal",
-    avg_rating: 4.0,
-    total_rater: 65,
-    image_url: "/default-image.jpg",
-    variants_list: [
-      {
-        id: 1,
-        product: "9",
-        name: "100gr",
-        img: "/default-image.jpg",
-        variant: "100gr",
-        expiration: "2025-12-31",
-        stock: 30,
-        discount: 6,
-        discounted_price: 16920
-      },
-      {
-        id: 2,
-        product: "9",
-        name: "250gr",
-        img: "/default-image.jpg",
-        variant: "250gr",
-        expiration: "2025-12-31",
-        stock: 20,
-        discount: 10,
-        discounted_price: 31500
-      }
-    ]
-  },
-  "10": {
-    id: "10",
-    name: "Lada Hitam Utuh",
-    info: "Lada hitam utuh premium yang dipetik dari pohon lada terbaik. Mengandung piperine yang memberikan rasa pedas dan manfaat kesehatan.",
-    description_list: [
-      "Lada hitam utuh premium dari pohon lada terbaik",
-      "Mengandung piperine yang memberikan rasa pedas",
-      "Dapat membantu meningkatkan penyerapan nutrisi",
-      "Baik untuk kesehatan pencernaan",
-      "Dapat membantu mengurangi peradangan",
-      "Membantu meningkatkan metabolisme tubuh",
-      "Cocok untuk campuran masakan atau minuman"
-    ],
-    instructions_list: [
-      "Simpan di tempat yang kering dan sejuk",
-      "Hindari paparan sinar matahari langsung",
-      "Gunakan dalam 24 bulan setelah dibuka",
-      "Bisa disimpan di kulkas untuk menjaga kesegaran"
-    ],
-    price: 25000,
-    is_active: true,
-    company: "Amimum Herbal",
-    avg_rating: 4.4,
-    total_rater: 98,
-    image_url: "/default-image.jpg",
-    variants_list: [
-      {
-        id: 1,
-        product: "10",
-        name: "50gr",
-        img: "/default-image.jpg",
-        variant: "50gr",
+        variant: "120ml",
         expiration: "2025-12-31",
         stock: 35,
-        discount: 8,
-        discounted_price: 23000
+        discount: 0,
+        discounted_price: 30000,
+        updated_at: "2024-01-01T00:00:00Z"
+      }
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
+  },
+  "18": {
+    id: "18",
+    name: "Jamu Kunyit Asam Nyonya Meneer",
+    info: "Jamu kunyit asam premium dari Nyonya Meneer dengan resep tradisional yang sudah turun temurun. Mengandung kurkumin dari kunyit dan asam jawa berkualitas tinggi.",
+    description_list: [
+      "Jamu kunyit asam premium dari Nyonya Meneer",
+      "Resep tradisional yang sudah turun temurun",
+      "Mengandung kurkumin dari kunyit dan asam jawa berkualitas tinggi",
+      "Baik untuk kesehatan pencernaan dan anti-inflamasi",
+      "Dapat membantu meredakan perut kembung",
+      "Membantu meningkatkan nafsu makan",
+      "Cocok dikonsumsi setelah makan"
+    ],
+    instructions_list: [
+      "Simpan di tempat yang kering dan sejuk",
+      "Hindari paparan sinar matahari langsung",
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
+    ],
+    price: 26000,
+    is_active: true,
+    company: "Nyonya Meneer",
+    avg_rating: 4.5,
+    total_rater: 134,
+    variants_list: [
+      {
+        id: 1,
+        product: "18",
+        name: "60ml",
+        img: "/default-image.jpg",
+        variant: "60ml",
+        expiration: "2025-12-31",
+        stock: 35,
+        discount: 0,
+        discounted_price: 26000,
+        updated_at: "2024-01-01T00:00:00Z"
       },
       {
         id: 2,
-        product: "10",
-        name: "100gr",
+        product: "18",
+        name: "120ml",
         img: "/default-image.jpg",
-        variant: "100gr",
+        variant: "120ml",
         expiration: "2025-12-31",
         stock: 25,
-        discount: 12,
-        discounted_price: 44000
+        discount: 0,
+        discounted_price: 48000,
+        updated_at: "2024-01-01T00:00:00Z"
       }
-    ]
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
+  },
+  "19": {
+    id: "19",
+    name: "Jamu Galian Singset Nyonya Meneer",
+    info: "Jamu galian singset premium dari Nyonya Meneer dengan resep tradisional yang sudah turun temurun. Mengandung senyawa aktif yang baik untuk kesehatan wanita.",
+    description_list: [
+      "Jamu galian singset premium dari Nyonya Meneer",
+      "Resep tradisional yang sudah turun temurun",
+      "Mengandung senyawa aktif yang baik untuk kesehatan wanita",
+      "Dapat membantu menjaga kebugaran tubuh",
+      "Baik untuk kesehatan sistem reproduksi wanita",
+      "Dapat membantu meningkatkan stamina dan vitalitas",
+      "Cocok dikonsumsi secara rutin untuk hasil optimal"
+    ],
+    instructions_list: [
+      "Simpan di tempat yang kering dan sejuk",
+      "Hindari paparan sinar matahari langsung",
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
+    ],
+    price: 27000,
+    is_active: true,
+    company: "Nyonya Meneer",
+    avg_rating: 4.4,
+    total_rater: 98,
+    variants_list: [
+      {
+        id: 1,
+        product: "19",
+        name: "60ml",
+        img: "/default-image.jpg",
+        variant: "60ml",
+        expiration: "2025-12-31",
+        stock: 20,
+        discount: 0,
+        discounted_price: 27000,
+        updated_at: "2024-01-01T00:00:00Z"
+      },
+      {
+        id: 2,
+        product: "19",
+        name: "120ml",
+        img: "/default-image.jpg",
+        variant: "120ml",
+        expiration: "2025-12-31",
+        stock: 10,
+        discount: 0,
+        discounted_price: 50000,
+        updated_at: "2024-01-01T00:00:00Z"
+      }
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
+  },
+  "20": {
+    id: "20",
+    name: "Jamu Temulawak Nyonya Meneer",
+    info: "Jamu temulawak premium dari Nyonya Meneer dengan resep tradisional yang sudah turun temurun. Mengandung kurkuminoid yang bermanfaat untuk kesehatan hati dan pencernaan.",
+    description_list: [
+      "Jamu temulawak premium dari Nyonya Meneer",
+      "Resep tradisional yang sudah turun temurun",
+      "Mengandung kurkuminoid yang bermanfaat untuk kesehatan hati",
+      "Dapat membantu meningkatkan nafsu makan secara alami",
+      "Baik untuk kesehatan liver dan sistem pencernaan",
+      "Dapat membantu mengurangi peradangan dalam tubuh",
+      "Cocok dikonsumsi pagi atau sore hari"
+    ],
+    instructions_list: [
+      "Simpan di tempat yang kering dan sejuk",
+      "Hindari paparan sinar matahari langsung",
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
+    ],
+    price: 28000,
+    is_active: true,
+    company: "Nyonya Meneer",
+    avg_rating: 4.6,
+    total_rater: 156,
+    variants_list: [
+      {
+        id: 1,
+        product: "20",
+        name: "60ml",
+        img: "/default-image.jpg",
+        variant: "60ml",
+        expiration: "2025-12-31",
+        stock: 30,
+        discount: 0,
+        discounted_price: 28000,
+        updated_at: "2024-01-01T00:00:00Z"
+      },
+      {
+        id: 2,
+        product: "20",
+        name: "120ml",
+        img: "/default-image.jpg",
+        variant: "120ml",
+        expiration: "2025-12-31",
+        stock: 20,
+        discount: 0,
+        discounted_price: 52000,
+        updated_at: "2024-01-01T00:00:00Z"
+      }
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
   }
 };
 

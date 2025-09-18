@@ -2,27 +2,29 @@ export interface VariantType {
     id: number;
     product: string;
     name: string;
-    img: string;
-    variant: string;
-    expiration: string;
+    img?: string;
+    variant?: string;
+    expiration?: string;
     stock: number;
-    discount: number;
-    discounted_price: number;
+    discount?: number;
+    discounted_price?: number;
+    updated_at: string;
 }
 
 export interface DetailProductType {
     id: string;
     name: string;
-    info: string;
+    info?: string;
     variants_list: VariantType[];
     description_list: string[];
     instructions_list: string[];
     price: number;  
     is_active: boolean;
     company: string;
-    avg_rating: number;
-    total_rater: number;
-    image_url?: string; // tambahkan agar konsisten dengan kebutuhan frontend
+    avg_rating?: number;
+    total_rater?: number;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface DetailProductResponseType {
