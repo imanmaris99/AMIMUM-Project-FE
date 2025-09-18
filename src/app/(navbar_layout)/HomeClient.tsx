@@ -3,11 +3,6 @@ import { useState } from "react";
 import Header from "@/components/homepage/Header_Section";
 import dynamic from "next/dynamic";
 import { validateProductionData } from "@/utils/dataValidation";
-import { testDataFlow } from "@/utils/testDataFlow";
-import { testProductionData } from "@/utils/testProductionData";
-import { debugProductionData } from "@/utils/debugProductionData";
-import { simpleProductionTest } from "@/utils/simpleProductionTest";
-import { quickProductionFix } from "@/utils/quickProductionFix";
 
 const Promo = dynamic(() => import("@/components/homepage/Promo_Section"), { ssr: false });
 const Category = dynamic(() => import("@/components/homepage/Category_Section"), { ssr: false });
@@ -56,19 +51,6 @@ export default function HomeClient({
     articles: articlesData.length
   });
   
-  // Run data flow test in development
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🔧 Development mode: Running data flow test...');
-    testDataFlow();
-    console.log('🔧 Testing production data...');
-    testProductionData();
-    console.log('🔧 Debugging production data...');
-    debugProductionData();
-    console.log('🔧 Simple production test...');
-    simpleProductionTest();
-    console.log('🔧 Quick production fix...');
-    quickProductionFix();
-  }
   
   const selectedCategoryName = categoriesData.find((cat: unknown) => (cat as { id: number; name: string }).id === selectedCategory)?.name;
   const filteredProductions = selectedCategory
