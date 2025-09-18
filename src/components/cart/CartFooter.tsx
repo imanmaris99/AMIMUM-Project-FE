@@ -9,12 +9,13 @@ interface CartFooterProps {
 }
 
 export default function CartFooter({ onCheckout }: CartFooterProps) {
-  const { cartItems, totalPrices, updateAllActiveStatus } = useCart();
+  const { cartItems, totalPrices, updateActiveStatus } = useCart();
 
   // Calculate totals
   const subtotal = totalPrices.all_item_active_prices;
   const total = totalPrices.total_all_active_prices;
   const allItemsSelected = cartItems.length > 0 && cartItems.every(item => item.is_active);
+  const someItemsSelected = cartItems.some(item => item.is_active);
 
   const handleSelectAll = () => {
     if (cartItems.length === 0) return;
@@ -22,7 +23,7 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
     // Toggle all items - if all selected, deselect all; if not all selected, select all
     const newStatus = !allItemsSelected;
     cartItems.forEach(item => {
-      updateAllActiveStatus(item.id, newStatus);
+      updateActiveStatus(item.id, newStatus);
     });
   };
 

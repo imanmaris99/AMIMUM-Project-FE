@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CartItemType } from "@/contexts/CartContext";
 
 interface CartItemProps {
@@ -18,6 +18,11 @@ const CartItem: React.FC<CartItemProps> = ({
 }) => {
   const [quantity, setQuantity] = useState(item.quantity);
   const [isChecked, setIsChecked] = useState(item.is_active);
+
+  // Sync local state with context when item.is_active changes
+  useEffect(() => {
+    setIsChecked(item.is_active);
+  }, [item.is_active]);
 
   const handleMinus = () => {
     const newQuantity = Math.max(1, quantity - 1);

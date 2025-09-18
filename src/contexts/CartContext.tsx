@@ -46,7 +46,6 @@ interface CartContextType {
   removeFromCart: (cartId: number) => void;
   updateQuantity: (cartId: number, quantity: number) => void;
   updateActiveStatus: (cartId: number, isActive: boolean) => void;
-  updateAllActiveStatus: (cartId: number, isActive: boolean) => void;
   clearCart: () => void;
   isInCart: (productId: string, variantId: number) => boolean;
 }
@@ -217,16 +216,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     });
   }, []);
 
-  // Update all active status (for select all functionality)
-  const updateAllActiveStatus = useCallback((cartId: number, isActive: boolean) => {
-    setCartItems(prevItems => {
-      const updatedItems = prevItems.map(item =>
-        item.id === cartId ? { ...item, is_active: isActive } : item
-      );
-      console.log("✅ Updated all active status for item:", cartId, "to", isActive);
-      return updatedItems;
-    });
-  }, []);
 
   // Clear cart
   const clearCart = useCallback(() => {
@@ -251,7 +240,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     removeFromCart,
     updateQuantity,
     updateActiveStatus,
-    updateAllActiveStatus,
     clearCart,
     isInCart,
   };
