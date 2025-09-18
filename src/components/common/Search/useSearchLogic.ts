@@ -1,13 +1,18 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { CardProductProps } from "./CardProduct/types";
 import { generateCardProductData } from "@/data/dummyData";
+import { validateProductData } from "@/utils/dataValidation";
 
 function debounce<T extends (...args: unknown[]) => void>(fn: T, delay: number): T {
   let timeout: ReturnType<typeof setTimeout>;
   return function(this: unknown, ...args: unknown[]) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => fn.apply(this, args), delay);
+    try {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => fn.apply(this, args), delay);
+    } catch (error) {
+      console.error("Error in debounced function:", error);
+    }
   } as T;
 }
 
@@ -22,20 +27,43 @@ const useSearchLogic = () => {
   const searchRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = () => {
-    if (search.trim()) {
-      router.push(`/search?q=${search}`);
+    try {
+      if (search.trim()) {
+        console.log(`Searching for: ${search}`);
+        router.push(`/search?q=${search}`);
+      }
+    } catch (error) {
+      console.error("Error handling search:", error);
     }
   };
 
   const handleSelectProduct = (productId: string) => {
-    router.push(`/detail-product/${productId}`);
+    try {
+      if (!productId) {
+        console.error("Invalid product ID for navigation:", productId);
+        return;
+      }
+      
+      console.log(`Navigating to product detail: ${productId}`);
+      router.push(`/detail-product/${productId}`);
+    } catch (error) {
+      console.error("Error navigating to product detail:", error);
+    }
   };
 
   // Menggunakan data dari centralized dummy data yang sudah sesuai dengan backend
-  const dummyProducts = generateCardProductData();
+  const dummyProducts = useMemo(() => {
+    try {
+      return generateCardProductData();
+    } catch (error) {
+      console.error("Error generating dummy products:", error);
+      return [];
+    }
+  }, []);
 
   // Ganti handleInputChange dengan versi debounce - dinonaktifkan sementara
-  const debouncedFetch = debounce(async (value: string) => {
+  const debouncedFetch = useMemo(() => debounce(async (...args: unknown[]) => {
+    const value = args[0] as string;
     setIsLoading(true);
     setIsError(false);
     setErrorMessage("");
@@ -44,9 +72,10 @@ const useSearchLogic = () => {
       // const res = await axios.get(`/api/product/search?name=${encodeURIComponent(value)}`);
       // setProducts(Array.isArray(res.data?.data) ? res.data.data : []);
       
-      // Menggunakan dummy data sementara
+      // Menggunakan dummy data sementara dengan validasi
       const filteredProducts = dummyProducts
         .filter(product => 
+          validateProductData(product) && 
           product.name.toLowerCase().includes(value.toLowerCase())
         )
         .sort((a, b) => {
@@ -56,39 +85,55 @@ const useSearchLogic = () => {
           return aIndex - bIndex;
         })
         .slice(0, 5); // Batasi maksimal 5 hasil
+      
+      console.log(`Search for "${value}" returned ${filteredProducts.length} results`);
       setProducts(filteredProducts);
     } catch (err: unknown) {
+      console.error("Search error:", err);
       setIsError(true);
       setErrorMessage(err instanceof Error ? err.message : "Gagal mengambil data produk.");
       setProducts([]);
     } finally {
       setIsLoading(false);
     }
-  }, 400);
+  }, 400), [dummyProducts]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearch(value);
-    setShowDropdown(value.length > 0);
-    if (value.length > 0) {
-      debouncedFetch(value);
-    } else {
-      setProducts([]);
+    try {
+      const value = e.target.value;
+      setSearch(value);
+      setShowDropdown(value.length > 0);
+      
+      if (value.length > 0) {
+        debouncedFetch(value);
+      } else {
+        setProducts([]);
+      }
+    } catch (error) {
+      console.error("Error handling input change:", error);
     }
   };
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-      setShowDropdown(false);
+  const handleClickOutside = useMemo(() => (event: MouseEvent) => {
+    try {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    } catch (error) {
+      console.error("Error handling click outside:", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    try {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    } catch (error) {
+      console.error("Error setting up click outside listener:", error);
+    }
+  }, [handleClickOutside]);
 
   return {
     search,

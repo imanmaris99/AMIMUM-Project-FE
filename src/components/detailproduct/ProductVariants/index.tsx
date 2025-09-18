@@ -30,8 +30,8 @@ const ProductVariants = ({ product, variants, onVariantChange }: ProductVariants
       <div className="grid grid-cols-2 gap-3">
         {flavorVariants.map((variant) => {
           const hasDiscount = variant.discount && variant.discount > 0;
-          const originalPrice = hasDiscount ? Math.round(variant.discounted_price / (1 - variant.discount / 100)) : (variant.discounted_price || product?.price);
-          const discountedPrice = variant.discounted_price || product?.price;
+          const originalPrice = hasDiscount ? Math.round(variant.discounted_price / (1 - variant.discount / 100)) : (variant.discounted_price || product?.price || 0);
+          const discountedPrice = variant.discounted_price || product?.price || 0;
           
           return (
             <label 

@@ -8,10 +8,10 @@ import ProductVariants from "@/components/detailproduct/ProductVariants";
 import ProductInformation from "@/components/detailproduct/ProductInformation";
 import ProductDescription from "@/components/detailproduct/ProductDescription";
 import ProductPrice from "@/components/detailproduct/ProductPrice";
-import DetailProductHeader from "@/components/detailproduct/DetailProductHeader";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 import { getDetailProduct } from "@/data/dataUtils";
 import { CartProvider } from "@/contexts/CartContext";
+import { validateDetailProductData } from "@/utils/dataValidation";
 
 export default function DetailProduct() {
   const params = useParams();
@@ -26,26 +26,43 @@ export default function DetailProduct() {
     const loadProduct = async () => {
       try {
         setIsLoading(true);
+        setErrorMessage(null);
+        
+        console.log(`Loading product with ID: ${productId}`);
         const product = getDetailProduct(productId);
         
         if (!product) {
+          console.warn(`Product with ID ${productId} not found`);
           setErrorMessage("Produk tidak ditemukan");
           return;
         }
         
+        // Validate product data before setting
+        if (!validateDetailProductData(product)) {
+          console.error(`Invalid product data for ID ${productId}:`, product);
+          setErrorMessage("Data produk tidak valid");
+          return;
+        }
+        
+        console.log(`Product loaded successfully: ${product.name}`);
         setDetailProduct(product);
+        
         // Set default selected variant to first variant
         if (product.variants_list && product.variants_list.length > 0) {
           setSelectedVariant(product.variants_list[0]);
+          console.log(`Default variant selected: ${product.variants_list[0].variant}`);
         }
       } catch (err) {
+        console.error(`Error loading product ${productId}:`, err);
         setErrorMessage(err instanceof Error ? err.message : String(err));
       } finally {
         setIsLoading(false);
       }
     };
     
-    loadProduct();
+    if (productId) {
+      loadProduct();
+    }
   }, [productId]);
   
   const handleVariantChange = (variant: VariantProductType) => {

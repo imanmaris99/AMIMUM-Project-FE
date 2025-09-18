@@ -3,14 +3,11 @@ import { DetailProductType, VariantType } from "@/types/detailProduct";
 import Spinner from "@/components/ui/Spinner";
 import { useCart } from "@/contexts/CartContext";
 import { useState } from "react";
+import { getProductRatingSummary } from "@/data/dummyData";
+import RatingDisplay from "@/components/rating/RatingDisplay";
 
 interface ProductPriceProps {
   data: DetailProductType | undefined;
-  isError: number;
-  isLoading: boolean;
-}
-
-interface ProductPriceProps {
   datavariant: VariantType | undefined;
   isError: number;
   isLoading: boolean;
@@ -42,27 +39,41 @@ const ProductPrice = ({
   const [isAdding, setIsAdding] = useState(false);
 
   const handleAddToCart = async () => {
-    if (!data || !datavariant) return;
+    if (!data || !datavariant) {
+      console.warn("Missing data or variant for cart addition");
+      return;
+    }
     
     setIsAdding(true);
     
     try {
+      // Validate data before adding to cart
+      if (!data.id || !data.name || !data.price) {
+        console.error("Invalid product data for cart:", data);
+        return;
+      }
+      
+      if (!datavariant.id || !datavariant.variant) {
+        console.error("Invalid variant data for cart:", datavariant);
+        return;
+      }
+      
       // Convert DetailProductType to format expected by CartContext
       const productForCart = {
         id: data.id,
         name: data.name,
         price: data.price,
-        image_url: datavariant.img || "/buyungupik_agr-1.svg",
+        image_url: datavariant.img,
         brand_info: { name: data.company }
       };
       
       // Convert VariantType to format expected by CartContext
       const variantForCart = {
         id: datavariant.id,
-        variant: datavariant.variant || datavariant.name,
+        variant: datavariant.variant,
         name: datavariant.name,
         img: datavariant.img,
-        discount: datavariant.discount || 0
+        discount: datavariant.discount
       };
       
       addToCart(productForCart, variantForCart);
@@ -70,6 +81,8 @@ const ProductPrice = ({
       // Show feedback
       setShowFeedback(true);
       setTimeout(() => setShowFeedback(false), 3000);
+      
+      console.log(`Added to cart: ${data.name} ${datavariant.variant}`);
       
     } catch (error) {
       console.error("Error adding to cart:", error);
@@ -122,34 +135,24 @@ const ProductPrice = ({
   const hasDiscount = datavariant?.discount && datavariant.discount > 0;
   const discountPercentage = datavariant?.discount || 0;
   const discountedPrice = datavariant?.discounted_price || data?.price || 0;
-  const originalPrice = hasDiscount ? Math.round(discountedPrice / (1 - discountPercentage / 100)) : discountedPrice;
-  const savings = hasDiscount ? (originalPrice || 0) - discountedPrice : 0;
+  const originalPrice = hasDiscount ? Math.round(discountedPrice / (1 - discountPercentage / 100)) : (discountedPrice || 0);
+  const savings = hasDiscount ? Math.max(0, originalPrice - discountedPrice) : 0;
 
   return (
     <div className="bg-white rounded-lg shadow-sm">
       <div className="p-4">
         {/* Rating Section */}
-      <div className="flex items-center gap-2 mb-4">
-        <div className="flex items-center">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <svg
-              key={star}
-              className={`w-4 h-4 ${
-                star <= Math.floor(data?.avg_rating || 0)
-                  ? "text-yellow-400"
-                  : "text-gray-300"
-              }`}
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          ))}
-        </div>
-        <span className="text-sm text-gray-600">
-          {data?.avg_rating?.toFixed(1)} ({data?.total_rater} ulasan)
-        </span>
-      </div>
+        {data?.id && (
+          <RatingDisplay
+            ratingData={getProductRatingSummary(data.id) || {
+              avg_rating: data.avg_rating || 0,
+              total_rater: data.total_rater || 0,
+              rating_distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+              recent_reviews: []
+            }}
+            className="mb-4"
+          />
+        )}
 
       {/* Price Section */}
       <div className="flex items-center justify-between">

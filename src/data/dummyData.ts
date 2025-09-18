@@ -5,6 +5,31 @@ import { DetailProductType } from "@/types/detailProduct";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 import { AllProductInfoType, BrandInfoType, VariantAllProductType } from "@/types/apiTypes";
 
+// ==================== RATING TYPES ====================
+export interface RatingDummyType {
+  id: number;
+  rate: number;
+  review: string | null;
+  product_id: string;
+  user_id: string;
+  product_name: string;
+  rater_name: string;
+  created_at: string;
+}
+
+export interface ProductRatingSummary {
+  avg_rating: number;
+  total_rater: number;
+  rating_distribution: {
+    5: number;
+    4: number;
+    3: number;
+    2: number;
+    1: number;
+  };
+  recent_reviews: RatingDummyType[];
+}
+
 // ==================== BRAND DATA ====================
 export const BRAND_DATA = {
   "1": {
@@ -19,7 +44,7 @@ export const BRAND_DATA = {
     category: "Jamu",
     total_product: 15,
     total_product_with_promo: 7, // 7 produk yang memiliki discount
-    promo_special: 20,
+    promo_special: 29, // Update to match actual max discount
     created_at: "2024-01-01T00:00:00Z"
   },
   "2": {
@@ -34,7 +59,7 @@ export const BRAND_DATA = {
     category: "Jamu",
     total_product: 15,
     total_product_with_promo: 6, // 6 produk yang memiliki discount
-    promo_special: 15,
+    promo_special: 28, // Update to match actual max discount
     created_at: "2024-01-01T00:00:00Z"
   },
   "3": {
@@ -49,7 +74,7 @@ export const BRAND_DATA = {
     category: "Jamu",
     total_product: 15,
     total_product_with_promo: 8, // 8 produk yang memiliki discount
-    promo_special: 25,
+    promo_special: 30, // Update to match actual max discount
     created_at: "2024-01-01T00:00:00Z"
   },
   "4": {
@@ -79,7 +104,7 @@ export const BRAND_DATA = {
     category: "Jamu",
     total_product: 10,
     total_product_with_promo: 4, // 4 produk yang memiliki discount
-    promo_special: 18,
+    promo_special: 27, // Update to match actual max discount
     created_at: "2024-01-01T00:00:00Z"
   },
   "6": {
@@ -94,7 +119,7 @@ export const BRAND_DATA = {
     category: "Jamu",
     total_product: 15,
     total_product_with_promo: 7, // 7 produk yang memiliki discount
-    promo_special: 22,
+    promo_special: 26, // Update to match actual max discount
     created_at: "2024-01-01T00:00:00Z"
   }
 } as const;
@@ -650,11 +675,259 @@ export const PROMO_DATA = {
   }))
 };
 
+// ==================== RATING DATA ====================
+export const RATING_DUMMY_DATA: RatingDummyType[] = [
+  // Air Mancur products ratings
+  {
+    id: 1,
+    rate: 5,
+    review: "Produk berkualitas tinggi, sangat membantu untuk kesehatan. Kemasan rapi dan higienis.",
+    product_id: "prod-1-1",
+    user_id: "user-001",
+    product_name: "Air Mancur Temulawak",
+    rater_name: "Budi Santoso",
+    created_at: "2024-01-15T10:30:00Z"
+  },
+  {
+    id: 2,
+    rate: 4,
+    review: "Bagus, sesuai ekspektasi. Rasa enak dan tidak terlalu pahit.",
+    product_id: "prod-1-1",
+    user_id: "user-002",
+    product_name: "Air Mancur Temulawak",
+    rater_name: "Siti Nurhaliza",
+    created_at: "2024-01-20T14:15:00Z"
+  },
+  {
+    id: 3,
+    rate: 5,
+    review: "Sangat puas dengan produk ini. Khasiatnya terasa setelah konsumsi rutin.",
+    product_id: "prod-1-2",
+    user_id: "user-003",
+    product_name: "Air Mancur Kunyit Asam",
+    rater_name: "Ahmad Wijaya",
+    created_at: "2024-01-25T09:45:00Z"
+  },
+  {
+    id: 4,
+    rate: 3,
+    review: "Cukup baik, tapi harganya agak mahal untuk ukuran sachet kecil.",
+    product_id: "prod-1-3",
+    user_id: "user-004",
+    product_name: "Air Mancur Beras Kencur",
+    rater_name: "Dewi Sartika",
+    created_at: "2024-02-01T16:20:00Z"
+  },
+  {
+    id: 5,
+    rate: 5,
+    review: "Produk terbaik! Sudah langganan bertahun-tahun. Kualitas konsisten.",
+    product_id: "prod-1-4",
+    user_id: "user-005",
+    product_name: "Air Mancur Jahe Merah",
+    rater_name: "Rudi Hartono",
+    created_at: "2024-02-05T11:30:00Z"
+  },
+  // Aji Mujarab products ratings
+  {
+    id: 6,
+    rate: 4,
+    review: "Jamu tradisional yang berkualitas. Rasa asli dan tidak ada bahan kimia.",
+    product_id: "prod-2-1",
+    user_id: "user-006",
+    product_name: "Aji Mujarab Temulawak",
+    rater_name: "Maya Sari",
+    created_at: "2024-02-10T13:45:00Z"
+  },
+  {
+    id: 7,
+    rate: 5,
+    review: "Sangat mujarab! Masalah pencernaan hilang setelah konsumsi rutin.",
+    product_id: "prod-2-2",
+    user_id: "user-007",
+    product_name: "Aji Mujarab Kunyit Asam",
+    rater_name: "Bambang Sutrisno",
+    created_at: "2024-02-15T08:15:00Z"
+  },
+  {
+    id: 8,
+    rate: 4,
+    review: "Bagus untuk kesehatan, tapi kemasan bisa diperbaiki lagi.",
+    product_id: "prod-2-3",
+    user_id: "user-008",
+    product_name: "Aji Mujarab Beras Kencur",
+    rater_name: "Indah Permata",
+    created_at: "2024-02-20T15:30:00Z"
+  },
+  {
+    id: 9,
+    rate: 5,
+    review: "Produk terpercaya! Sudah turun temurun di keluarga kami.",
+    product_id: "prod-2-4",
+    user_id: "user-009",
+    product_name: "Aji Mujarab Jahe Merah",
+    rater_name: "Suryadi",
+    created_at: "2024-02-25T12:00:00Z"
+  },
+  {
+    id: 10,
+    rate: 3,
+    review: "Cukup baik, tapi harganya agak mahal dibanding produk sejenis.",
+    product_id: "prod-2-5",
+    user_id: "user-010",
+    product_name: "Aji Mujarab Sambiloto",
+    rater_name: "Rina Wulandari",
+    created_at: "2024-03-01T17:45:00Z"
+  },
+  // Jamu Jago products ratings
+  {
+    id: 11,
+    rate: 5,
+    review: "Jamu Jago memang jago! Kualitas premium dengan harga terjangkau.",
+    product_id: "prod-3-1",
+    user_id: "user-011",
+    product_name: "Jamu Jago Temulawak",
+    rater_name: "Agus Setiawan",
+    created_at: "2024-03-05T10:20:00Z"
+  },
+  {
+    id: 12,
+    rate: 4,
+    review: "Produk bagus, kemasan menarik dan praktis untuk dibawa.",
+    product_id: "prod-3-2",
+    user_id: "user-012",
+    product_name: "Jamu Jago Kunyit Asam",
+    rater_name: "Sari Dewi",
+    created_at: "2024-03-10T14:30:00Z"
+  },
+  {
+    id: 13,
+    rate: 5,
+    review: "Sangat puas! Khasiatnya terasa dan tidak ada efek samping.",
+    product_id: "prod-3-3",
+    user_id: "user-013",
+    product_name: "Jamu Jago Beras Kencur",
+    rater_name: "Dedi Kurniawan",
+    created_at: "2024-03-15T09:15:00Z"
+  },
+  {
+    id: 14,
+    rate: 4,
+    review: "Bagus untuk kesehatan, rasa enak dan tidak terlalu pahit.",
+    product_id: "prod-3-4",
+    user_id: "user-014",
+    product_name: "Jamu Jago Jahe Merah",
+    rater_name: "Lina Marlina",
+    created_at: "2024-03-20T16:00:00Z"
+  },
+  {
+    id: 15,
+    rate: 5,
+    review: "Produk terbaik! Sudah langganan dan selalu puas dengan kualitasnya.",
+    product_id: "prod-3-5",
+    user_id: "user-015",
+    product_name: "Jamu Jago Sambiloto",
+    rater_name: "Hendra Pratama",
+    created_at: "2024-03-25T11:45:00Z"
+  }
+];
+
+// ==================== RATING SUMMARY DATA ====================
+export const RATING_SUMMARY_DATA: { [productId: string]: ProductRatingSummary } = {
+  "prod-1-1": {
+    avg_rating: 4.5,
+    total_rater: 2,
+    rating_distribution: { 5: 1, 4: 1, 3: 0, 2: 0, 1: 0 },
+    recent_reviews: RATING_DUMMY_DATA.filter(r => r.product_id === "prod-1-1").slice(0, 2)
+  },
+  "prod-1-2": {
+    avg_rating: 5.0,
+    total_rater: 1,
+    rating_distribution: { 5: 1, 4: 0, 3: 0, 2: 0, 1: 0 },
+    recent_reviews: RATING_DUMMY_DATA.filter(r => r.product_id === "prod-1-2").slice(0, 1)
+  },
+  "prod-1-3": {
+    avg_rating: 3.0,
+    total_rater: 1,
+    rating_distribution: { 5: 0, 4: 0, 3: 1, 2: 0, 1: 0 },
+    recent_reviews: RATING_DUMMY_DATA.filter(r => r.product_id === "prod-1-3").slice(0, 1)
+  },
+  "prod-1-4": {
+    avg_rating: 5.0,
+    total_rater: 1,
+    rating_distribution: { 5: 1, 4: 0, 3: 0, 2: 0, 1: 0 },
+    recent_reviews: RATING_DUMMY_DATA.filter(r => r.product_id === "prod-1-4").slice(0, 1)
+  },
+  "prod-2-1": {
+    avg_rating: 4.0,
+    total_rater: 1,
+    rating_distribution: { 5: 0, 4: 1, 3: 0, 2: 0, 1: 0 },
+    recent_reviews: RATING_DUMMY_DATA.filter(r => r.product_id === "prod-2-1").slice(0, 1)
+  },
+  "prod-2-2": {
+    avg_rating: 5.0,
+    total_rater: 1,
+    rating_distribution: { 5: 1, 4: 0, 3: 0, 2: 0, 1: 0 },
+    recent_reviews: RATING_DUMMY_DATA.filter(r => r.product_id === "prod-2-2").slice(0, 1)
+  },
+  "prod-2-3": {
+    avg_rating: 4.0,
+    total_rater: 1,
+    rating_distribution: { 5: 0, 4: 1, 3: 0, 2: 0, 1: 0 },
+    recent_reviews: RATING_DUMMY_DATA.filter(r => r.product_id === "prod-2-3").slice(0, 1)
+  },
+  "prod-2-4": {
+    avg_rating: 5.0,
+    total_rater: 1,
+    rating_distribution: { 5: 1, 4: 0, 3: 0, 2: 0, 1: 0 },
+    recent_reviews: RATING_DUMMY_DATA.filter(r => r.product_id === "prod-2-4").slice(0, 1)
+  },
+  "prod-2-5": {
+    avg_rating: 3.0,
+    total_rater: 1,
+    rating_distribution: { 5: 0, 4: 0, 3: 1, 2: 0, 1: 0 },
+    recent_reviews: RATING_DUMMY_DATA.filter(r => r.product_id === "prod-2-5").slice(0, 1)
+  },
+  "prod-3-1": {
+    avg_rating: 5.0,
+    total_rater: 1,
+    rating_distribution: { 5: 1, 4: 0, 3: 0, 2: 0, 1: 0 },
+    recent_reviews: RATING_DUMMY_DATA.filter(r => r.product_id === "prod-3-1").slice(0, 1)
+  },
+  "prod-3-2": {
+    avg_rating: 4.0,
+    total_rater: 1,
+    rating_distribution: { 5: 0, 4: 1, 3: 0, 2: 0, 1: 0 },
+    recent_reviews: RATING_DUMMY_DATA.filter(r => r.product_id === "prod-3-2").slice(0, 1)
+  },
+  "prod-3-3": {
+    avg_rating: 5.0,
+    total_rater: 1,
+    rating_distribution: { 5: 1, 4: 0, 3: 0, 2: 0, 1: 0 },
+    recent_reviews: RATING_DUMMY_DATA.filter(r => r.product_id === "prod-3-3").slice(0, 1)
+  },
+  "prod-3-4": {
+    avg_rating: 4.0,
+    total_rater: 1,
+    rating_distribution: { 5: 0, 4: 1, 3: 0, 2: 0, 1: 0 },
+    recent_reviews: RATING_DUMMY_DATA.filter(r => r.product_id === "prod-3-4").slice(0, 1)
+  },
+  "prod-3-5": {
+    avg_rating: 5.0,
+    total_rater: 1,
+    rating_distribution: { 5: 1, 4: 0, 3: 0, 2: 0, 1: 0 },
+    recent_reviews: RATING_DUMMY_DATA.filter(r => r.product_id === "prod-3-5").slice(0, 1)
+  }
+};
+
 // ==================== PRODUCT GENERATION FUNCTIONS ====================
 
 // Fungsi untuk membuat brand info sesuai dengan backend DTO
 function createBrandInfo(brandId: number): BrandInfoType {
   const brand = BRAND_DATA[brandId.toString() as keyof typeof BRAND_DATA];
+  if (!brand) {
+    throw new Error(`Brand with ID ${brandId} not found`);
+  }
   return {
     id: brand.id,
     name: brand.name,
@@ -666,20 +939,36 @@ function createBrandInfo(brandId: number): BrandInfoType {
 function createVariantAllProduct(
   variantId: number, 
   variant: string, 
-  hasDiscount: boolean = false
+  hasDiscount: boolean = false,
+  brandId?: number
 ): VariantAllProductType {
   // Menggunakan seed berdasarkan variantId untuk konsistensi
   const seed = variantId * 7 + variant.length;
   const basePrice = 15000 + (seed % 30000); // 15k-45k konsisten
-  const discount = hasDiscount ? (seed % 25) + 5 : 0; // 5-30% konsisten
+  
+  // Buat variasi discount berdasarkan brand untuk konsistensi dengan promo_special
+  let discount = 0;
+  if (hasDiscount) {
+    const brandDiscountRanges: { [key: number]: { min: number; max: number } } = {
+      1: { min: 15, max: 29 }, // Air Mancur: 15-29%
+      2: { min: 12, max: 28 }, // Aji Mujarab: 12-28%
+      3: { min: 18, max: 30 }, // Jamu Jago: 18-30%
+      4: { min: 10, max: 30 }, // Nyonya Meneer: 10-30%
+      6: { min: 14, max: 26 }, // Sido Muncul: 14-26%
+    };
+    
+    const range = brandDiscountRanges[brandId || 1] || { min: 5, max: 25 };
+    discount = (seed % (range.max - range.min + 1)) + range.min;
+  }
+  
   const discountedPrice = hasDiscount ? Math.floor(basePrice * (1 - discount / 100)) : basePrice;
   
   return {
     id: variantId,
     variant: variant,
     img: "/buyungupik_agr-1.svg",
-    discount: hasDiscount ? discount : undefined,
-    discounted_price: hasDiscount ? discountedPrice : undefined,
+    discount: discount,
+    discounted_price: discountedPrice,
     updated_at: new Date().toISOString()
   };
 }
@@ -699,8 +988,33 @@ function createAllProductInfo(
   ];
   
   const variants = flavorVariants.map((flavor, index) => 
-    createVariantAllProduct(index + 1, flavor, hasDiscount)
+    createVariantAllProduct(index + 1, flavor, hasDiscount, brandId)
   );
+  
+  // Ensure at least one variant has the brand's highest discount
+  if (hasDiscount) {
+    const brand = BRAND_DATA[brandId.toString() as keyof typeof BRAND_DATA];
+    if (brand) {
+      const maxDiscount = brand.promo_special;
+      const hasMaxDiscount = variants.some(v => v.discount === maxDiscount);
+      
+      if (!hasMaxDiscount) {
+        // Find the variant with highest current discount and update it to max
+        const highestDiscountIndex = variants.reduce((maxIndex, variant, index) => 
+          variant.discount > variants[maxIndex].discount ? index : maxIndex, 0
+        );
+        
+        const variant = variants[highestDiscountIndex];
+        const newDiscountedPrice = Math.floor(variant.discounted_price / (1 - variant.discount / 100) * (1 - maxDiscount / 100));
+        
+        variants[highestDiscountIndex] = {
+          ...variant,
+          discount: maxDiscount,
+          discounted_price: newDiscountedPrice
+        };
+      }
+    }
+  }
 
   return {
     id: productId,
@@ -731,15 +1045,20 @@ export function generateCardProductData(): CardProductProps[] {
       const hasDiscount = i < promoCount;
       const basePrice = 15000 + (productId * 1000) % 30000; // 15k-45k konsisten berdasarkan productId
       
-      const product = createAllProductInfo(
-        `prod-${brand.id}-${productId}`,
-        `${brand.name} ${templateArray[i % templateArray.length].baseName}`,
-        brand.id,
-        basePrice,
-        hasDiscount
-      );
+      try {
+        const product = createAllProductInfo(
+          `prod-${brand.id}-${productId}`,
+          `${brand.name} ${templateArray[i % templateArray.length].baseName}`,
+          brand.id,
+          basePrice,
+          hasDiscount
+        );
+        
+        products.push(product);
+      } catch (error) {
+        console.warn(`Failed to create product for brand ${brand.id}, product ${productId}:`, error);
+      }
       
-      products.push(product);
       productId++;
     }
   });
@@ -752,11 +1071,14 @@ export function generateBrandProducts(brandId: string): CardProductProps[] {
   const allProducts = generateCardProductData();
   const brand = BRAND_DATA[brandId as keyof typeof BRAND_DATA];
   
-  if (!brand) return [];
+  if (!brand) {
+    console.warn(`Brand with ID ${brandId} not found`);
+    return [];
+  }
   
   // Filter products by brand ID
   return allProducts.filter(product => 
-    product.brand_info?.id === brand.id
+    product.brand_info.id === brand.id
   );
 }
 
@@ -765,14 +1087,23 @@ export function generatePromoProducts(brandId: string): CardProductProps[] {
   const allProducts = generateCardProductData();
   const brand = BRAND_DATA[brandId as keyof typeof BRAND_DATA];
   
-  if (!brand) return [];
+  if (!brand) {
+    console.warn(`Brand with ID ${brandId} not found`);
+    return [];
+  }
   
   // Filter products by brand ID and only include those with discount
-  return allProducts.filter(product => {
-    const isFromBrand = product.brand_info?.id === brand.id;
-    const hasDiscount = product.all_variants.some(variant => variant.discount && variant.discount > 0);
+  const promoProducts = allProducts.filter(product => {
+    const isFromBrand = product.brand_info.id === brand.id;
+    const hasDiscount = product.all_variants.some(variant => variant.discount > 0);
     return isFromBrand && hasDiscount;
   });
+  
+  // Add brand's highest discount to each product for consistent display
+  return promoProducts.map(product => ({
+    ...product,
+    brand_highest_discount: brand.promo_special // Add brand's highest discount
+  }));
 }
 
 // Fungsi untuk menghasilkan detail produk sesuai dengan backend DTO
@@ -781,48 +1112,103 @@ export function generateDetailProductData(): { [key: string]: DetailProductType 
   const cardProducts = generateCardProductData();
   
   cardProducts.forEach(cardProduct => {
-    if (cardProduct.id && cardProduct.name) {
-      const variants = cardProduct.all_variants.map(variant => ({
-        id: variant.id || 0,
-        product: cardProduct.name || "",
-        name: `${cardProduct.name} ${variant.variant || "Original"}`,
-        img: variant.img,
-        variant: variant.variant,
-        expiration: "12/25/2025",
-        stock: 50 + (variant.id * 3) % 50, // 50-100 konsisten berdasarkan variant.id
-        discount: variant.discount,
-        discounted_price: variant.discounted_price,
-        updated_at: variant.updated_at
-      }));
+    try {
+      if (cardProduct.id && cardProduct.name && cardProduct.brand_info) {
+        const variants = cardProduct.all_variants.map(variant => ({
+          id: variant.id,
+          product: cardProduct.name,
+          name: variant.variant,
+          img: variant.img,
+          variant: variant.variant,
+          expiration: "12/25/2025",
+          stock: 50 + (variant.id * 3) % 50, // 50-100 konsisten berdasarkan variant.id
+          discount: variant.discount,
+          discounted_price: variant.discounted_price,
+          updated_at: variant.updated_at
+        }));
 
-      detailProducts[cardProduct.id] = {
-        id: cardProduct.id,
-        name: cardProduct.name,
-        info: "1pack isi 11sachet dengan berat ± 5gram",
-        variants_list: variants,
-        description_list: [
-          "Jamu tradisional berkualitas tinggi",
-          "Menggunakan bahan-bahan alami pilihan",
-          "Proses produksi higienis dan modern",
-          "Baik untuk kesehatan tubuh",
-          "Cocok dikonsumsi secara rutin"
-        ],
-        instructions_list: [
-          "Simpan di tempat yang kering dan sejuk",
-          "Hindari paparan sinar matahari langsung",
-          "Gunakan dalam 12 bulan setelah dibuka",
-          "Kocok sebelum diminum untuk hasil terbaik"
-        ],
-        price: cardProduct.price,
-        is_active: true,
-        company: cardProduct.brand_info?.name || "Unknown Brand",
-        avg_rating: 3.5 + (cardProduct.id.charCodeAt(0) % 15) / 10, // 3.5-5.0 konsisten berdasarkan productId
-        total_rater: 20 + (cardProduct.id.charCodeAt(0) % 80), // 20-100 konsisten berdasarkan productId
-        created_at: cardProduct.created_at,
-        updated_at: new Date().toISOString()
-      };
+        detailProducts[cardProduct.id] = {
+          id: cardProduct.id,
+          name: cardProduct.name,
+          info: "1pack isi 11sachet dengan berat ± 5gram",
+          variants_list: variants,
+          description_list: [
+            "Jamu tradisional berkualitas tinggi",
+            "Menggunakan bahan-bahan alami pilihan",
+            "Proses produksi higienis dan modern",
+            "Baik untuk kesehatan tubuh",
+            "Cocok dikonsumsi secara rutin"
+          ],
+          instructions_list: [
+            "Simpan di tempat yang kering dan sejuk",
+            "Hindari paparan sinar matahari langsung",
+            "Gunakan dalam 12 bulan setelah dibuka",
+            "Kocok sebelum diminum untuk hasil terbaik"
+          ],
+          price: cardProduct.price,
+          is_active: true,
+          company: cardProduct.brand_info.name,
+          avg_rating: RATING_SUMMARY_DATA[cardProduct.id]?.avg_rating || 4.0,
+          total_rater: RATING_SUMMARY_DATA[cardProduct.id]?.total_rater || 0,
+          created_at: cardProduct.created_at,
+          updated_at: new Date().toISOString()
+        };
+      }
+    } catch (error) {
+      console.warn(`Failed to create detail product for ${cardProduct.id}:`, error);
     }
   });
 
   return detailProducts;
+}
+
+// ==================== RATING UTILITIES ====================
+
+// Fungsi untuk mendapatkan rating summary berdasarkan product ID
+export function getProductRatingSummary(productId: string): ProductRatingSummary | null {
+  return RATING_SUMMARY_DATA[productId] || null;
+}
+
+// Fungsi untuk mendapatkan semua rating berdasarkan product ID
+export function getProductRatings(productId: string): RatingDummyType[] {
+  return RATING_DUMMY_DATA.filter(rating => rating.product_id === productId);
+}
+
+// Fungsi untuk mendapatkan rating user berdasarkan user ID
+export function getUserRatings(userId: string): RatingDummyType[] {
+  return RATING_DUMMY_DATA.filter(rating => rating.user_id === userId);
+}
+
+// Fungsi untuk mendapatkan rating berdasarkan rating ID
+export function getRatingById(ratingId: number): RatingDummyType | null {
+  return RATING_DUMMY_DATA.find(rating => rating.id === ratingId) || null;
+}
+
+// Fungsi untuk menghitung rating summary dari data rating
+export function calculateRatingSummary(ratings: RatingDummyType[]): ProductRatingSummary {
+  if (ratings.length === 0) {
+    return {
+      avg_rating: 0,
+      total_rater: 0,
+      rating_distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+      recent_reviews: []
+    };
+  }
+
+  const totalRating = ratings.reduce((sum, rating) => sum + rating.rate, 0);
+  const avgRating = totalRating / ratings.length;
+  
+  const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+  ratings.forEach(rating => {
+    distribution[rating.rate as keyof typeof distribution]++;
+  });
+
+  return {
+    avg_rating: Math.round(avgRating * 10) / 10, // Round to 1 decimal place
+    total_rater: ratings.length,
+    rating_distribution: distribution,
+    recent_reviews: ratings
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 5) // Get 5 most recent reviews
+  };
 }

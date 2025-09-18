@@ -2,12 +2,12 @@ export interface VariantType {
     id: number;
     product: string;
     name: string;
-    img?: string;
-    variant?: string;
-    expiration?: string;
+    img: string;
+    variant: string;
+    expiration: string;
     stock: number;
-    discount?: number;
-    discounted_price?: number;
+    discount: number;
+    discounted_price: number;
     updated_at: string;
 }
 
@@ -16,27 +16,27 @@ export interface VariantProductType {
     id: number;
     product: string;
     name: string;
-    img?: string;
-    variant?: string;
-    expiration?: string;
+    img: string;
+    variant: string;
+    expiration: string;
     stock: number;
-    discount?: number;
-    discounted_price?: number;
+    discount: number;
+    discounted_price: number;
     updated_at: string;
 }
 
 export interface DetailProductType {
     id: string;
     name: string;
-    info?: string;
+    info: string;
     variants_list: VariantProductType[];
     description_list: string[];
     instructions_list: string[];
     price: number;  
     is_active: boolean;
     company: string;
-    avg_rating?: number;
-    total_rater?: number;
+    avg_rating: number;
+    total_rater: number;
     created_at: string;
     updated_at: string;
 }
@@ -63,11 +63,11 @@ export interface ProductType {
 export interface BrandDetailType {
     id: number;
     name: string;
-    photo_url?: string;
+    photo_url: string;
     description_list: string[];
-    category?: string;
-    total_product?: number;
-    total_product_with_promo?: number;
+    category: string;
+    total_product: number;
+    total_product_with_promo: number;
     created_at: string;
 }
 

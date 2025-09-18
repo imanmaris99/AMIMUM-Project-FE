@@ -31,9 +31,9 @@ export interface PromoProps {
 export interface ProductionProps {
   id: number;
   name: string;
-  photo_url?: string;
+  photo_url: string;
   description_list: string[];
-  category?: string;
+  category: string;
   created_at: string;
 }
 
@@ -41,11 +41,11 @@ export interface ProductionProps {
 export interface DetailProductionType {
   id: number;
   name: string;
-  photo_url?: string;
+  photo_url: string;
   description_list: string[];
-  category?: string;
-  total_product?: number;
-  total_product_with_promo?: number;
+  category: string;
+  total_product: number;
+  total_product_with_promo: number;
   created_at: string;
 }
 
@@ -56,7 +56,7 @@ export interface ProductionDetailResponseType {
 }
 
 export interface ArticleProps {
-  display_id: number;
+  display_id: string;
   title: string;
   img: string;
   description_list: string[];
@@ -129,25 +129,26 @@ export interface BrandFilteredLoader {
 export interface BrandInfoType {
   id: number;
   name: string;
-  photo_url?: string;
+  photo_url: string;
 }
 
 export interface VariantAllProductType {
-  id?: number;
-  variant?: string;
-  img?: string;
-  discount?: number;
-  discounted_price?: number;
+  id: number;
+  variant: string;
+  img: string;
+  discount: number;
+  discounted_price: number;
   updated_at: string;
 }
 
 export interface AllProductInfoType {
-  id?: string;
-  name?: string;
+  id: string;
+  name: string;
   price: number;
-  brand_info?: BrandInfoType;
+  brand_info: BrandInfoType;
   all_variants: VariantAllProductType[];
   created_at: string;
+  brand_highest_discount?: number; // Optional field for promo products
 }
 
 export interface AllProductInfoResponseType {

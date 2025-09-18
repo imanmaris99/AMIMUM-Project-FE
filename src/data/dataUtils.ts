@@ -1,20 +1,26 @@
 // Data Utility Functions
 // Memudahkan akses dan sinkronisasi data antar komponen
 
-import { 
-  generateDetailProductData, 
-  generateCardProductData, 
-  generateBrandProducts, 
+import {
+  generateDetailProductData,
+  generateCardProductData,
+  generateBrandProducts,
   generatePromoProducts,
   BRAND_DATA,
   CATEGORY_DATA,
   ARTICLE_DATA,
   PRODUCTION_DATA,
-  PROMO_DATA
+  PROMO_DATA,
+  RATING_DUMMY_DATA,
+  RATING_SUMMARY_DATA,
+  getProductRatingSummary,
+  getProductRatings,
+  getUserRatings
 } from './dummyData';
 import { DetailProductType } from '@/types/detailProduct';
 import { CardProductProps } from '@/components/common/Search/CardProduct/types';
 import { CartResponseType, CartItemType, CartTotalPricesType } from '@/types/apiTypes';
+import { validateDetailProductData, validateProductData } from '@/utils/dataValidation';
 
 // ==================== CACHED DATA ====================
 let cachedDetailProducts: { [key: string]: DetailProductType } | null = null;
@@ -25,7 +31,15 @@ export function getDetailProduct(productId: string): DetailProductType | undefin
   if (!cachedDetailProducts) {
     cachedDetailProducts = generateDetailProductData();
   }
-  return cachedDetailProducts[productId];
+  const product = cachedDetailProducts[productId];
+  
+  // Validate product data before returning
+  if (product && !validateDetailProductData(product)) {
+    console.warn(`Invalid detail product data for ID: ${productId}`);
+    return undefined;
+  }
+  
+  return product;
 }
 
 export function getAllDetailProducts(): { [key: string]: DetailProductType } {
@@ -40,11 +54,18 @@ export function getAllCardProducts(): CardProductProps[] {
   if (!cachedCardProducts) {
     cachedCardProducts = generateCardProductData();
   }
-  return cachedCardProducts;
+  
+  // Filter out invalid products
+  return cachedCardProducts.filter(validateProductData);
 }
 
 export function getCardProductsByBrand(brandId: string): CardProductProps[] {
-  return generateBrandProducts(brandId);
+  try {
+    return generateBrandProducts(brandId);
+  } catch (error) {
+    console.warn(`Failed to get products for brand ${brandId}:`, error);
+    return [];
+  }
 }
 
 export function getCardProductsBySearch(query: string, brandFilter?: string): CardProductProps[] {
@@ -65,9 +86,9 @@ export function getCardProductsBySearch(query: string, brandFilter?: string): Ca
     
     if (brand) {
       filteredProducts = allProducts.filter(product => 
-        product.brand_info?.id === brand.id || 
-        product.name?.toLowerCase().includes(brand.name.toLowerCase()) ||
-        product.brand_info?.name?.toLowerCase().includes(brand.name.toLowerCase())
+        product.brand_info.id === brand.id || 
+        product.name.toLowerCase().includes(brand.name.toLowerCase()) ||
+        product.brand_info.name.toLowerCase().includes(brand.name.toLowerCase())
       );
     }
   }
@@ -75,8 +96,8 @@ export function getCardProductsBySearch(query: string, brandFilter?: string): Ca
   // Filter by search query
   if (query.trim()) {
     filteredProducts = filteredProducts.filter(product =>
-      product.name?.toLowerCase().includes(query.toLowerCase()) ||
-      product.brand_info?.name?.toLowerCase().includes(query.toLowerCase())
+      product.name.toLowerCase().includes(query.toLowerCase()) ||
+      product.brand_info.name.toLowerCase().includes(query.toLowerCase())
     );
   }
   
@@ -85,7 +106,11 @@ export function getCardProductsBySearch(query: string, brandFilter?: string): Ca
 
 // ==================== BRAND UTILITIES ====================
 export function getBrandData(brandId: string) {
-  return BRAND_DATA[brandId as keyof typeof BRAND_DATA];
+  const brand = BRAND_DATA[brandId as keyof typeof BRAND_DATA];
+  if (!brand) {
+    console.warn(`Brand with ID ${brandId} not found`);
+  }
+  return brand;
 }
 
 export function getAllBrands() {
@@ -94,7 +119,10 @@ export function getAllBrands() {
 
 export function getBrandForPromo(promoId: string) {
   const brand = getBrandData(promoId);
-  if (!brand) return null;
+  if (!brand) {
+    console.warn(`Brand with ID ${promoId} not found for promo`);
+    return null;
+  }
   
   return {
     data: {
@@ -106,7 +134,12 @@ export function getBrandForPromo(promoId: string) {
 
 // ==================== PROMO UTILITIES ====================
 export function getPromoProducts(brandId: string): CardProductProps[] {
-  return generatePromoProducts(brandId);
+  try {
+    return generatePromoProducts(brandId);
+  } catch (error) {
+    console.warn(`Failed to get promo products for brand ${brandId}:`, error);
+    return [];
+  }
 }
 
 export function getPromoData() {
@@ -138,9 +171,34 @@ export function getHomepageData() {
   };
 }
 
+// ==================== RATING UTILITIES ====================
+
+export function getRatingData() {
+  return {
+    ratings: RATING_DUMMY_DATA,
+    summaries: RATING_SUMMARY_DATA
+  };
+}
+
+export function getProductRatingData(productId: string) {
+  return {
+    summary: getProductRatingSummary(productId),
+    ratings: getProductRatings(productId)
+  };
+}
+
+export function getUserRatingData(userId: string) {
+  return getUserRatings(userId);
+}
+
 // ==================== SEARCH UTILITIES ====================
 export function searchProducts(query: string, brandFilter?: string): CardProductProps[] {
-  return getCardProductsBySearch(query, brandFilter);
+  try {
+    return getCardProductsBySearch(query, brandFilter);
+  } catch (error) {
+    console.warn(`Failed to search products with query "${query}" and brand filter "${brandFilter}":`, error);
+    return [];
+  }
 }
 
 // ==================== CART UTILITIES ====================
@@ -261,9 +319,18 @@ export function generateCartData(): CartResponseType {
 export function clearCache() {
   cachedDetailProducts = null;
   cachedCardProducts = null;
+  console.log('Data cache cleared');
 }
 
 export function refreshData() {
   clearCache();
   // Force regeneration on next access
+  console.log('Data refresh initiated');
+}
+
+export function getCacheStatus() {
+  return {
+    detailProducts: cachedDetailProducts ? Object.keys(cachedDetailProducts).length : 0,
+    cardProducts: cachedCardProducts ? cachedCardProducts.length : 0
+  };
 }

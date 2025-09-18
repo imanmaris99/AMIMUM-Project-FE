@@ -30,17 +30,28 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    if (isWishlisted) {
-      // If already in wishlist, remove it directly
-      toggleWishlist(product);
-    } else {
-      // If not in wishlist, show variant modal if enabled and product has multiple variants
-      if (showVariantModal && product.all_variants && product.all_variants.length > 1) {
-        setIsModalOpen(true);
-      } else {
-        // If no modal needed or single variant, add directly
-        toggleWishlist(product);
+    try {
+      if (!product || !product.id || !product.name) {
+        console.error("Invalid product data for wishlist:", product);
+        return;
       }
+      
+      if (isWishlisted) {
+        // If already in wishlist, remove it directly
+        toggleWishlist(product);
+        console.log(`Removed from wishlist: ${product.name}`);
+      } else {
+        // If not in wishlist, show variant modal if enabled and product has multiple variants
+        if (showVariantModal && product.all_variants && product.all_variants.length > 1) {
+          setIsModalOpen(true);
+        } else {
+          // If no modal needed or single variant, add directly
+          toggleWishlist(product);
+          console.log(`Added to wishlist: ${product.name}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error handling wishlist click:", error);
     }
   };
 

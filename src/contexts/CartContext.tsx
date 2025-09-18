@@ -63,42 +63,53 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const totalPrices = calculateTotalPrices(cartItems);
 
   const addToCart = (product: any, variant?: any) => {
-    const variantToUse = variant || product.all_variants?.[0];
-    
-    if (!variantToUse) {
-      console.error("No variant available for product");
-      return;
-    }
+    try {
+      const variantToUse = variant || product.all_variants?.[0];
+      
+      if (!variantToUse) {
+        console.error("No variant available for product:", product);
+        return;
+      }
 
-    const existingItemIndex = cartItems.findIndex(
-      item => item.product_name === product.name && 
-              item.variant_info.variant === variantToUse.variant
-    );
+      if (!product.name || !product.price) {
+        console.error("Invalid product data:", product);
+        return;
+      }
 
-    if (existingItemIndex > -1) {
-      // Update quantity if item already exists
-      const updatedItems = [...cartItems];
-      updatedItems[existingItemIndex].quantity += 1;
-      setCartItems(updatedItems);
-    } else {
-      // Add new item to cart
-      const newCartItem: CartItemType = {
-        id: Date.now(), // Simple ID generation
-        product_name: product.name,
-        product_price: product.price,
-        variant_info: {
-          id: variantToUse.id || 1,
-          variant: variantToUse.variant || variantToUse.name,
-          name: variantToUse.name || variantToUse.variant,
-          img: variantToUse.img || product.image_url || "/buyungupik_agr-1.svg",
-          discount: variantToUse.discount || 0
-        },
-        quantity: 1,
-        is_active: true,
-        created_at: new Date().toISOString()
-      };
+      const existingItemIndex = cartItems.findIndex(
+        item => item.product_name === product.name && 
+                item.variant_info.variant === variantToUse.variant
+      );
 
-      setCartItems(prev => [...prev, newCartItem]);
+      if (existingItemIndex > -1) {
+        // Update quantity if item already exists
+        const updatedItems = [...cartItems];
+        updatedItems[existingItemIndex].quantity += 1;
+        setCartItems(updatedItems);
+        console.log(`Updated quantity for ${product.name} ${variantToUse.variant}`);
+      } else {
+        // Add new item to cart
+        const newCartItem: CartItemType = {
+          id: Math.floor(Math.random() * 1000000) + 1, // Better ID generation
+          product_name: product.name,
+          product_price: product.price,
+          variant_info: {
+            id: variantToUse.id,
+            variant: variantToUse.variant,
+            name: variantToUse.name,
+            img: variantToUse.img,
+            discount: variantToUse.discount
+          },
+          quantity: 1,
+          is_active: true,
+          created_at: new Date().toISOString()
+        };
+
+        setCartItems(prev => [...prev, newCartItem]);
+        console.log(`Added to cart: ${product.name} ${variantToUse.variant}`);
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
     }
   };
 

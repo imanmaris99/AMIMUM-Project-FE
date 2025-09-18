@@ -46,40 +46,53 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   }, [wishlistItems]);
 
   const addToWishlist = (product: any) => {
-    // Get the first variant or use default variant
-    const firstVariant = product.all_variants?.[0];
-    const variantName = firstVariant?.variant || firstVariant?.name || "Anggur";
-    
-    // Create unique ID that includes variant to allow multiple variants of same product
-    const variantId = firstVariant?.id || 1;
-    const uniqueId = `${product.id}-${variantId}`;
-    
-    // Calculate pricing info
-    const hasDiscount = firstVariant?.discount && firstVariant.discount > 0;
-    const discountedPrice = firstVariant?.discounted_price || (hasDiscount ? product.price * (1 - firstVariant.discount / 100) : product.price);
-    const finalPrice = hasDiscount ? discountedPrice : product.price;
-    
-    const wishlistItem: WishlistItem = {
-      id: `wish-${uniqueId}`,
-      productId: product.id,
-      name: product.name,
-      price: finalPrice,
-      image: firstVariant?.img || product.image_url || "/buyungupik_agr-1.svg",
-      variant: variantName,
-      quantity: "1 dus",
-      addedAt: new Date().toISOString(),
-      brand: product.brand_info?.name || "Unknown Brand",
-      originalPrice: hasDiscount ? product.price : undefined,
-      discount: firstVariant?.discount || undefined
-    };
+    try {
+      if (!product.id || !product.name) {
+        console.error("Invalid product data for wishlist:", product);
+        return;
+      }
 
-    setWishlistItems(prev => {
-      // Check if this specific variant already exists
-      const exists = prev.some(item => item.id === wishlistItem.id);
-      if (exists) return prev;
+      // Get the first variant or use default variant
+      const firstVariant = product.all_variants?.[0];
+      const variantName = firstVariant?.variant || firstVariant?.name || "Anggur";
       
-      return [...prev, wishlistItem];
-    });
+      // Create unique ID that includes variant to allow multiple variants of same product
+      const variantId = firstVariant?.id || 1;
+      const uniqueId = `${product.id}-${variantId}`;
+      
+      // Calculate pricing info
+      const hasDiscount = firstVariant?.discount && firstVariant.discount > 0;
+      const discountedPrice = firstVariant?.discounted_price || (hasDiscount ? product.price * (1 - firstVariant.discount / 100) : product.price);
+      const finalPrice = hasDiscount ? discountedPrice : product.price;
+      
+      const wishlistItem: WishlistItem = {
+        id: `wish-${uniqueId}`,
+        productId: product.id,
+        name: product.name,
+        price: finalPrice,
+        image: firstVariant?.img || "/buyungupik_agr-1.svg",
+        variant: variantName,
+        quantity: "1 dus",
+        addedAt: new Date().toISOString(),
+        brand: product.brand_info?.name || "Unknown Brand",
+        originalPrice: hasDiscount ? product.price : undefined,
+        discount: firstVariant?.discount || undefined
+      };
+
+      setWishlistItems(prev => {
+        // Check if this specific variant already exists
+        const exists = prev.some(item => item.id === wishlistItem.id);
+        if (exists) {
+          console.log(`Product ${product.name} ${variantName} already in wishlist`);
+          return prev;
+        }
+        
+        console.log(`Added to wishlist: ${product.name} ${variantName}`);
+        return [...prev, wishlistItem];
+      });
+    } catch (error) {
+      console.error("Error adding to wishlist:", error);
+    }
   };
 
   const removeFromWishlist = (productId: string) => {

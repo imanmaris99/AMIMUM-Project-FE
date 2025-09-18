@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { GoHeart } from "react-icons/go";
 import { CardProductProps } from "./types";
 import rupiahFormater from "@/utils/rupiahFormater";
 import useSearchLogic from "../useSearchLogic";
@@ -10,18 +9,40 @@ import WishlistButton from "@/components/common/WishlistButton";
 const CardProduct = ({ product }: { product: CardProductProps }) => {
   const { handleSelectProduct } = useSearchLogic();
 
+  // Validate product data
+  if (!product || !product.all_variants || product.all_variants.length === 0) {
+    console.warn("Invalid product data:", product);
+    return null;
+  }
+
   // Calculate highest discount from all variants
-  const highestDiscount = product.all_variants.reduce((max, variant) => {
+  // If brand_highest_discount is available (for promo pages), use it instead
+  const highestDiscount = product.brand_highest_discount || product.all_variants.reduce((max, variant) => {
     const discount = variant.discount || 0;
     return discount > max ? discount : max;
   }, 0);
 
   // Calculate lowest discounted price from all variants
   const lowestDiscountedPrice = product.all_variants.reduce((min, variant) => {
-    const discountedPrice = variant.discounted_price || variant.discount ? 
-      (variant.discount ? product.price * (1 - variant.discount / 100) : product.price) : product.price;
+    const discountedPrice = variant.discounted_price || product.price;
     return discountedPrice < min ? discountedPrice : min;
   }, product.price);
+
+  // Find the variant with lowest discounted price to get its original price
+  const lowestPriceVariant = product.all_variants.find(variant => 
+    variant.discounted_price === lowestDiscountedPrice
+  );
+  
+  // Use the original price of the variant with lowest discounted price
+  // If using brand_highest_discount, calculate original price based on that discount
+  let originalPriceForDisplay = product.price;
+  if (product.brand_highest_discount) {
+    // Calculate original price based on brand's highest discount
+    originalPriceForDisplay = Math.round(lowestDiscountedPrice / (1 - product.brand_highest_discount / 100));
+  } else if (lowestPriceVariant) {
+    // Use the original price of the variant with lowest discounted price
+    originalPriceForDisplay = Math.round(lowestDiscountedPrice / (1 - (lowestPriceVariant.discount || 0) / 100));
+  }
 
   // Check if product has any discount
   const hasDiscount = highestDiscount > 0;
@@ -47,7 +68,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
         <div className="bg-gray-100 w-32 h-28 rounded-lg flex justify-center items-center">
           <Image
             src={product.all_variants[0]?.img || "/buyungupik_agr-1.svg"}
-            alt={product.name || "Product"}
+            alt={product.name}
             width={100}
             height={100}
             className="rounded-lg"
@@ -77,7 +98,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
                   {rupiahFormater(lowestDiscountedPrice)}
                 </p>
                 <p className="text-xs text-gray-400 line-through">
-                  {rupiahFormater(product.price)}
+                  {rupiahFormater(originalPriceForDisplay)}
                 </p>
               </>
             ) : (
