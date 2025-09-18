@@ -30,7 +30,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
           {errorMessage}
         </li>
       ) : (
-        products?.map((product: CardProductProps) => (
+        products?.slice(0, 5).map((product: CardProductProps) => (
           <li
             key={product.id}
             className="p-2 hover:bg-gray-100 cursor-pointer"
@@ -39,10 +39,13 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-lg flex justify-center items-center bg-gray-100 p-1">
                 <Image
-                  src="/default-image.jpg"
+                  src={product.all_variants[0]?.img || "/buyungupik_agr-1.svg"}
                   alt={product.name}
                   width={50}
                   height={50}
+                  onError={(e) => {
+                    e.currentTarget.src = "/buyungupik_agr-1.svg";
+                  }}
                 />
               </div>
               <div className="flex-1">
