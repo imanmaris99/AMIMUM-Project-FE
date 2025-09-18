@@ -1,14 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import LogoutModal from "../molecules/LogoutModal";
 
 const ProfileSettings: React.FC = () => {
   const router = useRouter();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLocationClick = () => {
-    router.push("/shipment");
+    router.push("/saved-addresses");
   };
 
   const handleAdminClick = () => {
@@ -17,6 +19,10 @@ const ProfileSettings: React.FC = () => {
   };
 
   const handleLogoutClick = () => {
+    setIsLogoutModalOpen(true);
+  };
+
+  const handleConfirmLogout = () => {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("userEmail");
     
@@ -30,8 +36,13 @@ const ProfileSettings: React.FC = () => {
       document.body.removeChild(successMessage);
     }, 3000);
     
-    // Reload page to update state
+    // Close modal and reload page
+    setIsLogoutModalOpen(false);
     window.location.reload();
+  };
+
+  const handleCloseLogoutModal = () => {
+    setIsLogoutModalOpen(false);
   };
 
   return (
@@ -116,6 +127,13 @@ const ProfileSettings: React.FC = () => {
           />
         </div>
       </div>
+
+      {/* Logout Modal */}
+      <LogoutModal
+        isOpen={isLogoutModalOpen}
+        onClose={handleCloseLogoutModal}
+        onConfirm={handleConfirmLogout}
+      />
     </div>
   );
 };

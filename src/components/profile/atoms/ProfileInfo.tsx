@@ -1,9 +1,60 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
+import EditProfileModal from "../molecules/EditProfileModal";
+import ChangePhotoModal from "../molecules/ChangePhotoModal";
 
 const ProfileInfo: React.FC = () => {
+  const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
+  const [isChangePhotoModalOpen, setIsChangePhotoModalOpen] = useState(false);
+
+  const handleEditProfileClick = () => {
+    setIsEditProfileModalOpen(true);
+  };
+
+  const handleCloseEditProfileModal = () => {
+    setIsEditProfileModalOpen(false);
+  };
+
+  const handleSaveProfile = (profileData: any) => {
+    // Handle save profile data
+    console.log("Profile data saved:", profileData);
+    
+    // Show success message
+    const successMessage = document.createElement("div");
+    successMessage.className = "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg";
+    successMessage.textContent = "Profile berhasil diperbarui!";
+    document.body.appendChild(successMessage);
+    
+    setTimeout(() => {
+      document.body.removeChild(successMessage);
+    }, 3000);
+  };
+
+  const handleChangePhotoClick = () => {
+    setIsChangePhotoModalOpen(true);
+  };
+
+  const handleCloseChangePhotoModal = () => {
+    setIsChangePhotoModalOpen(false);
+  };
+
+  const handlePhotoUpload = (file: File) => {
+    // Handle photo upload
+    console.log("Photo uploaded:", file);
+    
+    // Show success message
+    const successMessage = document.createElement("div");
+    successMessage.className = "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg";
+    successMessage.textContent = "Foto berhasil diunggah!";
+    document.body.appendChild(successMessage);
+    
+    setTimeout(() => {
+      document.body.removeChild(successMessage);
+    }, 3000);
+  };
+
   return (
     <div className="bg-white">
       {/* Profile Photo Section */}
@@ -45,7 +96,10 @@ const ProfileInfo: React.FC = () => {
 
         {/* Action Buttons */}
         <div className="flex gap-2 mt-6">
-          <button className="bg-[#007A4F] text-[#E6F2F0] px-4 py-2 rounded-2xl text-sm font-medium border border-[#A2A2A2] flex items-center gap-2">
+          <button 
+            onClick={handleEditProfileClick}
+            className="bg-[#007A4F] text-[#E6F2F0] px-4 py-2 rounded-2xl text-sm font-medium border border-[#A2A2A2] flex items-center gap-2 hover:bg-[#005A3C] transition-colors"
+          >
             <Image
               src="/edit.svg"
               alt="Edit"
@@ -56,7 +110,10 @@ const ProfileInfo: React.FC = () => {
             Edit Akunku
           </button>
           
-          <button className="bg-[#E6F2F0] text-[#0D0E09] px-4 py-2 rounded-2xl text-sm font-medium border border-[#A2A2A2] flex items-center gap-2">
+          <button 
+            onClick={handleChangePhotoClick}
+            className="bg-[#E6F2F0] text-[#0D0E09] px-4 py-2 rounded-2xl text-sm font-medium border border-[#A2A2A2] flex items-center gap-2 hover:bg-[#D4E8E0] transition-colors"
+          >
             <Image
               src="/note.svg"
               alt="Note"
@@ -68,6 +125,26 @@ const ProfileInfo: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={isEditProfileModalOpen}
+        onClose={handleCloseEditProfileModal}
+        onSave={handleSaveProfile}
+        initialData={{
+          firstname: "Faisal",
+          lastname: "Jaya",
+          phone: "+62 877 877 3455",
+          address: "Jl. Sunan Kalijaga, Kpg. Nelayan No. 220, Pati, Jawa Tengah."
+        }}
+      />
+
+      {/* Change Photo Modal */}
+      <ChangePhotoModal
+        isOpen={isChangePhotoModalOpen}
+        onClose={handleCloseChangePhotoModal}
+        onUpload={handlePhotoUpload}
+      />
     </div>
   );
 };
