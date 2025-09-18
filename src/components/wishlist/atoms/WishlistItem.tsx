@@ -50,16 +50,34 @@ const WishlistItem: React.FC<WishlistItemProps> = ({
         </h3>
         
         {/* Detail Section: Variant */}
-        <div className="mb-3">
+        <div className="mb-2">
           <span className="text-xs text-[#C4C4C4]">
             {item.variant}
           </span>
         </div>
         
-        {/* Price */}
-        <p className="text-sm font-bold text-[#001F14]">
-          {rupiahFormater(item.price)}
-        </p>
+        {/* Price with Discount Info */}
+        <div className="space-y-1">
+          {item.discount && item.originalPrice ? (
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-bold text-red-500">
+                  {rupiahFormater(item.price)}
+                </p>
+                <span className="bg-red-100 text-red-600 px-1.5 py-0.5 rounded text-[10px] font-bold">
+                  -{item.discount}%
+                </span>
+              </div>
+              <p className="text-xs text-gray-400 line-through">
+                {rupiahFormater(item.originalPrice)}
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm font-bold text-[#001F14]">
+              {rupiahFormater(item.price)}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Remove Button */}

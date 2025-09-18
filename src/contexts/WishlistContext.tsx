@@ -46,23 +46,36 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   }, [wishlistItems]);
 
   const addToWishlist = (product: any) => {
-    // Get the first variant or use product name as variant
+    // Get the first variant or use default variant
     const firstVariant = product.all_variants?.[0];
-    const variantName = firstVariant?.name || product.name || "Produk";
+    const variantName = firstVariant?.variant || firstVariant?.name || "Anggur";
+    
+    // Create unique ID that includes variant to allow multiple variants of same product
+    const variantId = firstVariant?.id || 1;
+    const uniqueId = `${product.id}-${variantId}`;
+    
+    // Calculate pricing info
+    const hasDiscount = firstVariant?.discount && firstVariant.discount > 0;
+    const discountedPrice = firstVariant?.discounted_price || (hasDiscount ? product.price * (1 - firstVariant.discount / 100) : product.price);
+    const finalPrice = hasDiscount ? discountedPrice : product.price;
     
     const wishlistItem: WishlistItem = {
-      id: `wish-${product.id}`,
+      id: `wish-${uniqueId}`,
       productId: product.id,
       name: product.name,
-      price: product.price,
+      price: finalPrice,
       image: firstVariant?.img || product.image_url || "/buyungupik_agr-1.svg",
       variant: variantName,
-      brand: product.brand_info?.name || "Unknown Brand"
+      quantity: "1 dus",
+      addedAt: new Date().toISOString(),
+      brand: product.brand_info?.name || "Unknown Brand",
+      originalPrice: hasDiscount ? product.price : undefined,
+      discount: firstVariant?.discount || undefined
     };
 
     setWishlistItems(prev => {
-      // Check if product already exists
-      const exists = prev.some(item => item.productId === product.id);
+      // Check if this specific variant already exists
+      const exists = prev.some(item => item.id === wishlistItem.id);
       if (exists) return prev;
       
       return [...prev, wishlistItem];
@@ -73,7 +86,14 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     setWishlistItems(prev => prev.filter(item => item.productId !== productId));
   };
 
-  const isInWishlist = (productId: string) => {
+  const isInWishlist = (productId: string, variantId?: number) => {
+    if (variantId) {
+      // Check specific variant
+      return wishlistItems.some(item => 
+        item.productId === productId && item.id.includes(`-${variantId}`)
+      );
+    }
+    // Check if any variant of the product exists
     return wishlistItems.some(item => item.productId === productId);
   };
 

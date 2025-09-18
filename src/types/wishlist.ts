@@ -7,6 +7,9 @@ export interface WishlistItem {
   price: number;
   image: string;
   addedAt: string;
+  brand?: string;
+  originalPrice?: number;
+  discount?: number;
 }
 
 export interface WishlistData {
