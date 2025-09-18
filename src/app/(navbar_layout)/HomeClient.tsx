@@ -31,23 +31,31 @@ export default function HomeClient({
   articleError
 }: HomeClientProps) {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const selectedCategoryName = categories.find((cat) => cat.id === selectedCategory)?.name;
+  
+  // Extract data from API response structure
+  const categoriesData = Array.isArray(categories) ? categories : (categories?.data || []);
+  const productionsData = Array.isArray(productions) ? productions : (productions?.data || []);
+  const promoData = Array.isArray(promo) ? promo : (promo?.data || []);
+  const articlesData = Array.isArray(articles) ? articles : (articles?.data || []);
+  
+  const selectedCategoryName = categoriesData.find((cat: any) => cat.id === selectedCategory)?.name;
   const filteredProductions = selectedCategory
-    ? productions.filter((prod: any) => prod.category === selectedCategoryName)
-    : productions;
+    ? productionsData.filter((prod: any) => prod.category === selectedCategoryName)
+    : productionsData;
+    
   return (
     <div className="pb-20">
       <Header />
       <Search />
-      <Promo promo={promo} errorMessage={promoError} />
+      <Promo promo={promoData} errorMessage={promoError} />
       <Category
-        categories={categories}
+        categories={categoriesData}
         errorMessage={categoryError}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
       />
       <Production productions={filteredProductions} errorMessage={productionError} />
-      <ArticleSection articles={articles} errorMessage={articleError} />
+      <ArticleSection articles={articlesData} errorMessage={articleError} />
     </div>
   );
 } 

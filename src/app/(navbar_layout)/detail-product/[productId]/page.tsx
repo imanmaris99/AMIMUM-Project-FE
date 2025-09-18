@@ -8,29 +8,30 @@ import ProductPrice from "@/components/detailproduct/ProductPrice";
 import { DetailProductType } from "@/types/detailProduct";
 
 // Dummy data untuk detail product sementara karena server sedang down
+// Sesuai dengan ProductDetailResponseDto dari API backend
 const dummyProductsData: { [key: string]: DetailProductType } = {
   "1": {
     id: "1",
-    name: "Jahe Merah Organik",
-    info: "Jahe merah organik berkualitas tinggi yang dipanen langsung dari perkebunan terbaik. Dikeringkan secara alami tanpa bahan kimia untuk menjaga khasiat dan nutrisinya.",
+    name: "Jamu Beras Kencur Air Mancur",
+    info: "Jamu beras kencur tradisional dengan khasiat yang sudah terbukti. Terbuat dari bahan-bahan alami pilihan yang diolah secara higienis untuk menjaga kualitas dan manfaatnya.",
     description_list: [
-      "Jahe merah organik berkualitas tinggi yang dipanen langsung dari perkebunan terbaik",
-      "Dikeringkan secara alami tanpa bahan kimia untuk menjaga khasiat dan nutrisinya",
-      "Mengandung senyawa anti-inflamasi yang dapat membantu mengurangi peradangan",
-      "Dapat membantu meredakan mual dan gangguan pencernaan",
-      "Membantu meningkatkan sistem kekebalan tubuh",
-      "Dapat membantu mengurangi nyeri otot dan sendi",
-      "Cocok untuk dibuat minuman hangat atau campuran masakan"
+      "Jamu beras kencur tradisional dengan khasiat yang sudah terbukti",
+      "Terbuat dari bahan-bahan alami pilihan yang diolah secara higienis",
+      "Mengandung senyawa aktif yang baik untuk kesehatan pencernaan",
+      "Dapat membantu meredakan perut kembung dan mual",
+      "Membantu meningkatkan nafsu makan secara alami",
+      "Baik untuk kesehatan lambung dan usus",
+      "Cocok dikonsumsi pagi atau sore hari"
     ],
     instructions_list: [
       "Simpan di tempat yang kering dan sejuk",
       "Hindari paparan sinar matahari langsung",
-      "Gunakan dalam 6 bulan setelah dibuka",
-      "Bisa disimpan di kulkas untuk menjaga kesegaran"
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
     ],
-    price: 30000,
+    price: 15000,
     is_active: true,
-    company: "Amimum Herbal",
+    company: "Air Mancur",
     avg_rating: 4.5,
     total_rater: 128,
     image_url: "/default-image.jpg",
@@ -38,60 +39,51 @@ const dummyProductsData: { [key: string]: DetailProductType } = {
       {
         id: 1,
         product: "1",
-        name: "100gr",
+        name: "100ml",
         img: "/default-image.jpg",
-        variant: "100gr",
+        variant: "100ml",
         expiration: "2025-12-31",
         stock: 50,
-        discount: 20,
-        discounted_price: 20000
+        discount: 10,
+        discounted_price: 13500
       },
       {
         id: 2,
         product: "1",
-        name: "250gr",
+        name: "200ml",
         img: "/default-image.jpg",
-        variant: "250gr",
+        variant: "200ml",
         expiration: "2025-12-31",
         stock: 30,
         discount: 15,
-        discounted_price: 42500
-      },
-      {
-        id: 3,
-        product: "1",
-        name: "500gr",
-        img: "/default-image.jpg",
-        variant: "500gr",
-        expiration: "2025-12-31",
-        stock: 20,
-        discount: 25,
-        discounted_price: 67500
+        discounted_price: 25500
       }
-    ]
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
   },
   "2": {
     id: "2",
-    name: "Kunyit Bubuk Premium",
-    info: "Kunyit bubuk premium yang diolah dari kunyit segar pilihan. Mengandung kurkumin tinggi yang bermanfaat untuk kesehatan tubuh dan kecantikan kulit.",
+    name: "Jamu Kunyit Asam Air Mancur",
+    info: "Jamu kunyit asam tradisional yang menyegarkan. Mengandung kurkumin dari kunyit dan asam jawa yang baik untuk kesehatan pencernaan dan anti-inflamasi.",
     description_list: [
-      "Kunyit bubuk premium dari kunyit segar pilihan",
-      "Mengandung kurkumin tinggi yang bermanfaat untuk kesehatan",
-      "Dapat membantu mengurangi peradangan dalam tubuh",
-      "Membantu meningkatkan sistem pencernaan",
-      "Baik untuk kesehatan kulit dan wajah",
-      "Dapat membantu mencegah penuaan dini",
-      "Cocok untuk campuran minuman atau masker wajah"
+      "Jamu kunyit asam tradisional yang menyegarkan",
+      "Mengandung kurkumin dari kunyit dan asam jawa",
+      "Baik untuk kesehatan pencernaan dan anti-inflamasi",
+      "Dapat membantu meredakan perut kembung",
+      "Membantu meningkatkan nafsu makan",
+      "Baik untuk kesehatan lambung",
+      "Cocok dikonsumsi setelah makan"
     ],
     instructions_list: [
       "Simpan di tempat yang kering dan sejuk",
       "Hindari paparan sinar matahari langsung",
-      "Gunakan dalam 8 bulan setelah dibuka",
-      "Bisa disimpan di kulkas untuk menjaga kesegaran"
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
     ],
-    price: 25000,
+    price: 18000,
     is_active: true,
-    company: "Amimum Herbal",
+    company: "Air Mancur",
     avg_rating: 4.3,
     total_rater: 95,
     image_url: "/default-image.jpg",
@@ -99,49 +91,51 @@ const dummyProductsData: { [key: string]: DetailProductType } = {
       {
         id: 1,
         product: "2",
-        name: "50gr",
+        name: "100ml",
         img: "/default-image.jpg",
-        variant: "50gr",
+        variant: "100ml",
         expiration: "2025-12-31",
         stock: 40,
         discount: 10,
-        discounted_price: 22500
+        discounted_price: 16200
       },
       {
         id: 2,
         product: "2",
-        name: "100gr",
+        name: "200ml",
         img: "/default-image.jpg",
-        variant: "100gr",
+        variant: "200ml",
         expiration: "2025-12-31",
         stock: 25,
         discount: 15,
-        discounted_price: 42500
+        discounted_price: 30600
       }
-    ]
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
   },
   "3": {
     id: "3",
-    name: "Temulawak Kering",
-    info: "Temulawak kering berkualitas tinggi yang diolah secara tradisional. Mengandung kurkuminoid yang bermanfaat untuk kesehatan hati dan pencernaan.",
+    name: "Jamu Temulawak Air Mancur",
+    info: "Jamu temulawak tradisional yang baik untuk kesehatan hati dan pencernaan. Mengandung kurkuminoid yang bermanfaat untuk meningkatkan nafsu makan dan menjaga kesehatan liver.",
     description_list: [
-      "Temulawak kering berkualitas tinggi",
-      "Diolah secara tradisional tanpa bahan kimia",
-      "Mengandung kurkuminoid yang bermanfaat untuk kesehatan hati",
-      "Dapat membantu meningkatkan nafsu makan",
-      "Baik untuk kesehatan pencernaan",
-      "Dapat membantu mengurangi peradangan",
-      "Cocok untuk dibuat jamu atau minuman kesehatan"
+      "Jamu temulawak tradisional yang baik untuk kesehatan hati",
+      "Mengandung kurkuminoid yang bermanfaat untuk pencernaan",
+      "Dapat membantu meningkatkan nafsu makan secara alami",
+      "Baik untuk kesehatan liver dan sistem pencernaan",
+      "Dapat membantu mengurangi peradangan dalam tubuh",
+      "Membantu menjaga kesehatan saluran cerna",
+      "Cocok dikonsumsi pagi atau sore hari"
     ],
     instructions_list: [
       "Simpan di tempat yang kering dan sejuk",
       "Hindari paparan sinar matahari langsung",
-      "Gunakan dalam 6 bulan setelah dibuka",
-      "Bisa disimpan di kulkas untuk menjaga kesegaran"
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
     ],
-    price: 28000,
+    price: 20000,
     is_active: true,
-    company: "Amimum Herbal",
+    company: "Air Mancur",
     avg_rating: 4.2,
     total_rater: 87,
     image_url: "/default-image.jpg",
@@ -149,49 +143,51 @@ const dummyProductsData: { [key: string]: DetailProductType } = {
       {
         id: 1,
         product: "3",
-        name: "100gr",
+        name: "60ml",
         img: "/default-image.jpg",
-        variant: "100gr",
+        variant: "60ml",
         expiration: "2025-12-31",
         stock: 35,
-        discount: 12,
-        discounted_price: 24640
+        discount: 10,
+        discounted_price: 18000
       },
       {
         id: 2,
         product: "3",
-        name: "250gr",
+        name: "120ml",
         img: "/default-image.jpg",
-        variant: "250gr",
+        variant: "120ml",
         expiration: "2025-12-31",
-        stock: 15,
-        discount: 18,
-        discounted_price: 57400
+        stock: 20,
+        discount: 15,
+        discounted_price: 32000
       }
-    ]
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
   },
   "4": {
     id: "4",
-    name: "Teh Hijau Daun",
-    info: "Teh hijau daun premium yang dipetik dari perkebunan teh terbaik. Mengandung antioksidan tinggi yang bermanfaat untuk kesehatan dan kecantikan.",
+    name: "Jamu Jahe Merah Air Mancur",
+    info: "Jamu jahe merah tradisional yang menghangatkan tubuh. Mengandung senyawa aktif yang baik untuk kesehatan pernapasan dan membantu meredakan batuk serta flu.",
     description_list: [
-      "Teh hijau daun premium dari perkebunan terbaik",
-      "Mengandung antioksidan tinggi yang bermanfaat untuk kesehatan",
-      "Dapat membantu meningkatkan metabolisme tubuh",
-      "Baik untuk kesehatan jantung dan pembuluh darah",
-      "Dapat membantu mencegah penuaan dini",
-      "Membantu meningkatkan konsentrasi dan fokus",
-      "Cocok untuk diminum pagi atau sore hari"
+      "Jamu jahe merah tradisional yang menghangatkan tubuh",
+      "Mengandung senyawa aktif yang baik untuk kesehatan pernapasan",
+      "Dapat membantu meredakan batuk dan flu",
+      "Baik untuk kesehatan tenggorokan dan saluran pernapasan",
+      "Dapat membantu meningkatkan sistem kekebalan tubuh",
+      "Membantu meredakan perut kembung dan mual",
+      "Cocok dikonsumsi saat cuaca dingin atau saat sakit"
     ],
     instructions_list: [
       "Simpan di tempat yang kering dan sejuk",
       "Hindari paparan sinar matahari langsung",
       "Gunakan dalam 12 bulan setelah dibuka",
-      "Bisa disimpan di kulkas untuk menjaga kesegaran"
+      "Kocok sebelum diminum untuk hasil terbaik"
     ],
-    price: 20000,
+    price: 22000,
     is_active: true,
-    company: "Amimum Herbal",
+    company: "Air Mancur",
     avg_rating: 4.4,
     total_rater: 112,
     image_url: "/default-image.jpg",
@@ -199,49 +195,51 @@ const dummyProductsData: { [key: string]: DetailProductType } = {
       {
         id: 1,
         product: "4",
-        name: "25gr",
+        name: "60ml",
         img: "/default-image.jpg",
-        variant: "25gr",
+        variant: "60ml",
         expiration: "2025-12-31",
-        stock: 60,
-        discount: 8,
-        discounted_price: 18400
+        stock: 30,
+        discount: 10,
+        discounted_price: 19800
       },
       {
         id: 2,
         product: "4",
-        name: "50gr",
+        name: "120ml",
         img: "/default-image.jpg",
-        variant: "50gr",
+        variant: "120ml",
         expiration: "2025-12-31",
-        stock: 40,
-        discount: 12,
+        stock: 20,
+        discount: 15,
         discounted_price: 35200
       }
-    ]
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
   },
   "5": {
     id: "5",
-    name: "Madu Murni Asli",
-    info: "Madu murni asli dari lebah yang dipelihara di perkebunan organik. Mengandung enzim dan nutrisi alami yang bermanfaat untuk kesehatan tubuh.",
+    name: "Jamu Sari Kurma Air Mancur",
+    info: "Jamu sari kurma tradisional yang kaya akan nutrisi. Mengandung vitamin dan mineral alami yang baik untuk kesehatan tubuh dan membantu meningkatkan energi.",
     description_list: [
-      "Madu murni asli dari lebah yang dipelihara di perkebunan organik",
-      "Mengandung enzim dan nutrisi alami yang bermanfaat untuk kesehatan",
+      "Jamu sari kurma tradisional yang kaya akan nutrisi",
+      "Mengandung vitamin dan mineral alami yang baik untuk kesehatan",
+      "Dapat membantu meningkatkan energi dan stamina",
+      "Baik untuk kesehatan pencernaan dan metabolisme",
       "Dapat membantu meningkatkan sistem kekebalan tubuh",
-      "Baik untuk kesehatan tenggorokan dan pernapasan",
-      "Dapat membantu meredakan batuk dan flu",
-      "Membantu meningkatkan energi dan stamina",
-      "Cocok untuk diminum pagi atau sebelum tidur"
+      "Membantu menjaga kesehatan jantung dan pembuluh darah",
+      "Cocok dikonsumsi pagi atau sore hari"
     ],
     instructions_list: [
       "Simpan di tempat yang kering dan sejuk",
       "Hindari paparan sinar matahari langsung",
-      "Gunakan dalam 24 bulan setelah dibuka",
-      "Bisa disimpan di kulkas untuk menjaga kesegaran"
+      "Gunakan dalam 12 bulan setelah dibuka",
+      "Kocok sebelum diminum untuk hasil terbaik"
     ],
-    price: 45000,
+    price: 25000,
     is_active: true,
-    company: "Amimum Herbal",
+    company: "Air Mancur",
     avg_rating: 4.6,
     total_rater: 156,
     image_url: "/default-image.jpg",
@@ -249,49 +247,51 @@ const dummyProductsData: { [key: string]: DetailProductType } = {
       {
         id: 1,
         product: "5",
-        name: "250ml",
+        name: "60ml",
         img: "/default-image.jpg",
-        variant: "250ml",
+        variant: "60ml",
         expiration: "2025-12-31",
-        stock: 30,
-        discount: 15,
-        discounted_price: 38250
+        stock: 25,
+        discount: 10,
+        discounted_price: 22500
       },
       {
         id: 2,
         product: "5",
-        name: "500ml",
+        name: "120ml",
         img: "/default-image.jpg",
-        variant: "500ml",
+        variant: "120ml",
         expiration: "2025-12-31",
-        stock: 20,
-        discount: 20,
-        discounted_price: 72000
+        stock: 15,
+        discount: 15,
+        discounted_price: 40000
       }
-    ]
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
   },
   "6": {
     id: "6",
-    name: "Kayu Manis Batang",
-    info: "Kayu manis batang premium yang dipetik dari pohon kayu manis terbaik. Mengandung cinnamaldehyde yang memberikan aroma dan rasa khas.",
+    name: "Jamu Brotowali Air Mancur",
+    info: "Jamu brotowali tradisional yang pahit namun berkhasiat. Mengandung senyawa aktif yang baik untuk kesehatan dan membantu menjaga daya tahan tubuh.",
     description_list: [
-      "Kayu manis batang premium dari pohon terbaik",
-      "Mengandung cinnamaldehyde yang memberikan aroma khas",
+      "Jamu brotowali tradisional yang pahit namun berkhasiat",
+      "Mengandung senyawa aktif yang baik untuk kesehatan",
+      "Dapat membantu menjaga daya tahan tubuh",
+      "Baik untuk kesehatan kulit dan membantu meredakan gatal",
       "Dapat membantu mengontrol kadar gula darah",
-      "Baik untuk kesehatan pencernaan",
-      "Dapat membantu mengurangi peradangan",
-      "Membantu meningkatkan metabolisme tubuh",
-      "Cocok untuk campuran minuman atau masakan"
+      "Membantu meningkatkan sistem kekebalan tubuh",
+      "Cocok dikonsumsi untuk menjaga kesehatan secara rutin"
     ],
     instructions_list: [
       "Simpan di tempat yang kering dan sejuk",
       "Hindari paparan sinar matahari langsung",
       "Gunakan dalam 12 bulan setelah dibuka",
-      "Bisa disimpan di kulkas untuk menjaga kesegaran"
+      "Kocok sebelum diminum untuk hasil terbaik"
     ],
-    price: 15000,
+    price: 16000,
     is_active: true,
-    company: "Amimum Herbal",
+    company: "Air Mancur",
     avg_rating: 4.1,
     total_rater: 73,
     image_url: "/default-image.jpg",
@@ -299,26 +299,28 @@ const dummyProductsData: { [key: string]: DetailProductType } = {
       {
         id: 1,
         product: "6",
-        name: "50gr",
+        name: "60ml",
         img: "/default-image.jpg",
-        variant: "50gr",
+        variant: "60ml",
         expiration: "2025-12-31",
-        stock: 45,
-        discount: 5,
-        discounted_price: 14250
+        stock: 40,
+        discount: 10,
+        discounted_price: 14400
       },
       {
         id: 2,
         product: "6",
-        name: "100gr",
+        name: "120ml",
         img: "/default-image.jpg",
-        variant: "100gr",
+        variant: "120ml",
         expiration: "2025-12-31",
         stock: 25,
-        discount: 10,
-        discounted_price: 27000
+        discount: 15,
+        discounted_price: 25600
       }
-    ]
+    ],
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z"
   },
   "7": {
     id: "7",

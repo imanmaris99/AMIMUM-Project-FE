@@ -5,13 +5,16 @@ import SearchProductByBrand from "@/components/DetailBrand/SearchProductByBrand"
 import { BrandDetailResponseType, ProductType } from "@/types/detailProduct";
 
 // Dummy data untuk brand sementara karena server sedang down
+// Sesuai dengan ProductionDetailResponseDto dari API backend
 const dummyBrandsData: { [key: string]: {
   id: number;
   name: string;
   photo_url: string;
   description_list: string[];
+  category: string;
   total_product: number;
   total_product_with_promo: number;
+  created_at: string;
 } } = {
   "1": {
     id: 1,
@@ -23,8 +26,10 @@ const dummyBrandsData: { [key: string]: {
       "Proses produksi yang higienis dan modern",
       "Sudah bersertifikat halal dan BPOM"
     ],
+    category: "Jamu",
     total_product: 6,
-    total_product_with_promo: 4
+    total_product_with_promo: 4,
+    created_at: "2024-01-01T00:00:00Z"
   },
   "2": {
     id: 2,
@@ -36,8 +41,10 @@ const dummyBrandsData: { [key: string]: {
       "Proses pengolahan tradisional yang terjaga",
       "Terpercaya untuk kesehatan keluarga"
     ],
+    category: "Jamu",
     total_product: 5,
-    total_product_with_promo: 3
+    total_product_with_promo: 3,
+    created_at: "2024-01-01T00:00:00Z"
   },
   "3": {
     id: 3,
@@ -49,8 +56,10 @@ const dummyBrandsData: { [key: string]: {
       "Diolah dengan teknologi modern yang higienis",
       "Membantu menjaga kesehatan dan kebugaran"
     ],
+    category: "Jamu",
     total_product: 7,
-    total_product_with_promo: 5
+    total_product_with_promo: 5,
+    created_at: "2024-01-01T00:00:00Z"
   },
   "4": {
     id: 4,
@@ -62,8 +71,10 @@ const dummyBrandsData: { [key: string]: {
       "Kualitas terjamin dengan sertifikasi lengkap",
       "Solusi kesehatan alami untuk keluarga"
     ],
+    category: "Jamu",
     total_product: 8,
-    total_product_with_promo: 6
+    total_product_with_promo: 6,
+    created_at: "2024-01-01T00:00:00Z"
   },
   "5": {
     id: 5,
@@ -75,8 +86,10 @@ const dummyBrandsData: { [key: string]: {
       "Proses produksi yang ramah lingkungan",
       "Mendukung gaya hidup sehat dan seimbang"
     ],
+    category: "Jamu",
     total_product: 4,
-    total_product_with_promo: 2
+    total_product_with_promo: 2,
+    created_at: "2024-01-01T00:00:00Z"
   },
   "6": {
     id: 6,
@@ -88,8 +101,10 @@ const dummyBrandsData: { [key: string]: {
       "Kualitas konsisten dengan standar tinggi",
       "Terpercaya oleh jutaan konsumen Indonesia"
     ],
+    category: "Jamu",
     total_product: 9,
-    total_product_with_promo: 7
+    total_product_with_promo: 7,
+    created_at: "2024-01-01T00:00:00Z"
   }
 };
 

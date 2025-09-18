@@ -3,11 +3,11 @@ export interface CardProductProps {
     name: string;
     price: number;
     all_variants: {
-        id: number;
-        variant: string;
-        img: string;
-        discount: number;
-        discounted_price: number;
+        id?: number;
+        variant?: string;
+        img?: string;
+        discount?: number;
+        discounted_price?: number;
         updated_at: string;
     }[];
     created_at: string;
