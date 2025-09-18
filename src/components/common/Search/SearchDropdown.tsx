@@ -36,20 +36,26 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
             className="p-2 hover:bg-gray-100 cursor-pointer"
             onClick={() => handleSelectProduct(product.id)}
           >
-            <div>
-              {product.all_variants.map((variant) => (
-                <div key={variant.id} className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-lg flex justify-center items-center bg-gray-100 p-1">
-                    <Image
-                      src={variant.img || "/default-image.jpg"}
-                      alt={product.name}
-                      width={50}
-                      height={50}
-                    />
-                  </div>
-                  <p className="text-sm">{product.name}</p>
-                </div>
-              ))}
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-lg flex justify-center items-center bg-gray-100 p-1">
+                <Image
+                  src="/default-image.jpg"
+                  alt={product.name}
+                  width={50}
+                  height={50}
+                />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium">{product.name}</p>
+                <p className="text-xs text-gray-500">
+                  {product.all_variants.length} varian tersedia
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-medium text-green-600">
+                  Rp {product.price.toLocaleString()}
+                </p>
+              </div>
             </div>
           </li>
         ))

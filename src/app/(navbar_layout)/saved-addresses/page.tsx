@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { GoChevronLeft } from "react-icons/go";
 import EditAddressModal from "../../../components/profile/molecules/EditAddressModal";
 import AddAddressModal from "../../../components/profile/molecules/AddAddressModal";
@@ -12,7 +11,6 @@ const SavedAddressesPage: React.FC = () => {
   const [selectedAddress, setSelectedAddress] = useState<string>("1"); // Default select first address
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingAddressId, setEditingAddressId] = useState<string>("");
 
   const handleBack = () => {
     router.back();
@@ -22,17 +20,23 @@ const SavedAddressesPage: React.FC = () => {
     setSelectedAddress(addressId);
   };
 
-  const handleEditAddress = (addressId: string) => {
-    setEditingAddressId(addressId);
+  const handleEditAddress = () => {
     setIsEditModalOpen(true);
   };
 
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
-    setEditingAddressId("");
   };
 
-  const handleSaveAddress = (addressData: any) => {
+  const handleSaveAddress = (addressData: {
+    name: string;
+    phone: string;
+    address: string;
+    city: string;
+    province: string;
+    country: string;
+    postalCode: string;
+  }) => {
     // Handle save address data
     console.log("Address data saved:", addressData);
     
@@ -55,7 +59,15 @@ const SavedAddressesPage: React.FC = () => {
     setIsAddModalOpen(false);
   };
 
-  const handleSaveNewAddress = (addressData: any) => {
+  const handleSaveNewAddress = (addressData: {
+    name: string;
+    phone: string;
+    address: string;
+    city: string;
+    province: string;
+    country: string;
+    postalCode: string;
+  }) => {
     // Handle save new address data
     console.log("New address data saved:", addressData);
     
@@ -133,10 +145,10 @@ const SavedAddressesPage: React.FC = () => {
 
               {/* Edit Button */}
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleEditAddress("1");
-                }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditAddress();
+                        }}
                 className="bg-[#006A47] text-white px-3 py-1.5 rounded-2xl text-sm font-medium hover:bg-[#005A3C] transition-colors"
               >
                 Edit
@@ -193,10 +205,10 @@ const SavedAddressesPage: React.FC = () => {
 
               {/* Edit Button */}
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleEditAddress("2");
-                }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditAddress();
+                        }}
                 className="bg-[#006A47] text-white px-3 py-1.5 rounded-2xl text-sm font-medium hover:bg-[#005A3C] transition-colors"
               >
                 Edit

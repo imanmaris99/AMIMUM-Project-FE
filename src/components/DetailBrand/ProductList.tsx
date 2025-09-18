@@ -7,7 +7,7 @@ interface ProductListProps {
 
 const ProductList = ({ products }: ProductListProps) => {
   return (
-    <div className="mt-4">
+    <div className="mt-4 mx-6">
       <h6 className="font-semibold font-jakarta">Daftar Produk Brand</h6>
       {products && products.length > 0 ? (
         <ListProductSection products={products} />
