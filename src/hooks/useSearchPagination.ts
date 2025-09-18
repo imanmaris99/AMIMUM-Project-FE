@@ -117,5 +117,4 @@ const useSearchPagination = ({
   };
 };
 
-export { useSearchPagination };
 export default useSearchPagination;
