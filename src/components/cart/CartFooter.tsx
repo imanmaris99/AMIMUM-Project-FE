@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import rupiahFormater from '@/utils/rupiahFormater';
 
@@ -17,15 +17,17 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
   const allItemsSelected = cartItems.length > 0 && cartItems.every(item => item.is_active);
   const someItemsSelected = cartItems.some(item => item.is_active);
 
-  const handleSelectAll = () => {
+  const handleSelectAll = useCallback(() => {
     if (cartItems.length === 0) return;
     
     // Toggle all items - if all selected, deselect all; if not all selected, select all
     const newStatus = !allItemsSelected;
+    
+    // Batch update all items at once to prevent multiple re-renders
     cartItems.forEach(item => {
       updateActiveStatus(item.id, newStatus);
     });
-  };
+  }, [cartItems, allItemsSelected, updateActiveStatus]);
 
   const handleCheckout = () => {
     if (onCheckout) {
@@ -36,7 +38,7 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
   };
 
   return (
-    <div className="fixed bottom-0 right-0 left-0 bg-white border-t border-gray-200 z-50 mx-auto" style={{ maxWidth: '440px', width: '100%' }}>
+    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-white border-t border-gray-200 z-50" style={{ maxWidth: '440px', width: '100%' }}>
       {/* Main Footer Content */}
       <div className="px-4 py-4">
         <div className="flex items-center justify-between">
@@ -44,7 +46,7 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
           <div className="flex items-center space-x-2">
             <button
               onClick={handleSelectAll}
-              className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
+              className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all duration-200 ${
                 allItemsSelected
                   ? 'border-primary bg-primary'
                   : 'border-gray-300 bg-white'

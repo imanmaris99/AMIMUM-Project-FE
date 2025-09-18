@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { CartItemType } from "@/contexts/CartContext";
 
 interface CartItemProps {
@@ -16,6 +17,7 @@ const CartItem: React.FC<CartItemProps> = ({
   onCheckChange,
   onDelete,
 }) => {
+  const router = useRouter();
   const [quantity, setQuantity] = useState(item.quantity);
   const [isChecked, setIsChecked] = useState(item.is_active);
 
@@ -52,15 +54,19 @@ const CartItem: React.FC<CartItemProps> = ({
     onDelete?.(item.id);
   };
 
+  const handleItemClick = () => {
+    router.push(`/detail-product/${item.product_id}`);
+  };
+
   // Calculate display price (use discounted price if available)
   const displayPrice = item.variant_info.discount > 0 
     ? item.variant_info.discounted_price 
     : item.product_price;
 
   return (
-    <article className="flex items-center gap-3 p-4 border border-gray-200 rounded-xl max-w-full mx-auto">
+    <article className="flex items-center gap-3 p-4 border border-gray-200 rounded-xl max-w-full mx-auto will-change-auto">
       {/* Checkbox */}
-      <label className={`w-7 h-7 border-2 rounded-lg grid place-items-center cursor-pointer flex-shrink-0 transition-all duration-150 ${
+      <label className={`w-7 h-7 border-2 rounded-lg grid place-items-center cursor-pointer flex-shrink-0 transition-all duration-150 will-change-transform ${
         isChecked 
           ? 'border-primary bg-primary' 
           : 'border-gray-300 hover:border-gray-400'
@@ -88,26 +94,32 @@ const CartItem: React.FC<CartItemProps> = ({
         </svg>
       </label>
 
-      {/* Image */}
-      <div className="w-[70px] h-[70px] rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 bg-gray-50 grid place-items-center">
-        <img src={item.variant_info.img} alt={item.product_name} className="w-full h-full object-cover" />
-      </div>
+      {/* Clickable Area - Image and Text */}
+      <div 
+        onClick={handleItemClick}
+        className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors"
+      >
+        {/* Image */}
+        <div className="w-[70px] h-[70px] rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 bg-gray-50 grid place-items-center">
+          <img src={item.variant_info.img} alt={item.product_name} className="w-full h-full object-cover" />
+        </div>
 
-      {/* Text */}
-      <div className="flex-1 min-w-0">
-        <h2 className="font-bold text-sm mb-1 line-clamp-2 leading-tight">
-          {item.product_name}
-        </h2>
-        <p className="text-gray-500 text-xs m-0 truncate">
-          {item.variant_info.variant}
-        </p>
-        <div className="mt-2 text-sm font-bold text-green-800" data-unit={displayPrice}>
-          Rp {displayPrice.toLocaleString('id-ID')}
-          {item.variant_info.discount > 0 && (
-            <span className="bg-red-100 text-red-600 px-1 py-0.5 rounded text-[10px] font-bold ml-2">
-              -{item.variant_info.discount}%
-            </span>
-          )}
+        {/* Text */}
+        <div className="flex-1 min-w-0">
+          <h2 className="font-bold text-sm mb-1 line-clamp-2 leading-tight">
+            {item.product_name}
+          </h2>
+          <p className="text-gray-500 text-xs m-0 truncate">
+            {item.variant_info.variant}
+          </p>
+          <div className="mt-2 text-sm font-bold text-green-800" data-unit={displayPrice}>
+            Rp {displayPrice.toLocaleString('id-ID')}
+            {item.variant_info.discount > 0 && (
+              <span className="bg-red-100 text-red-600 px-1 py-0.5 rounded text-[10px] font-bold ml-2">
+                -{item.variant_info.discount}%
+              </span>
+            )}
+          </div>
         </div>
       </div>
 

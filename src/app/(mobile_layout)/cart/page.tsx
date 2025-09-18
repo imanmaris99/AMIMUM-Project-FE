@@ -35,14 +35,13 @@ export default function CartPage() {
       </div>
 
       {/* Content */}
-      <div className="px-4 py-6 pb-40">
+      <div className="px-4 py-6 pb-20">
         <div className="max-w-sm mx-auto">
           <CartList />
+          {/* Cart Summary */}
+          <CartSummary />
         </div>
       </div>
-
-      {/* Cart Summary */}
-      <CartSummary />
       
       {/* Cart Footer */}
       <CartFooter />
