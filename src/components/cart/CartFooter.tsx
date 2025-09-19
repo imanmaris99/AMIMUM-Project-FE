@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
 import rupiahFormater from '@/utils/rupiahFormater';
 
@@ -9,6 +10,7 @@ interface CartFooterProps {
 }
 
 export default function CartFooter({ onCheckout }: CartFooterProps) {
+  const router = useRouter();
   const { cartItems, totalPrices, updateActiveStatus } = useCart();
 
   // Calculate totals
@@ -33,7 +35,8 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
     if (onCheckout) {
       onCheckout();
     } else {
-      console.log('Checkout clicked');
+      // Redirect to order-1 page
+      router.push('/order-1');
     }
   };
 
