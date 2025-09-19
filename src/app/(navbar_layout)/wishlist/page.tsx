@@ -138,9 +138,9 @@ const Wishlist = () => {
                     height={32} 
                     className="hover:opacity-70 transition-opacity cursor-pointer"
                   />
-                  {/* Cart Badge */}
+                  {/* Cart Badge - Dynamic count */}
                   <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                    2
+                    0
                   </div>
                 </Link>
 
@@ -153,10 +153,7 @@ const Wishlist = () => {
                     height={32} 
                     className="hover:opacity-70 transition-opacity cursor-pointer"
                   />
-                  {/* Notification Badge */}
-                  <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                    3
-                  </div>
+                  {/* Notification Badge - Only show when there are notifications */}
                 </Link>
               </div>
             )}
