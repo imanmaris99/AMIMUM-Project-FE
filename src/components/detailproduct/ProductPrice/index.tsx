@@ -150,30 +150,45 @@ const ProductPrice = ({
             {!isSticky && (
               <p className="text-gray-700 font-semibold text-sm mb-2">Harga Produk :</p>
             )}
-            {hasDiscount ? (
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 justify-center">
-                  <span className="bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
-                    -{discountPercentage}%
-                  </span>
-                  <span className="text-gray-400 line-through text-sm">
-                    Rp {originalPrice?.toLocaleString()}
-                  </span>
-                </div>
-                <p className={`font-bold text-green-600 ${isSticky ? 'text-lg' : 'text-xl'} text-center`}>
-                  Rp {discountedPrice?.toLocaleString()}
-                </p>
-                {!isSticky && (
-                  <p className="text-xs text-gray-500">
-                    Hemat Rp {savings.toLocaleString()}
+            {isSticky && datavariant && (
+              <p className="text-gray-600 text-xs mb-1">Harga Terpilih</p>
+            )}
+            {isSticky && !datavariant && (
+              <p className="text-gray-500 text-xs mb-1">Pilih varian untuk melihat harga</p>
+            )}
+            
+            {/* Show price only when variant is selected */}
+            {datavariant ? (
+              hasDiscount ? (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 justify-center">
+                    <span className="bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
+                      -{discountPercentage}%
+                    </span>
+                    <span className="text-gray-400 line-through text-sm">
+                      Rp {originalPrice?.toLocaleString()}
+                    </span>
+                  </div>
+                  <p className={`font-bold text-green-600 ${isSticky ? 'text-lg' : 'text-xl'} text-center`}>
+                    Rp {discountedPrice?.toLocaleString()}
                   </p>
-                )}
-              </div>
+                  {!isSticky && (
+                    <p className="text-xs text-gray-500">
+                      Hemat Rp {savings.toLocaleString()}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <p className={`font-bold text-gray-900 ${isSticky ? 'text-lg' : 'text-xl'} ${isSticky ? 'text-center' : ''}`}>
+                    Rp {data?.price?.toLocaleString()}
+                  </p>
+                </div>
+              )
             ) : (
-              <div>
-                <p className={`font-bold text-gray-900 ${isSticky ? 'text-lg' : 'text-xl'} ${isSticky ? 'text-center' : ''}`}>
-                  Rp {data?.price?.toLocaleString()}
-                </p>
+              /* Show placeholder when no variant selected */
+              <div className="text-center">
+                <p className="text-gray-400 text-sm">-</p>
               </div>
             )}
           </div>
@@ -186,6 +201,8 @@ const ProductPrice = ({
               className={`${
                 isItemInCart 
                   ? "bg-green-600 hover:bg-green-700" 
+                  : !datavariant
+                  ? "bg-gray-400 hover:bg-gray-400"
                   : "bg-[#006A47] hover:bg-[#005A3C]"
               } text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ${
                 isSticky ? 'px-4 py-2 text-sm w-full' : 'px-4 py-2'
@@ -198,6 +215,8 @@ const ProductPrice = ({
                 </div>
               ) : isItemInCart ? (
                 isSticky ? "✓ Di Keranjang" : "✓ Di Keranjang"
+              ) : !datavariant ? (
+                isSticky ? "Pilih Varian" : "Pilih Varian"
               ) : (
                 isSticky ? "+ Keranjang" : "+ Keranjang"
               )}
