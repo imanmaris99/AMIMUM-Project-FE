@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { DetailProductType, VariantType } from "@/types/detailProduct";
+import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 import Spinner from "@/components/ui/Spinner";
 import { useState } from "react";
 import { getProductRatingSummary } from "@/data/dummyData";
@@ -8,9 +8,10 @@ import { useCart } from "@/contexts/CartContext";
 
 interface ProductPriceProps {
   data: DetailProductType | undefined;
-  datavariant: VariantType | undefined;
+  datavariant: VariantProductType | undefined;
   isError: number;
   isLoading: boolean;
+  isSticky?: boolean;
 }
 const ProductPriceSkeleton = () => (
   <div className="p-4 flex items-center justify-between mb-20 animate-pulse">
@@ -33,6 +34,7 @@ const ProductPrice = ({
   isLoading,
   data,
   datavariant,
+  isSticky = false,
 }: ProductPriceProps) => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -127,10 +129,10 @@ const ProductPrice = ({
   const savings = hasDiscount ? Math.max(0, originalPrice - discountedPrice) : 0;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
-      <div className="p-4">
-        {/* Rating Section */}
-        {data?.id && (
+    <div className={`${isSticky ? 'shadow-lg' : 'shadow-sm'} bg-white ${isSticky ? 'rounded-none' : 'rounded-lg'}`}>
+      <div className={isSticky ? 'p-3' : 'p-4'}>
+        {/* Rating Section - Only show in non-sticky mode */}
+        {!isSticky && data?.id && (
           <RatingDisplay
             ratingData={getProductRatingSummary(data.id) || {
               avg_rating: data.avg_rating || 0,
@@ -142,71 +144,78 @@ const ProductPrice = ({
           />
         )}
 
-      {/* Price Section */}
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-gray-700 font-semibold">Harga Produk :</p>
-          {hasDiscount ? (
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <span className="bg-red-500 text-white text-sm font-semibold px-2 py-1 rounded">
-                  -{discountPercentage}%
-                </span>
-                <span className="text-gray-400 line-through text-lg">
-                  Rp {originalPrice?.toLocaleString()}
-                </span>
-              </div>
-              <p className="text-2xl font-bold text-green-600">
-                Rp {discountedPrice?.toLocaleString()}
-              </p>
-              <p className="text-sm text-gray-500">
-                Hemat Rp {savings.toLocaleString()}
-              </p>
-            </div>
-          ) : (
-            <div>
-              <p className="text-2xl font-bold text-gray-900">
-                Rp {data?.price?.toLocaleString()}
-              </p>
-            </div>
-          )}
-        </div>
-        <div className="relative">
-          <Button 
-            variant="default" 
-            onClick={handleAddToCart}
-            disabled={isAdding || !datavariant}
-            className={`${
-              isItemInCart 
-                ? "bg-green-600 hover:bg-green-700" 
-                : "bg-[#006A47] hover:bg-[#005A3C]"
-            } text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200`}
-          >
-            {isAdding ? (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Menambah...</span>
-              </div>
-            ) : isItemInCart ? (
-              "✓ Di Keranjang"
-            ) : (
-              "+ Keranjang"
+        {/* Price Section */}
+        <div className={isSticky ? "space-y-2" : "flex items-center justify-between"}>
+          <div className={isSticky ? "text-center" : "flex-1"}>
+            {!isSticky && (
+              <p className="text-gray-700 font-semibold text-sm mb-2">Harga Produk :</p>
             )}
-          </Button>
-          
-          {/* User Feedback Toast - Higher up and slightly to the left */}
-          {showFeedback && (
-            <div className="fixed top-7 left-[49%] transform -translate-x-1/2 bg-primary text-white px-4 py-2 rounded-lg shadow-lg z-50 max-w-[280px] mx-4">
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-                <span className="text-sm font-medium">Ditambahkan ke keranjang!</span>
+            {hasDiscount ? (
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 justify-center">
+                  <span className="bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
+                    -{discountPercentage}%
+                  </span>
+                  <span className="text-gray-400 line-through text-sm">
+                    Rp {originalPrice?.toLocaleString()}
+                  </span>
+                </div>
+                <p className={`font-bold text-green-600 ${isSticky ? 'text-lg' : 'text-xl'} text-center`}>
+                  Rp {discountedPrice?.toLocaleString()}
+                </p>
+                {!isSticky && (
+                  <p className="text-xs text-gray-500">
+                    Hemat Rp {savings.toLocaleString()}
+                  </p>
+                )}
               </div>
-            </div>
-          )}
+            ) : (
+              <div>
+                <p className={`font-bold text-gray-900 ${isSticky ? 'text-lg' : 'text-xl'} ${isSticky ? 'text-center' : ''}`}>
+                  Rp {data?.price?.toLocaleString()}
+                </p>
+              </div>
+            )}
+          </div>
+          
+          <div className={`relative ${isSticky ? '' : 'ml-4'}`}>
+            <Button 
+              variant="default" 
+              onClick={handleAddToCart}
+              disabled={isAdding || !datavariant}
+              className={`${
+                isItemInCart 
+                  ? "bg-green-600 hover:bg-green-700" 
+                  : "bg-[#006A47] hover:bg-[#005A3C]"
+              } text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ${
+                isSticky ? 'px-4 py-2 text-sm w-full' : 'px-4 py-2'
+              }`}
+            >
+              {isAdding ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>{isSticky ? 'Menambah...' : 'Menambah...'}</span>
+                </div>
+              ) : isItemInCart ? (
+                isSticky ? "✓ Di Keranjang" : "✓ Di Keranjang"
+              ) : (
+                isSticky ? "+ Keranjang" : "+ Keranjang"
+              )}
+            </Button>
+            
+            {/* User Feedback Toast */}
+            {showFeedback && (
+              <div className="fixed top-7 left-[49%] transform -translate-x-1/2 bg-primary text-white px-4 py-2 rounded-lg shadow-lg z-50 max-w-[280px] mx-4">
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-sm font-medium">Ditambahkan ke keranjang!</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );

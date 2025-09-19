@@ -16,7 +16,7 @@ import { validateDetailProductData } from "@/utils/dataValidation";
 export default function DetailProduct() {
   const params = useParams();
   const router = useRouter();
-  const productId = params.productId as string;
+  const productId = params?.productId as string;
   
   const [detailProduct, setDetailProduct] = useState<DetailProductType | undefined>(undefined);
   const [selectedVariant, setSelectedVariant] = useState<VariantProductType | undefined>(undefined);
@@ -96,23 +96,35 @@ export default function DetailProduct() {
           </div>
         </div>
         
-        {/* Content - Same structure as other pages */}
-        <div className="px-4 py-6 pb-6">
+        {/* Content - Optimized layout with proper spacing */}
+        <div className="px-4 py-6 pb-40">
           <div className="max-w-sm mx-auto space-y-4">
             <ProductImage detailProduct={detailProduct} />
             <TitleProduct isLoading={isLoading} isError={isError} data={detailProduct} />
+            
+            {/* Variants Selection */}
             <ProductVariants 
               product={detailProduct} 
               variants={detailProduct?.variants_list ?? []} 
               onVariantChange={handleVariantChange}
+              selectedVariant={selectedVariant}
+              showQuickAdd={false}
             />
+            
             <ProductInformation isLoading={isLoading} isError={isError} datavariant={selectedVariant} />
             <ProductDescription isLoading={isLoading} isError={isError} data={detailProduct} />
+          </div>
+        </div>
+
+        {/* Sticky Cart Section - Fixed positioning and z-index */}
+        <div className="fixed bottom-14 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-30" style={{ maxWidth: '440px', margin: '0 auto' }}>
+          <div className="px-4 py-3">
             <ProductPrice 
               isLoading={isLoading} 
               isError={isError} 
               data={detailProduct} 
-              datavariant={selectedVariant} 
+              datavariant={selectedVariant}
+              isSticky={true}
             />
           </div>
         </div>

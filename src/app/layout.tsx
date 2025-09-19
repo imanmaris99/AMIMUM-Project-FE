@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/contexts/CartContext";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "AmImUm",
@@ -21,6 +22,16 @@ export default function RootLayout({
       <body className="antialiased font-jakarta">
         <CartProvider>
           {children}
+          <Toaster 
+            position="top-center"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#363636',
+                color: '#fff',
+              },
+            }}
+          />
         </CartProvider>
       </body>
     </html>
