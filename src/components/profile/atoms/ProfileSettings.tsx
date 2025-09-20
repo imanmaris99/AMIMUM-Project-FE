@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 import LogoutModal from "../molecules/LogoutModal";
 
 const ProfileSettings: React.FC = () => {
@@ -27,14 +28,7 @@ const ProfileSettings: React.FC = () => {
     localStorage.removeItem("userEmail");
     
     // Show success message
-    const successMessage = document.createElement("div");
-    successMessage.className = "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-primary text-white px-4 py-2 rounded-lg shadow-lg";
-    successMessage.textContent = "Berhasil keluar! Anda masih bisa menjelajahi toko.";
-    document.body.appendChild(successMessage);
-    
-    setTimeout(() => {
-      document.body.removeChild(successMessage);
-    }, 3000);
+    toast.success("Berhasil keluar! Anda masih bisa menjelajahi toko.");
     
     // Close modal and reload page
     setIsLogoutModalOpen(false);

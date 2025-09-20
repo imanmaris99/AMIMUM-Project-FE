@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { GoChevronLeft } from "react-icons/go";
+import { toast } from "react-hot-toast";
 import EditAddressModal from "../../../components/profile/molecules/EditAddressModal";
 import AddAddressModal from "../../../components/profile/molecules/AddAddressModal";
 
@@ -41,14 +42,7 @@ const SavedAddressesPage: React.FC = () => {
     console.log("Address data saved:", addressData);
     
     // Show success message
-    const successMessage = document.createElement("div");
-    successMessage.className = "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg";
-    successMessage.textContent = "Alamat berhasil diperbarui!";
-    document.body.appendChild(successMessage);
-    
-    setTimeout(() => {
-      document.body.removeChild(successMessage);
-    }, 3000);
+    toast.success("Alamat berhasil diperbarui!");
   };
 
   const handleAddAddress = () => {
@@ -72,14 +66,7 @@ const SavedAddressesPage: React.FC = () => {
     console.log("New address data saved:", addressData);
     
     // Show success message
-    const successMessage = document.createElement("div");
-    successMessage.className = "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg";
-    successMessage.textContent = "Alamat baru berhasil ditambahkan!";
-    document.body.appendChild(successMessage);
-    
-    setTimeout(() => {
-      document.body.removeChild(successMessage);
-    }, 3000);
+    toast.success("Alamat baru berhasil ditambahkan!");
   };
 
   return (

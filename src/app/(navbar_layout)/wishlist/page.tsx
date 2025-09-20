@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import WishlistList from "@/components/wishlist/molecules/WishlistList";
 import { WishlistItem } from "@/types/wishlist";
 import { useWishlist } from "@/contexts/WishlistContext";
+import LoginProtection from "@/components/common/LoginProtection";
 
 const Wishlist = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -64,7 +65,7 @@ const Wishlist = () => {
   };
 
   return (
-    <>
+    <LoginProtection>
       {/* Logout Success Message */}
       {showLogoutMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
@@ -196,7 +197,7 @@ const Wishlist = () => {
           </div>
         </footer>
       </div>
-    </>
+    </LoginProtection>
   );
 };
 

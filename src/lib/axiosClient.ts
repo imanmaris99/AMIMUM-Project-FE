@@ -1,5 +1,5 @@
 import axios from "axios";
-import Swal from "sweetalert2";
+import { toast } from "react-hot-toast";
 
 const axiosClient = axios.create({
   baseURL: "https://amimumprojectbe-production.up.railway.app",
@@ -30,45 +30,19 @@ axiosClient.interceptors.response.use(
         switch (status) {
             case 401:
                 localStorage.removeItem("access_token");
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Sesi Berakhir',
-                    text: 'Silakan login kembali untuk melanjutkan.',
-                    confirmButtonText: 'Login',
-                    customClass: {
-                        popup: 'swal-mobile-popup'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.replace("/login");
-                    }
-                });
+                toast.error("Sesi berakhir. Silakan login kembali untuk melanjutkan.");
+                setTimeout(() => {
+                    window.location.replace("/login");
+                }, 2000);
                 break;
             case 403:
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Tidak Dapat Mengakses',
-                    text: 'Anda tidak memiliki izin untuk mengakses sumber daya ini.',
-                    confirmButtonText: 'Kembali ke Beranda',
-                    customClass: {
-                        popup: 'swal-mobile-popup'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.replace("/");
-                    }
-                });
+                toast.error("Anda tidak memiliki izin untuk mengakses sumber daya ini.");
+                setTimeout(() => {
+                    window.location.replace("/");
+                }, 2000);
                 break;
             case 500:
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Kesalahan Server',
-                    text: 'Terjadi masalah pada server kami. Mohon coba lagi nanti.',
-                    confirmButtonText: 'OK',
-                    customClass: {
-                        popup: 'swal-mobile-popup'
-                    }
-                });
+                toast.error("Terjadi masalah pada server kami. Mohon coba lagi nanti.");
                 break;
         }
     }

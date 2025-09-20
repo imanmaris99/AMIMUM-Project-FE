@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 import Spinner from "@/components/ui/Spinner";
+import ButtonSpinner from "@/components/ui/ButtonSpinner";
 import { useState } from "react";
 import { getProductRatingSummary } from "@/data/dummyData";
 import RatingDisplay from "@/components/rating/RatingDisplay";
@@ -91,6 +92,15 @@ const ProductPrice = ({
     
     if (!data || !datavariant) {
       console.warn("❌ ProductPrice: Missing data or variant");
+      return;
+    }
+    
+    // Check if user is logged in
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    
+    if (!isLoggedIn) {
+      toast.error('Silakan login terlebih dahulu untuk melanjutkan pembelian');
+      router.push('/login');
       return;
     }
     
@@ -260,10 +270,7 @@ const ProductPrice = ({
                   } text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 px-4 py-2 text-sm w-full`}
                 >
                   {isAdding ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Menambah...</span>
-                    </div>
+                    <ButtonSpinner size="sm" color="white" text="Menambah..." />
                   ) : isItemInCart ? (
                     "✓ Di Keranjang"
                   ) : !datavariant ? (
@@ -280,10 +287,7 @@ const ProductPrice = ({
                   className="w-full px-4 py-2 text-sm border-primary text-primary hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 >
                   {isBuying ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                      <span>Memproses...</span>
-                    </div>
+                    <ButtonSpinner size="sm" color="primary" text="Memproses..." />
                   ) : !datavariant ? (
                     "Pilih Varian"
                   ) : (

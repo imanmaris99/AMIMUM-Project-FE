@@ -3,6 +3,7 @@
 import React, { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
+import { toast } from 'react-hot-toast';
 import rupiahFormater from '@/utils/rupiahFormater';
 
 interface CartFooterProps {
@@ -32,6 +33,15 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
   }, [cartItems, allItemsSelected, updateActiveStatus]);
 
   const handleCheckout = () => {
+    // Check if user is logged in
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    
+    if (!isLoggedIn) {
+      toast.error('Silakan login terlebih dahulu untuk melanjutkan checkout');
+      router.push('/login');
+      return;
+    }
+    
     if (onCheckout) {
       onCheckout();
     } else {

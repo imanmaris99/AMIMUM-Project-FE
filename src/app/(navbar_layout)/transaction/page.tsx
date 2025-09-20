@@ -8,6 +8,7 @@ import TransactionList from "@/components/transaction/molecules/TransactionList"
 import { Transaction } from "@/types/transaction";
 import { useTransaction } from "@/contexts/TransactionContext";
 import { toast } from "react-hot-toast";
+import LoginProtection from "@/components/common/LoginProtection";
 
 const TransactionPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -75,7 +76,7 @@ const TransactionPage = () => {
   };
 
   return (
-    <>
+    <LoginProtection>
       {/* Logout Success Message */}
       {showLogoutMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
@@ -211,7 +212,7 @@ const TransactionPage = () => {
           </div>
         </footer>
       </div>
-    </>
+    </LoginProtection>
   );
 };
 

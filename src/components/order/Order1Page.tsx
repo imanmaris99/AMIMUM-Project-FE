@@ -6,6 +6,7 @@ import { GoChevronLeft, GoLocation, GoPackage, GoCreditCard, GoPlus } from 'reac
 import { IoCheckmarkCircle, IoWarning } from 'react-icons/io5';
 import { toast } from 'react-hot-toast';
 import rupiahFormater from '@/utils/rupiahFormater';
+import ButtonSpinner from '@/components/ui/ButtonSpinner';
 import { useCart, CartItemType } from '@/contexts/CartContext';
 import { useTransaction } from '@/contexts/TransactionContext';
 import CourierSelector from './CourierSelector';
@@ -618,10 +619,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             }`}
           >
             {isLoading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                Memproses...
-              </div>
+              <ButtonSpinner size="md" color="white" text="Memproses..." />
             ) : (
               `Bayar ${rupiahFormater(totals.total)}`
             )}

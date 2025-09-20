@@ -13,7 +13,7 @@ import { PhoneInput } from "@/components/ui/phone-input";
 import { postRegister } from "@/API/register";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/ui/Spinner";
 import React from "react";
@@ -208,35 +208,6 @@ const RegisterForm = () => {
                   "Submit"
                 )}
               </Button>
-               <Toaster
-                position="bottom-center"
-                reverseOrder={false}
-                toastOptions={{
-                  success: {
-                    duration: 5000,
-                    style: {
-                      background: 'rgb(134 239 172)',
-                      color:'black',
-                      opacity:"0.5"
-                    },
-                    iconTheme: {
-                      primary: 'green',
-                      secondary: 'white',
-                    },
-                  },
-                  error:{
-                    style: {
-                      background: 'rgb(252 165 165)',
-                      color:'black',
-                      opacity:"0.5"
-                    },
-                    iconTheme: {
-                      primary: 'red',
-                      secondary: 'white',
-                    },
-                  }
-                }}
-                />
               </div>
             </form>
           </Form>

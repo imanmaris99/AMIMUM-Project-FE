@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 import { ProfileHeader } from "@/components/profile";
 import { ProfileInfo } from "@/components/profile";
 import { ProfileSettings } from "@/components/profile";
+import LoginProtection from "@/components/common/LoginProtection";
 
 const ProfilePage: React.FC = () => {
   const router = useRouter();
@@ -26,19 +28,13 @@ const ProfilePage: React.FC = () => {
     setIsLoggedIn(false);
     setUserEmail("");
     
-    // Show success message
-    const successMessage = document.createElement("div");
-    successMessage.className = "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg";
-    successMessage.textContent = "Berhasil keluar! Anda masih bisa menjelajahi toko.";
-    document.body.appendChild(successMessage);
-    
-    setTimeout(() => {
-      document.body.removeChild(successMessage);
-    }, 3000);
+    // Show success message using toast
+    toast.success("Berhasil keluar! Anda masih bisa menjelajahi toko.");
   };
 
   return (
-    <div className="h-screen bg-[#FAFAFA] overflow-hidden flex flex-col">
+    <LoginProtection>
+      <div className="h-screen bg-[#FAFAFA] overflow-hidden flex flex-col">
       {/* Header */}
       <ProfileHeader 
         isLoggedIn={isLoggedIn}
@@ -67,6 +63,7 @@ const ProfilePage: React.FC = () => {
         </div>
       </footer>
     </div>
+    </LoginProtection>
   );
 };
 

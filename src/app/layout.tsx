@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/contexts/CartContext";
 import { TransactionProvider } from "@/contexts/TransactionContext";
-import { Toaster } from "react-hot-toast";
+import ToastProvider from "@/components/ui/ToastProvider";
 
 export const metadata: Metadata = {
   title: "AmImUm",
@@ -24,16 +24,7 @@ export default function RootLayout({
         <CartProvider>
           <TransactionProvider>
             {children}
-            <Toaster 
-              position="top-center"
-              toastOptions={{
-                duration: 3000,
-                style: {
-                  background: '#363636',
-                  color: '#fff',
-                },
-              }}
-            />
+            <ToastProvider />
           </TransactionProvider>
         </CartProvider>
       </body>

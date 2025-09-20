@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { toast } from "react-hot-toast";
 import EditProfileModal from "../molecules/EditProfileModal";
 import ChangePhotoModal from "../molecules/ChangePhotoModal";
 
@@ -22,14 +23,7 @@ const ProfileInfo: React.FC = () => {
     console.log("Profile data saved:", profileData);
     
     // Show success message
-    const successMessage = document.createElement("div");
-    successMessage.className = "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-primary text-white px-4 py-2 rounded-lg shadow-lg";
-    successMessage.textContent = "Profile berhasil diperbarui!";
-    document.body.appendChild(successMessage);
-    
-    setTimeout(() => {
-      document.body.removeChild(successMessage);
-    }, 3000);
+    toast.success("Profile berhasil diperbarui!");
   };
 
   const handleChangePhotoClick = () => {
@@ -45,14 +39,7 @@ const ProfileInfo: React.FC = () => {
     console.log("Photo uploaded:", file);
     
     // Show success message
-    const successMessage = document.createElement("div");
-    successMessage.className = "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-primary text-white px-4 py-2 rounded-lg shadow-lg";
-    successMessage.textContent = "Foto berhasil diunggah!";
-    document.body.appendChild(successMessage);
-    
-    setTimeout(() => {
-      document.body.removeChild(successMessage);
-    }, 3000);
+    toast.success("Foto berhasil diunggah!");
   };
 
   return (
