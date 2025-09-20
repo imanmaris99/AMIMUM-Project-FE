@@ -136,6 +136,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
     console.log('🧹 TransactionContext: All transactions cleared');
   }, []);
 
+
   const value: TransactionContextType = {
     transactions,
     addTransaction,
