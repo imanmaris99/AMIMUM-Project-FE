@@ -1,25 +1,54 @@
-// Types untuk Shipment dengan data dummy
+// Types untuk Shipment sesuai dengan backend DTOs
 export interface ShipmentAddress {
   id: number;
   name: string;
-  phone: string;
-  address: string;
-  city: string;
-  cityId: number;
-  state: string;
-  country: string;
-  zipCode: string;
-  isActive: boolean;
-  createdAt: string;
+  phone: string; // Format: +62xxxxxxxxxx
+  address?: string;
+  city?: string;
+  city_id?: number;
+  state?: string;
+  country?: string;
+  zip_code?: number;
+  created_at: string;
+}
+
+// Untuk create address
+export interface ShipmentAddressCreate {
+  name: string;
+  phone: string; // Format: +62xxxxxxxxxx
+  address?: string;
+  city?: string;
+  city_id?: number;
+  state?: string;
+  country?: string;
+  zip_code?: number;
 }
 
 export interface Courier {
   id: number;
-  courierName: string;
-  serviceType: string;
+  courier_name: string; // 'jne', 'pos', 'tiki'
   weight: number;
-  cost: number;
-  estimatedDelivery: string;
+  phone_number?: string;
+  service_type?: string;
+  length?: number;
+  width?: number;
+  height?: number;
+  cost?: number;
+  estimated_delivery?: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+// Untuk create courier
+export interface CourierCreate {
+  courier_name: 'jne' | 'pos' | 'tiki';
+  weight?: number;
+  length?: number;
+  width?: number;
+  height?: number;
+  service_type?: string;
+  cost?: number;
+  estimated_delivery?: string;
 }
 
 // New types for hierarchical courier selection
@@ -43,8 +72,30 @@ export interface ShipmentData {
   id: string;
   address: ShipmentAddress;
   courier: Courier;
-  isActive: boolean;
-  createdAt: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+// Untuk create shipment
+export interface ShipmentCreate {
+  address: ShipmentAddressCreate;
+  courier: CourierCreate;
+}
+
+// Response DTOs sesuai backend
+export interface ShipmentInfo {
+  shipment_id: string;
+  courier_id: number;
+  address_id: number;
+  code_tracking: string;
+  created_at: string;
+  is_active: boolean;
+}
+
+export interface ShipmentResponse {
+  status_code: number;
+  message: string;
+  data: ShipmentInfo;
 }
 
 export interface SenderFormData {

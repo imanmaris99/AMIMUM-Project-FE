@@ -7,8 +7,10 @@ import { IoCheckmarkCircle, IoWarning } from 'react-icons/io5';
 import { toast } from 'react-hot-toast';
 import rupiahFormater from '@/utils/rupiahFormater';
 import { useCart, CartItemType } from '@/contexts/CartContext';
+import { useTransaction } from '@/contexts/TransactionContext';
 import CourierSelector from './CourierSelector';
-import { courierCompanies } from '@/data/shipmentDummyData';
+import AddressSelector from './AddressSelector';
+import { courierCompanies, dummyShipments } from '@/data/shipmentDummyData';
 
 interface Order1PageProps {
   onBack?: () => void;
@@ -19,16 +21,19 @@ interface Order1PageProps {
 // Removed local interfaces - now using CourierCompany and CourierService from types/shipment.ts
 
 interface AddressInfo {
+  id: string;
   name: string;
   phone: string;
   address: string;
   city: string;
   postal_code: string;
+  isDefault?: boolean;
 }
 
 const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const router = useRouter();
   const { cartItems, totalPrices, clearCart } = useCart();
+  const { addTransaction } = useTransaction();
   
   // State management
   const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
@@ -37,19 +42,41 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const [selectedCourierService, setSelectedCourierService] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
-  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [showAddressSelector, setShowAddressSelector] = useState(false);
   
-  // Address state
-  const [addresses, setAddresses] = useState<AddressInfo[]>([
-    {
-      name: "John Doe",
-      phone: "+62 812-3456-7890",
-      address: "Jl. Sudirman No. 123, RT 01/RW 02, Kelurahan Menteng",
-      city: "Jakarta Pusat",
-      postal_code: "10310"
-    }
-  ]);
-  const [selectedAddress, setSelectedAddress] = useState<AddressInfo | null>(addresses[0]);
+  // Additional notes state
+  const [additionalNotes, setAdditionalNotes] = useState<string>('');
+  
+  // Address state - using shipment data
+  const [addresses, setAddresses] = useState<AddressInfo[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<AddressInfo | null>(null);
+
+  // Load addresses from shipment data
+  useEffect(() => {
+    const loadAddresses = () => {
+      const shipmentAddresses: AddressInfo[] = dummyShipments.map(shipment => ({
+        id: shipment.address.id.toString(),
+        name: shipment.address.name,
+        phone: shipment.address.phone,
+        address: shipment.address.address || '',
+        city: shipment.address.city || '',
+        postal_code: shipment.address.zip_code?.toString() || '',
+        isDefault: shipment.is_active
+      }));
+      
+      setAddresses(shipmentAddresses);
+      
+      // Set default address (first active one)
+      const defaultAddress = shipmentAddresses.find(addr => addr.isDefault);
+      if (defaultAddress) {
+        setSelectedAddress(defaultAddress);
+      } else if (shipmentAddresses.length > 0) {
+        setSelectedAddress(shipmentAddresses[0]);
+      }
+    };
+
+    loadAddresses();
+  }, []);
 
   // Get selected courier service data for calculations
   const selectedCourierData = courierCompanies
@@ -116,7 +143,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       // Create order data based on backend DTOs
       const orderData = {
         delivery_type: deliveryMethod,
-        notes: deliveryMethod === 'pickup' ? 'Ambil di toko' : undefined,
+        notes: additionalNotes || (deliveryMethod === 'pickup' ? 'Ambil di toko' : undefined),
         shipment_id: deliveryMethod === 'delivery' ? selectedCourierService : undefined,
         items: cartItems.map((item: CartItemType) => ({
           product_id: item.product_id,
@@ -127,6 +154,11 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       
       console.log('Order data:', orderData);
       
+      // Add transaction to context
+      console.log('📝 Order1Page: Adding transaction...');
+      const newTransaction = addTransaction(orderData, cartItems);
+      console.log('📝 Order1Page: Transaction added:', newTransaction);
+      
       // Clear cart after successful payment
       console.log('🧹 Order1Page: Clearing cart after payment...');
       clearCart();
@@ -134,8 +166,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       
       toast.success('Pesanan berhasil dibuat! Keranjang telah dikosongkan.');
       
-      // Navigate to payment or order confirmation
-      // router.push('/payment');
+      // Navigate to order confirmation page
+      setTimeout(() => {
+        router.push('/order-confirmation');
+      }, 2000); // Wait 2 seconds to show success message
       
     } catch (error) {
       console.error('Payment error:', error);
@@ -146,7 +180,20 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   };
 
   const handleAddAddress = () => {
-    setShowAddressModal(true);
+    // Buka address selector untuk memilih dari alamat yang ada
+    setShowAddressSelector(true);
+  };
+
+  const handleAddressSelect = (address: AddressInfo) => {
+    setSelectedAddress(address);
+    setShowAddressSelector(false);
+    clearError('address');
+  };
+
+  const handleAddNewAddress = () => {
+    // Redirect ke page shipment untuk menambah alamat baru
+    setShowAddressSelector(false);
+    router.push('/shipment/create');
   };
 
   return (
@@ -293,7 +340,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                 className="text-primary text-sm font-medium hover:underline flex items-center"
               >
                 <GoPlus className="w-4 h-4 mr-1" />
-                Tambah
+                Tambah Alamat
               </button>
             </div>
             
@@ -400,6 +447,51 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
           </div>
         )}
 
+        {/* Additional Notes */}
+        <div className="px-4 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Catatan Tambahan</h2>
+          <div className="space-y-3">
+            <div>
+              <label htmlFor="additionalNotes" className="block text-sm font-medium text-gray-700 mb-2">
+                Pesan untuk penjual (opsional)
+              </label>
+              <textarea
+                id="additionalNotes"
+                value={additionalNotes}
+                onChange={(e) => {
+                  setAdditionalNotes(e.target.value);
+                  clearError('notes');
+                }}
+                placeholder="Contoh: Ambil jam 3 sore, tolong bungkus rapi, dll."
+                className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none transition-colors"
+                rows={3}
+                maxLength={500}
+              />
+              <div className="flex justify-between items-center mt-2">
+                <p className="text-xs text-gray-500">
+                  Maksimal 500 karakter
+                </p>
+                <span className="text-xs text-gray-400">
+                  {additionalNotes.length}/500
+                </span>
+              </div>
+            </div>
+            
+            {/* Example notes for better UX */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-sm text-blue-800 font-medium mb-2">
+                💡 Contoh catatan yang berguna:
+              </p>
+              <ul className="text-xs text-blue-700 space-y-1">
+                <li>• "Ambil jam 3 sore"</li>
+                <li>• "Tolong bungkus rapi"</li>
+                <li>• "Kirim ke alamat kantor"</li>
+                <li>• "Hubungi sebelum kirim"</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
         {/* Payment Summary */}
         <div className="px-4 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Ringkasan Pembayaran</h2>
@@ -481,6 +573,16 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
           )}
         </div>
       </div>
+
+      {/* Address Selector Modal */}
+      <AddressSelector
+        addresses={addresses}
+        selectedAddress={selectedAddress}
+        onAddressSelect={handleAddressSelect}
+        onAddNew={handleAddNewAddress}
+        onClose={() => setShowAddressSelector(false)}
+        isOpen={showAddressSelector}
+      />
     </div>
   );
 };

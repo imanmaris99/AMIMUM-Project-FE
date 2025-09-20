@@ -6,14 +6,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import TransactionList from "@/components/transaction/molecules/TransactionList";
 import { Transaction } from "@/types/transaction";
-import { dummyTransactionData } from "@/data/transactionDummyData";
+import { useTransaction } from "@/contexts/TransactionContext";
 
 const TransactionPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [showLogoutMessage, setShowLogoutMessage] = useState(false);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [totalTransactions, setTotalTransactions] = useState(0);
+  const { transactions } = useTransaction();
+  const totalTransactions = transactions.length;
 
   useEffect(() => {
     // Check if user is logged in (dummy implementation)
@@ -37,12 +37,7 @@ const TransactionPage = () => {
     };
   }, []);
 
-  // Load transaction data
-  useEffect(() => {
-    // Simulate loading transaction data
-    setTransactions(dummyTransactionData.transactions);
-    setTotalTransactions(dummyTransactionData.totalTransactions);
-  }, []);
+  // Transactions are now managed by TransactionContext
 
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');

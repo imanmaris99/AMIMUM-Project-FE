@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/contexts/CartContext";
+import { TransactionProvider } from "@/contexts/TransactionContext";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
@@ -21,17 +22,19 @@ export default function RootLayout({
       </head>
       <body className="antialiased font-jakarta">
         <CartProvider>
-          {children}
-          <Toaster 
-            position="top-center"
-            toastOptions={{
-              duration: 3000,
-              style: {
-                background: '#363636',
-                color: '#fff',
-              },
-            }}
-          />
+          <TransactionProvider>
+            {children}
+            <Toaster 
+              position="top-center"
+              toastOptions={{
+                duration: 3000,
+                style: {
+                  background: '#363636',
+                  color: '#fff',
+                },
+              }}
+            />
+          </TransactionProvider>
         </CartProvider>
       </body>
     </html>

@@ -9,6 +9,10 @@ export interface Transaction {
   items: TransactionItem[];
   createdAt: string;
   updatedAt: string;
+  // Additional order data
+  deliveryType?: string;
+  notes?: string;
+  shipmentId?: string;
 }
 
 export interface TransactionItem {

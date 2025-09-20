@@ -1,6 +1,6 @@
 import { ShipmentAddress, Courier, ShipmentData, CourierCompany, CourierService } from '@/types/shipment';
 
-// Data dummy untuk alamat pengiriman
+// Data dummy untuk alamat pengiriman sesuai backend DTOs
 export const dummyShipmentAddresses: ShipmentAddress[] = [
   {
     id: 1,
@@ -8,12 +8,11 @@ export const dummyShipmentAddresses: ShipmentAddress[] = [
     phone: "+6281234567890",
     address: "Jalan Patriot No. 15, Kecamatan Bayat",
     city: "Wonogiri",
-    cityId: 123,
+    city_id: 123,
     state: "Jawa Tengah",
     country: "Indonesia",
-    zipCode: "59191",
-    isActive: true, // Hanya 1 yang aktif sebagai default
-    createdAt: "2024-01-15T10:30:00Z"
+    zip_code: 59191,
+    created_at: "2024-01-15T10:30:00Z"
   },
   {
     id: 2,
@@ -21,12 +20,11 @@ export const dummyShipmentAddresses: ShipmentAddress[] = [
     phone: "+6282345678901",
     address: "Jl. Sudirman No. 45, Kelurahan Menteng",
     city: "Jakarta Pusat",
-    cityId: 124,
+    city_id: 124,
     state: "DKI Jakarta",
     country: "Indonesia",
-    zipCode: "10310",
-    isActive: false,
-    createdAt: "2024-01-20T14:15:00Z"
+    zip_code: 10310,
+    created_at: "2024-01-20T14:15:00Z"
   },
   {
     id: 3,
@@ -34,64 +32,75 @@ export const dummyShipmentAddresses: ShipmentAddress[] = [
     phone: "+6283456789012",
     address: "Perumahan Griya Asri Blok A-12",
     city: "Surabaya",
-    cityId: 125,
+    city_id: 125,
     state: "Jawa Timur",
     country: "Indonesia",
-    zipCode: "60217",
-    isActive: false, // Diubah ke false
-    createdAt: "2024-02-01T09:45:00Z"
+    zip_code: 60217,
+    created_at: "2024-02-01T09:45:00Z"
   }
 ];
 
-// Data dummy untuk kurir (legacy format)
+// Data dummy untuk kurir sesuai backend DTOs
 export const dummyCouriers: Courier[] = [
   {
     id: 1,
-    courierName: "JNE",
-    serviceType: "REG",
+    courier_name: "jne",
     weight: 1000,
+    service_type: "REG",
     cost: 15000,
-    estimatedDelivery: "1-2 hari"
+    estimated_delivery: "1-2 hari",
+    is_active: true,
+    created_at: "2024-01-15T10:30:00Z"
   },
   {
     id: 2,
-    courierName: "JNE",
-    serviceType: "EXPRESS",
+    courier_name: "jne",
     weight: 1000,
+    service_type: "EXPRESS",
     cost: 25000,
-    estimatedDelivery: "1 hari"
+    estimated_delivery: "1 hari",
+    is_active: true,
+    created_at: "2024-01-15T10:30:00Z"
   },
   {
     id: 3,
-    courierName: "J&T",
-    serviceType: "REG",
+    courier_name: "pos",
     weight: 1000,
+    service_type: "REG",
     cost: 12000,
-    estimatedDelivery: "2-3 hari"
+    estimated_delivery: "2-3 hari",
+    is_active: true,
+    created_at: "2024-01-15T10:30:00Z"
   },
   {
     id: 4,
-    courierName: "J&T",
-    serviceType: "EXPRESS",
+    courier_name: "pos",
     weight: 1000,
+    service_type: "EXPRESS",
     cost: 20000,
-    estimatedDelivery: "1-2 hari"
+    estimated_delivery: "1-2 hari",
+    is_active: true,
+    created_at: "2024-01-15T10:30:00Z"
   },
   {
     id: 5,
-    courierName: "Si Cepat",
-    serviceType: "REG",
+    courier_name: "tiki",
     weight: 1000,
+    service_type: "REG",
     cost: 13000,
-    estimatedDelivery: "2-3 hari"
+    estimated_delivery: "2-3 hari",
+    is_active: true,
+    created_at: "2024-01-15T10:30:00Z"
   },
   {
     id: 6,
-    courierName: "Si Cepat",
-    serviceType: "EXPRESS",
+    courier_name: "tiki",
     weight: 1000,
+    service_type: "EXPRESS",
     cost: 22000,
-    estimatedDelivery: "1 hari"
+    estimated_delivery: "1 hari",
+    is_active: true,
+    created_at: "2024-01-15T10:30:00Z"
   }
 ];
 
@@ -199,28 +208,28 @@ export const courierCompanies: CourierCompany[] = [
   }
 ];
 
-// Data dummy untuk shipment lengkap
+// Data dummy untuk shipment lengkap sesuai backend DTOs
 export const dummyShipments: ShipmentData[] = [
   {
     id: "ship-001",
     address: dummyShipmentAddresses[0],
     courier: dummyCouriers[0],
-    isActive: true, // Hanya 1 yang aktif sebagai default
-    createdAt: "2024-01-15T10:30:00Z"
+    is_active: true,
+    created_at: "2024-01-15T10:30:00Z"
   },
   {
     id: "ship-002",
     address: dummyShipmentAddresses[1],
     courier: dummyCouriers[2],
-    isActive: false,
-    createdAt: "2024-01-20T14:15:00Z"
+    is_active: false,
+    created_at: "2024-01-20T14:15:00Z"
   },
   {
     id: "ship-003",
     address: dummyShipmentAddresses[2],
     courier: dummyCouriers[4],
-    isActive: false, // Diubah ke false
-    createdAt: "2024-02-01T09:45:00Z"
+    is_active: false,
+    created_at: "2024-02-01T09:45:00Z"
   }
 ];
 
