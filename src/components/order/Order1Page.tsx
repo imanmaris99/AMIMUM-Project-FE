@@ -35,6 +35,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const { cartItems, totalPrices, clearCart } = useCart();
   const { addTransaction } = useTransaction();
   
+  // Direct checkout state
+  const [isDirectCheckout, setIsDirectCheckout] = useState(false);
+  const [directCheckoutItem, setDirectCheckoutItem] = useState<CartItemType | null>(null);
+  
   // State management
   const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
   // Courier state - using hierarchical selection
@@ -78,30 +82,81 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     loadAddresses();
   }, []);
 
+  // Handle direct checkout
+  useEffect(() => {
+    const checkDirectCheckout = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isDirect = urlParams.get('direct') === 'true';
+      
+      if (isDirect) {
+        const directItem = localStorage.getItem('directCheckoutItem');
+        if (directItem) {
+          try {
+            const parsedItem = JSON.parse(directItem);
+            setDirectCheckoutItem(parsedItem);
+            setIsDirectCheckout(true);
+            console.log('🚀 Order1Page: Direct checkout mode activated with item:', parsedItem);
+          } catch (error) {
+            console.error('❌ Order1Page: Error parsing direct checkout item:', error);
+          }
+        }
+      }
+    };
+
+    checkDirectCheckout();
+  }, []);
+
   // Get selected courier service data for calculations
   const selectedCourierData = courierCompanies
     .find(company => company.id === selectedCourierCompany)
     ?.services.find(service => service.id === selectedCourierService);
 
-  // Calculate totals
-  const subtotal = totalPrices.all_item_active_prices || 0;
-  const discount = totalPrices.all_item_active_prices - totalPrices.total_all_active_prices || 0;
-  const shippingCost = deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0;
-  const total = totalPrices.total_all_active_prices + shippingCost;
+  // Use direct checkout item or cart items
+  const currentItems = isDirectCheckout && directCheckoutItem ? [directCheckoutItem] : cartItems;
+  
+  // Calculate totals for direct checkout or cart
+  const calculateTotals = () => {
+    if (isDirectCheckout && directCheckoutItem) {
+      const itemPrice = directCheckoutItem.variant_info.discounted_price || directCheckoutItem.product_price;
+      const subtotal = itemPrice * directCheckoutItem.quantity;
+      const discount = 0; // No discount for direct checkout
+      const shippingCost = deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0;
+      return {
+        subtotal,
+        discount,
+        shipping: shippingCost,
+        total: subtotal + shippingCost
+      };
+    } else {
+      const subtotal = totalPrices.all_item_active_prices || 0;
+      const discount = totalPrices.all_item_active_prices - totalPrices.total_all_active_prices || 0;
+      const shippingCost = deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0;
+      return {
+        subtotal,
+        discount,
+        shipping: shippingCost,
+        total: totalPrices.total_all_active_prices + shippingCost
+      };
+    }
+  };
+
+  const totals = calculateTotals();
 
   // Validation
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
     
-    if (!selectedAddress) {
+    // Only require address for delivery method
+    if (deliveryMethod === 'delivery' && !selectedAddress) {
       newErrors.address = 'Alamat pengiriman harus dipilih';
     }
     
+    // Only require courier for delivery method
     if (deliveryMethod === 'delivery' && (!selectedCourierCompany || !selectedCourierService)) {
       newErrors.courier = 'Ekspedisi dan layanan pengiriman harus dipilih';
     }
     
-    if (cartItems.length === 0) {
+    if (currentItems.length === 0) {
       newErrors.cart = 'Keranjang kosong';
     }
     
@@ -145,7 +200,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         delivery_type: deliveryMethod,
         notes: additionalNotes || (deliveryMethod === 'pickup' ? 'Ambil di toko' : undefined),
         shipment_id: deliveryMethod === 'delivery' ? selectedCourierService : undefined,
-        items: cartItems.map((item: CartItemType) => ({
+        items: currentItems.map((item: CartItemType) => ({
           product_id: item.product_id,
           variant_id: item.variant_id,
           quantity: item.quantity
@@ -156,13 +211,19 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       
       // Add transaction to context
       console.log('📝 Order1Page: Adding transaction...');
-      const newTransaction = addTransaction(orderData, cartItems);
+      const newTransaction = addTransaction(orderData, currentItems);
       console.log('📝 Order1Page: Transaction added:', newTransaction);
       
-      // Clear cart after successful payment
-      console.log('🧹 Order1Page: Clearing cart after payment...');
-      clearCart();
-      console.log('🧹 Order1Page: Cart cleared successfully');
+      // Clear cart after successful payment (only if not direct checkout)
+      if (!isDirectCheckout) {
+        console.log('🧹 Order1Page: Clearing cart after payment...');
+        clearCart();
+        console.log('🧹 Order1Page: Cart cleared successfully');
+      } else {
+        // Clear direct checkout item from localStorage
+        localStorage.removeItem('directCheckoutItem');
+        console.log('🧹 Order1Page: Direct checkout item cleared from localStorage');
+      }
       
       toast.success('Pesanan berhasil dibuat! Keranjang telah dikosongkan.');
       
@@ -274,8 +335,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
         {/* Cart Items */}
         <div className="px-4 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Produk Pesanan</h2>
-          {cartItems.length === 0 ? (
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            {isDirectCheckout ? 'Produk yang Dibeli' : 'Produk Pesanan'}
+          </h2>
+          {currentItems.length === 0 ? (
             <div className="text-center py-8">
               <GoPackage className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <p className="text-gray-500">Keranjang kosong</p>
@@ -288,7 +351,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             </div>
           ) : (
             <div className="space-y-4">
-              {cartItems.map((item: CartItemType) => (
+              {currentItems.map((item: CartItemType) => (
                 <div key={item.id} className="flex items-center space-x-3">
                   <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0">
                     <img 
@@ -495,19 +558,19 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Ringkasan Pembayaran</h2>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Subtotal ({cartItems.length} item)</span>
-              <span className="font-medium">{rupiahFormater(subtotal)}</span>
+              <span className="text-gray-600">Subtotal ({currentItems.length} item)</span>
+              <span className="font-medium">{rupiahFormater(totals.subtotal)}</span>
             </div>
-            {discount > 0 && (
+            {totals.discount > 0 && (
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Diskon</span>
-                <span className="font-medium text-red-500">-{rupiahFormater(discount)}</span>
+                <span className="font-medium text-red-500">-{rupiahFormater(totals.discount)}</span>
               </div>
             )}
-            {deliveryMethod === 'delivery' && shippingCost > 0 && (
+            {deliveryMethod === 'delivery' && totals.shipping > 0 && (
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Ongkir</span>
-                <span className="font-medium">{rupiahFormater(shippingCost)}</span>
+                <span className="font-medium">{rupiahFormater(totals.shipping)}</span>
               </div>
             )}
             {deliveryMethod === 'pickup' && (
@@ -519,7 +582,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             <div className="border-t border-gray-200 pt-3">
               <div className="flex justify-between items-center text-lg font-semibold">
                 <span>Total</span>
-                <span className="text-primary">{rupiahFormater(total)}</span>
+                <span className="text-primary">{rupiahFormater(totals.total)}</span>
               </div>
             </div>
           </div>
@@ -547,9 +610,9 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         <div className="px-4 py-6 bg-white sticky bottom-0">
           <button
             onClick={handlePayment}
-            disabled={isLoading || cartItems.length === 0}
+            disabled={isLoading || currentItems.length === 0}
             className={`w-full py-4 rounded-lg font-semibold text-lg transition-all ${
-              isLoading || cartItems.length === 0
+              isLoading || currentItems.length === 0
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-primary text-white hover:bg-primary/90 active:scale-95'
             }`}
@@ -560,11 +623,11 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                 Memproses...
               </div>
             ) : (
-              `Bayar ${rupiahFormater(total)}`
+              `Bayar ${rupiahFormater(totals.total)}`
             )}
           </button>
           
-          {cartItems.length === 0 && (
+          {currentItems.length === 0 && (
             <p className="text-center text-sm text-gray-500 mt-2">
               Keranjang kosong, tidak dapat melanjutkan pembayaran
             </p>

@@ -9,6 +9,7 @@ interface TransactionContextType {
   addTransaction: (orderData: any, cartItems: CartItemType[]) => void;
   updateTransactionStatus: (transactionId: string, status: string) => void;
   getTransactionById: (transactionId: string) => Transaction | undefined;
+  clearTransactions: () => void;
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
@@ -85,13 +86,18 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
       }),
       status: 'pending',
       amount: finalAmount,
+      total: finalAmount, // Total amount for display
       items: transactionItems,
       createdAt: now.toISOString(),
       updatedAt: now.toISOString(),
       // Additional order data
       deliveryType: orderData.delivery_type,
       notes: orderData.notes,
-      shipmentId: orderData.shipment_id
+      shipmentId: orderData.shipment_id,
+      shipmentAddress: orderData.delivery_type === 'delivery' ? {
+        address: orderData.shipment_address?.address || 'Alamat tidak tersedia',
+        courier: orderData.courier_service || 'Kurir tidak tersedia'
+      } : undefined
     };
 
     setTransactions(prev => [newTransaction, ...prev]);
@@ -123,11 +129,19 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
     return transactions.find(transaction => transaction.transactionId === transactionId);
   }, [transactions]);
 
+  // Clear all transactions
+  const clearTransactions = useCallback(() => {
+    setTransactions([]);
+    localStorage.removeItem('transactions');
+    console.log('🧹 TransactionContext: All transactions cleared');
+  }, []);
+
   const value: TransactionContextType = {
     transactions,
     addTransaction,
     updateTransactionStatus,
     getTransactionById,
+    clearTransactions,
   };
 
   return (

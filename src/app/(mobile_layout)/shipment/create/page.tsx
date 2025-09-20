@@ -6,6 +6,7 @@ import ReceiverForm from "../edit/ReceiverForm";
 import PackageSpecificationForm from "../edit/PackageSpecificationForm";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 import { SenderFormData, ReceiverFormData, PackageFormData } from "@/types/shipment";
 
 const CreateShipment = () => {
@@ -50,7 +51,7 @@ const CreateShipment = () => {
       router.push("/shipment?created=true");
     } catch (error) {
       console.error("Gagal membuat shipment:", error);
-      alert("Gagal membuat alamat pengiriman. Silakan coba lagi.");
+      toast.error("Gagal membuat alamat pengiriman. Silakan coba lagi.");
     } finally {
       setIsLoading(false);
     }

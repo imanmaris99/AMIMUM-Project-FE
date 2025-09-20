@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import TransactionList from "@/components/transaction/molecules/TransactionList";
 import { Transaction } from "@/types/transaction";
 import { useTransaction } from "@/contexts/TransactionContext";
+import { toast } from "react-hot-toast";
 
 const TransactionPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [showLogoutMessage, setShowLogoutMessage] = useState(false);
-  const { transactions } = useTransaction();
+  const { transactions, clearTransactions } = useTransaction();
   const totalTransactions = transactions.length;
 
   useEffect(() => {
@@ -57,7 +58,20 @@ const TransactionPage = () => {
 
   const handleViewDetails = (transactionId: string) => {
     console.log("View details for transaction:", transactionId);
-    // TODO: Navigate to transaction details page
+    // Navigate to transaction details page
+    window.location.href = `/transaction/${transactionId}`;
+  };
+
+  const handleClearTransactions = () => {
+    if (transactions.length === 0) {
+      toast.info('Tidak ada transaksi untuk dihapus');
+      return;
+    }
+
+    if (window.confirm('Apakah Anda yakin ingin menghapus semua transaksi? Tindakan ini tidak dapat dibatalkan.')) {
+      clearTransactions();
+      toast.success('Semua transaksi berhasil dihapus');
+    }
   };
 
   return (
@@ -159,9 +173,24 @@ const TransactionPage = () => {
         <div className="px-6 flex-1 flex flex-col">
           {/* Riwayat Transaksi Header */}
           <div className="mb-10 mt-10">
-            <h1 className="text-[#0D0E09] text-lg font-semibold">
-              Riwayat Transaksi
-            </h1>
+            <div className="flex justify-between items-center">
+              <h1 className="text-[#0D0E09] text-lg font-semibold">
+                Riwayat Transaksi
+              </h1>
+              {transactions.length > 0 && (
+                <button
+                  onClick={handleClearTransactions}
+                  className="text-red-500 text-sm font-medium hover:text-red-700 transition-colors"
+                >
+                  Hapus Semua
+                </button>
+              )}
+            </div>
+            {transactions.length > 0 && (
+              <p className="text-gray-500 text-sm mt-1">
+                {totalTransactions} transaksi ditemukan
+              </p>
+            )}
           </div>
 
           {/* Transaction List - Scrollable */}

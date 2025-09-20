@@ -56,7 +56,10 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
   const statusConfig = getStatusConfig(transaction.status);
 
   return (
-    <div className="px-4 py-4 hover:bg-gray-50 transition-colors cursor-pointer">
+    <div 
+      className="px-4 py-4 hover:bg-gray-50 transition-colors cursor-pointer"
+      onClick={() => onViewDetails(transaction.id)}
+    >
       <div className="flex items-center gap-4">
         {/* Check Icon */}
         <div className="flex-shrink-0">

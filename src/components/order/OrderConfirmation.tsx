@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { GoCheckCircle, GoHome, GoPackage, GoCreditCard } from 'react-icons/go';
+import { GoCheckCircle, GoHome, GoPackage, GoCreditCard, GoLocation } from 'react-icons/go';
 import { IoCheckmarkCircle } from 'react-icons/io5';
+import { useTransaction } from '@/contexts/TransactionContext';
 
 interface OrderConfirmationProps {
   orderId?: string;
@@ -12,11 +13,20 @@ interface OrderConfirmationProps {
 }
 
 const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ 
-  orderId = "ORD-2024-001", 
+  orderId, 
   additionalNotes,
   onBack 
 }) => {
   const router = useRouter();
+  const { transactions } = useTransaction();
+  const [latestTransaction, setLatestTransaction] = useState<any>(null);
+
+  // Get the latest transaction
+  useEffect(() => {
+    if (transactions.length > 0) {
+      setLatestTransaction(transactions[0]); // First transaction is the latest
+    }
+  }, [transactions]);
 
   const handleBackToHome = () => {
     if (onBack) {
@@ -31,7 +41,11 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
   };
 
   const handleTrackOrder = () => {
-    router.push('/track-order');
+    if (latestTransaction?.id) {
+      router.push(`/track-order?transactionId=${latestTransaction.id}`);
+    } else {
+      router.push('/track-order');
+    }
   };
 
   return (
@@ -71,7 +85,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
           
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
             <p className="text-sm text-green-800 font-medium">
-              ID Pesanan: {orderId}
+              ID Pesanan: {latestTransaction?.transactionId || orderId || "ORD-2024-001"}
             </p>
             <p className="text-xs text-green-600 mt-1">
               Simpan ID ini untuk melacak pesanan Anda
@@ -91,18 +105,28 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Metode Pengiriman</span>
-              <span className="text-gray-900">Kirim ke tujuan</span>
+              <span className="text-gray-900">
+                {latestTransaction?.deliveryType === 'delivery' ? 'Kirim ke tujuan' : 'Ambil di toko'}
+              </span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Estimasi Pengiriman</span>
-              <span className="text-gray-900">2-3 hari kerja</span>
-            </div>
-            {additionalNotes && (
+            {latestTransaction?.deliveryType === 'delivery' && (
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Estimasi Pengiriman</span>
+                <span className="text-gray-900">2-3 hari kerja</span>
+              </div>
+            )}
+            {latestTransaction?.deliveryType === 'pickup' && (
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Pengambilan</span>
+                <span className="text-gray-900">Siap diambil</span>
+              </div>
+            )}
+            {(latestTransaction?.notes || additionalNotes) && (
               <div className="pt-3 border-t border-gray-200">
                 <div className="flex items-start space-x-2">
                   <span className="text-gray-600 text-sm">Catatan:</span>
                   <p className="text-gray-900 text-sm flex-1">
-                    "{additionalNotes}"
+                    "{latestTransaction?.notes || additionalNotes}"
                   </p>
                 </div>
               </div>
@@ -126,17 +150,31 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
               </div>
             </div>
             
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <GoPackage className="w-4 h-4 text-orange-600" />
+            {latestTransaction?.deliveryType === 'delivery' ? (
+              <div className="flex items-start space-x-3">
+                <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <GoPackage className="w-4 h-4 text-orange-600" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">Pesanan Diproses</p>
+                  <p className="text-sm text-gray-600">
+                    Kami akan memproses dan mengirim pesanan Anda
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium text-gray-900">Pesanan Diproses</p>
-                <p className="text-sm text-gray-600">
-                  Kami akan memproses dan mengirim pesanan Anda
-                </p>
+            ) : (
+              <div className="flex items-start space-x-3">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <GoLocation className="w-4 h-4 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">Siap Diambil</p>
+                  <p className="text-sm text-gray-600">
+                    Pesanan siap diambil di toko setelah pembayaran
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
@@ -149,12 +187,15 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
             Lihat Pesanan Saya
           </button>
           
-          <button
-            onClick={handleTrackOrder}
-            className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
-          >
-            Lacak Pesanan
-          </button>
+          {/* Only show "Lacak Pesanan" for delivery orders */}
+          {latestTransaction?.deliveryType === 'delivery' && (
+            <button
+              onClick={handleTrackOrder}
+              className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+            >
+              Lacak Pesanan
+            </button>
+          )}
           
           <button
             onClick={handleBackToHome}

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { getProductRatingSummary } from "@/data/dummyData";
 import RatingDisplay from "@/components/rating/RatingDisplay";
 import { useCart } from "@/contexts/CartContext";
+import { useRouter } from "next/navigation";
 
 interface ProductPriceProps {
   data: DetailProductType | undefined;
@@ -38,7 +39,9 @@ const ProductPrice = ({
 }: ProductPriceProps) => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [isBuying, setIsBuying] = useState(false);
   const { addToCart, isInCart } = useCart();
+  const router = useRouter();
 
   // Debug logging for received props
   console.log("🛒 ProductPrice: Props received - isLoading:", isLoading, "isError:", isError);
@@ -78,6 +81,53 @@ const ProductPrice = ({
       console.error("❌ ProductPrice: Error adding to cart:", error);
     } finally {
       setIsAdding(false);
+    }
+  };
+
+  const handleBuyNow = async () => {
+    console.log("🚀 ProductPrice: Buy now clicked");
+    console.log("📦 ProductPrice: Data:", data);
+    console.log("🎯 ProductPrice: Variant:", datavariant);
+    
+    if (!data || !datavariant) {
+      console.warn("❌ ProductPrice: Missing data or variant");
+      return;
+    }
+    
+    setIsBuying(true);
+    
+    try {
+      // Create temporary cart item for direct checkout
+      const tempCartItem = {
+        id: `temp-${Date.now()}`,
+        product_id: data.id,
+        product_name: data.name,
+        product_price: data.price,
+        quantity: 1,
+        variant_info: {
+          id: datavariant.id,
+          variant: datavariant.variant,
+          img: datavariant.img,
+          price: datavariant.price,
+          discounted_price: datavariant.discounted_price,
+          discount: datavariant.discount,
+          stock: datavariant.stock
+        }
+      };
+      
+      // Store temporary item in localStorage for direct checkout
+      localStorage.setItem('directCheckoutItem', JSON.stringify(tempCartItem));
+      
+      console.log(`✅ ProductPrice: Created direct checkout item: ${data.name} ${datavariant.variant}`);
+      
+      // Navigate to checkout page
+      console.log("🚀 ProductPrice: Navigating to direct checkout...");
+      router.push('/order-1?direct=true');
+      
+    } catch (error) {
+      console.error("❌ ProductPrice: Error in buy now:", error);
+    } finally {
+      setIsBuying(false);
     }
   };
 
@@ -194,33 +244,81 @@ const ProductPrice = ({
           </div>
           
           <div className={`relative ${isSticky ? '' : 'ml-4'}`}>
-            <Button 
-              variant="default" 
-              onClick={handleAddToCart}
-              disabled={isAdding || !datavariant}
-              className={`${
-                isItemInCart 
-                  ? "bg-green-600 hover:bg-green-700" 
-                  : !datavariant
-                  ? "bg-gray-400 hover:bg-gray-400"
-                  : "bg-[#006A47] hover:bg-[#005A3C]"
-              } text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ${
-                isSticky ? 'px-4 py-2 text-sm w-full' : 'px-4 py-2'
-              }`}
-            >
-              {isAdding ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>{isSticky ? 'Menambah...' : 'Menambah...'}</span>
-                </div>
-              ) : isItemInCart ? (
-                isSticky ? "✓ Di Keranjang" : "✓ Di Keranjang"
-              ) : !datavariant ? (
-                isSticky ? "Pilih Varian" : "Pilih Varian"
-              ) : (
-                isSticky ? "+ Keranjang" : "+ Keranjang"
-              )}
-            </Button>
+            {isSticky ? (
+              // Sticky mode - Show both buttons
+              <div className="space-y-2">
+                <Button 
+                  variant="default" 
+                  onClick={handleAddToCart}
+                  disabled={isAdding || !datavariant}
+                  className={`${
+                    isItemInCart 
+                      ? "bg-green-600 hover:bg-green-700" 
+                      : !datavariant
+                      ? "bg-gray-400 hover:bg-gray-400"
+                      : "bg-[#006A47] hover:bg-[#005A3C]"
+                  } text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 px-4 py-2 text-sm w-full`}
+                >
+                  {isAdding ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Menambah...</span>
+                    </div>
+                  ) : isItemInCart ? (
+                    "✓ Di Keranjang"
+                  ) : !datavariant ? (
+                    "Pilih Varian"
+                  ) : (
+                    "+ Keranjang"
+                  )}
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={handleBuyNow}
+                  disabled={isBuying || !datavariant}
+                  className="w-full px-4 py-2 text-sm border-primary text-primary hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                >
+                  {isBuying ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                      <span>Memproses...</span>
+                    </div>
+                  ) : !datavariant ? (
+                    "Pilih Varian"
+                  ) : (
+                    "🚀 Beli Langsung"
+                  )}
+                </Button>
+              </div>
+            ) : (
+              // Non-sticky mode - Show single button
+              <Button 
+                variant="default" 
+                onClick={handleAddToCart}
+                disabled={isAdding || !datavariant}
+                className={`${
+                  isItemInCart 
+                    ? "bg-green-600 hover:bg-green-700" 
+                    : !datavariant
+                    ? "bg-gray-400 hover:bg-gray-400"
+                    : "bg-[#006A47] hover:bg-[#005A3C]"
+                } text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 px-4 py-2`}
+              >
+                {isAdding ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Menambah...</span>
+                  </div>
+                ) : isItemInCart ? (
+                  "✓ Di Keranjang"
+                ) : !datavariant ? (
+                  "Pilih Varian"
+                ) : (
+                  "+ Keranjang"
+                )}
+              </Button>
+            )}
             
             {/* User Feedback Toast */}
             {showFeedback && (

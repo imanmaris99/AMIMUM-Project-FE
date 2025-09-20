@@ -6,24 +6,92 @@ import { GoChevronLeft } from "react-icons/go";
 import { TrackOrderList, DeliveryAddress, StatusOrder } from "@/components/track-order";
 import { trackOrderDummyData } from "@/data/trackOrderDummyData";
 import { TrackOrderItem } from "@/types/trackOrder";
+import { useTransaction } from "@/contexts/TransactionContext";
 
 const TrackOrderPage: React.FC = () => {
   const [productId, setProductId] = useState<string | null>(null);
+  const [transactionId, setTransactionId] = useState<string | null>(null);
   const [trackOrderItems, setTrackOrderItems] = useState<TrackOrderItem[]>([]);
+  const [currentTransaction, setCurrentTransaction] = useState<any>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { transactions } = useTransaction();
 
   useEffect(() => {
-    // Get productId from URL parameters
+    // Get productId or transactionId from URL parameters
     const productIdParam = searchParams.get("productId");
+    const transactionIdParam = searchParams.get("transactionId");
+    
     setProductId(productIdParam);
+    setTransactionId(transactionIdParam);
     
     // Load track order items
     setTrackOrderItems(trackOrderDummyData.items);
   }, [searchParams]);
 
+  // Get current transaction data
+  useEffect(() => {
+    if (transactionId) {
+      const transaction = transactions.find(t => t.id === transactionId);
+      setCurrentTransaction(transaction);
+    }
+  }, [transactionId, transactions]);
+
   const handleBack = () => {
     router.back();
+  };
+
+  // Get status configuration based on transaction status
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return {
+          text: 'Menunggu Pembayaran',
+          color: 'text-yellow-600',
+          bgColor: 'bg-yellow-100'
+        };
+      case 'completed':
+        return {
+          text: 'Lunas',
+          color: 'text-green-600',
+          bgColor: 'bg-green-100'
+        };
+      case 'cancelled':
+        return {
+          text: 'Batal',
+          color: 'text-red-600',
+          bgColor: 'bg-red-100'
+        };
+      case 'refund':
+        return {
+          text: 'Refund',
+          color: 'text-purple-600',
+          bgColor: 'bg-purple-100'
+        };
+      default:
+        return {
+          text: 'Unknown',
+          color: 'text-gray-600',
+          bgColor: 'bg-gray-100'
+        };
+    }
+  };
+
+  // Get current status index for StatusOrder component
+  const getCurrentStatusIndex = (status: string, deliveryType: string) => {
+    switch (status) {
+      case 'pending':
+        return 0; // Menunggu Pembayaran - belum ada yang selesai
+      case 'completed':
+        // Untuk pickup: max index 2, untuk delivery: max index 3
+        return deliveryType === 'pickup' ? 2 : 3;
+      case 'cancelled':
+        return -1; // Batal - tidak ada yang selesai
+      case 'refund':
+        return -1; // Refund - tidak ada yang selesai
+      default:
+        return 0; // Default - belum ada yang selesai
+    }
   };
 
   return (
@@ -43,6 +111,31 @@ const TrackOrderPage: React.FC = () => {
 
       {/* Content */}
       <div className="flex flex-col justify-center items-center gap-4 mt-20 mb-8 px-4">
+        {/* Transaction Info (if coming from transaction detail) */}
+        {transactionId && currentTransaction && (
+          <div className="w-full max-w-sm bg-white rounded-lg shadow-sm border p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Informasi Transaksi</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">ID Transaksi:</span>
+                <span className="text-sm font-medium text-gray-900">{currentTransaction.transactionId}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Status:</span>
+                <span className={`text-sm font-medium px-2 py-1 rounded-full ${getStatusConfig(currentTransaction.status).bgColor} ${getStatusConfig(currentTransaction.status).color}`}>
+                  {getStatusConfig(currentTransaction.status).text}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Metode:</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {currentTransaction.deliveryType === 'delivery' ? 'Kirim ke tujuan' : 'Ambil di toko'}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Track Order Items */}
         <div className="w-full max-w-sm">
           <TrackOrderList 
@@ -63,7 +156,10 @@ const TrackOrderPage: React.FC = () => {
         
         {/* Status Order */}
         <div className="w-full max-w-sm">
-          <StatusOrder currentStatus={1} />
+          <StatusOrder 
+            currentStatus={getCurrentStatusIndex(currentTransaction?.status, currentTransaction?.deliveryType)} 
+            deliveryType={currentTransaction?.deliveryType}
+          />
         </div>
         
         {/* Product ID Info (if available) */}

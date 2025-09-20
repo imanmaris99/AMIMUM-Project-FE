@@ -12,35 +12,64 @@ interface StatusItem {
 
 interface StatusOrderProps {
   currentStatus?: number; // 0-3 untuk menentukan status saat ini
+  deliveryType?: string; // 'delivery' atau 'pickup'
 }
 
-const StatusOrder: React.FC<StatusOrderProps> = ({ currentStatus = 0 }) => {
-  const statusItems: StatusItem[] = [
-    {
-      id: "packed",
-      title: "Dibungkus",
-      icon: "box",
-      isCompleted: currentStatus >= 0
-    },
-    {
-      id: "processing",
-      title: "Diproses ke kurir",
-      icon: "box-time",
-      isCompleted: currentStatus >= 1
-    },
-    {
-      id: "shipping",
-      title: "Pengiriman",
-      icon: "truck-time",
-      isCompleted: currentStatus >= 2
-    },
-    {
-      id: "delivered",
-      title: "Sampai tujuan",
-      icon: "truck-tick",
-      isCompleted: currentStatus >= 3
+const StatusOrder: React.FC<StatusOrderProps> = ({ currentStatus = 0, deliveryType = 'delivery' }) => {
+  // Different status items based on delivery type
+  const getStatusItems = (deliveryType: string): StatusItem[] => {
+    if (deliveryType === 'pickup') {
+      return [
+        {
+          id: "packed",
+          title: "Dibungkus",
+          icon: "box",
+          isCompleted: currentStatus >= 0
+        },
+        {
+          id: "ready",
+          title: "Siap Diambil",
+          icon: "box-time",
+          isCompleted: currentStatus >= 1
+        },
+        {
+          id: "picked",
+          title: "Sudah Diambil",
+          icon: "truck-tick",
+          isCompleted: currentStatus >= 2
+        }
+      ];
+    } else {
+      return [
+        {
+          id: "packed",
+          title: "Dibungkus",
+          icon: "box",
+          isCompleted: currentStatus >= 0
+        },
+        {
+          id: "processing",
+          title: "Diproses ke kurir",
+          icon: "box-time",
+          isCompleted: currentStatus >= 1
+        },
+        {
+          id: "shipping",
+          title: "Pengiriman",
+          icon: "truck-time",
+          isCompleted: currentStatus >= 2
+        },
+        {
+          id: "delivered",
+          title: "Sampai tujuan",
+          icon: "truck-tick",
+          isCompleted: currentStatus >= 3
+        }
+      ];
     }
-  ];
+  };
+
+  const statusItems = getStatusItems(deliveryType);
 
   const getIconComponent = (iconName: string) => {
     return (

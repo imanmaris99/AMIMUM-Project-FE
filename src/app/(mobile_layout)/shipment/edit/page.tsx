@@ -6,6 +6,7 @@ import ReceiverForm from "./ReceiverForm";
 import PackageSpecificationForm from "./PackageSpecificationForm";
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 import { SenderFormData, ReceiverFormData, PackageFormData } from "@/types/shipment";
 import { dummyShipments } from "@/data/shipmentDummyData";
 
@@ -102,7 +103,7 @@ const EditShipment = () => {
       
     } catch (error) {
       console.error("Gagal mengupdate shipment:", error);
-      alert("Gagal mengupdate alamat pengiriman. Silakan coba lagi.");
+      toast.error("Gagal mengupdate alamat pengiriman. Silakan coba lagi.");
     } finally {
       setIsLoading(false);
     }
