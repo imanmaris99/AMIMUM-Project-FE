@@ -1,4 +1,4 @@
-import { ShipmentAddress, Courier, ShipmentData } from '@/types/shipment';
+import { ShipmentAddress, Courier, ShipmentData, CourierCompany, CourierService } from '@/types/shipment';
 
 // Data dummy untuk alamat pengiriman
 export const dummyShipmentAddresses: ShipmentAddress[] = [
@@ -43,7 +43,7 @@ export const dummyShipmentAddresses: ShipmentAddress[] = [
   }
 ];
 
-// Data dummy untuk kurir
+// Data dummy untuk kurir (legacy format)
 export const dummyCouriers: Courier[] = [
   {
     id: 1,
@@ -92,6 +92,110 @@ export const dummyCouriers: Courier[] = [
     weight: 1000,
     cost: 22000,
     estimatedDelivery: "1 hari"
+  }
+];
+
+// Data kurir terstruktur untuk dropdown bertingkat
+export const courierCompanies: CourierCompany[] = [
+  {
+    id: "jne",
+    name: "JNE",
+    logo: "/jne-logo.png",
+    services: [
+      {
+        id: "jne-oke",
+        serviceType: "OKE",
+        cost: 12000,
+        estimatedDelivery: "4-5 hari kerja",
+        description: "Pengiriman ekonomis dengan harga terjangkau",
+        weight: 1000
+      },
+      {
+        id: "jne-reg",
+        serviceType: "REG",
+        cost: 15000,
+        estimatedDelivery: "2-3 hari kerja",
+        description: "Pengiriman standar dengan harga terjangkau",
+        weight: 1000
+      },
+      {
+        id: "jne-yes",
+        serviceType: "YES",
+        cost: 25000,
+        estimatedDelivery: "1-2 hari kerja",
+        description: "Pengiriman ekspres dengan jaminan waktu",
+        weight: 1000
+      }
+    ]
+  },
+  {
+    id: "jnt",
+    name: "J&T",
+    logo: "/jnt-logo.png",
+    services: [
+      {
+        id: "jnt-regular",
+        serviceType: "Regular",
+        cost: 12000,
+        estimatedDelivery: "2-3 hari kerja",
+        description: "Pengiriman standar dengan tracking lengkap",
+        weight: 1000
+      },
+      {
+        id: "jnt-express",
+        serviceType: "Express",
+        cost: 20000,
+        estimatedDelivery: "1-2 hari kerja",
+        description: "Pengiriman cepat dengan prioritas tinggi",
+        weight: 1000
+      }
+    ]
+  },
+  {
+    id: "sicepat",
+    name: "Si Cepat",
+    logo: "/sicepat-logo.png",
+    services: [
+      {
+        id: "sicepat-regular",
+        serviceType: "Regular",
+        cost: 13000,
+        estimatedDelivery: "2-3 hari kerja",
+        description: "Pengiriman standar dengan layanan terpercaya",
+        weight: 1000
+      },
+      {
+        id: "sicepat-express",
+        serviceType: "Express",
+        cost: 22000,
+        estimatedDelivery: "1 hari kerja",
+        description: "Pengiriman super cepat dengan jaminan hari ini",
+        weight: 1000
+      }
+    ]
+  },
+  {
+    id: "tiki",
+    name: "TIKI",
+    logo: "/tiki-logo.png",
+    services: [
+      {
+        id: "tiki-regular",
+        serviceType: "Regular",
+        cost: 18000,
+        estimatedDelivery: "2-3 hari kerja",
+        description: "Pengiriman standar dengan layanan profesional",
+        weight: 1000
+      },
+      {
+        id: "tiki-ons",
+        serviceType: "ONS",
+        cost: 30000,
+        estimatedDelivery: "1 hari kerja",
+        description: "Pengiriman overnight dengan jaminan keesokan harinya",
+        weight: 1000
+      }
+    ]
   }
 ];
 

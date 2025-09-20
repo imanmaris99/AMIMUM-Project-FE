@@ -7,6 +7,8 @@ import { IoCheckmarkCircle, IoWarning } from 'react-icons/io5';
 import { toast } from 'react-hot-toast';
 import rupiahFormater from '@/utils/rupiahFormater';
 import { useCart, CartItemType } from '@/contexts/CartContext';
+import CourierSelector from './CourierSelector';
+import { courierCompanies } from '@/data/shipmentDummyData';
 
 interface Order1PageProps {
   onBack?: () => void;
@@ -14,14 +16,7 @@ interface Order1PageProps {
 
 // Using CartItemType from CartContext
 
-interface CourierOption {
-  id: string;
-  name: string;
-  service: string;
-  cost: number;
-  estimated_days: string;
-  description: string;
-}
+// Removed local interfaces - now using CourierCompany and CourierService from types/shipment.ts
 
 interface AddressInfo {
   name: string;
@@ -33,11 +28,13 @@ interface AddressInfo {
 
 const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const router = useRouter();
-  const { cartItems, totalPrices } = useCart();
+  const { cartItems, totalPrices, clearCart } = useCart();
   
   // State management
   const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
-  const [selectedCourier, setSelectedCourier] = useState<string>('');
+  // Courier state - using hierarchical selection
+  const [selectedCourierCompany, setSelectedCourierCompany] = useState<string>('');
+  const [selectedCourierService, setSelectedCourierService] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [showAddressModal, setShowAddressModal] = useState(false);
@@ -54,71 +51,15 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   ]);
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo | null>(addresses[0]);
 
-  // Courier options based on backend DTOs
-  const courierOptions: CourierOption[] = [
-    {
-      id: 'jne-regular',
-      name: 'JNE',
-      service: 'Regular',
-      cost: 15000,
-      estimated_days: '2-3 hari kerja',
-      description: 'Pengiriman standar dengan harga terjangkau'
-    },
-    {
-      id: 'jne-oke',
-      name: 'JNE',
-      service: 'OKE',
-      cost: 12000,
-      estimated_days: '4-5 hari kerja',
-      description: 'Pengiriman ekonomis'
-    },
-    {
-      id: 'jne-yes',
-      name: 'JNE',
-      service: 'YES',
-      cost: 25000,
-      estimated_days: '1-2 hari kerja',
-      description: 'Pengiriman ekspres'
-    },
-    {
-      id: 'tiki-regular',
-      name: 'TIKI',
-      service: 'Regular',
-      cost: 18000,
-      estimated_days: '2-3 hari kerja',
-      description: 'Pengiriman standar'
-    },
-    {
-      id: 'tiki-ons',
-      name: 'TIKI',
-      service: 'ONS',
-      cost: 35000,
-      estimated_days: '1 hari kerja',
-      description: 'Pengiriman next day'
-    },
-    {
-      id: 'pos-reguler',
-      name: 'POS Indonesia',
-      service: 'Reguler',
-      cost: 10000,
-      estimated_days: '3-4 hari kerja',
-      description: 'Pengiriman reguler'
-    },
-    {
-      id: 'pos-express',
-      name: 'POS Indonesia',
-      service: 'Express',
-      cost: 20000,
-      estimated_days: '1-2 hari kerja',
-      description: 'Pengiriman ekspres'
-    }
-  ];
+  // Get selected courier service data for calculations
+  const selectedCourierData = courierCompanies
+    .find(company => company.id === selectedCourierCompany)
+    ?.services.find(service => service.id === selectedCourierService);
 
   // Calculate totals
   const subtotal = totalPrices.all_item_active_prices || 0;
   const discount = totalPrices.all_item_active_prices - totalPrices.total_all_active_prices || 0;
-  const shippingCost = selectedCourier ? 
-    courierOptions.find(c => c.id === selectedCourier)?.cost || 0 : 0;
+  const shippingCost = deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0;
   const total = totalPrices.total_all_active_prices + shippingCost;
 
   // Validation
@@ -129,8 +70,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       newErrors.address = 'Alamat pengiriman harus dipilih';
     }
     
-    if (deliveryMethod === 'delivery' && !selectedCourier) {
-      newErrors.courier = 'Kurir harus dipilih';
+    if (deliveryMethod === 'delivery' && (!selectedCourierCompany || !selectedCourierService)) {
+      newErrors.courier = 'Ekspedisi dan layanan pengiriman harus dipilih';
     }
     
     if (cartItems.length === 0) {
@@ -146,6 +87,17 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       onBack();
     } else {
       router.back();
+    }
+  };
+
+  // Clear specific error when user makes changes
+  const clearError = (field: string) => {
+    if (errors[field]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
     }
   };
 
@@ -165,7 +117,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       const orderData = {
         delivery_type: deliveryMethod,
         notes: deliveryMethod === 'pickup' ? 'Ambil di toko' : undefined,
-        shipment_id: deliveryMethod === 'delivery' ? selectedCourier : undefined,
+        shipment_id: deliveryMethod === 'delivery' ? selectedCourierService : undefined,
         items: cartItems.map((item: CartItemType) => ({
           product_id: item.product_id,
           variant_id: item.variant_id,
@@ -174,7 +126,13 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       };
       
       console.log('Order data:', orderData);
-      toast.success('Pesanan berhasil dibuat!');
+      
+      // Clear cart after successful payment
+      console.log('🧹 Order1Page: Clearing cart after payment...');
+      clearCart();
+      console.log('🧹 Order1Page: Cart cleared successfully');
+      
+      toast.success('Pesanan berhasil dibuat! Keranjang telah dikosongkan.');
       
       // Navigate to payment or order confirmation
       // router.push('/payment');
@@ -368,7 +326,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                     </p>
                   </div>
                   <button
-                    onClick={handleAddAddress}
+                    onClick={() => {
+                      handleAddAddress();
+                      clearError('address');
+                    }}
                     className="text-primary text-xs font-medium hover:underline"
                   >
                     Ubah
@@ -376,7 +337,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                 </div>
               ) : (
                 <button
-                  onClick={handleAddAddress}
+                  onClick={() => {
+                    handleAddAddress();
+                    clearError('address');
+                  }}
                   className="w-full text-center py-4 text-gray-500 hover:text-primary transition-colors"
                 >
                   <GoPlus className="w-6 h-6 mx-auto mb-2" />
@@ -416,48 +380,20 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         {deliveryMethod === 'delivery' && (
           <div className="px-4 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Pilih Kurir</h2>
-            <div className="space-y-3">
-              {courierOptions.map((courier) => (
-                <label
-                  key={courier.id}
-                  className={`block border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                    selectedCourier === courier.id
-                      ? 'border-primary bg-primary/5'
-                      : 'border-gray-200 hover:border-primary/50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <input
-                        type="radio"
-                        name="courier"
-                        value={courier.id}
-                        checked={selectedCourier === courier.id}
-                        onChange={(e) => setSelectedCourier(e.target.value)}
-                        className="w-4 h-4 text-primary focus:ring-primary border-gray-300"
-                      />
-                      <GoPackage className="w-5 h-5 text-gray-400" />
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {courier.name} {courier.service}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Estimasi: {courier.estimated_days}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {courier.description}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-sm font-medium text-gray-900">
-                        {rupiahFormater(courier.cost)}
-                      </span>
-                    </div>
-                  </div>
-                </label>
-              ))}
-            </div>
+            <CourierSelector
+              courierCompanies={courierCompanies}
+              selectedCompany={selectedCourierCompany}
+              selectedService={selectedCourierService}
+              onCompanySelect={(companyId) => {
+                setSelectedCourierCompany(companyId);
+                clearError('courier');
+              }}
+              onServiceSelect={(serviceId) => {
+                setSelectedCourierService(serviceId);
+                clearError('courier');
+              }}
+              isLoading={isLoading}
+            />
             {errors.courier && (
               <p className="text-red-500 text-xs mt-2">{errors.courier}</p>
             )}
@@ -475,13 +411,19 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             {discount > 0 && (
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Diskon</span>
-                <span className="font-medium text-green-600">-{rupiahFormater(discount)}</span>
+                <span className="font-medium text-red-500">-{rupiahFormater(discount)}</span>
               </div>
             )}
             {deliveryMethod === 'delivery' && shippingCost > 0 && (
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Ongkir</span>
                 <span className="font-medium">{rupiahFormater(shippingCost)}</span>
+              </div>
+            )}
+            {deliveryMethod === 'pickup' && (
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Pengambilan</span>
+                <span className="font-medium text-green-600">Gratis</span>
               </div>
             )}
             <div className="border-t border-gray-200 pt-3">

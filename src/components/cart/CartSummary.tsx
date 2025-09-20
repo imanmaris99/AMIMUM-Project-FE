@@ -24,7 +24,7 @@ export default function CartSummary() {
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-gray-600 text-sm">Items</span>
-              <span className="text-primary font-medium text-sm">
+              <span className="text-black font-medium text-sm">
                 {rupiahFormater(subtotal)}
               </span>
             </div>

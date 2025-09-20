@@ -141,9 +141,7 @@ const TransactionPage = () => {
                     className="hover:opacity-70 transition-opacity cursor-pointer"
                   />
                   {/* Cart Badge - Dynamic count */}
-                  <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                    0
-                  </div>
+                  {/* You can add cart context here later to make it dynamic */}
                 </Link>
 
                 {/* Notification Icon */}

@@ -22,6 +22,23 @@ export interface Courier {
   estimatedDelivery: string;
 }
 
+// New types for hierarchical courier selection
+export interface CourierService {
+  id: string;
+  serviceType: string;
+  cost: number;
+  estimatedDelivery: string;
+  description: string;
+  weight: number;
+}
+
+export interface CourierCompany {
+  id: string;
+  name: string;
+  logo?: string;
+  services: CourierService[];
+}
+
 export interface ShipmentData {
   id: string;
   address: ShipmentAddress;
