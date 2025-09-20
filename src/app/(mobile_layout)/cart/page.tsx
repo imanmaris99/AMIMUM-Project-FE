@@ -18,19 +18,14 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="bg-white sticky top-0 z-10">
-        <div className="flex justify-center items-center relative pt-16 pb-4">
-          <div className="absolute left-4">
-            <GoChevronLeft 
-              className="text-3xl cursor-pointer text-gray-700 hover:text-gray-900 transition-colors" 
-              onClick={handleBack} 
-            />
-          </div>
-          <div className="text-center">
-            <h1 className="text-[16px] font-semibold text-gray-900">Keranjangku</h1>
-            <p className="text-xs text-gray-500 mt-1">{totalItems} item di keranjang</p>
-          </div>
+      {/* Header - Same style as track order */}
+      <div className="flex justify-center items-center relative mt-16">
+        <div className="absolute left-10">
+          <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
+        </div>
+        <div className="text-center">
+          <h1 className="text-[16px] font-semibold">Keranjangku</h1>
+          <p className="text-xs text-gray-500 mt-1">{totalItems} item di keranjang</p>
         </div>
       </div>
 

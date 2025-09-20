@@ -28,14 +28,16 @@ const TrackOrderPage: React.FC = () => {
 
   return (
     <div className="flex flex-col justify-between min-h-screen bg-gray-100">
-      {/* Header - Same style as shipment */}
-      <div className="flex justify-center items-center relative mt-16">
-        <div className="absolute left-10">
-          <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-[16px] font-semibold">Track Order</h1>
-          <p className="text-xs text-gray-500 mt-1">Lacak status pesanan Anda</p>
+      {/* Header - Same style as shipment with white background */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="flex justify-center items-center relative mt-16 py-4">
+          <div className="absolute left-10">
+            <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
+          </div>
+          <div className="text-center">
+            <h1 className="text-[16px] font-semibold">Track Order</h1>
+            <p className="text-xs text-gray-500 mt-1">Lacak status pesanan Anda</p>
+          </div>
         </div>
       </div>
 

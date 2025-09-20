@@ -198,18 +198,16 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-10">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={handleBack}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            disabled={isLoading}
-          >
-            <GoChevronLeft className="w-6 h-6 text-gray-600" />
-          </button>
-          <h1 className="text-lg font-semibold text-gray-900">Checkout</h1>
-          <div className="w-10" />
+      {/* Header - Same style as track order with white background */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="flex justify-center items-center relative mt-16 py-4">
+          <div className="absolute left-10">
+            <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
+          </div>
+          <div className="text-center">
+            <h1 className="text-[16px] font-semibold">Checkout</h1>
+            <p className="text-xs text-gray-500 mt-1">Lengkapi data pesanan Anda</p>
+          </div>
         </div>
       </div>
 
