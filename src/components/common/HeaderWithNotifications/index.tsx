@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
+import { useNotification } from "@/contexts/NotificationContext";
 
 interface HeaderWithNotificationsProps {
   userEmail?: string;
@@ -16,13 +17,14 @@ interface HeaderWithNotificationsProps {
 
 const HeaderWithNotifications = ({ 
   userEmail, 
-  showLogo = true, 
+  showLogo = true,
   title = "Selamat Datang",
   subtitle = "di Toko Herbal AmImUm",
   onLogout
 }: HeaderWithNotificationsProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { cartItems, totalItems } = useCart();
+  const { getNotificationCount, resetNotification } = useNotification();
 
   useEffect(() => {
     // Check if user is logged in - using the same logic as original header
@@ -110,7 +112,11 @@ const HeaderWithNotifications = ({
           {isLoggedIn && (
             <div className="flex items-center gap-4">
               {/* Cart Icon */}
-              <Link href="/cart" className="relative">
+              <Link 
+                href="/cart" 
+                className="relative"
+                onClick={() => resetNotification("cart")}
+              >
                 <Image 
                   src="/bag-2.svg" 
                   alt="cart" 
@@ -118,10 +124,10 @@ const HeaderWithNotifications = ({
                   height={32} 
                   className="hover:opacity-70 transition-opacity cursor-pointer"
                 />
-                {/* Cart Badge - Dynamic count */}
-                {totalItems > 0 && (
+                {/* Cart Badge - Show notification count only */}
+                {getNotificationCount("cart") > 0 && (
                   <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                    {totalItems > 99 ? '99+' : totalItems}
+                    {getNotificationCount("cart") > 99 ? '99+' : getNotificationCount("cart")}
                   </div>
                 )}
               </Link>

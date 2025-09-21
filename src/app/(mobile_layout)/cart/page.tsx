@@ -1,16 +1,23 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { GoChevronLeft } from "react-icons/go";
 import CartList from "@/components/cart/CartList";
 import CartSummary from "@/components/cart/CartSummary";
 import CartFooter from "@/components/cart/CartFooter";
 import { useCart } from "@/contexts/CartContext";
+import { useNotification } from "@/contexts/NotificationContext";
 
 export default function CartPage() {
   const router = useRouter();
   const { totalItems } = useCart();
+  const { resetNotification } = useNotification();
+
+  // Reset cart notification when user visits cart page
+  useEffect(() => {
+    resetNotification("cart");
+  }, [resetNotification]);
 
   const handleBack = () => {
     router.back();

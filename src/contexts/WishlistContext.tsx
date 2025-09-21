@@ -83,11 +83,9 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
         // Check if this specific variant already exists
         const exists = prev.some(item => item.id === wishlistItem.id);
         if (exists) {
-          console.log(`Product ${product.name} ${variantName} already in wishlist`);
           return prev;
         }
         
-        console.log(`Added to wishlist: ${product.name} ${variantName}`);
         return [...prev, wishlistItem];
       });
     } catch (error) {

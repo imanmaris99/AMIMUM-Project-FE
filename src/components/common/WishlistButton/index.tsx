@@ -39,7 +39,6 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
       if (isWishlisted) {
         // If already in wishlist, remove it directly
         toggleWishlist(product);
-        console.log(`Removed from wishlist: ${product.name}`);
       } else {
         // If not in wishlist, show variant modal if enabled and product has multiple variants
         if (showVariantModal && product.all_variants && product.all_variants.length > 1) {
@@ -47,7 +46,6 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
         } else {
           // If no modal needed or single variant, add directly
           toggleWishlist(product);
-          console.log(`Added to wishlist: ${product.name}`);
         }
       }
     } catch (error) {
