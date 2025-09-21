@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { GoChevronLeft } from "react-icons/go";
 import ProductImage from "@/components/detailproduct/ProductImage";
 import TitleProduct from "@/components/detailproduct/TitleProduct";
 import ProductVariants from "@/components/detailproduct/ProductVariants";
@@ -12,6 +11,7 @@ import ProductPrice from "@/components/detailproduct/ProductPrice";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 import { getDetailProduct } from "@/data/dataUtils";
 import { validateDetailProductData } from "@/utils/dataValidation";
+import UnifiedHeader from "@/components/common/UnifiedHeader";
 
 export default function DetailProduct() {
   const params = useParams();
@@ -75,16 +75,14 @@ export default function DetailProduct() {
   
   return (
     <div className="min-h-screen bg-white">
-        {/* Header - Same style as track order with white background */}
-        <div className="flex justify-center items-center relative mt-16">
-          <div className="absolute left-10">
-            <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
-          </div>
-          <div className="text-center">
-            <h1 className="text-[16px] font-semibold">Detail Item</h1>
-            <p className="text-xs text-gray-500 mt-1">Informasi lengkap produk</p>
-          </div>
-        </div>
+        {/* Unified Header */}
+        <UnifiedHeader 
+          type="secondary"
+          title="Detail Item"
+          subtitle="Informasi lengkap produk"
+          showBackButton={true}
+          onBack={handleBack}
+        />
         
         {/* Content - Optimized layout with proper spacing */}
         <div className="px-4 py-6 pb-56">

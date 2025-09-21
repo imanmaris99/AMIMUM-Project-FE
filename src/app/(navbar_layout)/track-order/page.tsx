@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { GoChevronLeft } from "react-icons/go";
 import { TrackOrderList, DeliveryAddress, StatusOrder } from "@/components/track-order";
 import { trackOrderDummyData } from "@/data/trackOrderDummyData";
 import { TrackOrderItem } from "@/types/trackOrder";
 import { useTransaction } from "@/contexts/TransactionContext";
+import UnifiedHeader from "@/components/common/UnifiedHeader";
 
 const TrackOrderPage: React.FC = () => {
   const [productId, setProductId] = useState<string | null>(null);
@@ -130,22 +130,18 @@ const TrackOrderPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col justify-between min-h-screen bg-gray-100">
-      {/* Header - Same style as shipment with white background */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="flex justify-center items-center relative mt-16 py-4">
-          <div className="absolute left-10">
-            <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
-          </div>
-          <div className="text-center">
-            <h1 className="text-[16px] font-semibold">Track Order</h1>
-            <p className="text-xs text-gray-500 mt-1">Lacak status pesanan Anda</p>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-100">
+      {/* Unified Header */}
+      <UnifiedHeader 
+        type="secondary"
+        title="Track Order"
+        subtitle="Lacak status pesanan Anda"
+        showBackButton={true}
+        onBack={handleBack}
+      />
 
       {/* Content */}
-      <div className="flex flex-col justify-center items-center gap-4 mt-20 mb-8 px-4">
+      <div className="flex flex-col justify-center items-center gap-4 py-8 px-4">
         {/* No Transactions Message */}
         {transactions.length === 0 ? (
           <div className="w-full max-w-sm bg-white rounded-lg shadow-sm border p-6 text-center">

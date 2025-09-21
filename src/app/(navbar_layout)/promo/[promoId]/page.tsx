@@ -1,9 +1,9 @@
-import Header from "@/components/homepage/Header_Section";
 import ProductList from "@/components/DetailBrand/ProductList";
 import DetailBrand from "@/components/DetailBrand";
 import { BrandDetailResponseType } from "@/types/detailProduct";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 import { getBrandForPromo, getPromoProducts } from "@/data/dataUtils";
+import UnifiedHeader from "@/components/common/UnifiedHeader";
 
 export default async function PromoDetailPage({ params }: { params: Promise<{ promoId: string }> }) {
   const { promoId } = await params;
@@ -61,7 +61,12 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
   
   return (
     <div className="pb-20">
-      <Header />
+      <UnifiedHeader 
+        type="main"
+        showSearch={true}
+        showCart={true}
+        showNotifications={true}
+      />
       <DetailBrand brandDetail={brandData} errorMessage={errorMessage} />
       <ProductList products={products} />
     </div>

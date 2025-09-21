@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { GoChevronLeft } from "react-icons/go";
 import { toast } from "react-hot-toast";
 import { useTransaction } from "@/contexts/TransactionContext";
 import { Transaction } from "@/types/transaction";
 import rupiahFormater from "@/utils/rupiahFormater";
+import UnifiedHeader from "@/components/common/UnifiedHeader";
 
 const TransactionDetailPage: React.FC = () => {
   const params = useParams();
@@ -96,14 +96,12 @@ const TransactionDetailPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="flex justify-center items-center relative mt-16">
-          <div className="absolute left-10">
-            <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
-          </div>
-          <div className="text-center">
-            <h1 className="text-[16px] font-semibold">Detail Transaksi</h1>
-          </div>
-        </div>
+        <UnifiedHeader 
+          type="secondary"
+          title="Detail Transaksi"
+          showBackButton={true}
+          onBack={handleBack}
+        />
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
@@ -114,16 +112,12 @@ const TransactionDetailPage: React.FC = () => {
   if (!transaction) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="bg-white border-b border-gray-200">
-          <div className="flex justify-center items-center relative mt-16 py-4">
-            <div className="absolute left-10">
-              <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
-            </div>
-            <div className="text-center">
-              <h1 className="text-[16px] font-semibold">Detail Transaksi</h1>
-            </div>
-          </div>
-        </div>
+        <UnifiedHeader 
+          type="secondary"
+          title="Detail Transaksi"
+          showBackButton={true}
+          onBack={handleBack}
+        />
         <div className="flex flex-col items-center justify-center h-64 px-4">
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
             <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,18 +139,14 @@ const TransactionDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header - Same style as track order with white background */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="flex justify-center items-center relative mt-16 py-4">
-          <div className="absolute left-10">
-            <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
-          </div>
-          <div className="text-center">
-            <h1 className="text-[16px] font-semibold">Detail Transaksi</h1>
-            <p className="text-xs text-gray-500 mt-1">Informasi lengkap transaksi</p>
-          </div>
-        </div>
-      </div>
+      {/* Unified Header */}
+      <UnifiedHeader 
+        type="secondary"
+        title="Detail Transaksi"
+        subtitle="Informasi lengkap transaksi"
+        showBackButton={true}
+        onBack={handleBack}
+      />
 
       {/* Content */}
       <div className="px-4 py-6">

@@ -1,10 +1,10 @@
-import Header from "@/components/homepage/Header_Section";
 import DetailBrand from "@/components/DetailBrand";
 import ProductList from "@/components/DetailBrand/ProductList";
 import SearchProductByBrand from "@/components/DetailBrand/SearchProductByBrand";
 import { BrandDetailResponseType } from "@/types/detailProduct";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 import { getBrandData, getCardProductsByBrand } from "@/data/dataUtils";
+import UnifiedHeader from "@/components/common/UnifiedHeader";
 
 export default async function BrandPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params;
@@ -59,7 +59,12 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   
   return (
     <main className="pb-20">
-      <Header />
+      <UnifiedHeader 
+        type="main"
+        showSearch={true}
+        showCart={true}
+        showNotifications={true}
+      />
       <DetailBrand brandDetail={brandData} errorMessage={errorMessage} />
       <SearchProductByBrand brandId={Number(brandId)} brandName={brandData?.name || ""} />
       <ProductList products={products} />

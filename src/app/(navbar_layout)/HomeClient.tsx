@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import Header from "@/components/homepage/Header_Section";
+import UnifiedHeader from "@/components/common/UnifiedHeader";
 import dynamic from "next/dynamic";
 import { validateProductionData } from "@/utils/dataValidation";
 
@@ -63,7 +63,12 @@ export default function HomeClient({
     
   return (
     <div className="pb-20">
-      <Header />
+      <UnifiedHeader 
+        type="main"
+        showSearch={true}
+        showCart={true}
+        showNotifications={true}
+      />
       <Search />
       <Promo promo={promoData} errorMessage={promoError} />
       <Category
