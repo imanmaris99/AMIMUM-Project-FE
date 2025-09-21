@@ -946,6 +946,7 @@ function createVariantAllProduct(
   const seed = variantId * 7 + variant.length;
   const basePrice = 15000 + (seed % 30000); // 15k-45k konsisten
   
+  
   // Buat variasi discount berdasarkan brand untuk konsistensi dengan promo_special
   let discount = 0;
   if (hasDiscount) {
@@ -959,6 +960,10 @@ function createVariantAllProduct(
     
     const range = brandDiscountRanges[brandId || 1] || { min: 5, max: 25 };
     discount = (seed % (range.max - range.min + 1)) + range.min;
+    
+    
+    // Ensure minimum discount of 5% for promo products
+    if (discount < 5) discount = 5;
   }
   
   const discountedPrice = hasDiscount ? Math.floor(basePrice * (1 - discount / 100)) : basePrice;
@@ -1026,8 +1031,16 @@ function createAllProductInfo(
   };
 }
 
+// Cache untuk mencegah duplikasi data
+let cachedCardProductData: CardProductProps[] | null = null;
+
 // Fungsi untuk menghasilkan data produk card sesuai dengan backend DTO
 export function generateCardProductData(): CardProductProps[] {
+  // Return cached data if available
+  if (cachedCardProductData) {
+    return cachedCardProductData;
+  }
+
   const products: CardProductProps[] = [];
   let productId = 1;
   
@@ -1045,6 +1058,7 @@ export function generateCardProductData(): CardProductProps[] {
       const hasDiscount = i < promoCount;
       const basePrice = 15000 + (productId * 1000) % 30000; // 15k-45k konsisten berdasarkan productId
       
+      
       try {
         const product = createAllProductInfo(
           `prod-${brand.id}-${productId}`,
@@ -1056,13 +1070,14 @@ export function generateCardProductData(): CardProductProps[] {
         
         products.push(product);
       } catch (error) {
-        console.warn(`Failed to create product for brand ${brand.id}, product ${productId}:`, error);
       }
       
       productId++;
     }
   });
 
+  // Cache the result to prevent duplication
+  cachedCardProductData = products;
   return products;
 }
 
@@ -1072,7 +1087,6 @@ export function generateBrandProducts(brandId: string): CardProductProps[] {
   const brand = BRAND_DATA[brandId as keyof typeof BRAND_DATA];
   
   if (!brand) {
-    console.warn(`Brand with ID ${brandId} not found`);
     return [];
   }
   
@@ -1088,16 +1102,21 @@ export function generatePromoProducts(brandId: string): CardProductProps[] {
   const brand = BRAND_DATA[brandId as keyof typeof BRAND_DATA];
   
   if (!brand) {
-    console.warn(`Brand with ID ${brandId} not found`);
     return [];
   }
   
   // Filter products by brand ID and only include those with discount
   const promoProducts = allProducts.filter(product => {
     const isFromBrand = product.brand_info.id === brand.id;
+    if (!isFromBrand) return false;
+    
+    // Check if any variant has discount > 0 (this is the correct way)
     const hasDiscount = product.all_variants.some(variant => variant.discount > 0);
-    return isFromBrand && hasDiscount;
+    
+    
+    return hasDiscount;
   });
+  
   
   // Add brand's highest discount to each product for consistent display
   return promoProducts.map(product => ({
@@ -1155,7 +1174,6 @@ export function generateDetailProductData(): { [key: string]: DetailProductType 
         };
       }
     } catch (error) {
-      console.warn(`Failed to create detail product for ${cardProduct.id}:`, error);
     }
   });
 

@@ -11,7 +11,6 @@ function debounce<T extends (...args: unknown[]) => void>(fn: T, delay: number):
       clearTimeout(timeout);
       timeout = setTimeout(() => fn.apply(this, args), delay);
     } catch (error) {
-      console.error("Error in debounced function:", error);
     }
   } as T;
 }
@@ -29,25 +28,20 @@ const useSearchLogic = () => {
   const handleSearch = () => {
     try {
       if (search.trim()) {
-        console.log(`Searching for: ${search}`);
         router.push(`/search?q=${search}`);
       }
     } catch (error) {
-      console.error("Error handling search:", error);
     }
   };
 
   const handleSelectProduct = (productId: string) => {
     try {
       if (!productId) {
-        console.error("Invalid product ID for navigation:", productId);
         return;
       }
       
-      console.log(`Navigating to product detail: ${productId}`);
       router.push(`/detail-product/${productId}`);
     } catch (error) {
-      console.error("Error navigating to product detail:", error);
     }
   };
 
@@ -56,7 +50,6 @@ const useSearchLogic = () => {
     try {
       return generateCardProductData();
     } catch (error) {
-      console.error("Error generating dummy products:", error);
       return [];
     }
   }, []);
@@ -86,10 +79,8 @@ const useSearchLogic = () => {
         })
         .slice(0, 5); // Batasi maksimal 5 hasil
       
-      console.log(`Search for "${value}" returned ${filteredProducts.length} results`);
       setProducts(filteredProducts);
     } catch (err: unknown) {
-      console.error("Search error:", err);
       setIsError(true);
       setErrorMessage(err instanceof Error ? err.message : "Gagal mengambil data produk.");
       setProducts([]);
@@ -110,7 +101,6 @@ const useSearchLogic = () => {
         setProducts([]);
       }
     } catch (error) {
-      console.error("Error handling input change:", error);
     }
   };
 
@@ -120,7 +110,6 @@ const useSearchLogic = () => {
         setShowDropdown(false);
       }
     } catch (error) {
-      console.error("Error handling click outside:", error);
     }
   }, []);
 
@@ -131,7 +120,6 @@ const useSearchLogic = () => {
         document.removeEventListener("mousedown", handleClickOutside);
       };
     } catch (error) {
-      console.error("Error setting up click outside listener:", error);
     }
   }, [handleClickOutside]);
 

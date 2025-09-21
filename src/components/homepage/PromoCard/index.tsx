@@ -24,7 +24,8 @@ const PromoCard = ({ promo }: { promo: PromoProps }) => {
             alt="promo"
             width={50}
             height={50}
-            style={{ width: "100%", height: "auto" }}
+            style={{ width: "auto", height: "auto" }}
+            priority
           />
         </div>
 

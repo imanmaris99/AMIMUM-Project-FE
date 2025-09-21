@@ -29,28 +29,23 @@ export default function DetailProduct() {
         setIsLoading(true);
         setErrorMessage(null);
         
-        console.log(`Loading product with ID: ${productId}`);
         const product = getDetailProduct(productId);
         
         if (!product) {
-          console.warn(`Product with ID ${productId} not found`);
           setErrorMessage("Produk tidak ditemukan");
           return;
         }
         
         // Validate product data before setting
         if (!validateDetailProductData(product)) {
-          console.error(`Invalid product data for ID ${productId}:`, product);
           setErrorMessage("Data produk tidak valid");
           return;
         }
         
-        console.log(`Product loaded successfully: ${product.name}`);
         setDetailProduct(product);
         
         // Don't auto-select variant - let user choose
       } catch (err) {
-        console.error(`Error loading product ${productId}:`, err);
         setErrorMessage(err instanceof Error ? err.message : String(err));
       } finally {
         setIsLoading(false);
@@ -113,8 +108,8 @@ export default function DetailProduct() {
           </div>
         </div>
 
-        {/* Sticky Cart Section - Always show, but with different states */}
-        {!isLoading && (
+        {/* Sticky Cart Section - Only show when variant is selected */}
+        {!isLoading && selectedVariant && (
           <div className="fixed bottom-14 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-30" style={{ maxWidth: '440px', margin: '0 auto' }}>
             <div className="px-4 py-3">
               <ProductPrice 

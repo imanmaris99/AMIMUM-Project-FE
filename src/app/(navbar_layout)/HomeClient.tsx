@@ -53,16 +53,13 @@ export default function HomeClient({
   const invalidProductions = filteredProductions.filter(prod => !validateProductionData(prod));
   
   
-  if (invalidProductions.length > 0) {
-    console.warn('Invalid productions found:', invalidProductions);
-  }
   
   // Fallback: jika tidak ada valid productions, gunakan semua productions tanpa validasi
   const finalProductions = validProductions.length > 0 ? validProductions : filteredProductions;
   
     
   return (
-    <div className="pb-20">
+    <div className="pb-20" suppressHydrationWarning>
         <UnifiedHeader 
           type="main"
           showCart={true}

@@ -16,7 +16,6 @@ const TransactionPage = () => {
   // Transactions are now managed by TransactionContext
 
   const handleViewDetails = (transactionId: string) => {
-    console.log("View details for transaction:", transactionId);
     // Navigate to transaction details page
     window.location.href = `/transaction/${transactionId}`;
   };

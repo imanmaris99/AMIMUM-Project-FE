@@ -32,7 +32,6 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
     
     try {
       if (!product || !product.id || !product.name) {
-        console.error("Invalid product data for wishlist:", product);
         return;
       }
       
@@ -49,7 +48,6 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
         }
       }
     } catch (error) {
-      console.error("Error handling wishlist click:", error);
     }
   };
 

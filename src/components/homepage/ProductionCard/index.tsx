@@ -23,7 +23,7 @@ const ProductionCard = ({ production }: { production: ProductionProps }) => {
           alt={production.name}
           width={50}
           height={50}
-          style={{ width: "100%", height: "auto" }}
+          style={{ width: "auto", height: "auto" }}
         />
       </div>
 

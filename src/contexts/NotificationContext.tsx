@@ -57,7 +57,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
           setNotifications(validatedNotifications);
         }
       } catch (error) {
-        console.error('Error loading notifications from localStorage:', error);
         // Reset to default state on error
         setNotifications({
           tracking: { count: 0, isViewed: true },

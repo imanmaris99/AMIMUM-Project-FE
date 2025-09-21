@@ -1,4 +1,4 @@
-import ProductList from "@/components/DetailBrand/ProductList";
+import ProductListWithPagination from "@/components/DetailBrand/ProductListWithPagination";
 import DetailBrand from "@/components/DetailBrand";
 import { BrandDetailResponseType } from "@/types/detailProduct";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
@@ -66,8 +66,16 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
                 showCart={true}
                 showNotifications={true}
               />
-      <DetailBrand brandDetail={brandData} errorMessage={errorMessage} />
-      <ProductList products={products} />
+      <DetailBrand 
+        brandDetail={brandData} 
+        errorMessage={errorMessage} 
+        promoProductCount={products.length}
+      />
+      <ProductListWithPagination 
+        products={products} 
+        title={`Produk Promo ${brandData?.name || "Brand"}`}
+        emptyMessage="Produk promo belum tersedia."
+      />
     </div>
   );
 }

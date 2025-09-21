@@ -123,7 +123,6 @@ export function validateWishlistItemData(item: any): item is WishlistItem {
 
 export function sanitizeProductData(product: any): AllProductInfoType | null {
   if (!validateProductData(product)) {
-    console.warn('Invalid product data:', product);
     return null;
   }
   
@@ -139,7 +138,6 @@ export function sanitizeProductData(product: any): AllProductInfoType | null {
 
 export function sanitizeDetailProductData(product: any): DetailProductType | null {
   if (!validateDetailProductData(product)) {
-    console.warn('Invalid detail product data:', product);
     return null;
   }
   
@@ -170,7 +168,6 @@ export function validateAndThrow<T>(
 
 export function logValidationErrors(data: any, context: string) {
   console.group(`Data Validation Errors - ${context}`);
-  console.error('Invalid data:', data);
   console.groupEnd();
 }
 

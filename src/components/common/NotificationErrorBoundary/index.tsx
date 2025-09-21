@@ -23,7 +23,6 @@ class NotificationErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Notification system error:', error, errorInfo);
   }
 
   render() {

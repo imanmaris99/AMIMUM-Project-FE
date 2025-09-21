@@ -5,9 +5,10 @@ import Spinner from "@/components/ui/Spinner";
 interface DetailBrandProps {
   brandDetail: BrandDetailType | null;
   errorMessage?: string | null;
+  promoProductCount?: number; // Add promo product count
 }
 
-const DetailBrand = ({ brandDetail, errorMessage }: DetailBrandProps) => {
+const DetailBrand = ({ brandDetail, errorMessage, promoProductCount }: DetailBrandProps) => {
   if (errorMessage) {
     return <div className="text-red-500 text-center mt-4">{errorMessage}</div>;
   }
@@ -21,7 +22,8 @@ const DetailBrand = ({ brandDetail, errorMessage }: DetailBrandProps) => {
   }
   // Gunakan description_list sesuai dengan backend DTO
   const descriptionArr = brandDetail.description_list || [];
-  const productCount = brandDetail.total_product ?? 0;
+  // Use promo product count if available, otherwise fall back to total_product
+  const productCount = promoProductCount ?? brandDetail.total_product ?? 0;
   return (
     <div className="mt-4 mx-6">
       <div>
@@ -34,6 +36,7 @@ const DetailBrand = ({ brandDetail, errorMessage }: DetailBrandProps) => {
             alt={brandDetail.name || "brand"}
             width={70}
             height={70}
+            style={{ width: "auto", height: "auto" }}
           />
           <div>
             <h1 className="font-bold">{brandDetail.name || "Brand Name"}</h1>

@@ -99,7 +99,6 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             setDirectCheckoutItem(parsedItem);
             setIsDirectCheckout(true);
           } catch (error) {
-            console.error('❌ Order1Page: Error parsing direct checkout item:', error);
           }
         }
       }
@@ -196,8 +195,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     setIsLoading(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate API call - reduced time for better UX
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Create order data based on backend DTOs
       const orderData = {
@@ -218,22 +217,21 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       // Remove only active items from cart after successful payment (only if not direct checkout)
       if (!isDirectCheckout) {
         removeActiveItems();
-        toast.success('Pesanan berhasil dibuat! Item yang dipilih telah dihapus dari keranjang.');
       } else {
         // Clear direct checkout item from localStorage
         localStorage.removeItem('directCheckoutItem');
-        toast.success('Pesanan berhasil dibuat!');
       }
       
-      // Navigate to order confirmation page
+      // Show success message and navigate immediately
+      toast.success('Pesanan berhasil dibuat!');
+      
+      // Navigate after a short delay to ensure toast is visible
       setTimeout(() => {
         router.push('/order-confirmation');
-      }, 2000); // Wait 2 seconds to show success message
+      }, 500);
       
     } catch (error) {
-      console.error('Payment error:', error);
       toast.error('Terjadi kesalahan saat memproses pesanan');
-    } finally {
       setIsLoading(false);
     }
   };

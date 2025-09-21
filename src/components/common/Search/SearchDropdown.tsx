@@ -54,11 +54,6 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
                   {product.all_variants.length} varian tersedia
                 </p>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-medium text-green-600">
-                  Rp {product.price.toLocaleString()}
-                </p>
-              </div>
             </div>
           </li>
         ))

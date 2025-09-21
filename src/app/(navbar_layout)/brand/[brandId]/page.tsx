@@ -1,5 +1,5 @@
 import DetailBrand from "@/components/DetailBrand";
-import ProductList from "@/components/DetailBrand/ProductList";
+import ProductListWithPagination from "@/components/DetailBrand/ProductListWithPagination";
 import SearchProductByBrand from "@/components/DetailBrand/SearchProductByBrand";
 import { BrandDetailResponseType } from "@/types/detailProduct";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
@@ -66,7 +66,11 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
               />
       <DetailBrand brandDetail={brandData} errorMessage={errorMessage} />
       <SearchProductByBrand brandId={Number(brandId)} brandName={brandData?.name || ""} />
-      <ProductList products={products} />
+      <ProductListWithPagination 
+        products={products} 
+        title={`Daftar Produk ${brandData?.name || "Brand"}`}
+        emptyMessage="Produk brand belum tersedia."
+      />
     </main>
   );
 }

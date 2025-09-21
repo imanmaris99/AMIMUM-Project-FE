@@ -35,7 +35,6 @@ export function getDetailProduct(productId: string): DetailProductType | undefin
   
   // Validate product data before returning
   if (product && !validateDetailProductData(product)) {
-    console.warn(`Invalid detail product data for ID: ${productId}`);
     return undefined;
   }
   
@@ -63,7 +62,6 @@ export function getCardProductsByBrand(brandId: string): CardProductProps[] {
   try {
     return generateBrandProducts(brandId);
   } catch (error) {
-    console.warn(`Failed to get products for brand ${brandId}:`, error);
     return [];
   }
 }
@@ -107,9 +105,6 @@ export function getCardProductsBySearch(query: string, brandFilter?: string): Ca
 // ==================== BRAND UTILITIES ====================
 export function getBrandData(brandId: string) {
   const brand = BRAND_DATA[brandId as keyof typeof BRAND_DATA];
-  if (!brand) {
-    console.warn(`Brand with ID ${brandId} not found`);
-  }
   return brand;
 }
 
@@ -120,7 +115,6 @@ export function getAllBrands() {
 export function getBrandForPromo(promoId: string) {
   const brand = getBrandData(promoId);
   if (!brand) {
-    console.warn(`Brand with ID ${promoId} not found for promo`);
     return null;
   }
   
@@ -135,9 +129,33 @@ export function getBrandForPromo(promoId: string) {
 // ==================== PROMO UTILITIES ====================
 export function getPromoProducts(brandId: string): CardProductProps[] {
   try {
-    return generatePromoProducts(brandId);
+    // Use cached data to prevent duplication
+    const allProducts = getAllCardProducts();
+    const brand = BRAND_DATA[brandId as keyof typeof BRAND_DATA];
+    
+  if (!brand) {
+    return [];
+  }
+    
+    // Filter products by brand ID and only include those with discount
+    const promoProducts = allProducts.filter(product => {
+      const isFromBrand = product.brand_info.id === brand.id;
+      if (!isFromBrand) return false;
+      
+      // Check if any variant has discount > 0
+      const hasDiscount = product.all_variants.some(variant => variant.discount > 0);
+      
+      
+      return hasDiscount;
+    });
+    
+    
+    // Add brand's highest discount to each product for consistent display
+    return promoProducts.map(product => ({
+      ...product,
+      brand_highest_discount: brand.promo_special
+    }));
   } catch (error) {
-    console.warn(`Failed to get promo products for brand ${brandId}:`, error);
     return [];
   }
 }
@@ -196,7 +214,6 @@ export function searchProducts(query: string, brandFilter?: string): CardProduct
   try {
     return getCardProductsBySearch(query, brandFilter);
   } catch (error) {
-    console.warn(`Failed to search products with query "${query}" and brand filter "${brandFilter}":`, error);
     return [];
   }
 }
@@ -319,13 +336,11 @@ export function generateCartData(): CartResponseType {
 export function clearCache() {
   cachedDetailProducts = null;
   cachedCardProducts = null;
-  console.log('Data cache cleared');
 }
 
 export function refreshData() {
   clearCache();
   // Force regeneration on next access
-  console.log('Data refresh initiated');
 }
 
 export function getCacheStatus() {

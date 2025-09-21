@@ -36,7 +36,6 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       try {
         setWishlistItems(JSON.parse(savedWishlist));
       } catch (error) {
-        console.error('Error loading wishlist from localStorage:', error);
       }
     }
   }, []);
@@ -49,7 +48,6 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   const addToWishlist = (product: any) => {
     try {
       if (!product.id || !product.name) {
-        console.error("Invalid product data for wishlist:", product);
         return;
       }
 
@@ -90,7 +88,6 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
         return [...prev, wishlistItem];
       });
     } catch (error) {
-      console.error("Error adding to wishlist:", error);
     }
   };
 

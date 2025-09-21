@@ -38,7 +38,6 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
       try {
         setTransactions(JSON.parse(savedTransactions));
       } catch (error) {
-        console.error('Error loading transactions from localStorage:', error);
       }
     }
   }, []);

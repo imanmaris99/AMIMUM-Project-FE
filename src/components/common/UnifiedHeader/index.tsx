@@ -47,10 +47,10 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   if (type === 'main') {
     return (
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between">
+        <div className="px-4 py-3" suppressHydrationWarning>
+          <div className="flex items-center justify-between" suppressHydrationWarning>
             {/* Left: Logo + Brand */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3" suppressHydrationWarning>
               <Image 
                 src="/logo_toko.svg" 
                 alt="AmImUm Logo" 
@@ -58,7 +58,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                 height={40}
                 className="w-10 h-10"
               />
-              <div>
+              <div suppressHydrationWarning>
                 <h1 className="text-lg font-bold text-gray-900">AmImUm</h1>
                 <p className="text-xs text-gray-500">Toko Herbal</p>
               </div>
@@ -67,7 +67,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
             {/* Center: Search (if enabled) - Removed to avoid redundancy with homepage Search component */}
 
             {/* Right: Only Cart (no navbar redundancy) */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3" suppressHydrationWarning>
               {showCart && (
                 <Link href="/cart" className="relative">
                   <HiOutlineShoppingBag className="w-6 h-6 text-gray-700 hover:text-primary transition-colors" />

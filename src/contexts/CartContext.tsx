@@ -77,7 +77,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         const parsedCart = JSON.parse(savedCart);
         setCartItems(parsedCart);
       } catch (error) {
-        console.error('Error loading cart from localStorage:', error);
       }
     }
   }, []);
@@ -124,12 +123,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
     // Validate required data
     if (!product || !variant) {
-      console.error("❌ Missing product or variant data");
       return;
     }
 
     if (!product.id || !variant.id) {
-      console.error("❌ Missing product.id or variant.id");
       return;
     }
 

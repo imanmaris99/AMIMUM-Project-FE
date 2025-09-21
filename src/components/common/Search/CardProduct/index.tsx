@@ -11,7 +11,6 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
 
   // Validate product data
   if (!product || !product.all_variants || product.all_variants.length === 0) {
-    console.warn("Invalid product data:", product);
     return null;
   }
 

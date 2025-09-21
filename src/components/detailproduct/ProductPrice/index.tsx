@@ -48,7 +48,6 @@ const ProductPrice = ({
   const handleAddToCart = async () => {
     
     if (!data || !datavariant) {
-      console.warn("❌ ProductPrice: Missing data or variant");
       return;
     }
     
@@ -65,7 +64,6 @@ const ProductPrice = ({
       setTimeout(() => setShowFeedback(false), 3000);
       
     } catch (error) {
-      console.error("❌ ProductPrice: Error adding to cart:", error);
     } finally {
       setIsAdding(false);
     }
@@ -74,7 +72,6 @@ const ProductPrice = ({
   const handleBuyNow = async () => {
     
     if (!data || !datavariant) {
-      console.warn("❌ ProductPrice: Missing data or variant");
       return;
     }
     
@@ -115,7 +112,6 @@ const ProductPrice = ({
       router.push('/order-1?direct=true');
       
     } catch (error) {
-      console.error("❌ ProductPrice: Error in buy now:", error);
     } finally {
       setIsBuying(false);
     }
@@ -190,11 +186,8 @@ const ProductPrice = ({
             {!isSticky && (
               <p className="text-gray-700 font-semibold text-sm mb-2">Harga Produk :</p>
             )}
-            {isSticky && datavariant && (
+            {isSticky && (
               <p className="text-gray-600 text-xs mb-1">Harga Terpilih</p>
-            )}
-            {isSticky && !datavariant && (
-              <p className="text-gray-500 text-xs mb-1">Pilih varian untuk melihat harga</p>
             )}
             
             {/* Show price only when variant is selected */}
@@ -235,17 +228,15 @@ const ProductPrice = ({
           
           <div className={`relative ${isSticky ? '' : 'ml-4'}`}>
             {isSticky ? (
-              // Sticky mode - Show both buttons
+              // Sticky mode - Show both buttons (only when variant is selected)
               <div className="space-y-2">
                 <Button 
                   variant="default" 
                   onClick={handleAddToCart}
-                  disabled={isAdding || !datavariant}
+                  disabled={isAdding}
                   className={`${
                     isItemInCart 
                       ? "bg-green-600 hover:bg-green-700" 
-                      : !datavariant
-                      ? "bg-gray-400 hover:bg-gray-400"
                       : "bg-[#006A47] hover:bg-[#005A3C]"
                   } text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 px-4 py-2 text-sm w-full`}
                 >
@@ -253,8 +244,6 @@ const ProductPrice = ({
                     <ButtonSpinner size="sm" color="white" text="Menambah..." />
                   ) : isItemInCart ? (
                     "✓ Di Keranjang"
-                  ) : !datavariant ? (
-                    "Pilih Varian"
                   ) : (
                     "+ Keranjang"
                   )}
@@ -263,13 +252,11 @@ const ProductPrice = ({
                 <Button 
                   variant="outline" 
                   onClick={handleBuyNow}
-                  disabled={isBuying || !datavariant}
+                  disabled={isBuying}
                   className="w-full px-4 py-2 text-sm border-primary text-primary hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 >
                   {isBuying ? (
                     <ButtonSpinner size="sm" color="primary" text="Memproses..." />
-                  ) : !datavariant ? (
-                    "Pilih Varian"
                   ) : (
                     "🚀 Beli Langsung"
                   )}
