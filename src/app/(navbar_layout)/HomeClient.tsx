@@ -39,17 +39,6 @@ export default function HomeClient({
   const promoData = Array.isArray(promo) ? promo : (promo?.data || []);
   const articlesData = Array.isArray(articles) ? articles : (articles?.data || []);
   
-  // Debug logging untuk melihat struktur data
-  console.log('Raw productions data:', productions);
-  console.log('Extracted productions data:', productionsData);
-  
-  // Log data validation status
-  console.log('Homepage data validation:', {
-    categories: categoriesData.length,
-    productions: productionsData.length,
-    promo: promoData.length,
-    articles: articlesData.length
-  });
   
   
   const selectedCategoryName = categoriesData.find((cat: unknown) => (cat as { id: number; name: string }).id === selectedCategory)?.name;
@@ -58,22 +47,11 @@ export default function HomeClient({
     : productionsData;
     
   // Debug logging untuk filtering
-  console.log('Category filtering:', {
-    selectedCategory,
-    selectedCategoryName,
-    totalProductions: productionsData.length,
-    filteredProductions: filteredProductions.length
-  });
     
   // Validate productions data - menggunakan validator yang tepat untuk productions
   const validProductions = filteredProductions.filter(validateProductionData);
   const invalidProductions = filteredProductions.filter(prod => !validateProductionData(prod));
   
-  console.log('Production validation:', {
-    beforeValidation: filteredProductions.length,
-    afterValidation: validProductions.length,
-    invalidCount: invalidProductions.length
-  });
   
   if (invalidProductions.length > 0) {
     console.warn('Invalid productions found:', invalidProductions);
@@ -82,7 +60,6 @@ export default function HomeClient({
   // Fallback: jika tidak ada valid productions, gunakan semua productions tanpa validasi
   const finalProductions = validProductions.length > 0 ? validProductions : filteredProductions;
   
-  console.log('Final productions to display:', finalProductions.length);
     
   return (
     <div className="pb-20">
@@ -96,12 +73,6 @@ export default function HomeClient({
         setSelectedCategory={setSelectedCategory}
       />
       <Production productions={finalProductions} errorMessage={productionError} />
-      {/* Debug info untuk development */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="fixed bottom-4 right-4 bg-black text-white p-2 text-xs rounded">
-          Productions: {finalProductions.length}
-        </div>
-      )}
       <ArticleSection articles={articlesData} errorMessage={articleError} />
     </div>
   );

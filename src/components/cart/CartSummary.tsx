@@ -6,9 +6,6 @@ import rupiahFormater from '@/utils/rupiahFormater';
 export default function CartSummary() {
   const { cartItems, totalPrices } = useCart();
 
-  // Debug logging
-  console.log("🛒 CartSummary: cartItems length:", cartItems.length);
-  console.log("🛒 CartSummary: totalPrices:", totalPrices);
 
   // Calculate totals
   const subtotal = totalPrices.all_item_active_prices;

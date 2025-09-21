@@ -102,7 +102,6 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
 
     setTransactions(prev => [newTransaction, ...prev]);
     
-    console.log('📝 TransactionContext: New transaction added:', newTransaction);
     
     return newTransaction;
   }, []);
@@ -121,7 +120,6 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
       )
     );
     
-    console.log(`📝 TransactionContext: Transaction ${transactionId} status updated to ${status}`);
   }, []);
 
   // Get transaction by ID
@@ -133,7 +131,6 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
   const clearTransactions = useCallback(() => {
     setTransactions([]);
     localStorage.removeItem('transactions');
-    console.log('🧹 TransactionContext: All transactions cleared');
   }, []);
 
 

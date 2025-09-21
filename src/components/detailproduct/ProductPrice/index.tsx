@@ -44,35 +44,21 @@ const ProductPrice = ({
   const { addToCart, isInCart } = useCart();
   const router = useRouter();
 
-  // Debug logging for received props
-  console.log("🛒 ProductPrice: Props received - isLoading:", isLoading, "isError:", isError);
-  console.log("🛒 ProductPrice: Data:", data);
-  console.log("🛒 ProductPrice: Datavariant:", datavariant);
 
   const handleAddToCart = async () => {
-    console.log("🛒 ProductPrice: Add to cart clicked");
-    console.log("📦 ProductPrice: Data:", data);
-    console.log("🎯 ProductPrice: Variant:", datavariant);
     
     if (!data || !datavariant) {
       console.warn("❌ ProductPrice: Missing data or variant");
       return;
     }
     
-    // Validate data structure
-    console.log("🔍 ProductPrice: Product ID:", data.id);
-    console.log("🔍 ProductPrice: Variant ID:", datavariant.id);
-    console.log("🔍 ProductPrice: Product name:", data.name);
-    console.log("🔍 ProductPrice: Variant name:", datavariant.name);
     
     setIsAdding(true);
     
     try {
       // Add to cart using CartContext
-      console.log("🛒 ProductPrice: Calling addToCart...");
       addToCart(data, datavariant);
       
-      console.log(`✅ ProductPrice: Added to cart: ${data.name} ${datavariant.variant}`);
       
       // Show feedback
       setShowFeedback(true);
@@ -86,9 +72,6 @@ const ProductPrice = ({
   };
 
   const handleBuyNow = async () => {
-    console.log("🚀 ProductPrice: Buy now clicked");
-    console.log("📦 ProductPrice: Data:", data);
-    console.log("🎯 ProductPrice: Variant:", datavariant);
     
     if (!data || !datavariant) {
       console.warn("❌ ProductPrice: Missing data or variant");
@@ -128,10 +111,7 @@ const ProductPrice = ({
       // Store temporary item in localStorage for direct checkout
       localStorage.setItem('directCheckoutItem', JSON.stringify(tempCartItem));
       
-      console.log(`✅ ProductPrice: Created direct checkout item: ${data.name} ${datavariant.variant}`);
-      
       // Navigate to checkout page
-      console.log("🚀 ProductPrice: Navigating to direct checkout...");
       router.push('/order-1?direct=true');
       
     } catch (error) {

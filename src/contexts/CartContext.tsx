@@ -74,7 +74,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       try {
         const parsedCart = JSON.parse(savedCart);
         setCartItems(parsedCart);
-        console.log("🛒 Cart loaded from localStorage:", parsedCart.length, "items");
       } catch (error) {
         console.error('Error loading cart from localStorage:', error);
       }
@@ -84,7 +83,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   // Save cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cartItems));
-    console.log("🛒 Cart saved to localStorage:", cartItems.length, "items");
   }, [cartItems]);
 
   // Generate unique cart ID
@@ -121,9 +119,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   // Add to cart
   const addToCart = useCallback((product: DetailProductType, variant: VariantProductType) => {
-    console.log("🛒 CartContext: Adding to cart");
-    console.log("📦 Product received:", product);
-    console.log("🎯 Variant received:", variant);
 
     // Validate required data
     if (!product || !variant) {
@@ -137,20 +132,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
 
     setCartItems(prevItems => {
-      console.log("🛒 Current cart items before add:", prevItems.length);
 
       const existingItemIndex = prevItems.findIndex(
         item => item.product_id === product.id && item.variant_id === variant.id
       );
 
-      console.log("🔍 Existing item index:", existingItemIndex);
 
       if (existingItemIndex > -1) {
         // Update quantity if item already exists
         const updatedItems = [...prevItems];
         updatedItems[existingItemIndex].quantity += 1;
-        console.log("🔄 Updated existing item quantity:", updatedItems[existingItemIndex]);
-        console.log("🛒 Updated cart items after quantity update:", updatedItems.length);
         return updatedItems;
       } else {
         // Add new item
@@ -173,11 +164,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           created_at: new Date().toISOString(),
         };
 
-        console.log("🆕 New cart item created:", newCartItem);
 
         const updatedItems = [...prevItems, newCartItem];
-        console.log("🛒 Updated cart items after add:", updatedItems.length);
-        console.log("🛒 All cart items:", updatedItems);
         return updatedItems;
       }
     });
@@ -187,7 +175,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const removeFromCart = useCallback((cartId: number) => {
     setCartItems(prevItems => {
       const updatedItems = prevItems.filter(item => item.id !== cartId);
-      console.log("🗑️ Removed item from cart:", cartId);
       return updatedItems;
     });
   }, []);
@@ -200,7 +187,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       const updatedItems = prevItems.map(item =>
         item.id === cartId ? { ...item, quantity } : item
       );
-      console.log("📊 Updated quantity for item:", cartId, "to", quantity);
       return updatedItems;
     });
   }, []);
@@ -211,7 +197,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       const updatedItems = prevItems.map(item =>
         item.id === cartId ? { ...item, is_active: isActive } : item
       );
-      console.log("✅ Updated active status for item:", cartId, "to", isActive);
       return updatedItems;
     });
   }, []);
@@ -220,7 +205,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   // Clear cart
   const clearCart = useCallback(() => {
     setCartItems([]);
-    console.log("🧹 Cart cleared");
   }, []);
 
   // Check if item is in cart

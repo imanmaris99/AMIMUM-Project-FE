@@ -89,14 +89,15 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       const urlParams = new URLSearchParams(window.location.search);
       const isDirect = urlParams.get('direct') === 'true';
       
+      
       if (isDirect) {
         const directItem = localStorage.getItem('directCheckoutItem');
+        
         if (directItem) {
           try {
             const parsedItem = JSON.parse(directItem);
             setDirectCheckoutItem(parsedItem);
             setIsDirectCheckout(true);
-            console.log('🚀 Order1Page: Direct checkout mode activated with item:', parsedItem);
           } catch (error) {
             console.error('❌ Order1Page: Error parsing direct checkout item:', error);
           }
@@ -114,6 +115,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
   // Use direct checkout item or cart items
   const currentItems = isDirectCheckout && directCheckoutItem ? [directCheckoutItem] : cartItems;
+  
+  
   
   // Calculate totals for direct checkout or cart
   const calculateTotals = () => {
@@ -208,25 +211,19 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         }))
       };
       
-      console.log('Order data:', orderData);
       
       // Add transaction to context
-      console.log('📝 Order1Page: Adding transaction...');
       const newTransaction = addTransaction(orderData, currentItems);
-      console.log('📝 Order1Page: Transaction added:', newTransaction);
       
       // Clear cart after successful payment (only if not direct checkout)
       if (!isDirectCheckout) {
-        console.log('🧹 Order1Page: Clearing cart after payment...');
         clearCart();
-        console.log('🧹 Order1Page: Cart cleared successfully');
+        toast.success('Pesanan berhasil dibuat! Keranjang telah dikosongkan.');
       } else {
         // Clear direct checkout item from localStorage
         localStorage.removeItem('directCheckoutItem');
-        console.log('🧹 Order1Page: Direct checkout item cleared from localStorage');
+        toast.success('Pesanan berhasil dibuat!');
       }
-      
-      toast.success('Pesanan berhasil dibuat! Keranjang telah dikosongkan.');
       
       // Navigate to order confirmation page
       setTimeout(() => {

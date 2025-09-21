@@ -49,7 +49,6 @@ export default function DetailProduct() {
         setDetailProduct(product);
         
         // Don't auto-select variant - let user choose
-        console.log("🎯 Product loaded, waiting for user to select variant");
       } catch (err) {
         console.error(`Error loading product ${productId}:`, err);
         setErrorMessage(err instanceof Error ? err.message : String(err));
@@ -64,9 +63,6 @@ export default function DetailProduct() {
   }, [productId]);
   
   const handleVariantChange = (variant: VariantProductType) => {
-    console.log("🎯 DetailProduct: Variant changed to:", variant);
-    console.log("🎯 DetailProduct: Variant ID:", variant.id);
-    console.log("🎯 DetailProduct: Variant name:", variant.name);
     setSelectedVariant(variant);
   };
   

@@ -18,6 +18,12 @@ const Navbar = () => {
     return currentPath === path ? "bg-primary text-white" : "bg-white text-black";
   };
 
+
+
+
+
+
+
   return (
     <div className="flex flex-col gap-4 fixed bottom-0 right-0 left-0 bg-white mx-auto z-50" style={{ maxWidth: '440px', width: '100%' }}>
       <div className="shadow-box">
@@ -25,15 +31,19 @@ const Navbar = () => {
           <div className={`${getIconClass("/")} rounded-full p-2 cursor-pointer`} onClick={() => handleClick("/")}>
             <GoHome size={32} />
           </div>
+          
           <div className={`${getIconClass("/wishlist")} rounded-full p-2 cursor-pointer`} onClick={() => handleClick("/wishlist")}>
             <GoHeart size={32} />
           </div>
+          
           <div className={`${getIconClass("/track-order")} rounded-full p-2 cursor-pointer`} onClick={() => handleClick("/track-order")}>
             <HiOutlineTruck size={32} />
           </div>
+          
           <div className={`${getIconClass("/transaction")} rounded-full p-2 cursor-pointer`} onClick={() => handleClick("/transaction")}>
             <HiOutlineDocumentText size={32} />
           </div>
+          
           <div className={`${getIconClass("/profile")} rounded-full p-2 cursor-pointer`} onClick={() => handleClick("/profile")}>
             <VscAccount size={32} />
           </div>

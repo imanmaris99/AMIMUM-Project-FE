@@ -10,13 +10,6 @@ const CartList: React.FC = () => {
   const router = useRouter();
   const { cartItems, updateQuantity, updateActiveStatus, removeFromCart } = useCart();
 
-  useEffect(() => {
-    console.log("🛒 CartList: useEffect - Cart items changed:", cartItems.length, "items");
-    console.log("🛒 CartList: useEffect - Cart items:", cartItems);
-  }, [cartItems]);
-
-  console.log("🛒 CartList: Rendering with", cartItems.length, "items");
-  console.log("🛒 CartList: Cart items:", cartItems);
 
   const handleQuantityChange = (cartId: number, quantity: number) => {
     updateQuantity(cartId, quantity);
