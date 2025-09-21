@@ -7,6 +7,7 @@ interface WishlistContextType {
   wishlistItems: WishlistItem[];
   addToWishlist: (product: any) => void;
   removeFromWishlist: (productId: string) => void;
+  clearAll: () => void;
   isInWishlist: (productId: string) => boolean;
   toggleWishlist: (product: any) => void;
 }
@@ -97,6 +98,10 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     setWishlistItems(prev => prev.filter(item => item.productId !== productId));
   };
 
+  const clearAll = () => {
+    setWishlistItems([]);
+  };
+
   const isInWishlist = (productId: string, variantId?: number) => {
     if (variantId) {
       // Check specific variant
@@ -120,6 +125,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     wishlistItems,
     addToWishlist,
     removeFromWishlist,
+    clearAll,
     isInWishlist,
     toggleWishlist
   };

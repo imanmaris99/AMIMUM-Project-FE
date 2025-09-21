@@ -47,6 +47,7 @@ interface CartContextType {
   updateQuantity: (cartId: number, quantity: number) => void;
   updateActiveStatus: (cartId: number, isActive: boolean) => void;
   clearCart: () => void;
+  clearAll: () => void; // Alias for clearCart
   removeActiveItems: () => void;
   isInCart: (productId: string, variantId: number) => boolean;
 }
@@ -208,6 +209,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setCartItems([]);
   }, []);
 
+  // Clear all items (alias for clearCart)
+  const clearAll = useCallback(() => {
+    setCartItems([]);
+  }, []);
+
   // Remove only active items from cart (for checkout)
   const removeActiveItems = useCallback(() => {
     setCartItems(prevItems => prevItems.filter(item => !item.is_active));
@@ -231,6 +237,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     updateQuantity,
     updateActiveStatus,
     clearCart,
+    clearAll,
     removeActiveItems,
     isInCart,
   };
