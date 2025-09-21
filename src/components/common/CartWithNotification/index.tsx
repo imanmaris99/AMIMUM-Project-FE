@@ -17,13 +17,19 @@ const CartWithNotification: React.FC<CartWithNotificationProps> = ({ children })
     const prevLength = parseInt(localStorage.getItem('cart_prev_length') || '0');
     const currentLength = cartItems.length;
     
-    if (currentLength > prevLength) {
+    // Only trigger notification if cart actually has items and length increased
+    if (currentLength > 0 && currentLength > prevLength) {
       // New item was added to cart
       addNotification("cart");
     }
     
     // Update stored length
     localStorage.setItem('cart_prev_length', currentLength.toString());
+    
+    // Clean up if cart is empty
+    if (currentLength === 0) {
+      localStorage.removeItem('cart_prev_length');
+    }
   }, [cartItems.length, addNotification]);
 
   return <>{children}</>;

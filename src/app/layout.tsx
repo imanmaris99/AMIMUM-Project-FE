@@ -6,6 +6,7 @@ import { NotificationProvider } from "@/contexts/NotificationContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
 import WishlistWithNotification from "@/components/common/WishlistWithNotification";
 import CartWithNotification from "@/components/common/CartWithNotification";
+import NotificationErrorBoundary from "@/components/common/NotificationErrorBoundary";
 import ToastProvider from "@/components/ui/ToastProvider";
 
 export const metadata: Metadata = {
@@ -25,20 +26,22 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;700;900&display=swap" rel="stylesheet" />
       </head>
       <body className="antialiased font-jakarta">
-        <NotificationProvider>
-          <CartProvider>
-            <CartWithNotification>
-              <WishlistProvider>
-                <WishlistWithNotification>
-                  <TransactionProvider>
-                    {children}
-                    <ToastProvider />
-                  </TransactionProvider>
-                </WishlistWithNotification>
-              </WishlistProvider>
-            </CartWithNotification>
-          </CartProvider>
-        </NotificationProvider>
+        <NotificationErrorBoundary>
+          <NotificationProvider>
+            <CartProvider>
+              <CartWithNotification>
+                <WishlistProvider>
+                  <WishlistWithNotification>
+                    <TransactionProvider>
+                      {children}
+                      <ToastProvider />
+                    </TransactionProvider>
+                  </WishlistWithNotification>
+                </WishlistProvider>
+              </CartWithNotification>
+            </CartProvider>
+          </NotificationProvider>
+        </NotificationErrorBoundary>
       </body>
     </html>
   );

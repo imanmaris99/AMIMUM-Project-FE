@@ -46,9 +46,25 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     if (savedNotifications) {
       try {
         const parsed = JSON.parse(savedNotifications);
-        setNotifications(parsed);
+        // Validate parsed data structure
+        if (parsed && typeof parsed === 'object') {
+          const validatedNotifications = {
+            tracking: parsed.tracking || { count: 0, isViewed: true },
+            transaction: parsed.transaction || { count: 0, isViewed: true },
+            wishlist: parsed.wishlist || { count: 0, isViewed: true },
+            cart: parsed.cart || { count: 0, isViewed: true }
+          };
+          setNotifications(validatedNotifications);
+        }
       } catch (error) {
         console.error('Error loading notifications from localStorage:', error);
+        // Reset to default state on error
+        setNotifications({
+          tracking: { count: 0, isViewed: true },
+          transaction: { count: 0, isViewed: true },
+          wishlist: { count: 0, isViewed: true },
+          cart: { count: 0, isViewed: true }
+        });
       }
     }
   }, []);

@@ -47,6 +47,7 @@ interface CartContextType {
   updateQuantity: (cartId: number, quantity: number) => void;
   updateActiveStatus: (cartId: number, isActive: boolean) => void;
   clearCart: () => void;
+  removeActiveItems: () => void;
   isInCart: (productId: string, variantId: number) => boolean;
 }
 
@@ -207,6 +208,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setCartItems([]);
   }, []);
 
+  // Remove only active items from cart (for checkout)
+  const removeActiveItems = useCallback(() => {
+    setCartItems(prevItems => prevItems.filter(item => !item.is_active));
+  }, []);
+
   // Check if item is in cart
   const isInCart = useCallback((productId: string, variantId: number) => {
     return cartItems.some(item => item.product_id === productId && item.variant_id === variantId);
@@ -225,6 +231,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     updateQuantity,
     updateActiveStatus,
     clearCart,
+    removeActiveItems,
     isInCart,
   };
 

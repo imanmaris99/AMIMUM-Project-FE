@@ -17,13 +17,19 @@ const WishlistWithNotification: React.FC<WishlistWithNotificationProps> = ({ chi
     const prevLength = parseInt(localStorage.getItem('wishlist_prev_length') || '0');
     const currentLength = wishlistItems.length;
     
-    if (currentLength > prevLength) {
+    // Only trigger notification if wishlist actually has items and length increased
+    if (currentLength > 0 && currentLength > prevLength) {
       // New item was added
       addNotification("wishlist");
     }
     
     // Update stored length
     localStorage.setItem('wishlist_prev_length', currentLength.toString());
+    
+    // Clean up if wishlist is empty
+    if (currentLength === 0) {
+      localStorage.removeItem('wishlist_prev_length');
+    }
   }, [wishlistItems.length, addNotification]);
 
   return <>{children}</>;

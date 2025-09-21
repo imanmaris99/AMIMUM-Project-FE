@@ -33,7 +33,7 @@ interface AddressInfo {
 
 const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const router = useRouter();
-  const { cartItems, totalPrices, clearCart } = useCart();
+  const { cartItems, totalPrices, removeActiveItems } = useCart();
   const { addTransaction } = useTransaction();
   
   // Direct checkout state
@@ -215,10 +215,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       // Add transaction to context
       const newTransaction = addTransaction(orderData, currentItems);
       
-      // Clear cart after successful payment (only if not direct checkout)
+      // Remove only active items from cart after successful payment (only if not direct checkout)
       if (!isDirectCheckout) {
-        clearCart();
-        toast.success('Pesanan berhasil dibuat! Keranjang telah dikosongkan.');
+        removeActiveItems();
+        toast.success('Pesanan berhasil dibuat! Item yang dipilih telah dihapus dari keranjang.');
       } else {
         // Clear direct checkout item from localStorage
         localStorage.removeItem('directCheckoutItem');
