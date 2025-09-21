@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 
-export type NotificationType = 'tracking' | 'transaction';
+export type NotificationType = 'tracking' | 'transaction' | 'wishlist';
 
 interface NotificationState {
   count: number;
@@ -35,7 +35,8 @@ interface NotificationProviderProps {
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({ children }) => {
   const [notifications, setNotifications] = useState<Record<NotificationType, NotificationState>>({
     tracking: { count: 0, isViewed: true },
-    transaction: { count: 0, isViewed: true }
+    transaction: { count: 0, isViewed: true },
+    wishlist: { count: 0, isViewed: true }
   });
 
   // Load notifications from localStorage on mount

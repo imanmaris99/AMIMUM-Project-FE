@@ -13,11 +13,13 @@ const Navbar = () => {
   const { getNotificationCount, resetNotification } = useNotification();
 
   const handleClick = (path: string) => {
-    // Reset notification when user clicks on tracking or transaction menu
+    // Reset notification when user clicks on tracking, transaction, or wishlist menu
     if (path === "/track-order") {
       resetNotification("tracking");
     } else if (path === "/transaction") {
       resetNotification("transaction");
+    } else if (path === "/wishlist") {
+      resetNotification("wishlist");
     }
     
     router.push(path);
@@ -57,10 +59,11 @@ const Navbar = () => {
           <div
             className={`${getIconClass(
               "/wishlist"
-            )} rounded-full p-2 cursor-pointer`}
+            )} rounded-full p-2 cursor-pointer relative`}
             onClick={() => handleClick("/wishlist")}
           >
             <GoHeart size={32} />
+            <Badge count={getNotificationCount("wishlist")} />
           </div>
 
           <div

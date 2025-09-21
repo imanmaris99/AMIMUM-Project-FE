@@ -3,6 +3,8 @@ import "./globals.css";
 import { CartProvider } from "@/contexts/CartContext";
 import { TransactionProvider } from "@/contexts/TransactionContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
+import { WishlistProvider } from "@/contexts/WishlistContext";
+import WishlistWithNotification from "@/components/common/WishlistWithNotification";
 import ToastProvider from "@/components/ui/ToastProvider";
 
 export const metadata: Metadata = {
@@ -24,10 +26,14 @@ export default function RootLayout({
       <body className="antialiased font-jakarta">
         <NotificationProvider>
           <CartProvider>
-            <TransactionProvider>
-              {children}
-              <ToastProvider />
-            </TransactionProvider>
+            <WishlistProvider>
+              <WishlistWithNotification>
+                <TransactionProvider>
+                  {children}
+                  <ToastProvider />
+                </TransactionProvider>
+              </WishlistWithNotification>
+            </WishlistProvider>
           </CartProvider>
         </NotificationProvider>
       </body>

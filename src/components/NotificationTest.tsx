@@ -3,11 +3,13 @@
 import { useNotification } from "@/contexts/NotificationContext";
 import { useTransaction } from "@/contexts/TransactionContext";
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 
 const NotificationTest = () => {
   const { addNotification, resetNotification, getNotificationCount } = useNotification();
   const { addTransaction } = useTransaction();
   const { cartItems } = useCart();
+  const { addToWishlist } = useWishlist();
 
   const handleAddTestTransaction = () => {
     // Create dummy order data
@@ -63,11 +65,41 @@ const NotificationTest = () => {
     resetNotification("transaction");
   };
 
+  const handleAddTestWishlist = () => {
+    // Create dummy product data
+    const testProduct = {
+      id: `test-product-${Date.now()}`,
+      name: `Test Product ${Date.now()}`,
+      price: 25000,
+      all_variants: [{
+        id: 1,
+        variant: "Test Variant",
+        name: "Test Variant Name",
+        img: "/default-image.jpg",
+        discount: 10,
+        discounted_price: 22500
+      }],
+      brand_info: {
+        name: "Test Brand"
+      }
+    };
+
+    addToWishlist(testProduct);
+  };
+
+  const handleAddWishlistNotification = () => {
+    addNotification("wishlist");
+  };
+
+  const handleResetWishlist = () => {
+    resetNotification("wishlist");
+  };
+
   return (
     <div className="p-4 space-y-4 bg-gray-100 min-h-screen">
       <h1 className="text-2xl font-bold">Notification Badge Test</h1>
       
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-2">Tracking Order</h2>
           <p className="text-sm text-gray-600 mb-2">
@@ -109,19 +141,55 @@ const NotificationTest = () => {
             </button>
           </div>
         </div>
+
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h2 className="text-lg font-semibold mb-2">Wishlist</h2>
+          <p className="text-sm text-gray-600 mb-2">
+            Current count: {getNotificationCount("wishlist")}
+          </p>
+          <div className="space-y-2">
+            <button
+              onClick={handleAddWishlistNotification}
+              className="w-full bg-pink-500 text-white px-3 py-2 rounded text-sm"
+            >
+              Add Wishlist Notification
+            </button>
+            <button
+              onClick={handleResetWishlist}
+              className="w-full bg-red-500 text-white px-3 py-2 rounded text-sm"
+            >
+              Reset Wishlist
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="bg-white p-4 rounded-lg shadow">
-        <h2 className="text-lg font-semibold mb-2">Test Full Transaction Flow</h2>
-        <p className="text-sm text-gray-600 mb-2">
-          This will add a new transaction and trigger both badge counters
-        </p>
-        <button
-          onClick={handleAddTestTransaction}
-          className="w-full bg-purple-500 text-white px-4 py-2 rounded"
-        >
-          Add Test Transaction
-        </button>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h2 className="text-lg font-semibold mb-2">Test Full Transaction Flow</h2>
+          <p className="text-sm text-gray-600 mb-2">
+            This will add a new transaction and trigger both badge counters
+          </p>
+          <button
+            onClick={handleAddTestTransaction}
+            className="w-full bg-purple-500 text-white px-4 py-2 rounded"
+          >
+            Add Test Transaction
+          </button>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h2 className="text-lg font-semibold mb-2">Test Wishlist Flow</h2>
+          <p className="text-sm text-gray-600 mb-2">
+            This will add a new product to wishlist and trigger wishlist badge
+          </p>
+          <button
+            onClick={handleAddTestWishlist}
+            className="w-full bg-pink-500 text-white px-4 py-2 rounded"
+          >
+            Add Test Product to Wishlist
+          </button>
+        </div>
       </div>
 
       <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
@@ -129,6 +197,8 @@ const NotificationTest = () => {
         <ul className="text-sm text-yellow-700 mt-2 space-y-1">
           <li>• Click &quot;Add Test Transaction&quot; to simulate a new transaction</li>
           <li>• Both Tracking Order and Transaction badges should show +1</li>
+          <li>• Click &quot;Add Test Product to Wishlist&quot; to simulate adding to wishlist</li>
+          <li>• Wishlist badge should show +1</li>
           <li>• Click on the navbar menu items to reset their respective badges</li>
           <li>• Add more notifications to see the counter increment</li>
         </ul>
