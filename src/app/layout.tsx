@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/contexts/CartContext";
 import { TransactionProvider } from "@/contexts/TransactionContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 import ToastProvider from "@/components/ui/ToastProvider";
 
 export const metadata: Metadata = {
@@ -21,12 +22,14 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;700;900&display=swap" rel="stylesheet" />
       </head>
       <body className="antialiased font-jakarta">
-        <CartProvider>
-          <TransactionProvider>
-            {children}
-            <ToastProvider />
-          </TransactionProvider>
-        </CartProvider>
+        <NotificationProvider>
+          <CartProvider>
+            <TransactionProvider>
+              {children}
+              <ToastProvider />
+            </TransactionProvider>
+          </CartProvider>
+        </NotificationProvider>
       </body>
     </html>
   );

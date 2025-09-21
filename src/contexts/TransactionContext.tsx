@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { Transaction, TransactionItem } from "@/types/transaction";
 import { CartItemType } from "./CartContext";
+import { useNotification } from "./NotificationContext";
 
 interface TransactionContextType {
   transactions: Transaction[];
@@ -28,6 +29,7 @@ interface TransactionProviderProps {
 
 export const TransactionProvider: React.FC<TransactionProviderProps> = ({ children }) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const { addNotification } = useNotification();
 
   // Load transactions from localStorage on mount
   useEffect(() => {
@@ -102,9 +104,12 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
 
     setTransactions(prev => [newTransaction, ...prev]);
     
+    // Add notification for both tracking and transaction menus
+    addNotification("tracking");
+    addNotification("transaction");
     
     return newTransaction;
-  }, []);
+  }, [addNotification]);
 
   // Update transaction status
   const updateTransactionStatus = useCallback((transactionId: string, status: string) => {
