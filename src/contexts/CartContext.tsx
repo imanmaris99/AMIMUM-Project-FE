@@ -1,7 +1,9 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useMemo } from "react";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
+import { debounce, memoize } from "@/lib/performance";
+import { ErrorHandler } from "@/lib/errorHandler";
 
 // Cart Item Type sesuai dengan backend DTO
 export interface CartItemType {
@@ -75,16 +77,35 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     if (savedCart) {
       try {
         const parsedCart = JSON.parse(savedCart);
-        setCartItems(parsedCart);
+        if (Array.isArray(parsedCart)) {
+          setCartItems(parsedCart);
+        }
       } catch (error) {
+        ErrorHandler.handleError(error, 'CartLoad');
+        // Clear corrupted cart data
+        localStorage.removeItem('cart');
       }
     }
   }, []);
 
+  // Debounced save to localStorage to prevent excessive writes
+  const debouncedSave = useMemo(
+    () => debounce((items: CartItemType[]) => {
+      try {
+        localStorage.setItem('cart', JSON.stringify(items));
+      } catch (error) {
+        ErrorHandler.handleError(error, 'CartSave');
+      }
+    }, 300),
+    []
+  );
+
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-  }, [cartItems]);
+    if (cartItems.length > 0) {
+      debouncedSave(cartItems);
+    }
+  }, [cartItems, debouncedSave]);
 
   // Generate unique cart ID
   const generateCartId = useCallback(() => {
@@ -221,11 +242,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     return cartItems.some(item => item.product_id === productId && item.variant_id === variantId);
   }, [cartItems]);
 
-  // Calculate totals
-  const totalItems = cartItems.length;
-  const totalPrices = calculateTotalPrices(cartItems);
+  // Memoized calculations to prevent unnecessary re-renders
+  const totalItems = useMemo(() => cartItems.length, [cartItems.length]);
+  const totalPrices = useMemo(() => calculateTotalPrices(cartItems), [cartItems]);
 
-  const value: CartContextType = {
+  // Memoized context value to prevent unnecessary re-renders
+  const value: CartContextType = useMemo(() => ({
     cartItems,
     totalItems,
     totalPrices,
@@ -237,7 +259,19 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     clearAll,
     removeActiveItems,
     isInCart,
-  };
+  }), [
+    cartItems,
+    totalItems,
+    totalPrices,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    updateActiveStatus,
+    clearCart,
+    clearAll,
+    removeActiveItems,
+    isInCart,
+  ]);
 
   return (
     <CartContext.Provider value={value}>

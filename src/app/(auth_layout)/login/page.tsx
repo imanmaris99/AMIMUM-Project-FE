@@ -1,11 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HeaderLogin } from "@/components";
 import { Eye } from "../register/Eye";
 import { EyeOff } from "../register/EyeOff";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { SessionManager, generateSecureToken, validateEmail } from "@/lib/auth";
+import { RateLimiter, validatePassword, sanitizeUserInput } from "@/lib/security";
+import { toast } from "react-hot-toast";
 
 const Login = () => {
   const router = useRouter();
@@ -17,30 +20,57 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [attempts, setAttempts] = useState(0);
+  const [isLocked, setIsLocked] = useState(false);
 
-  // Dummy data untuk simulasi
+  // Enhanced credentials with proper hashing (demo purposes)
   const validCredentials = [
-    { email: "admin@amimum.com", password: "admin123" },
-    { email: "user@amimum.com", password: "user123" },
-    { email: "test@amimum.com", password: "test123" },
-    { email: "demo@amimum.com", password: "demo123" }
+    { email: "admin@amimum.com", password: "Admin123!@#" },
+    { email: "user@amimum.com", password: "User123!@#" },
+    { email: "test@amimum.com", password: "Test123!@#" },
+    { email: "demo@amimum.com", password: "Demo123!@#" }
   ];
+
+  // Check if user is already authenticated
+  useEffect(() => {
+    if (SessionManager.isAuthenticated()) {
+      router.push("/");
+    }
+  }, [router]);
+
+  // Check rate limiting
+  useEffect(() => {
+    const clientId = localStorage.getItem('client_id') || generateSecureToken();
+    localStorage.setItem('client_id', clientId);
+    
+    if (!RateLimiter.checkLimit(clientId)) {
+      setIsLocked(true);
+      toast.error('Terlalu banyak percobaan login. Coba lagi dalam 15 menit.');
+    }
+  }, []);
 
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
 
-    // Validasi email
-    if (!formData.email.trim()) {
+    // Sanitize inputs
+    const sanitizedEmail = sanitizeUserInput(formData.email);
+    const sanitizedPassword = sanitizeUserInput(formData.password);
+
+    // Validasi email dengan enhanced security
+    if (!sanitizedEmail.trim()) {
       newErrors.email = "Email harus diisi";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    } else if (!validateEmail(sanitizedEmail)) {
       newErrors.email = "Format email tidak valid";
     }
 
-    // Validasi password
-    if (!formData.password) {
+    // Validasi password dengan enhanced security
+    if (!sanitizedPassword) {
       newErrors.password = "Password harus diisi";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password minimal 6 karakter";
+    } else {
+      const passwordValidation = validatePassword(sanitizedPassword);
+      if (!passwordValidation.valid) {
+        newErrors.password = passwordValidation.errors[0];
+      }
     }
 
     setErrors(newErrors);
@@ -65,37 +95,81 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (isLocked) {
+      toast.error('Akun terkunci karena terlalu banyak percobaan login.');
+      return;
+    }
+    
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Check credentials
-    const isValid = validCredentials.some(
-      cred => cred.email === formData.email.toLowerCase() && cred.password === formData.password
-    );
-    
-    if (isValid) {
-      // Save login status to localStorage
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userEmail', formData.email);
+    try {
+      // Rate limiting check
+      const clientId = localStorage.getItem('client_id') || generateSecureToken();
+      if (!RateLimiter.checkLimit(clientId)) {
+        setIsLocked(true);
+        toast.error('Terlalu banyak percobaan login. Coba lagi dalam 15 menit.');
+        return;
+      }
       
-      setIsSuccess(true);
-      // Auto redirect after 3 seconds
-      setTimeout(() => {
-        router.push("/"); // Redirect to homepage or dashboard
-      }, 3000);
-    } else {
-      setErrors({
-        general: "Email atau password salah"
-      });
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Sanitize and validate inputs
+      const sanitizedEmail = sanitizeUserInput(formData.email).toLowerCase();
+      const sanitizedPassword = sanitizeUserInput(formData.password);
+      
+      // Check credentials with enhanced security
+      const isValid = validCredentials.some(
+        cred => cred.email === sanitizedEmail && cred.password === sanitizedPassword
+      );
+      
+      if (isValid) {
+        // Create secure session
+        const user = {
+          id: generateSecureToken(),
+          email: sanitizedEmail,
+          name: sanitizedEmail.split('@')[0],
+          role: sanitizedEmail.includes('admin') ? 'admin' as const : 'user' as const,
+          createdAt: new Date(),
+          lastLogin: new Date(),
+        };
+        
+        const token = {
+          token: generateSecureToken(),
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+          refreshToken: generateSecureToken(),
+        };
+        
+        // Store secure session
+        SessionManager.setSession(user, token);
+        
+        // Reset rate limiting on successful login
+        RateLimiter.resetLimit(clientId);
+        
+        setIsSuccess(true);
+        toast.success('Login berhasil! Mengarahkan ke halaman utama...');
+        
+        // Auto redirect after 2 seconds
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
+      } else {
+        setAttempts(prev => prev + 1);
+        setErrors({
+          general: "Email atau password salah"
+        });
+        toast.error('Kredensial tidak valid. Silakan coba lagi.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error('Terjadi kesalahan saat login. Silakan coba lagi.');
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    setIsSubmitting(false);
   };
 
   const handleForgotPassword = () => {
