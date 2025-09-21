@@ -59,12 +59,11 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   
   return (
     <main className="pb-20">
-      <UnifiedHeader 
-        type="main"
-        showSearch={true}
-        showCart={true}
-        showNotifications={true}
-      />
+              <UnifiedHeader 
+                type="main"
+                showCart={true}
+                showNotifications={true}
+              />
       <DetailBrand brandDetail={brandData} errorMessage={errorMessage} />
       <SearchProductByBrand brandId={Number(brandId)} brandName={brandData?.name || ""} />
       <ProductList products={products} />

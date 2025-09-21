@@ -63,12 +63,11 @@ export default function HomeClient({
     
   return (
     <div className="pb-20">
-      <UnifiedHeader 
-        type="main"
-        showSearch={true}
-        showCart={true}
-        showNotifications={true}
-      />
+        <UnifiedHeader 
+          type="main"
+          showCart={true}
+          showNotifications={true}
+        />
       <Search />
       <Promo promo={promoData} errorMessage={promoError} />
       <Category

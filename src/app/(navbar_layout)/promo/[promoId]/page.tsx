@@ -61,12 +61,11 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
   
   return (
     <div className="pb-20">
-      <UnifiedHeader 
-        type="main"
-        showSearch={true}
-        showCart={true}
-        showNotifications={true}
-      />
+              <UnifiedHeader 
+                type="main"
+                showCart={true}
+                showNotifications={true}
+              />
       <DetailBrand brandDetail={brandData} errorMessage={errorMessage} />
       <ProductList products={products} />
     </div>

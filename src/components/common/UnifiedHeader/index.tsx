@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { GoChevronLeft, GoSearch } from 'react-icons/go';
+import { GoChevronLeft } from 'react-icons/go';
 import { HiOutlineShoppingBag, HiOutlineBell } from 'react-icons/hi';
 import { useNotification } from '@/contexts/NotificationContext';
 
@@ -15,7 +15,6 @@ interface UnifiedHeaderProps {
   title?: string;
   subtitle?: string;
   showBackButton?: boolean;
-  showSearch?: boolean;
   showCart?: boolean;
   showNotifications?: boolean;
   onBack?: () => void;
@@ -27,7 +26,6 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   title = "AmImUm",
   subtitle,
   showBackButton = false,
-  showSearch = false,
   showCart = true,
   showNotifications = true,
   onBack,
@@ -66,19 +64,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
               </div>
             </div>
 
-            {/* Center: Search (if enabled) */}
-            {showSearch && (
-              <div className="flex-1 max-w-md mx-4">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Cari produk..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  />
-                  <GoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                </div>
-              </div>
-            )}
+            {/* Center: Search (if enabled) - Removed to avoid redundancy with homepage Search component */}
 
             {/* Right: Only Cart (no navbar redundancy) */}
             <div className="flex items-center gap-3">
