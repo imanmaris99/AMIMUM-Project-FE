@@ -14,11 +14,19 @@ const WishlistWithNotification: React.FC<WishlistWithNotificationProps> = ({ chi
 
   // Track previous wishlist length to detect new additions
   useEffect(() => {
+    // Skip if wishlistItems is still loading (empty array on initial load)
+    if (wishlistItems.length === 0) {
+      return;
+    }
+
     const prevLength = parseInt(localStorage.getItem('wishlist_prev_length') || '0');
     const currentLength = wishlistItems.length;
     
-    // Only trigger notification if wishlist actually has items and length increased
-    if (currentLength > 0 && currentLength > prevLength) {
+    // Only trigger notification if:
+    // 1. Wishlist has items
+    // 2. Length actually increased (not just initial load)
+    // 3. Previous length was not 0 (to avoid triggering on first load)
+    if (currentLength > 0 && currentLength > prevLength && prevLength > 0) {
       // New item was added
       addNotification("wishlist");
     }

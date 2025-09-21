@@ -14,11 +14,19 @@ const CartWithNotification: React.FC<CartWithNotificationProps> = ({ children })
 
   // Track previous cart length to detect new additions
   useEffect(() => {
+    // Skip if cartItems is still loading (empty array on initial load)
+    if (cartItems.length === 0) {
+      return;
+    }
+
     const prevLength = parseInt(localStorage.getItem('cart_prev_length') || '0');
     const currentLength = cartItems.length;
     
-    // Only trigger notification if cart actually has items and length increased
-    if (currentLength > 0 && currentLength > prevLength) {
+    // Only trigger notification if:
+    // 1. Cart has items
+    // 2. Length actually increased (not just initial load)
+    // 3. Previous length was not 0 (to avoid triggering on first load)
+    if (currentLength > 0 && currentLength > prevLength && prevLength > 0) {
       // New item was added to cart
       addNotification("cart");
     }
