@@ -132,7 +132,7 @@ const Shipment = () => {
           isActive: idx === index
         })));
         
-      } catch (error) {
+      } catch {
       } finally {
         setSavingIndex(null);
       }

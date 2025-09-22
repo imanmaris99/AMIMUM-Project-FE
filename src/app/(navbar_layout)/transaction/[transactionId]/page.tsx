@@ -232,7 +232,7 @@ const TransactionDetailPage: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm border p-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Catatan Tambahan</h3>
               <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
-                "{transaction.notes}"
+                &ldquo;{transaction.notes}&rdquo;
               </p>
             </div>
           )}

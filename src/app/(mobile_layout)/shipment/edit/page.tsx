@@ -83,13 +83,13 @@ const EditShipment = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Simulasi data shipment yang diupdate
-      const updatedShipment = {
-        id: shipmentId,
-        sender: senderData,
-        receiver: receiverData,
-        package: data,
-        updatedAt: new Date().toISOString()
-      };
+      // const updatedShipment = { // Removed unused variable
+      //   id: shipmentId,
+      //   sender: senderData,
+      //   receiver: receiverData,
+      //   package: data,
+      //   updatedAt: new Date().toISOString()
+      // };
       
       
       // Show success message
@@ -100,17 +100,17 @@ const EditShipment = () => {
         router.push("/shipment?updated=true");
       }, 2000);
       
-    } catch (error) {
+    } catch {
       toast.error("Gagal mengupdate alamat pengiriman. Silakan coba lagi.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleNextStep = (event: React.FormEvent) => {
-    event.preventDefault();
-    setCurrentStep((prevStep) => prevStep + 1);
-  };
+  // const handleNextStep = (event: React.FormEvent) => { // Removed unused function
+  //   event.preventDefault();
+  //   setCurrentStep((prevStep) => prevStep + 1);
+  // };
 
   const handlePreviousStep = () => {
     setCurrentStep((prevStep) => prevStep - 1);

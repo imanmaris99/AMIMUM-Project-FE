@@ -13,18 +13,18 @@ const CreateShipment = () => {
   const router = useRouter();
   
   const [currentStep, setCurrentStep] = useState(0);
-  const [senderData, setSenderData] = useState<SenderFormData | null>(null);
-  const [receiverData, setReceiverData] = useState<ReceiverFormData | null>(null);
-  const [packageData, setPackageData] = useState<PackageFormData | null>(null);
+  // const [senderData, setSenderData] = useState<SenderFormData | null>(null); // Removed unused variable
+  // const [receiverData, setReceiverData] = useState<ReceiverFormData | null>(null); // Removed unused variable
+  // const [packageData, setPackageData] = useState<PackageFormData | null>(null); // Removed unused variable
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSenderSubmit = (data: SenderFormData) => {
-    setSenderData(data);
+  const handleSenderSubmit = (/* data: SenderFormData */) => { // Removed unused parameter
+    // setSenderData(data); // Removed unused function call
     setCurrentStep(1);
   };
 
-  const handleReceiverSubmit = (data: ReceiverFormData) => {
-    setReceiverData(data);
+  const handleReceiverSubmit = (/* data: ReceiverFormData */) => { // Removed unused parameter
+    // setReceiverData(data); // Removed unused function call
     setCurrentStep(2);
   };
 
@@ -37,28 +37,28 @@ const CreateShipment = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Simulasi data shipment baru
-      const newShipment = {
-        id: `ship-${Date.now()}`,
-        sender: senderData,
-        receiver: receiverData,
-        package: data,
-        createdAt: new Date().toISOString()
-      };
+      // const newShipment = { // Removed unused variable
+      //   id: `ship-${Date.now()}`,
+      //   sender: senderData,
+      //   receiver: receiverData,
+      //   package: data,
+      //   createdAt: new Date().toISOString()
+      // };
       
       
       // Redirect ke halaman shipment dengan pesan sukses
       router.push("/shipment?created=true");
-    } catch (error) {
+    } catch {
       toast.error("Gagal membuat alamat pengiriman. Silakan coba lagi.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleNextStep = (event: React.FormEvent) => {
-    event.preventDefault();
-    setCurrentStep((prevStep) => prevStep + 1);
-  };
+  // const handleNextStep = (event: React.FormEvent) => { // Removed unused function
+  //   event.preventDefault();
+  //   setCurrentStep((prevStep) => prevStep + 1);
+  // };
 
   const handlePreviousStep = () => {
     setCurrentStep((prevStep) => prevStep - 1);

@@ -20,7 +20,7 @@ const Wishlist = () => {
     setTotalItems(wishlistItems.length);
   }, [wishlistItems]);
 
-  const handleRemoveItem = (_itemId: string) => {
+  const handleRemoveItem = (/* _itemId: string */) => { // Removed unused parameter
     // This function is now handled by the context
     // We keep it for backward compatibility with WishlistList
   };

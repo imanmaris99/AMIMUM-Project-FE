@@ -18,7 +18,7 @@ export default function MyRatingsPage() {
         const userId = "user-001"; // Dummy user ID
         const userRatings = getUserRatingData(userId);
         setRatings(userRatings);
-      } catch (error) {
+      } catch {
       } finally {
         setIsLoading(false);
       }

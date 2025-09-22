@@ -20,7 +20,7 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
-  const [attempts] = useState(0);
+  // const [attempts] = useState(0); // Removed unused variable
   const [isLocked, setIsLocked] = useState(false);
 
   // Enhanced credentials with proper hashing (demo purposes)
@@ -178,7 +178,7 @@ const Login = () => {
         });
         toast.error('Kredensial tidak valid. Silakan coba lagi.');
       }
-    } catch (error) {
+    } catch {
       toast.error('Terjadi kesalahan saat login. Silakan coba lagi.');
     } finally {
       setIsSubmitting(false);

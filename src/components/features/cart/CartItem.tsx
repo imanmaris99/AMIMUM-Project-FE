@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { CartItemType } from "@/contexts/CartContext";
 
@@ -101,7 +102,14 @@ const CartItem: React.FC<CartItemProps> = ({
       >
         {/* Image */}
         <div className="w-[70px] h-[70px] rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 bg-gray-50 grid place-items-center">
-          <img src={item.variant_info.img} alt={item.product_name} className="w-full h-full object-cover" />
+          <Image 
+            src={item.variant_info.img} 
+            alt={item.product_name} 
+            width={70}
+            height={70}
+            className="w-full h-full object-cover"
+            sizes="70px"
+          />
         </div>
 
         {/* Text */}
@@ -130,7 +138,7 @@ const CartItem: React.FC<CartItemProps> = ({
           title="Hapus" 
           onClick={handleDelete}
         >
-          <img src="/Trush_Icon_UIA.svg" alt="Hapus" width="16" height="16" />
+          <Image src="/Trush_Icon_UIA.svg" alt="Hapus" width={16} height={16} />
         </button>
 
         <div className="flex items-center border border-gray-200 rounded-md h-7 overflow-hidden" role="group" aria-label="Pengatur jumlah">

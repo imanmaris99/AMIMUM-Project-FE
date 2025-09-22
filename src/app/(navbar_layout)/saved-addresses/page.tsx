@@ -29,15 +29,7 @@ const SavedAddressesPage: React.FC = () => {
     setIsEditModalOpen(false);
   };
 
-  const handleSaveAddress = (addressData: {
-    name: string;
-    phone: string;
-    address: string;
-    city: string;
-    province: string;
-    country: string;
-    postalCode: string;
-  }) => {
+  const handleSaveAddress = () => { // Removed unused parameter
     // Handle save address data
     
     // Show success message
@@ -52,15 +44,7 @@ const SavedAddressesPage: React.FC = () => {
     setIsAddModalOpen(false);
   };
 
-  const handleSaveNewAddress = (addressData: {
-    name: string;
-    phone: string;
-    address: string;
-    city: string;
-    province: string;
-    country: string;
-    postalCode: string;
-  }) => {
+  const handleSaveNewAddress = () => { // Removed unused parameter
     // Handle save new address data
     
     // Show success message
