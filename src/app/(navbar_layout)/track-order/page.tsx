@@ -68,8 +68,18 @@ const TrackOrderPage: React.FC = () => {
   // Get current transaction data
   useEffect(() => {
     if (transactionId) {
+      // If specific transaction ID is provided, find that transaction
       const transaction = transactions.find(t => t.id === transactionId);
       setCurrentTransaction(transaction);
+    } else if (transactions.length > 0) {
+      // If no specific transaction ID, use the most recent transaction
+      const mostRecentTransaction = transactions.sort((a, b) => 
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+      )[0];
+      setCurrentTransaction(mostRecentTransaction);
+    } else {
+      // No transactions available
+      setCurrentTransaction(null);
     }
   }, [transactionId, transactions]);
 
