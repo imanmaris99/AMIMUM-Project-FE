@@ -503,30 +503,30 @@ const PRODUCT_TEMPLATES = {
 // } as const;
 
 // ==================== UTILITY FUNCTIONS ====================
-function calculateDiscountedPrice(price: number, discount: number): number {
-  return Math.round(price * (1 - discount / 100));
-}
+// function calculateDiscountedPrice(price: number, discount: number): number { // Removed unused function
+//   return Math.round(price * (1 - discount / 100));
+// }
 
 // function generateProductId(brandId: string, productIndex: number): string { // Removed unused function
 //   return `${brandId}${String(productIndex).padStart(2, '0')}`;
 // }
 
 // ==================== IMAGE MAPPING ====================
-const PRODUCT_IMAGES = {
-  "beras-kencur": "/buyungupik_agr-1.svg",
-  "kunyit-asam": "/buyungupik_agr-1.svg",
-  "galian-singset": "/buyungupik_agr-1.svg",
-  "temulawak": "/buyungupik_agr-1.svg",
-  "jahe-merah": "/buyungupik_agr-1.svg",
-  "asam-urat": "/buyungupik_agr-1.svg",
-  "sirih-merah": "/buyungupik_agr-1.svg",
-  "kumis-kucing": "/buyungupik_agr-1.svg",
-  "sambiloto": "/buyungupik_agr-1.svg",
-  "daun-dewa": "/buyungupik_agr-1.svg",
-  "pegagan": "/buyungupik_agr-1.svg",
-  "lidah-buaya": "/buyungupik_agr-1.svg",
-  "mahkota-dewa": "/buyungupik_agr-1.svg"
-} as const;
+// const PRODUCT_IMAGES = { // Removed unused variable
+//   "beras-kencur": "/buyungupik_agr-1.svg",
+//   "kunyit-asam": "/buyungupik_agr-1.svg",
+//   "galian-singset": "/buyungupik_agr-1.svg",
+//   "temulawak": "/buyungupik_agr-1.svg",
+//   "jahe-merah": "/buyungupik_agr-1.svg",
+//   "asam-urat": "/buyungupik_agr-1.svg",
+//   "sirih-merah": "/buyungupik_agr-1.svg",
+//   "kumis-kucing": "/buyungupik_agr-1.svg",
+//   "sambiloto": "/buyungupik_agr-1.svg",
+//   "daun-dewa": "/buyungupik_agr-1.svg",
+//   "pegagan": "/buyungupik_agr-1.svg",
+//   "lidah-buaya": "/buyungupik_agr-1.svg",
+//   "mahkota-dewa": "/buyungupik_agr-1.svg"
+// } as const;
 
 // function createVariants(basePrice: number, discount: number, stock: number[], hasDiscount: boolean, template: string): any[] { // Removed unused function
 //   const actualDiscount = hasDiscount ? discount : 0;

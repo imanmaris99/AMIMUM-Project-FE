@@ -74,7 +74,7 @@ export default async function handler(
 
 // Example helper functions (implement based on your needs)
 
-async function storePerformanceInDatabase(performance: PerformanceReport[]) {
+// async function storePerformanceInDatabase(performance: PerformanceReport[]) { // Removed unused function
   // Implement database storage
   // Example with Prisma:
   // await prisma.performance.createMany({
@@ -88,9 +88,9 @@ async function storePerformanceInDatabase(performance: PerformanceReport[]) {
   //     context: metric.context
   //   }))
   // });
-}
+// }
 
-async function sendToGoogleAnalytics(performance: PerformanceReport[]) {
+// async function sendToGoogleAnalytics(performance: PerformanceReport[]) { // Removed unused function
   // Implement Google Analytics integration
   // Example:
   // performance.forEach(metric => {
@@ -102,9 +102,9 @@ async function sendToGoogleAnalytics(performance: PerformanceReport[]) {
   //     session_id: metric.sessionId
   //   });
   // });
-}
+// }
 
-async function sendToCustomAnalytics(performance: PerformanceReport[]) {
+// async function sendToCustomAnalytics(performance: PerformanceReport[]) { // Removed unused function
   // Implement custom analytics service
   // Example:
   // await fetch('https://your-analytics-service.com/api/performance', {
@@ -112,9 +112,9 @@ async function sendToCustomAnalytics(performance: PerformanceReport[]) {
   //   headers: { 'Content-Type': 'application/json' },
   //   body: JSON.stringify({ performance })
   // });
-}
+// }
 
-async function sendPerformanceAlert(slowMetrics: PerformanceReport[]) {
+// async function sendPerformanceAlert(slowMetrics: PerformanceReport[]) { // Removed unused function
   // Implement performance alert system
   // Example:
   // await sendAlert({
@@ -122,4 +122,4 @@ async function sendPerformanceAlert(slowMetrics: PerformanceReport[]) {
   //   message: `${slowMetrics.length} slow tasks detected`,
   //   metrics: slowMetrics
   // });
-}
+// }

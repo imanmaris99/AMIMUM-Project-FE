@@ -194,11 +194,11 @@ export class PerformanceMonitor {
 
       // CLS - Cumulative Layout Shift
       const clsObserver = new PerformanceObserver((list) => {
-        let clsValue = 0;
+        // let clsValue = 0; // Removed unused variable
         const entries = list.getEntries();
         entries.forEach((entry) => {
           if (!(entry as any).hadRecentInput) {
-            clsValue += (entry as any).value;
+            // clsValue += (entry as any).value; // Removed unused variable usage
           }
         });
       });
@@ -307,7 +307,7 @@ export function analyzeBundleSize() {
         fetch(src)
           .then(response => response.blob())
           .then(blob => {
-            const sizeKB = (blob.size / 1024).toFixed(2);
+            // const sizeKB = (blob.size / 1024).toFixed(2); // Removed unused variable
           });
       }
     });

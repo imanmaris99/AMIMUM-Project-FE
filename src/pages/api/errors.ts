@@ -77,7 +77,7 @@ export default async function handler(
 
 // Example helper functions (implement based on your needs)
 
-async function storeErrorsInDatabase(errors: ErrorReport[]) {
+// async function storeErrorsInDatabase(errors: ErrorReport[]) { // Removed unused function
   // Implement database storage
   // Example with Prisma:
   // await prisma.error.createMany({
@@ -96,9 +96,9 @@ async function storeErrorsInDatabase(errors: ErrorReport[]) {
   //     context: error.context
   //   }))
   // });
-}
+// }
 
-async function sendToSentry(errors: ErrorReport[]) {
+// async function sendToSentry(errors: ErrorReport[]) { // Removed unused function
   // Implement Sentry integration
   // Example:
   // errors.forEach(error => {
@@ -117,9 +117,9 @@ async function sendToSentry(errors: ErrorReport[]) {
   //     }
   //   });
   // });
-}
+// }
 
-async function sendCriticalErrorAlert(criticalErrors: ErrorReport[]) {
+// async function sendCriticalErrorAlert(criticalErrors: ErrorReport[]) { // Removed unused function
   // Implement alert system
   // Example with email/Slack/Discord:
   // await sendAlert({
@@ -127,14 +127,14 @@ async function sendCriticalErrorAlert(criticalErrors: ErrorReport[]) {
   //   message: `${criticalErrors.length} critical errors occurred`,
   //   errors: criticalErrors
   // });
-}
+// }
 
-async function logErrorsToFile(errors: ErrorReport[]) {
+// async function logErrorsToFile(errors: ErrorReport[]) { // Removed unused function
   // Implement file logging
   // Example with fs:
   // const logEntry = {
   //   timestamp: new Date().toISOString(),
   //   errors: errors
   // };
-  // await fs.appendFile('error.log', JSON.stringify(logEntry) + '\n');
-}
+  // await fs.appendFile('error.log', JSON.stringify(logEntry) + '\n');  
+// }

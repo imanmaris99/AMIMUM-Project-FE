@@ -1,4 +1,4 @@
-import { ShipmentAddress, Courier, ShipmentData, CourierCompany, CourierService } from '@/types/shipment';
+import { ShipmentAddress, Courier, ShipmentData, CourierCompany } from '@/types/shipment';
 
 // Data dummy untuk alamat pengiriman sesuai backend DTOs
 export const dummyShipmentAddresses: ShipmentAddress[] = [
