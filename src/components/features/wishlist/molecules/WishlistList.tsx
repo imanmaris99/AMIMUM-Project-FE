@@ -27,7 +27,8 @@ const WishlistList: React.FC<WishlistListProps> = ({ items, onRemoveItem }) => {
       }
       // Also call the passed onRemoveItem for backward compatibility
       onRemoveItem(id);
-    } catch (error) {
+    } catch {
+      // Ignore wishlist removal errors
     } finally {
       setRemovingItems(prev => {
         const newSet = new Set(prev);

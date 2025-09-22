@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { GoChevronDown, GoPackage, GoCheck } from 'react-icons/go';
-import { CourierCompany, CourierService } from '@/types/shipment';
+import { CourierCompany } from '@/types/shipment';
 import rupiahFormater from '@/utils/rupiahFormater';
 
 interface CourierSelectorProps {

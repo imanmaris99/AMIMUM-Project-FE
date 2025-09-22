@@ -61,9 +61,9 @@ export function getAllCardProducts(): CardProductProps[] {
 export function getCardProductsByBrand(brandId: string): CardProductProps[] {
   try {
     return generateBrandProducts(brandId);
-  } catch (error) {
-    return [];
-  }
+    } catch {
+      return [];
+    }
 }
 
 export function getCardProductsBySearch(query: string, brandFilter?: string): CardProductProps[] {
@@ -155,9 +155,9 @@ export function getPromoProducts(brandId: string): CardProductProps[] {
       ...product,
       brand_highest_discount: brand.promo_special
     }));
-  } catch (error) {
-    return [];
-  }
+    } catch {
+      return [];
+    }
 }
 
 export function getPromoData() {
@@ -213,9 +213,9 @@ export function getUserRatingData(userId: string) {
 export function searchProducts(query: string, brandFilter?: string): CardProductProps[] {
   try {
     return getCardProductsBySearch(query, brandFilter);
-  } catch (error) {
-    return [];
-  }
+    } catch {
+      return [];
+    }
 }
 
 // ==================== CART UTILITIES ====================

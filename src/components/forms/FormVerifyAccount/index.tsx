@@ -1,8 +1,8 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Card, CardContent } from "@/components/ui/card";
+// import { Input } from "@/components/ui/input"; // Removed unused import
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -11,7 +11,7 @@ import { postVerifyAccount } from "@/services/api/verify-account";
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/ui/Spinner";
 import React from "react";
-import Image from "next/image";
+// import Image from "next/image"; // Removed unused import
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),

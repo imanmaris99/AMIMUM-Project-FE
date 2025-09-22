@@ -93,7 +93,7 @@ const StatusOrder: React.FC<StatusOrderProps> = ({ currentStatus = 0, deliveryTy
         
         {/* Status List */}
         <div className="space-y-5">
-          {statusItems.map((item, index) => (
+          {statusItems.map((item) => (
             <div key={item.id} className="flex items-center justify-between">
               {/* Left side - Icon and Text */}
               <div className="flex items-center gap-4">

@@ -56,7 +56,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
           };
           setNotifications(validatedNotifications);
         }
-      } catch (error) {
+      } catch {
         // Reset to default state on error
         setNotifications({
           tracking: { count: 0, isViewed: true },

@@ -83,7 +83,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         try {
           const isValid = validateCartItemData(item);
           return isValid;
-        } catch (validationError) {
+        } catch {
           return false;
         }
       });

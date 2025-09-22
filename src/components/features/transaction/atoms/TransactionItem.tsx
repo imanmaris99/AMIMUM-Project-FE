@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Transaction } from "@/types/transaction";
-import rupiahFormater from "@/utils/rupiahFormater";
+// import rupiahFormater from "@/utils/rupiahFormater"; // Removed unused import
 
 interface TransactionItemProps {
   transaction: Transaction;

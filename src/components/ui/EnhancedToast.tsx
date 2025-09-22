@@ -22,8 +22,8 @@ const EnhancedToast: React.FC<EnhancedToastProps> = ({
   type = "info",
   title,
   action,
-  duration = 5000,
-  persistent = false
+  // duration = 5000, // Removed unused parameter
+  // persistent = false // Removed unused parameter
 }) => {
   const icons = {
     success: <CheckCircle className="w-5 h-5 text-green-500" />,
@@ -155,8 +155,8 @@ export const enhancedToast = {
     });
   },
 
-  loading: (message: string, options?: Partial<EnhancedToastProps>) => {
-    return toast.custom((t) => (
+  loading: (message: string, /* options?: Partial<EnhancedToastProps> */) => { // Removed unused parameter
+    return toast.custom((/* t */) => ( // Removed unused parameter
       <div className="max-w-sm w-full bg-white border border-gray-200 rounded-lg shadow-lg pointer-events-auto">
         <div className="p-4">
           <div className="flex items-center">
