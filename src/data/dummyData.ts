@@ -41,7 +41,7 @@ export const BRAND_DATA = {
       "Menggunakan bahan-bahan alami pilihan",
       "Proses produksi higienis dan modern"
     ],
-    category: "Jamu",
+    category: "Jamu Tradisional",
     total_product: 15,
     total_product_with_promo: 7, // 7 produk yang memiliki discount
     promo_special: 29, // Update to match actual max discount
@@ -56,7 +56,7 @@ export const BRAND_DATA = {
       "Resep tradisional yang sudah terbukti",
       "Diolah dengan standar farmasi"
     ],
-    category: "Jamu",
+    category: "Jamu Herbal",
     total_product: 15,
     total_product_with_promo: 6, // 6 produk yang memiliki discount
     promo_special: 28, // Update to match actual max discount
@@ -71,7 +71,7 @@ export const BRAND_DATA = {
       "Menggunakan teknologi modern",
       "Terpercaya sejak puluhan tahun"
     ],
-    category: "Jamu",
+    category: "Jamu Modern",
     total_product: 15,
     total_product_with_promo: 8, // 8 produk yang memiliki discount
     promo_special: 30, // Update to match actual max discount
@@ -86,7 +86,7 @@ export const BRAND_DATA = {
       "Resep turun temurun yang sudah terbukti",
       "Kualitas terjamin dan terpercaya"
     ],
-    category: "Jamu",
+    category: "Jamu Premium",
     total_product: 15,
     total_product_with_promo: 9, // 9 produk yang memiliki discount
     promo_special: 30,
@@ -101,7 +101,7 @@ export const BRAND_DATA = {
       "Mengutamakan keseimbangan tubuh dan jiwa",
       "Bahan-bahan alami berkualitas tinggi"
     ],
-    category: "Jamu",
+    category: "Jamu Kesehatan",
     total_product: 10,
     total_product_with_promo: 4, // 4 produk yang memiliki discount
     promo_special: 27, // Update to match actual max discount
@@ -116,7 +116,7 @@ export const BRAND_DATA = {
       "Menggabungkan tradisi dan teknologi",
       "Terpercaya oleh jutaan keluarga Indonesia"
     ],
-    category: "Jamu",
+    category: "Jamu Modern",
     total_product: 15,
     total_product_with_promo: 7, // 7 produk yang memiliki discount
     promo_special: 26, // Update to match actual max discount
