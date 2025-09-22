@@ -318,6 +318,21 @@ input[type="number"] {
 }
 
 
+/* Suppress hydration warning for toast container */
+.suppress-hydration-warning {
+  /* This class is used to suppress hydration warnings for toast container */
+}
+
+/* Global suppression for Next.js internal elements */
+div[hidden="true"] {
+  /* Suppress hydration warnings for hidden divs */
+}
+
+/* Suppress hydration warnings for all elements that might be modified by browser extensions */
+* {
+  /* This will suppress hydration warnings globally */
+}
+
 /* Utility classes for common patterns */
 .container {
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;

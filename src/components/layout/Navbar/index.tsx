@@ -46,13 +46,14 @@ const Navbar = () => {
     <div
       className="flex flex-col gap-4 fixed bottom-0 right-0 left-0 bg-white mx-auto z-50"
       style={{ maxWidth: "440px", width: "100%" }}
+      suppressHydrationWarning={true}
     >
-      <div className="shadow-box" suppressHydrationWarning>
-        <div className="flex justify-center items-center gap-8 h-14" suppressHydrationWarning>
+      <div className="shadow-box" suppressHydrationWarning={true}>
+        <div className="flex justify-center items-center gap-8 h-14" suppressHydrationWarning={true}>
           <div
             className={`${getIconClass("/")} rounded-full p-2 cursor-pointer`}
             onClick={() => handleClick("/")}
-            suppressHydrationWarning
+            suppressHydrationWarning={true}
           >
             <GoHome size={32} />
           </div>
@@ -62,7 +63,7 @@ const Navbar = () => {
               "/wishlist"
             )} rounded-full p-2 cursor-pointer relative`}
             onClick={() => handleClick("/wishlist")}
-            suppressHydrationWarning
+            suppressHydrationWarning={true}
           >
             <GoHeart size={32} />
             <Badge count={getNotificationCount("wishlist")} />
@@ -73,7 +74,7 @@ const Navbar = () => {
               "/track-order"
             )} rounded-full p-2 cursor-pointer relative`}
             onClick={() => handleClick("/track-order")}
-            suppressHydrationWarning
+            suppressHydrationWarning={true}
           >
             <HiOutlineTruck size={32} />
             <Badge count={getNotificationCount("tracking")} />
@@ -84,7 +85,7 @@ const Navbar = () => {
               "/transaction"
             )} rounded-full p-2 cursor-pointer relative`}
             onClick={() => handleClick("/transaction")}
-            suppressHydrationWarning
+            suppressHydrationWarning={true}
           >
             <HiOutlineDocumentText size={32} />
             <Badge count={getNotificationCount("transaction")} />
@@ -95,7 +96,7 @@ const Navbar = () => {
               "/profile"
             )} rounded-full p-2 cursor-pointer`}
             onClick={() => handleClick("/profile")}
-            suppressHydrationWarning
+            suppressHydrationWarning={true}
           >
             <VscAccount size={32} />
           </div>

@@ -1,13 +1,25 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 
 const ToastProvider: React.FC = () => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
+
   return (
-    <Toaster 
-      position="top-center"
-      toastOptions={{
+    <div suppressHydrationWarning={true}>
+      <Toaster 
+        position="top-center"
+        suppressHydrationWarning={true}
+        toastOptions={{
         duration: 3000,
         style: {
           background: '#363636',
@@ -59,7 +71,9 @@ const ToastProvider: React.FC = () => {
         width: '100%',
         zIndex: 9999,
       }}
-    />
+      containerClassName="suppress-hydration-warning"
+      />
+    </div>
   );
 };
 

@@ -114,10 +114,10 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   if (type === 'main') {
     return (
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="px-3 sm:px-4 py-2 sm:py-3" suppressHydrationWarning>
-          <div className="flex items-center justify-between" suppressHydrationWarning>
+        <div className="px-3 sm:px-4 py-2 sm:py-3" suppressHydrationWarning={true}>
+          <div className="flex items-center justify-between" suppressHydrationWarning={true}>
             {/* Left: Logo + Brand */}
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink-0" suppressHydrationWarning>
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink-0" suppressHydrationWarning={true}>
               <Image 
                 src="/logo_toko.svg" 
                 alt="AmImUm Logo" 
@@ -134,7 +134,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
             {/* Center: Search (if enabled) - Removed to avoid redundancy with homepage Search component */}
 
             {/* Right: User Menu */}
-            <div className="flex items-center gap-2" suppressHydrationWarning>
+            <div className="flex items-center gap-2" suppressHydrationWarning={true}>
               {/* User Menu */}
               {isLoggedIn ? (
                 <div className="relative" ref={profileDropdownRef}>
@@ -142,6 +142,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                   <button
                     onClick={() => setShowProfileDropdown(!showProfileDropdown)}
                     className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    suppressHydrationWarning={true}
                   >
                     {/* Username */}
                     <span className="hidden md:block text-sm text-gray-700 max-w-20 truncate">
@@ -239,7 +240,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                   )}
                 </div>
               ) : (
-                <div className="hidden sm:flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-2" suppressHydrationWarning={true}>
                   <Link
                     href="/login"
                     className="text-sm text-primary hover:text-primary/80 transition-colors px-3 py-2 rounded-lg"
@@ -275,7 +276,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
           <div className="sm:hidden fixed inset-0 z-50 bg-black bg-opacity-50" onClick={() => setShowMobileMenu(false)}>
             <div className="absolute right-0 top-0 h-full w-80 bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
               <div className="p-4 border-b border-gray-200">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between" suppressHydrationWarning={true}>
                   <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
                   <button
                     onClick={() => setShowMobileMenu(false)}
@@ -392,7 +393,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
     return (
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="px-3 sm:px-4 py-2 sm:py-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between" suppressHydrationWarning={true}>
             {/* Left: Back Button */}
             {showBackButton && (
               <button

@@ -20,25 +20,30 @@ const Carousel = ({ items, itemsToShow, interval = 4000 }: CarouselProps) => {
   );
   
   const carouselRef = useRef<HTMLDivElement>(null);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   const handleIndicatorClick = useCallback(
     (index: number) => {
       setActiveIndex(index * itemsToShow);
     },
-    [itemsToShow]
+    [itemsToShow, setActiveIndex]
   );
 
   const transformValue = (activeIndex / itemsToShow) * 100;
   
+  // Handle mounting to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
   // Force transition to work
   useEffect(() => {
-    if (carouselRef.current) {
+    if (carouselRef.current && isMounted) {
       // Remove transition temporarily
       carouselRef.current.style.transition = 'none';
       
       // Force reflow
-      carouselRef.current.offsetHeight;
+      void carouselRef.current.offsetHeight;
       
       // Add transition back after a small delay
       setTimeout(() => {
@@ -47,7 +52,7 @@ const Carousel = ({ items, itemsToShow, interval = 4000 }: CarouselProps) => {
         }
       }, 10);
     }
-  }, [activeIndex]);
+  }, [activeIndex, isMounted]);
   
   
   
@@ -60,6 +65,7 @@ const Carousel = ({ items, itemsToShow, interval = 4000 }: CarouselProps) => {
         style={{
           transform: `translateX(-${transformValue}%)`,
         }}
+        suppressHydrationWarning={true}
       >
         {items.map((item, index) => (
           <CarouselItem key={index} item={item} itemsToShow={itemsToShow} />
