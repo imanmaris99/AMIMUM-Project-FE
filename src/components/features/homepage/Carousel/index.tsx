@@ -23,7 +23,7 @@ const Carousel = ({ items, itemsToShow, interval = 4000 }: CarouselProps) => {
     (index: number) => {
       setActiveIndex(index * itemsToShow);
     },
-    [itemsToShow]
+    [itemsToShow, setActiveIndex]
   );
 
   return (

@@ -306,7 +306,7 @@ export function analyzeBundleSize() {
       if (src) {
         fetch(src)
           .then(response => response.blob())
-          .then(blob => {
+          .then(() => {
             // const sizeKB = (blob.size / 1024).toFixed(2); // Removed unused variable
           });
       }

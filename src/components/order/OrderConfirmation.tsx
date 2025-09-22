@@ -19,7 +19,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
 }) => {
   const router = useRouter();
   const { transactions } = useTransaction();
-  const [latestTransaction, setLatestTransaction] = useState<any>(null);
+  const [latestTransaction, setLatestTransaction] = useState<Transaction | null>(null);
 
   // Get the latest transaction
   useEffect(() => {

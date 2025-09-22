@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { GoChevronLeft, GoLocation, GoPackage, GoCreditCard, GoPlus } from 'react-icons/go';
 import { IoCheckmarkCircle, IoWarning } from 'react-icons/io5';
 import { toast } from 'react-hot-toast';
@@ -356,10 +357,13 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
               {currentItems.map((item: CartItemType) => (
                 <div key={item.id} className="flex items-center space-x-3">
                   <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0">
-                    <img 
+                    <Image 
                       src={item.variant_info.img || "/default-image.jpg"} 
                       alt={item.product_name} 
+                      width={64}
+                      height={64}
                       className="w-full h-full object-cover rounded-lg"
+                      sizes="64px"
                     />
                   </div>
                   <div className="flex-1">

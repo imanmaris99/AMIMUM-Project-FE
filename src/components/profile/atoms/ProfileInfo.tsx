@@ -18,7 +18,7 @@ const ProfileInfo: React.FC = () => {
     setIsEditProfileModalOpen(false);
   };
 
-  const handleSaveProfile = (profileData: any) => {
+  const handleSaveProfile = (profileData: { name: string; email: string; phone: string }) => {
     // Handle save profile data
     
     // Show success message

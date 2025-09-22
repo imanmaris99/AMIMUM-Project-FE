@@ -303,7 +303,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   // Memoized calculations to prevent unnecessary re-renders
   const totalItems = useMemo(() => cartItems.length, [cartItems.length]);
-  const totalPrices = useMemo(() => calculateTotalPrices(cartItems), [cartItems]);
+  const totalPrices = useMemo(() => calculateTotalPrices(cartItems), [cartItems, calculateTotalPrices]);
 
   // Memoized context value to prevent unnecessary re-renders
   const value: CartContextType = useMemo(() => ({

@@ -8,7 +8,7 @@ export interface AnalyticsEvent {
   action: string;
   label?: string;
   value?: number;
-  properties?: Record<string, any>;
+  properties?: Record<string, string | number | boolean>;
   timestamp: Date;
   userId?: string;
   sessionId?: string;
@@ -51,7 +51,7 @@ export class UserBehaviorTracker {
     action: string,
     label?: string,
     value?: number,
-    properties?: Record<string, any>
+    properties?: Record<string, string | number | boolean>
   ) {
     if (!this.isTracking) return;
 

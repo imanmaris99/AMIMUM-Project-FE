@@ -9,7 +9,7 @@ import { ErrorHandler } from "@/lib/errorHandler";
 
 interface TransactionContextType {
   transactions: Transaction[];
-  addTransaction: (orderData: any, cartItems: CartItemType[]) => Transaction | null;
+  addTransaction: (orderData: { shippingAddress: any; paymentMethod: string; notes?: string }, cartItems: CartItemType[]) => Transaction | null;
   updateTransactionStatus: (transactionId: string, status: string) => void;
   getTransactionById: (transactionId: string) => Transaction | undefined;
   clearTransactions: () => void;
@@ -68,7 +68,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
   }, [transactions]);
 
   // Add new transaction
-  const addTransaction = useCallback((orderData: any, cartItems: CartItemType[]) => {
+  const addTransaction = useCallback((orderData: { shippingAddress: any; paymentMethod: string; notes?: string }, cartItems: CartItemType[]) => {
     try {
       
       // Validate input data
