@@ -2,20 +2,24 @@
 
 import { useState, useEffect } from "react";
 import HeaderWithNotifications from "@/components/common/HeaderWithNotifications";
+import { SessionManager } from "@/lib/auth";
 
 const Header = () => {
   const [userEmail, setUserEmail] = useState("");
   const [showLogoutMessage, setShowLogoutMessage] = useState(false);
 
   useEffect(() => {
-    // Get user email from localStorage
-    const email = localStorage.getItem('userEmail');
-    setUserEmail(email || "");
+    // Get user email from SessionManager
+    const session = SessionManager.getSession();
+    if (session?.user?.email) {
+      setUserEmail(session.user.email);
+    }
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userEmail');
+    // Use SessionManager to clear session
+    SessionManager.clearSession();
+    setUserEmail("");
     
     // Show success message
     setShowLogoutMessage(true);

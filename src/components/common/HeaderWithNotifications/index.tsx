@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useNotification } from "@/contexts/NotificationContext";
+import { SessionManager } from "@/lib/auth";
 
 interface HeaderWithNotificationsProps {
   userEmail?: string;
@@ -23,33 +24,32 @@ const HeaderWithNotifications = ({
   onLogout
 }: HeaderWithNotificationsProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { cartItems, totalItems } = useCart();
+  const { } = useCart();
   const { getNotificationCount, resetNotification } = useNotification();
 
   useEffect(() => {
-    // Check if user is logged in - using the same logic as original header
+    // Check if user is logged in using SessionManager
     const checkAuth = () => {
-      const loginStatus = localStorage.getItem('isLoggedIn');
-      const email = localStorage.getItem('userEmail');
-      
-      if (loginStatus === 'true' && email) {
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-      }
+      const isAuthenticated = SessionManager.isAuthenticated();
+      setIsLoggedIn(isAuthenticated);
     };
 
     checkAuth();
     
     // Listen for storage changes (login/logout from other tabs)
-    window.addEventListener('storage', checkAuth);
-    return () => window.removeEventListener('storage', checkAuth);
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'isLoggedIn' || e.key === 'userEmail') {
+        checkAuth();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const handleLogout = () => {
-    // Use the same logout logic as original header
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userEmail');
+    // Use SessionManager to clear session
+    SessionManager.clearSession();
     setIsLoggedIn(false);
     
     // Call parent's logout handler if provided

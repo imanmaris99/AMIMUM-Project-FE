@@ -5,12 +5,27 @@ import { BrandDetailResponseType } from "@/types/detailProduct";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 import { getBrandData, getCardProductsByBrand } from "@/data/dataUtils";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
+import { validateProductData } from "@/utils/dataValidation";
+import { ErrorHandler } from "@/lib/errorHandler";
 
 export default async function BrandPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params;
   let brandDetail: BrandDetailResponseType | null = null;
   let products: CardProductProps[] = [];
   const errorMessage: string | null = null;
+  
+  // Validate brandId parameter
+  if (!brandId || typeof brandId !== 'string') {
+    ErrorHandler.handleError(new Error('Invalid brand ID parameter'), 'BrandPage');
+    return (
+      <main className="pb-20">
+        <UnifiedHeader type="back" title="Brand Not Found" />
+        <div className="p-4 text-center">
+          <p className="text-red-500">Invalid brand ID provided</p>
+        </div>
+      </main>
+    );
+  }
   
   // API calls dinonaktifkan sementara karena server sedang down
   // try {
@@ -24,12 +39,19 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   //   errorMessage = err instanceof Error ? err.message : String(err);
   // }
   
-  // Menggunakan centralized data management
+  // Menggunakan centralized data management with validation
   const selectedBrandData = getBrandData(brandId);
   if (selectedBrandData) {
-    brandDetail = {
-      data: selectedBrandData
-    };
+    // Validate brand data structure
+    if (!selectedBrandData.id || !selectedBrandData.name) {
+      ErrorHandler.handleError(new Error('Invalid brand data structure'), 'BrandPage');
+    } else {
+      brandDetail = {
+        data: selectedBrandData
+      };
+    }
+  } else {
+    ErrorHandler.handleError(new Error(`Brand with ID ${brandId} not found`), 'BrandPage');
   }
   
   // Mapping brand detail agar field sesuai kebutuhan komponen
@@ -54,8 +76,27 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   //   // error produk tidak fatal
   // }
   
-  // Menggunakan centralized data management
-  products = getCardProductsByBrand(brandId);
+  // Menggunakan centralized data management with validation
+  const allProducts = getCardProductsByBrand(brandId);
+  
+  // Validate products data
+  const validProducts = allProducts.filter(validateProductData);
+  const invalidProducts = allProducts.filter(prod => !validateProductData(prod));
+  
+  if (invalidProducts.length > 0) {
+    ErrorHandler.handleError(new Error(`${invalidProducts.length} invalid products found and filtered out`), 'BrandPage');
+  }
+  
+  products = validProducts;
+  
+  // Log validation results
+  console.log('Brand Page Data Validation:', {
+    brandId,
+    totalProducts: allProducts.length,
+    validProducts: validProducts.length,
+    invalidProducts: invalidProducts.length,
+    brandFound: !!brandDetail
+  });
   
   return (
     <main className="pb-20">

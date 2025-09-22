@@ -3,6 +3,7 @@ import { useState } from "react";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 import dynamic from "next/dynamic";
 import { validateProductionData } from "@/utils/dataValidation";
+import { ErrorHandler } from "@/lib/errorHandler";
 
 const Promo = dynamic(() => import("@/components/homepage/Promo_Section"), { ssr: false });
 const Category = dynamic(() => import("@/components/homepage/Category_Section"), { ssr: false });
@@ -33,29 +34,65 @@ export default function HomeClient({
 }: HomeClientProps) {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   
-  // Extract data from API response structure with error handling
+  // Extract data from API response structure with comprehensive validation
   const categoriesData = Array.isArray(categories) ? categories : (categories?.data || []);
   const productionsData = Array.isArray(productions) ? productions : (productions?.data || []);
   const promoData = Array.isArray(promo) ? promo : (promo?.data || []);
   const articlesData = Array.isArray(articles) ? articles : (articles?.data || []);
   
+  // Validate data arrays
+  if (!Array.isArray(categoriesData)) {
+    ErrorHandler.handleError(new Error('Categories data is not an array'), 'HomepageData');
+  }
+  if (!Array.isArray(productionsData)) {
+    ErrorHandler.handleError(new Error('Productions data is not an array'), 'HomepageData');
+  }
+  if (!Array.isArray(promoData)) {
+    ErrorHandler.handleError(new Error('Promo data is not an array'), 'HomepageData');
+  }
+  if (!Array.isArray(articlesData)) {
+    ErrorHandler.handleError(new Error('Articles data is not an array'), 'HomepageData');
+  }
   
   
-  const selectedCategoryName = categoriesData.find((cat: unknown) => (cat as { id: number; name: string }).id === selectedCategory)?.name;
-  const filteredProductions = selectedCategory
-    ? productionsData.filter((prod: unknown) => (prod as { category: string }).category === selectedCategoryName)
+  
+  // Validate category selection
+  const selectedCategoryName = selectedCategory 
+    ? categoriesData.find((cat: unknown) => {
+        const category = cat as { id: number; name: string };
+        return category && typeof category.id === 'number' && typeof category.name === 'string' && category.id === selectedCategory;
+      })?.name
+    : null;
+    
+  const filteredProductions = selectedCategory && selectedCategoryName
+    ? productionsData.filter((prod: unknown) => {
+        const production = prod as { category: string };
+        return production && typeof production.category === 'string' && production.category === selectedCategoryName;
+      })
     : productionsData;
     
-  // Debug logging untuk filtering
-    
-  // Validate productions data - menggunakan validator yang tepat untuk productions
+  // Validate productions data with comprehensive error handling
   const validProductions = filteredProductions.filter(validateProductionData);
   const invalidProductions = filteredProductions.filter(prod => !validateProductionData(prod));
   
+  // Log validation results
+  if (invalidProductions.length > 0) {
+    ErrorHandler.handleError(new Error(`${invalidProductions.length} invalid productions found and filtered out`), 'HomepageValidation');
+  }
   
+  // Use valid productions only, with fallback to empty array if none valid
+  const finalProductions = validProductions.length > 0 ? validProductions : [];
   
-  // Fallback: jika tidak ada valid productions, gunakan semua productions tanpa validasi
-  const finalProductions = validProductions.length > 0 ? validProductions : filteredProductions;
+  // Log final data counts for debugging
+  console.log('Homepage Data Validation:', {
+    categories: categoriesData.length,
+    productions: productionsData.length,
+    validProductions: validProductions.length,
+    invalidProductions: invalidProductions.length,
+    finalProductions: finalProductions.length,
+    promo: promoData.length,
+    articles: articlesData.length
+  });
   
     
   return (

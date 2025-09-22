@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { SessionManager } from '@/lib/auth';
 
 interface LoginProtectionProps {
   children: React.ReactNode;
@@ -21,10 +22,9 @@ const LoginProtection: React.FC<LoginProtectionProps> = ({
 
   useEffect(() => {
     const checkLoginStatus = () => {
-      const loginStatus = localStorage.getItem('isLoggedIn');
-      const email = localStorage.getItem('userEmail');
+      const isAuthenticated = SessionManager.isAuthenticated();
       
-      if (loginStatus === 'true' && email) {
+      if (isAuthenticated) {
         setIsLoggedIn(true);
       } else {
         setIsLoggedIn(false);
@@ -38,10 +38,16 @@ const LoginProtection: React.FC<LoginProtectionProps> = ({
     checkLoginStatus();
     
     // Listen for storage changes (when user logs in from another tab)
-    window.addEventListener('storage', checkLoginStatus);
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'isLoggedIn' || e.key === 'userEmail') {
+        checkLoginStatus();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
     
     return () => {
-      window.removeEventListener('storage', checkLoginStatus);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, [router, redirectTo, showMessage]);
 

@@ -64,7 +64,17 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
           wishlist: { count: 0, isViewed: true },
           cart: { count: 0, isViewed: true }
         });
+        // Clear corrupted data
+        localStorage.removeItem('notifications');
       }
+    } else {
+      // Initialize with default state if no saved data
+      setNotifications({
+        tracking: { count: 0, isViewed: true },
+        transaction: { count: 0, isViewed: true },
+        wishlist: { count: 0, isViewed: true },
+        cart: { count: 0, isViewed: true }
+      });
     }
   }, []);
 

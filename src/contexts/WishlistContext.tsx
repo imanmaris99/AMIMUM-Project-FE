@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { WishlistItem } from '@/types/wishlist';
+import { validateProductData, validateWishlistItemData } from '@/utils/dataValidation';
+import { ErrorHandler } from '@/lib/errorHandler';
 
 interface WishlistContextType {
   wishlistItems: WishlistItem[];
@@ -34,8 +36,19 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     const savedWishlist = localStorage.getItem('wishlist');
     if (savedWishlist) {
       try {
-        setWishlistItems(JSON.parse(savedWishlist));
+        const parsedWishlist = JSON.parse(savedWishlist);
+        if (Array.isArray(parsedWishlist)) {
+          // Validate each wishlist item before loading
+          const validWishlistItems = parsedWishlist.filter(item => validateWishlistItemData(item));
+          if (validWishlistItems.length !== parsedWishlist.length) {
+            ErrorHandler.handleError(new Error('Some wishlist items are invalid and were removed'), 'WishlistLoad');
+          }
+          setWishlistItems(validWishlistItems);
+        }
       } catch (error) {
+        ErrorHandler.handleError(error, 'WishlistLoad');
+        // Clear corrupted wishlist data
+        localStorage.removeItem('wishlist');
       }
     }
   }, []);
@@ -47,7 +60,21 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
   const addToWishlist = (product: any) => {
     try {
+      // Comprehensive data validation
+      if (!product) {
+        ErrorHandler.handleError(new Error('Product is required'), 'WishlistAdd');
+        return;
+      }
+
+      // Validate product data structure
+      if (!validateProductData(product)) {
+        ErrorHandler.handleError(new Error('Invalid product data structure'), 'WishlistAdd');
+        return;
+      }
+
+      // Validate required fields
       if (!product.id || !product.name) {
+        ErrorHandler.handleError(new Error('Product ID or name is missing'), 'WishlistAdd');
         return;
       }
 
@@ -88,10 +115,17 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
         return [...prev, wishlistItem];
       });
     } catch (error) {
+      ErrorHandler.handleError(error, 'WishlistAdd');
     }
   };
 
   const removeFromWishlist = (productId: string) => {
+    // Validate product ID
+    if (!productId || typeof productId !== 'string') {
+      ErrorHandler.handleError(new Error('Invalid product ID'), 'WishlistRemove');
+      return;
+    }
+    
     setWishlistItems(prev => prev.filter(item => item.productId !== productId));
   };
 
@@ -111,6 +145,12 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   };
 
   const toggleWishlist = (product: any) => {
+    // Validate product before toggle
+    if (!product || !product.id) {
+      ErrorHandler.handleError(new Error('Invalid product for wishlist toggle'), 'WishlistToggle');
+      return;
+    }
+    
     if (isInWishlist(product.id)) {
       removeFromWishlist(product.id);
     } else {

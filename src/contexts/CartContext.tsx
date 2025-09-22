@@ -2,8 +2,9 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useMemo } from "react";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
-import { debounce, memoize } from "@/lib/performance";
+import { debounce } from "@/lib/performance";
 import { ErrorHandler } from "@/lib/errorHandler";
+import { validateDetailProductData, validateVariantData, validateCartItemData } from "@/utils/dataValidation";
 
 // Cart Item Type sesuai dengan backend DTO
 export interface CartItemType {
@@ -78,7 +79,27 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       try {
         const parsedCart = JSON.parse(savedCart);
         if (Array.isArray(parsedCart)) {
-          setCartItems(parsedCart);
+          // Fix and validate each cart item before loading
+          const fixedCartItems = parsedCart.map(item => {
+            // Fix missing discounted_price field
+            if (item.variant_info && typeof item.variant_info.discounted_price !== 'number') {
+              const discount = item.variant_info.discount || 0;
+              const discountedPrice = discount > 0 
+                ? Math.round(item.product_price * (1 - discount / 100))
+                : item.product_price;
+              
+              item.variant_info.discounted_price = discountedPrice;
+              console.log(`Fixed cart item ${item.product_name}: calculated discounted_price = ${discountedPrice}`);
+            }
+            return item;
+          });
+          
+          // Validate each fixed cart item
+          const validCartItems = fixedCartItems.filter(item => validateCartItemData(item));
+          if (validCartItems.length !== parsedCart.length) {
+            ErrorHandler.handleError(new Error('Some cart items are invalid and were removed'), 'CartLoad');
+          }
+          setCartItems(validCartItems);
         }
       } catch (error) {
         ErrorHandler.handleError(error, 'CartLoad');
@@ -100,11 +121,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     []
   );
 
-  // Save cart to localStorage whenever it changes
+  // Save cart to localStorage whenever it changes (including when empty)
   useEffect(() => {
-    if (cartItems.length > 0) {
-      debouncedSave(cartItems);
-    }
+    debouncedSave(cartItems);
   }, [cartItems, debouncedSave]);
 
   // Generate unique cart ID
@@ -141,13 +160,27 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   // Add to cart
   const addToCart = useCallback((product: DetailProductType, variant: VariantProductType) => {
-
-    // Validate required data
+    // Comprehensive data validation
     if (!product || !variant) {
+      ErrorHandler.handleError(new Error('Product or variant is required'), 'CartAdd');
       return;
     }
 
+    // Validate product data structure
+    if (!validateDetailProductData(product)) {
+      ErrorHandler.handleError(new Error('Invalid product data structure'), 'CartAdd');
+      return;
+    }
+
+    // Validate variant data structure
+    if (!validateVariantData(variant)) {
+      ErrorHandler.handleError(new Error('Invalid variant data structure'), 'CartAdd');
+      return;
+    }
+
+    // Validate required fields
     if (!product.id || !variant.id) {
+      ErrorHandler.handleError(new Error('Product ID or variant ID is missing'), 'CartAdd');
       return;
     }
 
@@ -165,19 +198,24 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         return updatedItems;
       } else {
         // Add new item
+        const productPrice = product.price || 0;
+        const discount = variant.discount || 0;
+        const discountedPrice = variant.discounted_price || 
+          (discount > 0 ? Math.round(productPrice * (1 - discount / 100)) : productPrice);
+        
         const newCartItem: CartItemType = {
           id: generateCartId(),
           product_id: product.id,
           product_name: product.name,
-          product_price: product.price || 0,
+          product_price: productPrice,
           variant_id: variant.id,
           variant_info: {
             id: variant.id,
             variant: variant.variant || "",
             name: variant.name || "",
             img: variant.img || "",
-            discount: variant.discount || 0,
-            discounted_price: variant.discounted_price || 0,
+            discount: discount,
+            discounted_price: discountedPrice,
           },
           quantity: 1,
           is_active: true,
@@ -195,13 +233,23 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const removeFromCart = useCallback((cartId: number) => {
     setCartItems(prevItems => {
       const updatedItems = prevItems.filter(item => item.id !== cartId);
+      // Immediately save to localStorage when removing items
+      try {
+        localStorage.setItem('cart', JSON.stringify(updatedItems));
+      } catch (error) {
+        ErrorHandler.handleError(error, 'CartRemove');
+      }
       return updatedItems;
     });
   }, []);
 
   // Update quantity
   const updateQuantity = useCallback((cartId: number, quantity: number) => {
-    if (quantity < 1) return;
+    // Validate quantity
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 999) {
+      ErrorHandler.handleError(new Error('Invalid quantity: must be between 1 and 999'), 'CartUpdate');
+      return;
+    }
     
     setCartItems(prevItems => {
       const updatedItems = prevItems.map(item =>
@@ -225,11 +273,23 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   // Clear cart
   const clearCart = useCallback(() => {
     setCartItems([]);
+    // Immediately clear localStorage
+    try {
+      localStorage.removeItem('cart');
+    } catch (error) {
+      ErrorHandler.handleError(error, 'CartClear');
+    }
   }, []);
 
   // Clear all items (alias for clearCart)
   const clearAll = useCallback(() => {
     setCartItems([]);
+    // Immediately clear localStorage
+    try {
+      localStorage.removeItem('cart');
+    } catch (error) {
+      ErrorHandler.handleError(error, 'CartClearAll');
+    }
   }, []);
 
   // Remove only active items from cart (for checkout)

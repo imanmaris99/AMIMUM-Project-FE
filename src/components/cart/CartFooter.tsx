@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'react-hot-toast';
 import rupiahFormater from '@/utils/rupiahFormater';
+import { SessionManager } from '@/lib/auth';
 
 interface CartFooterProps {
   onCheckout?: () => void;
@@ -15,10 +16,8 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
   const { cartItems, totalPrices, updateActiveStatus } = useCart();
 
   // Calculate totals
-  const subtotal = totalPrices.all_item_active_prices;
   const total = totalPrices.total_all_active_prices;
   const allItemsSelected = cartItems.length > 0 && cartItems.every(item => item.is_active);
-  const someItemsSelected = cartItems.some(item => item.is_active);
 
   const handleSelectAll = useCallback(() => {
     if (cartItems.length === 0) return;
@@ -33,8 +32,8 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
   }, [cartItems, allItemsSelected, updateActiveStatus]);
 
   const handleCheckout = () => {
-    // Check if user is logged in
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    // Check if user is logged in using SessionManager
+    const isLoggedIn = SessionManager.isAuthenticated();
     
     if (!isLoggedIn) {
       toast.error('Silakan login terlebih dahulu untuk melanjutkan checkout');

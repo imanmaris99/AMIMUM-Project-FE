@@ -20,7 +20,7 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
-  const [attempts, setAttempts] = useState(0);
+  const [attempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
 
   // Enhanced credentials with proper hashing (demo purposes)
@@ -246,10 +246,10 @@ const Login = () => {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <p className="text-blue-800 text-sm font-medium mb-2">Credentials untuk testing:</p>
             <div className="text-blue-700 text-xs space-y-1">
-              <p>• admin@amimum.com / admin123</p>
-              <p>• user@amimum.com / user123</p>
-              <p>• test@amimum.com / test123</p>
-              <p>• demo@amimum.com / demo123</p>
+              <p>• admin@amimum.com / Admin123!@#</p>
+              <p>• user@amimum.com / User123!@#</p>
+              <p>• test@amimum.com / Test123!@#</p>
+              <p>• demo@amimum.com / Demo123!@#</p>
             </div>
           </div>
 

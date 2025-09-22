@@ -7,6 +7,8 @@ import { getProductRatingSummary } from "@/data/dummyData";
 import RatingDisplay from "@/components/rating/RatingDisplay";
 import { useCart } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
+import { SessionManager } from "@/lib/auth";
 
 interface ProductPriceProps {
   data: DetailProductType | undefined;
@@ -75,8 +77,8 @@ const ProductPrice = ({
       return;
     }
     
-    // Check if user is logged in
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    // Check if user is logged in using SessionManager
+    const isLoggedIn = SessionManager.isAuthenticated();
     
     if (!isLoggedIn) {
       toast.error('Silakan login terlebih dahulu untuk melanjutkan pembelian');
@@ -89,19 +91,21 @@ const ProductPrice = ({
     try {
       // Create temporary cart item for direct checkout
       const tempCartItem = {
-        id: `temp-${Date.now()}`,
+        id: Date.now(), // Use number instead of string
         product_id: data.id,
         product_name: data.name,
         product_price: data.price,
+        variant_id: datavariant.id,
         quantity: 1,
+        is_active: true,
+        created_at: new Date().toISOString(),
         variant_info: {
           id: datavariant.id,
           variant: datavariant.variant,
+          name: datavariant.variant, // Add required name field
           img: datavariant.img,
-          price: datavariant.price,
-          discounted_price: datavariant.discounted_price,
           discount: datavariant.discount,
-          stock: datavariant.stock
+          discounted_price: datavariant.discounted_price
         }
       };
       

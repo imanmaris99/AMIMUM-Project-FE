@@ -27,7 +27,7 @@ const CartWithNotification: React.FC<CartWithNotificationProps> = ({ children })
     
     // Only trigger notification if:
     // 1. Cart has items
-    // 2. Length actually increased
+    // 2. Length actually increased (new item added)
     // 3. Not the first render (to avoid triggering on refresh)
     if (currentLength > 0 && currentLength > prevLength) {
       // New item was added to cart

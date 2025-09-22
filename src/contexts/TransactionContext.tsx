@@ -4,10 +4,12 @@ import React, { createContext, useContext, useState, useEffect, useCallback, Rea
 import { Transaction, TransactionItem } from "@/types/transaction";
 import { CartItemType } from "./CartContext";
 import { useNotification } from "./NotificationContext";
+import { validateCartItemData } from "@/utils/dataValidation";
+import { ErrorHandler } from "@/lib/errorHandler";
 
 interface TransactionContextType {
   transactions: Transaction[];
-  addTransaction: (orderData: any, cartItems: CartItemType[]) => void;
+  addTransaction: (orderData: any, cartItems: CartItemType[]) => Transaction | null;
   updateTransactionStatus: (transactionId: string, status: string) => void;
   getTransactionById: (transactionId: string) => Transaction | undefined;
   clearTransactions: () => void;
@@ -36,8 +38,24 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
     const savedTransactions = localStorage.getItem('transactions');
     if (savedTransactions) {
       try {
-        setTransactions(JSON.parse(savedTransactions));
+        const parsedTransactions = JSON.parse(savedTransactions);
+        if (Array.isArray(parsedTransactions)) {
+          // Validate transaction data structure
+          const validTransactions = parsedTransactions.filter(transaction => 
+            transaction && 
+            typeof transaction.id === 'string' &&
+            typeof transaction.transactionId === 'string' &&
+            Array.isArray(transaction.items)
+          );
+          if (validTransactions.length !== parsedTransactions.length) {
+            ErrorHandler.handleError(new Error('Some transactions are invalid and were removed'), 'TransactionLoad');
+          }
+          setTransactions(validTransactions);
+        }
       } catch (error) {
+        ErrorHandler.handleError(error, 'TransactionLoad');
+        // Clear corrupted transaction data
+        localStorage.removeItem('transactions');
       }
     }
   }, []);
@@ -51,67 +69,146 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
 
   // Add new transaction
   const addTransaction = useCallback((orderData: any, cartItems: CartItemType[]) => {
-    const transactionId = `ORD-${Date.now()}`;
-    const now = new Date();
-    
-    // Convert cart items to transaction items
-    const transactionItems: TransactionItem[] = cartItems.map((item: CartItemType) => ({
-      id: `item-${Date.now()}-${item.id}`,
-      productId: item.product_id,
-      name: item.product_name,
-      quantity: item.quantity,
-      price: item.variant_info.discounted_price || item.product_price,
-      image: item.variant_info.img || "/default-image.jpg"
-    }));
+    try {
+      console.log('TransactionContext: addTransaction called with:', { orderData, cartItems });
+      
+      // Validate input data
+      if (!orderData || !cartItems || !Array.isArray(cartItems)) {
+        const error = new Error('Invalid order data or cart items');
+        console.error('TransactionContext: Validation failed:', error);
+        ErrorHandler.handleError(error, 'TransactionAdd');
+        return null;
+      }
 
-    // Calculate total amount
-    const totalAmount = cartItems.reduce((total, item) => {
-      const itemPrice = item.variant_info.discounted_price || item.product_price;
-      return total + (itemPrice * item.quantity);
-    }, 0);
+      // Validate cart items with detailed logging
+      const validCartItems = cartItems.filter(item => {
+        try {
+          const isValid = validateCartItemData(item);
+          if (!isValid) {
+            console.warn('TransactionContext: Invalid cart item:', {
+              item,
+              validation: {
+                hasId: typeof item?.id === 'number',
+                hasProductName: typeof item?.product_name === 'string',
+                hasProductPrice: typeof item?.product_price === 'number' && item?.product_price > 0,
+                hasVariantInfo: !!item?.variant_info,
+                hasVariantId: typeof item?.variant_info?.id === 'number',
+                hasVariantName: typeof item?.variant_info?.name === 'string',
+                hasVariantImg: typeof item?.variant_info?.img === 'string',
+                hasDiscount: typeof item?.variant_info?.discount === 'number' && item?.variant_info?.discount >= 0,
+                hasDiscountedPrice: typeof item?.variant_info?.discounted_price === 'number' && item?.variant_info?.discounted_price >= 0,
+                hasQuantity: typeof item?.quantity === 'number' && item?.quantity > 0,
+                hasIsActive: typeof item?.is_active === 'boolean',
+                hasCreatedAt: typeof item?.created_at === 'string'
+              }
+            });
+          }
+          return isValid;
+        } catch (validationError) {
+          console.warn('TransactionContext: Validation error for cart item:', item, validationError);
+          return false;
+        }
+      });
+      
+      if (validCartItems.length !== cartItems.length) {
+        console.warn('TransactionContext: Some cart items are invalid and were removed');
+        ErrorHandler.handleError(new Error('Some cart items are invalid and were removed'), 'TransactionAdd');
+      }
 
-    // Add shipping cost if delivery
-    const shippingCost = orderData.delivery_type === 'delivery' ? 15000 : 0;
-    const finalAmount = totalAmount + shippingCost;
+      if (validCartItems.length === 0) {
+        const error = new Error('No valid cart items to create transaction');
+        console.error('TransactionContext: No valid cart items:', error);
+        ErrorHandler.handleError(error, 'TransactionAdd');
+        return null;
+      }
 
-    const newTransaction: Transaction = {
-      id: `trans-${Date.now()}`,
-      transactionId: transactionId,
-      date: now.toLocaleString('id-ID', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      }),
-      status: 'pending',
-      amount: finalAmount,
-      total: finalAmount, // Total amount for display
-      items: transactionItems,
-      createdAt: now.toISOString(),
-      updatedAt: now.toISOString(),
-      // Additional order data
-      deliveryType: orderData.delivery_type,
-      notes: orderData.notes,
-      shipmentId: orderData.shipment_id,
-      shipmentAddress: orderData.delivery_type === 'delivery' ? {
-        address: orderData.shipment_address?.address || 'Alamat tidak tersedia',
-        courier: orderData.courier_service || 'Kurir tidak tersedia'
-      } : undefined
-    };
+      const transactionId = `ORD-${Date.now()}`;
+      const now = new Date();
+      
+      // Convert valid cart items to transaction items
+      const transactionItems: TransactionItem[] = validCartItems.map((item: CartItemType) => ({
+        id: `item-${Date.now()}-${item.id}`,
+        productId: item.product_id,
+        name: item.product_name,
+        quantity: item.quantity,
+        price: item.variant_info.discounted_price || item.product_price,
+        image: item.variant_info.img || "/default-image.jpg"
+      }));
 
-    setTransactions(prev => [newTransaction, ...prev]);
-    
-    // Add notification for both tracking and transaction menus
-    addNotification("tracking");
-    addNotification("transaction");
-    
-    return newTransaction;
+      // Calculate total amount using valid cart items
+      const totalAmount = validCartItems.reduce((total, item) => {
+        const itemPrice = item.variant_info.discounted_price || item.product_price;
+        return total + (itemPrice * item.quantity);
+      }, 0);
+
+      // Add shipping cost if delivery
+      const shippingCost = orderData.delivery_type === 'delivery' ? 15000 : 0;
+      const finalAmount = totalAmount + shippingCost;
+
+      const newTransaction: Transaction = {
+        id: `trans-${Date.now()}`,
+        transactionId: transactionId,
+        date: now.toLocaleString('id-ID', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        }),
+        status: 'pending',
+        amount: finalAmount,
+        total: finalAmount, // Total amount for display
+        items: transactionItems,
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
+        // Additional order data
+        deliveryType: orderData.delivery_type,
+        notes: orderData.notes,
+        shipmentId: orderData.shipment_id,
+        shipmentAddress: orderData.delivery_type === 'delivery' ? {
+          address: orderData.shipment_address?.address || 'Alamat tidak tersedia',
+          courier: orderData.courier_service || 'Kurir tidak tersedia'
+        } : undefined
+      };
+
+      console.log('TransactionContext: Creating new transaction:', newTransaction);
+
+      setTransactions(prev => [newTransaction, ...prev]);
+      
+      // Add notification for both tracking and transaction menus
+      addNotification("tracking");
+      addNotification("transaction");
+      
+      console.log('TransactionContext: Transaction created successfully');
+      return newTransaction;
+      
+    } catch (error) {
+      console.error('TransactionContext: Error creating transaction:', error);
+      ErrorHandler.handleError(error, 'TransactionAdd');
+      return null;
+    }
   }, [addNotification]);
 
   // Update transaction status
   const updateTransactionStatus = useCallback((transactionId: string, status: string) => {
+    // Validate inputs
+    if (!transactionId || typeof transactionId !== 'string') {
+      ErrorHandler.handleError(new Error('Invalid transaction ID'), 'TransactionUpdate');
+      return;
+    }
+
+    if (!status || typeof status !== 'string') {
+      ErrorHandler.handleError(new Error('Invalid status'), 'TransactionUpdate');
+      return;
+    }
+
+    const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      ErrorHandler.handleError(new Error('Invalid status value'), 'TransactionUpdate');
+      return;
+    }
+
     setTransactions(prev => 
       prev.map(transaction => 
         transaction.transactionId === transactionId 
@@ -128,6 +225,12 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
 
   // Get transaction by ID
   const getTransactionById = useCallback((transactionId: string) => {
+    // Validate transaction ID
+    if (!transactionId || typeof transactionId !== 'string') {
+      ErrorHandler.handleError(new Error('Invalid transaction ID'), 'TransactionGet');
+      return undefined;
+    }
+    
     return transactions.find(transaction => transaction.transactionId === transactionId);
   }, [transactions]);
 

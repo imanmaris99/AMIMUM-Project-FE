@@ -210,9 +210,17 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         }))
       };
       
+      console.log('Creating transaction with orderData:', orderData);
+      console.log('Current items:', currentItems);
       
       // Add transaction to context
       const newTransaction = addTransaction(orderData, currentItems);
+      
+      if (!newTransaction) {
+        throw new Error('Failed to create transaction');
+      }
+      
+      console.log('Transaction created successfully:', newTransaction);
       
       // Remove only active items from cart after successful payment (only if not direct checkout)
       if (!isDirectCheckout) {
@@ -231,7 +239,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       }, 500);
       
     } catch (error) {
-      toast.error('Terjadi kesalahan saat memproses pesanan');
+      console.error('Payment error:', error);
+      toast.error(`Terjadi kesalahan saat memproses pesanan: ${error.message || 'Unknown error'}`);
       setIsLoading(false);
     }
   };

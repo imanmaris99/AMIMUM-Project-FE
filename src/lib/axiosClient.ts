@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { toast } from "react-hot-toast";
-import { ErrorHandler, ErrorType, withRetry, safeAsync } from "./errorHandler";
+import { ErrorHandler, withRetry, safeAsync } from "./errorHandler";
 import { SessionManager } from "./auth";
 
 // Enhanced axios client with comprehensive error handling
@@ -52,6 +51,23 @@ axiosClient.interceptors.response.use(
     // Log successful requests
     const duration = Date.now() - (response.config.metadata?.startTime || 0);
     console.log(`API Success: ${response.config.method?.toUpperCase()} ${response.config.url} (${duration}ms)`);
+    
+    // Validate response data structure
+    if (!response.data || typeof response.data !== 'object') {
+      throw new Error('Invalid response format: response data is not an object');
+    }
+
+    // Validate common API response structure
+    if (response.data.status_code && typeof response.data.status_code !== 'number') {
+      throw new Error('Invalid response format: status_code must be a number');
+    }
+
+    if (response.data.message && typeof response.data.message !== 'string') {
+      throw new Error('Invalid response format: message must be a string');
+    }
+
+    // Log response validation
+    console.log(`Response validated: ${response.config.method?.toUpperCase()} ${response.config.url}`);
     
     return response.data;
   },
@@ -173,14 +189,14 @@ export const apiClient = {
     });
   },
 
-  async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     return withRetry(async () => {
       const response = await axiosClient.post(url, data, config);
       return response;
     });
   },
 
-  async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     return withRetry(async () => {
       const response = await axiosClient.put(url, data, config);
       return response;
@@ -194,7 +210,7 @@ export const apiClient = {
     });
   },
 
-  async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     return withRetry(async () => {
       const response = await axiosClient.patch(url, data, config);
       return response;
@@ -208,11 +224,21 @@ export const safeApiClient = {
     return safeAsync(() => apiClient.get<T>(url, config), `GET ${url}`);
   },
 
-  async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T | undefined> {
+  async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T | undefined> {
+    // Validate request data before sending
+    if (data && typeof data !== 'object') {
+      ErrorHandler.handleError(new Error('Request data must be an object'), 'SafeAPIPost');
+      return undefined;
+    }
     return safeAsync(() => apiClient.post<T>(url, data, config), `POST ${url}`);
   },
 
-  async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T | undefined> {
+  async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T | undefined> {
+    // Validate request data before sending
+    if (data && typeof data !== 'object') {
+      ErrorHandler.handleError(new Error('Request data must be an object'), 'SafeAPIPut');
+      return undefined;
+    }
     return safeAsync(() => apiClient.put<T>(url, data, config), `PUT ${url}`);
   },
 
@@ -220,7 +246,12 @@ export const safeApiClient = {
     return safeAsync(() => apiClient.delete<T>(url, config), `DELETE ${url}`);
   },
 
-  async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T | undefined> {
+  async patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T | undefined> {
+    // Validate request data before sending
+    if (data && typeof data !== 'object') {
+      ErrorHandler.handleError(new Error('Request data must be an object'), 'SafeAPIPatch');
+      return undefined;
+    }
     return safeAsync(() => apiClient.patch<T>(url, data, config), `PATCH ${url}`);
   }
 };

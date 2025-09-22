@@ -85,9 +85,11 @@ export function validateCartItemData(item: any): item is CartItemType {
   return !!(
     item &&
     typeof item.id === 'number' &&
+    typeof item.product_id === 'string' &&
     typeof item.product_name === 'string' &&
     typeof item.product_price === 'number' &&
     item.product_price > 0 &&
+    typeof item.variant_id === 'number' &&
     item.variant_info &&
     typeof item.variant_info.id === 'number' &&
     typeof item.variant_info.variant === 'string' &&
@@ -95,6 +97,8 @@ export function validateCartItemData(item: any): item is CartItemType {
     typeof item.variant_info.img === 'string' &&
     typeof item.variant_info.discount === 'number' &&
     item.variant_info.discount >= 0 &&
+    typeof item.variant_info.discounted_price === 'number' &&
+    item.variant_info.discounted_price >= 0 &&
     typeof item.quantity === 'number' &&
     item.quantity > 0 &&
     typeof item.is_active === 'boolean' &&

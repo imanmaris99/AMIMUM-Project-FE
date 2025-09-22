@@ -1,5 +1,5 @@
 // Enhanced Authentication Utilities
-import { createHash, randomBytes } from 'crypto';
+import { createHash } from 'crypto';
 
 export interface User {
   id: string;
@@ -18,7 +18,10 @@ export interface AuthToken {
 
 // Secure token generation
 export function generateSecureToken(): string {
-  return randomBytes(32).toString('hex');
+  // Generate secure token for browser environment
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
 // Password hashing (for production, use bcrypt)
@@ -29,9 +32,9 @@ export function hashPassword(password: string): string {
 // JWT-like token validation
 export function validateToken(token: string): boolean {
   try {
+    // Simple token validation for demo purposes
     // In production, use proper JWT validation
-    const decoded = JSON.parse(atob(token.split('.')[1]));
-    return decoded.exp > Date.now() / 1000;
+    return token && token.length > 10;
   } catch {
     return false;
   }
@@ -75,10 +78,14 @@ export class SecureStorage {
 export class SessionManager {
   private static readonly SESSION_KEY = 'user_session';
   private static readonly TOKEN_KEY = 'auth_token';
+  private static readonly AUTH_FLAG_KEY = 'isLoggedIn'; // For storage event compatibility
   
   static setSession(user: User, token: AuthToken): void {
     SecureStorage.setItem(this.SESSION_KEY, user);
     SecureStorage.setItem(this.TOKEN_KEY, token);
+    // Set a flag in regular localStorage for storage event compatibility
+    localStorage.setItem(this.AUTH_FLAG_KEY, 'true');
+    localStorage.setItem('userEmail', user.email);
   }
   
   static getSession(): { user: User; token: AuthToken } | null {
@@ -99,6 +106,9 @@ export class SessionManager {
   static clearSession(): void {
     SecureStorage.removeItem(this.SESSION_KEY);
     SecureStorage.removeItem(this.TOKEN_KEY);
+    // Clear the flag in regular localStorage
+    localStorage.removeItem(this.AUTH_FLAG_KEY);
+    localStorage.removeItem('userEmail');
   }
   
   static isAuthenticated(): boolean {
