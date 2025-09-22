@@ -71,7 +71,6 @@ export class UserBehaviorTracker {
     
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('Analytics Event:', event);
     }
 
     // Send to analytics service
@@ -90,7 +89,6 @@ export class UserBehaviorTracker {
         // });
       }
     } catch (error) {
-      console.error('Failed to send analytics event:', error);
     }
   }
 

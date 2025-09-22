@@ -179,7 +179,6 @@ const Login = () => {
         toast.error('Kredensial tidak valid. Silakan coba lagi.');
       }
     } catch (error) {
-      console.error('Login error:', error);
       toast.error('Terjadi kesalahan saat login. Silakan coba lagi.');
     } finally {
       setIsSubmitting(false);
@@ -192,7 +191,7 @@ const Login = () => {
 
 
   const handleGoogleLogin = () => {
-    console.log("Google login clicked");
+    // Handle Google login
   };
 
   const togglePasswordVisibility = () => {

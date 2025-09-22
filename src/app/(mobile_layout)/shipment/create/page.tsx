@@ -45,12 +45,10 @@ const CreateShipment = () => {
         createdAt: new Date().toISOString()
       };
       
-      console.log("Shipment baru dibuat:", newShipment);
       
       // Redirect ke halaman shipment dengan pesan sukses
       router.push("/shipment?created=true");
     } catch (error) {
-      console.error("Gagal membuat shipment:", error);
       toast.error("Gagal membuat alamat pengiriman. Silakan coba lagi.");
     } finally {
       setIsLoading(false);

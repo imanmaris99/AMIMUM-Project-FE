@@ -89,14 +89,6 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   
   products = validProducts;
   
-  // Log validation results
-  console.log('Brand Page Data Validation:', {
-    brandId,
-    totalProducts: allProducts.length,
-    validProducts: validProducts.length,
-    invalidProducts: invalidProducts.length,
-    brandFound: !!brandDetail
-  });
   
   return (
     <main className="pb-20">

@@ -49,7 +49,6 @@ export class SecureStorage {
       const encrypted = btoa(JSON.stringify(value));
       localStorage.setItem(this.PREFIX + key, encrypted);
     } catch (error) {
-      console.error('Failed to store secure data:', error);
     }
   }
   
@@ -59,7 +58,6 @@ export class SecureStorage {
       if (!encrypted) return null;
       return JSON.parse(atob(encrypted));
     } catch (error) {
-      console.error('Failed to retrieve secure data:', error);
       return null;
     }
   }

@@ -20,7 +20,6 @@ const ProfileInfo: React.FC = () => {
 
   const handleSaveProfile = (profileData: any) => {
     // Handle save profile data
-    console.log("Profile data saved:", profileData);
     
     // Show success message
     toast.success("Profile berhasil diperbarui!");
@@ -36,7 +35,6 @@ const ProfileInfo: React.FC = () => {
 
   const handlePhotoUpload = (file: File) => {
     // Handle photo upload
-    console.log("Photo uploaded:", file);
     
     // Show success message
     toast.success("Foto berhasil diunggah!");

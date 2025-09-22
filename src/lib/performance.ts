@@ -150,7 +150,6 @@ export class PerformanceMonitor {
       
       // Log slow operations
       if (duration > 100) {
-        console.warn(`Slow operation detected: ${label} took ${duration.toFixed(2)}ms`);
       }
     };
   }
@@ -178,7 +177,6 @@ export class PerformanceMonitor {
       const lcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         const lastEntry = entries[entries.length - 1];
-        console.log('LCP:', lastEntry.startTime);
       });
       lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
 
@@ -186,7 +184,6 @@ export class PerformanceMonitor {
       const fidObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         entries.forEach((entry) => {
-          console.log('FID:', entry.processingStart - entry.startTime);
         });
       });
       fidObserver.observe({ entryTypes: ['first-input'] });
@@ -200,7 +197,6 @@ export class PerformanceMonitor {
             clsValue += (entry as any).value;
           }
         });
-        console.log('CLS:', clsValue);
       });
       clsObserver.observe({ entryTypes: ['layout-shift'] });
 
@@ -308,7 +304,6 @@ export function analyzeBundleSize() {
           .then(response => response.blob())
           .then(blob => {
             const sizeKB = (blob.size / 1024).toFixed(2);
-            console.log(`Bundle: ${src} - ${sizeKB}KB`);
           });
       }
     });
@@ -339,7 +334,6 @@ export function checkPerformanceBudget() {
     Object.entries(metrics).forEach(([key, value]) => {
       const budget = PERFORMANCE_BUDGET[key as keyof typeof PERFORMANCE_BUDGET];
       if (value > budget) {
-        console.warn(`Performance budget exceeded: ${key} (${value}ms > ${budget}ms)`);
       }
     });
   }

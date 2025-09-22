@@ -89,7 +89,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
                 : item.product_price;
               
               item.variant_info.discounted_price = discountedPrice;
-              console.log(`Fixed cart item ${item.product_name}: calculated discounted_price = ${discountedPrice}`);
             }
             return item;
           });

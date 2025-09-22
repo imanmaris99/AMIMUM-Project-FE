@@ -25,7 +25,6 @@ export const postVerifyAccount = async (data: VerifyAccountData, onConfirm?: () 
       const errorMessage = error.response?.data?.detail?.message;
       toast.error(errorMessage || "Verifikasi gagal! Terjadi kesalahan. Silakan coba lagi.");
     } else {
-      console.error("Unexpected error:", error);
       toast.error("Terjadi kesalahan yang tidak terduga. Silakan coba lagi.");
     }
   }

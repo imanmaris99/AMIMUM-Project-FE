@@ -101,7 +101,6 @@ export class StatePersistence {
       const serialized = JSON.stringify(state);
       localStorage.setItem(this.STORAGE_PREFIX + key, serialized);
     } catch (error) {
-      console.error('Failed to save state:', error);
     }
   }
 
@@ -112,7 +111,6 @@ export class StatePersistence {
         return JSON.parse(serialized);
       }
     } catch (error) {
-      console.error('Failed to load state:', error);
     }
     return defaultValue;
   }
@@ -253,10 +251,6 @@ export class StateDebugger {
       this.logs = this.logs.slice(-100);
     }
 
-    console.group(`State Action: ${action.type}`);
-    console.log('Action:', action);
-    console.log('New State:', state);
-    console.groupEnd();
   }
 
   static getLogs(): Array<{ timestamp: Date; action: StateAction; state: any }> {
@@ -280,7 +274,6 @@ export class StateDebugger {
 export const stateMiddleware = {
   // Logging middleware
   logging: <T>(action: StateAction, next: () => void) => {
-    console.log('State Action:', action);
     next();
   },
 
@@ -305,7 +298,6 @@ export const stateMiddleware = {
       if (state) {
         const result = validator(state);
         if (!result.valid) {
-          console.error('State validation failed:', result.errors);
         }
       }
     }, 0);

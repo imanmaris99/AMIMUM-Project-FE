@@ -70,54 +70,30 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
   // Add new transaction
   const addTransaction = useCallback((orderData: any, cartItems: CartItemType[]) => {
     try {
-      console.log('TransactionContext: addTransaction called with:', { orderData, cartItems });
       
       // Validate input data
       if (!orderData || !cartItems || !Array.isArray(cartItems)) {
         const error = new Error('Invalid order data or cart items');
-        console.error('TransactionContext: Validation failed:', error);
         ErrorHandler.handleError(error, 'TransactionAdd');
         return null;
       }
 
-      // Validate cart items with detailed logging
+      // Validate cart items
       const validCartItems = cartItems.filter(item => {
         try {
           const isValid = validateCartItemData(item);
-          if (!isValid) {
-            console.warn('TransactionContext: Invalid cart item:', {
-              item,
-              validation: {
-                hasId: typeof item?.id === 'number',
-                hasProductName: typeof item?.product_name === 'string',
-                hasProductPrice: typeof item?.product_price === 'number' && item?.product_price > 0,
-                hasVariantInfo: !!item?.variant_info,
-                hasVariantId: typeof item?.variant_info?.id === 'number',
-                hasVariantName: typeof item?.variant_info?.name === 'string',
-                hasVariantImg: typeof item?.variant_info?.img === 'string',
-                hasDiscount: typeof item?.variant_info?.discount === 'number' && item?.variant_info?.discount >= 0,
-                hasDiscountedPrice: typeof item?.variant_info?.discounted_price === 'number' && item?.variant_info?.discounted_price >= 0,
-                hasQuantity: typeof item?.quantity === 'number' && item?.quantity > 0,
-                hasIsActive: typeof item?.is_active === 'boolean',
-                hasCreatedAt: typeof item?.created_at === 'string'
-              }
-            });
-          }
           return isValid;
         } catch (validationError) {
-          console.warn('TransactionContext: Validation error for cart item:', item, validationError);
           return false;
         }
       });
       
       if (validCartItems.length !== cartItems.length) {
-        console.warn('TransactionContext: Some cart items are invalid and were removed');
         ErrorHandler.handleError(new Error('Some cart items are invalid and were removed'), 'TransactionAdd');
       }
 
       if (validCartItems.length === 0) {
         const error = new Error('No valid cart items to create transaction');
-        console.error('TransactionContext: No valid cart items:', error);
         ErrorHandler.handleError(error, 'TransactionAdd');
         return null;
       }
@@ -172,7 +148,6 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         } : undefined
       };
 
-      console.log('TransactionContext: Creating new transaction:', newTransaction);
 
       setTransactions(prev => [newTransaction, ...prev]);
       
@@ -180,11 +155,9 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
       addNotification("tracking");
       addNotification("transaction");
       
-      console.log('TransactionContext: Transaction created successfully');
       return newTransaction;
       
     } catch (error) {
-      console.error('TransactionContext: Error creating transaction:', error);
       ErrorHandler.handleError(error, 'TransactionAdd');
       return null;
     }

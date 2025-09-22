@@ -83,16 +83,6 @@ export default function HomeClient({
   // Use valid productions only, with fallback to empty array if none valid
   const finalProductions = validProductions.length > 0 ? validProductions : [];
   
-  // Log final data counts for debugging
-  console.log('Homepage Data Validation:', {
-    categories: categoriesData.length,
-    productions: productionsData.length,
-    validProductions: validProductions.length,
-    invalidProductions: invalidProductions.length,
-    finalProductions: finalProductions.length,
-    promo: promoData.length,
-    articles: articlesData.length
-  });
   
     
   return (

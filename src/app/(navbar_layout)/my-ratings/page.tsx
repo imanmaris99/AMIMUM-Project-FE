@@ -19,7 +19,6 @@ export default function MyRatingsPage() {
         const userRatings = getUserRatingData(userId);
         setRatings(userRatings);
       } catch (error) {
-        console.error("Error loading user ratings:", error);
       } finally {
         setIsLoading(false);
       }
@@ -193,7 +192,6 @@ export default function MyRatingsPage() {
                   <Button
                     onClick={() => {
                       // In real app, this would call the API
-                      console.log("Edit rating:", selectedRating.id);
                       setSelectedRating(null);
                     }}
                     className="flex-1 bg-primary hover:bg-primary/90 text-white"

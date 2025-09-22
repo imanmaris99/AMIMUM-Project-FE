@@ -85,12 +85,10 @@ export const editCartQty = async (updatedCartItem: CartItemQtyPayload) => {
 
 export const editCartActive = async (updatedCartItem: CartItemActPayload) => {
   try {
-    // console.log("HELLO!");
     const response = await axiosClient.put(
       `/cart/update-activate/:cart_id`,
       updatedCartItem
     );
-    // console.log(response);
     return response ? response.data : null;
   } catch (error) {
     throw error;

@@ -17,7 +17,6 @@ const ProfileSettings: React.FC = () => {
 
   const handleAdminClick = () => {
     // Handle admin contact
-    console.log("Contact admin");
   };
 
   const handleLogoutClick = () => {

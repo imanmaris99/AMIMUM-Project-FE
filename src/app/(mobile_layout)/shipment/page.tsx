@@ -120,7 +120,6 @@ const Shipment = () => {
     // Simulasi save preferensi alamat otomatis
     const selectedShipment = shipments[index];
     if (selectedShipment) {
-      console.log("Alamat utama dipilih:", selectedShipment.address);
       
       // Simulasi API call untuk menyimpan preferensi
       try {
@@ -133,9 +132,7 @@ const Shipment = () => {
           isActive: idx === index
         })));
         
-        console.log("Alamat utama berhasil disimpan:", selectedShipment.address.city, selectedShipment.address.state);
       } catch (error) {
-        console.error("Gagal menyimpan alamat utama:", error);
       } finally {
         setSavingIndex(null);
       }

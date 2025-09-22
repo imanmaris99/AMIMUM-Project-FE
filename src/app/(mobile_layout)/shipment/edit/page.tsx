@@ -91,7 +91,6 @@ const EditShipment = () => {
         updatedAt: new Date().toISOString()
       };
       
-      console.log("Shipment Data Updated:", updatedShipment);
       
       // Show success message
       setShowSuccessMessage(true);
@@ -102,7 +101,6 @@ const EditShipment = () => {
       }, 2000);
       
     } catch (error) {
-      console.error("Gagal mengupdate shipment:", error);
       toast.error("Gagal mengupdate alamat pengiriman. Silakan coba lagi.");
     } finally {
       setIsLoading(false);

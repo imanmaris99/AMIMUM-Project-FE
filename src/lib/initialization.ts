@@ -22,7 +22,6 @@ export function initializeApp() {
   // Initialize accessibility features
   setupAccessibilityFeatures();
   
-  console.log('🚀 AMIMUM App initialized successfully!');
 }
 
 // Global error handling setup
@@ -55,10 +54,8 @@ function setupPerformanceOptimizations() {
   if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
     navigator.serviceWorker.register('/sw.js')
       .then(registration => {
-        console.log('Service Worker registered:', registration);
       })
       .catch(error => {
-        console.error('Service Worker registration failed:', error);
       });
   }
   
@@ -177,7 +174,6 @@ export function cleanupApp() {
   window.removeEventListener('unhandledrejection', () => {});
   window.removeEventListener('error', () => {});
   
-  console.log('🧹 AMIMUM App cleaned up');
 }
 
 // Development tools
@@ -200,5 +196,4 @@ if (process.env.NODE_ENV === 'development') {
     }
   };
   
-  console.log('🔧 Development tools available at window.AMIMUM_DEBUG');
 }

@@ -140,7 +140,7 @@ const FormVerifyAccount = () => {
 
       {/* Google Login */}
       <button
-        onClick={() => console.log("Google login clicked")}
+        onClick={() => {}}
         className="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded font-medium hover:bg-gray-50 transition-colors mb-4"
       >
         <div className="flex items-center justify-center gap-2">

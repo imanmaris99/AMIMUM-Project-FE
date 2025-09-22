@@ -39,7 +39,6 @@ const SavedAddressesPage: React.FC = () => {
     postalCode: string;
   }) => {
     // Handle save address data
-    console.log("Address data saved:", addressData);
     
     // Show success message
     toast.success("Alamat berhasil diperbarui!");
@@ -63,7 +62,6 @@ const SavedAddressesPage: React.FC = () => {
     postalCode: string;
   }) => {
     // Handle save new address data
-    console.log("New address data saved:", addressData);
     
     // Show success message
     toast.success("Alamat baru berhasil ditambahkan!");

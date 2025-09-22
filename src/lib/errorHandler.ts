@@ -148,7 +148,6 @@ export class ErrorHandler {
     };
 
     // Log error for debugging
-    console.error(`[${context}] Error:`, errorInfo);
 
     // Send error to monitoring service (in production)
     await this.reportError(errorInfo);
@@ -195,10 +194,8 @@ export class ErrorHandler {
       // In production, send to monitoring service like Sentry
       if (process.env.NODE_ENV === 'production') {
         // await sentry.captureException(errorInfo);
-        console.log('Error reported to monitoring service:', errorInfo);
       }
     } catch (reportError) {
-      console.error('Failed to report error:', reportError);
     }
   }
 
@@ -221,7 +218,6 @@ export class ErrorHandler {
         break;
       default:
         // Show error details in console for debugging
-        console.error('Error details:', errorInfo);
     }
   }
 

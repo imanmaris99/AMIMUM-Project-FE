@@ -35,7 +35,6 @@ axiosClient.interceptors.request.use(
 
       return config;
     } catch (error) {
-      console.error('Request interceptor error:', error);
       return Promise.reject(error);
     }
   },
@@ -50,7 +49,6 @@ axiosClient.interceptors.response.use(
   (response: AxiosResponse) => {
     // Log successful requests
     const duration = Date.now() - (response.config.metadata?.startTime || 0);
-    console.log(`API Success: ${response.config.method?.toUpperCase()} ${response.config.url} (${duration}ms)`);
     
     // Validate response data structure
     if (!response.data || typeof response.data !== 'object') {
@@ -67,7 +65,6 @@ axiosClient.interceptors.response.use(
     }
 
     // Log response validation
-    console.log(`Response validated: ${response.config.method?.toUpperCase()} ${response.config.url}`);
     
     return response.data;
   },
@@ -77,13 +74,6 @@ axiosClient.interceptors.response.use(
     const errorMessage = error.response?.data?.message || error.message;
 
     // Log error details
-    console.error('API Error:', {
-      url: error.config?.url,
-      method: error.config?.method,
-      status,
-      message: errorMessage,
-      data: error.response?.data
-    });
 
     // Handle different error types
     if (error.response) {
