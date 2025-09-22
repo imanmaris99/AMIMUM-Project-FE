@@ -8,24 +8,7 @@ interface ProductInformationProps {
   isLoading: boolean;
 }
 
-const ProductInformationSkeleton = () => (
-  <div className="bg-white rounded-lg shadow-sm animate-pulse">
-    <div className="p-4 space-y-2 text-gray-500 text-sm">
-      <div className="flex items-center space-x-2">
-        <div className="w-5 h-5 bg-gray-300 rounded-full" />
-        <div className="h-4 w-32 bg-gray-300 rounded" />
-      </div>
-      <div className="flex items-center space-x-2">
-        <div className="w-5 h-5 bg-gray-300 rounded-full" />
-        <div className="h-4 w-24 bg-gray-300 rounded" />
-      </div>
-      <div className="flex items-center space-x-2">
-        <div className="w-5 h-5 bg-gray-300 rounded-full" />
-        <div className="h-4 w-40 bg-gray-300 rounded" />
-      </div>
-    </div>
-  </div>
-);
+// ProductInformationSkeleton component removed - not used
 
 const ProductInformation = ({
   isError,

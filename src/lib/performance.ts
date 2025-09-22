@@ -177,6 +177,8 @@ export class PerformanceMonitor {
       const lcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         const lastEntry = entries[entries.length - 1];
+        // Log LCP for monitoring
+        console.log('LCP:', lastEntry?.startTime);
       });
       lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
 
@@ -184,6 +186,8 @@ export class PerformanceMonitor {
       const fidObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         entries.forEach((entry) => {
+          // Log FID for monitoring
+          console.log('FID:', entry.processingStart - entry.startTime);
         });
       });
       fidObserver.observe({ entryTypes: ['first-input'] });

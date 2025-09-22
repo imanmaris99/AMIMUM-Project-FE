@@ -3,7 +3,7 @@
 import React, { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
-import { toast } from 'react-hot-toast';
+// toast import removed - not used in this component
 import rupiahFormater from '@/utils/rupiahFormater';
 import { SessionManager } from '@/lib/auth';
 import LoginRequiredModal from '@/components/common/LoginRequiredModal';

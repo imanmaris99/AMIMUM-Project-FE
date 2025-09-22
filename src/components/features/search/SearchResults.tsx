@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { CardProductProps } from "./CardProduct/types";
 import ListProductSection from "./List_Product_Section";
 import LoadMoreButton from "./LoadMoreButton";
@@ -24,7 +24,7 @@ const SearchResults = ({
   searchResults, 
   errorMessage, 
   brandFilter,
-  isLoading = false,
+  // isLoading = false, // Removed unused parameter
   hasMore = false,
   onLoadMore,
   isLoadingMore = false,

@@ -16,7 +16,7 @@ const ProductVariants = ({
   variants, 
   onVariantChange, 
   selectedVariant: propSelectedVariant,
-  showQuickAdd = false 
+  // showQuickAdd = false // Removed unused parameter 
 }: ProductVariantsProps) => {
   const { isInCart: checkIsInCart } = useCart();
 

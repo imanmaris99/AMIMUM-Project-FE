@@ -13,8 +13,10 @@ const ProductImage = ({ detailProduct }: ProductImageProps) => {
       <Image 
         src={imageUrl} 
         alt={detailProduct?.name || "Product Image"} 
-        layout="fill" 
-        objectFit="contain"
+        fill
+        style={{ objectFit: "contain" }}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        priority={false}
         onError={(e) => {
           e.currentTarget.src = "/buyungupik_agr-1.svg";
         }}

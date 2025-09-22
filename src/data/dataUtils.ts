@@ -5,7 +5,7 @@ import {
   generateDetailProductData,
   generateCardProductData,
   generateBrandProducts,
-  generatePromoProducts,
+  // generatePromoProducts, // Removed - not used
   BRAND_DATA,
   CATEGORY_DATA,
   ARTICLE_DATA,

@@ -8,18 +8,7 @@ interface TitleProductProps {
   isError: number | string | null;
   isLoading: boolean;
 }
-const TitleProductSkeleton = () => (
-  <div className="flex items-center justify-between p-4 bg-white shadow-sm rounded-lg animate-pulse">
-    <div>
-      <div className="h-4 w-24 bg-gray-300 rounded mb-2" />
-      <div className="h-6 w-40 bg-gray-300 rounded" />
-    </div>
-    <div className="flex items-center gap-1 bg-orange-100 px-2 py-1 rounded-full">
-      <div className="h-6 w-6 bg-gray-300 rounded-full" />
-      <div className="h-4 w-8 bg-gray-300 rounded" />
-    </div>
-  </div>
-);
+// TitleProductSkeleton component removed - not used
 
 const TitleProduct = ({ isError, isLoading, data }: TitleProductProps) => {
   if (isError && typeof isError === "string") {

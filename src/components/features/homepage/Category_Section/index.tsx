@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+// useState import removed - not used in this component
 import { Tag, TagSkeleton } from "@/components";
 import { CategoryProps } from "./types";
 import React from "react";

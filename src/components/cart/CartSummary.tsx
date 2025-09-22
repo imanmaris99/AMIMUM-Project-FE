@@ -4,7 +4,7 @@ import { useCart } from '@/contexts/CartContext';
 import rupiahFormater from '@/utils/rupiahFormater';
 
 export default function CartSummary() {
-  const { cartItems, totalPrices } = useCart();
+  const { totalPrices } = useCart();
 
 
   // Calculate totals

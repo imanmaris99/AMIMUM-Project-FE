@@ -9,9 +9,7 @@ import CartWithNotification from "@/components/common/CartWithNotification";
 import NotificationErrorBoundary from "@/components/common/NotificationErrorBoundary";
 import ToastProvider from "@/components/ui/ToastProvider";
 import { ClientErrorBoundary } from "@/components/common/ClientErrorBoundary";
-import { initializeAnalytics } from "@/lib/analytics";
-import { PerformanceMonitor } from "@/lib/performance";
-import { getSecurityHeaders } from "@/lib/security";
+// Performance and analytics imports removed - will be initialized in client components
 
 export const metadata: Metadata = {
   title: "AmImUm",
@@ -26,8 +24,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <head suppressHydrationWarning={true}>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100;400;700;900&display=swap" rel="stylesheet" suppressHydrationWarning={true} />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;700;900&display=swap" rel="stylesheet" suppressHydrationWarning={true} />
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100;400;700;900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;700;900&display=swap" rel="stylesheet" />
         <meta name="viewport" content="width=device-width, initial-scale=1" suppressHydrationWarning={true} />
         <meta name="theme-color" content="#001E14" suppressHydrationWarning={true} />
         <meta name="description" content="Toko Herbal AmImUm - Produk herbal berkualitas tinggi" suppressHydrationWarning={true} />

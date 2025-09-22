@@ -9,16 +9,7 @@ interface ProductDescriptionProps {
   isLoading: boolean;
 }
 
-const ProductDescriptionSkeleton = () => (
-  <div className="border border-gray-300 p-4 rounded-lg shadow-sm animate-pulse">
-    <div className="h-6 w-1/3 bg-gray-300 rounded mb-2" />
-    <div className="space-y-2">
-      <div className="h-4 w-full bg-gray-300 rounded" />
-      <div className="h-4 w-5/6 bg-gray-300 rounded" />
-      <div className="h-4 w-2/3 bg-gray-300 rounded" />
-    </div>
-  </div>
-);
+// ProductDescriptionSkeleton component removed - not used
 
 const ProductDescription = ({
   isError,

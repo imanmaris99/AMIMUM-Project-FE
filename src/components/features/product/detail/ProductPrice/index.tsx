@@ -9,7 +9,7 @@ import { getProductRatingSummary } from "@/data/dummyData";
 import RatingDisplay from "@/components/rating/RatingDisplay";
 import { useCart } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
-import { toast } from "react-hot-toast";
+// toast import removed - not used in this component
 import { SessionManager } from "@/lib/auth";
 import LoginRequiredModal from "@/components/common/LoginRequiredModal";
 
@@ -20,21 +20,7 @@ interface ProductPriceProps {
   isLoading: boolean;
   isSticky?: boolean;
 }
-const ProductPriceSkeleton = () => (
-  <div className="p-4 flex items-center justify-between mb-20 animate-pulse">
-    <div>
-      <div className="h-4 w-32 bg-gray-300 rounded mb-2" />
-      <div className="flex items-center mt-1 space-x-2">
-        <div className="h-4 w-10 bg-gray-300 rounded" />
-        <div className="h-4 w-16 bg-gray-300 rounded" />
-      </div>
-      <div className="h-6 w-24 bg-gray-300 rounded mt-1" />
-    </div>
-    <div>
-      <div className="h-10 w-32 bg-gray-300 rounded" />
-    </div>
-  </div>
-);
+// ProductPriceSkeleton component removed - not used
 
 const ProductPrice = ({
   isError,

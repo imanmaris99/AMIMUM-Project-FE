@@ -45,7 +45,7 @@ const useSearchPagination = ({
       setTotalAvailable(0);
       fetchProducts(searchQuery, 1, true);
     }
-  }, [searchQuery, brandFilter]);
+  }, [searchQuery, brandFilter, fetchProducts]);
 
   const fetchProducts = useCallback(async (
     query: string, 

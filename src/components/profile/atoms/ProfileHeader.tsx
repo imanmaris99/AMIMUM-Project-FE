@@ -9,9 +9,9 @@ interface ProfileHeaderProps {
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
-  isLoggedIn,
-  userEmail,
-  onLogout
+  // isLoggedIn, // Removed unused parameter
+  // userEmail, // Removed unused parameter
+  // onLogout // Removed unused parameter
 }) => {
   return (
     <div className="bg-white px-4 py-4">

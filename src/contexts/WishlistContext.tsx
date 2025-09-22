@@ -7,11 +7,11 @@ import { ErrorHandler } from '@/lib/errorHandler';
 
 interface WishlistContextType {
   wishlistItems: WishlistItem[];
-  addToWishlist: (product: any) => void;
+  addToWishlist: (product: WishlistItem) => void;
   removeFromWishlist: (productId: string) => void;
   clearAll: () => void;
   isInWishlist: (productId: string) => boolean;
-  toggleWishlist: (product: any) => void;
+  toggleWishlist: (product: WishlistItem) => void;
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
@@ -58,7 +58,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
   }, [wishlistItems]);
 
-  const addToWishlist = (product: any) => {
+  const addToWishlist = (product: WishlistItem) => {
     try {
       // Comprehensive data validation
       if (!product) {
@@ -144,7 +144,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     return wishlistItems.some(item => item.productId === productId);
   };
 
-  const toggleWishlist = (product: any) => {
+  const toggleWishlist = (product: WishlistItem) => {
     // Validate product before toggle
     if (!product || !product.id) {
       ErrorHandler.handleError(new Error('Invalid product for wishlist toggle'), 'WishlistToggle');
