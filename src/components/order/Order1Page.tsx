@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { GoChevronLeft, GoLocation, GoPackage, GoCreditCard, GoPlus } from 'react-icons/go';
 import { IoCheckmarkCircle, IoWarning } from 'react-icons/io5';
@@ -98,7 +99,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             const parsedItem = JSON.parse(directItem);
             setDirectCheckoutItem(parsedItem);
             setIsDirectCheckout(true);
-          } catch (error) {
+          } catch {
+            // Ignore parsing errors
           }
         }
       }
@@ -355,9 +357,11 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
               {currentItems.map((item: CartItemType) => (
                 <div key={item.id} className="flex items-center space-x-3">
                   <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0">
-                    <img 
+                    <Image 
                       src={item.variant_info.img || "/default-image.jpg"} 
                       alt={item.product_name} 
+                      width={64}
+                      height={64}
                       className="w-full h-full object-cover rounded-lg"
                     />
                   </div>
@@ -545,10 +549,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                 💡 Contoh catatan yang berguna:
               </p>
               <ul className="text-xs text-blue-700 space-y-1">
-                <li>• "Ambil jam 3 sore"</li>
-                <li>• "Tolong bungkus rapi"</li>
-                <li>• "Kirim ke alamat kantor"</li>
-                <li>• "Hubungi sebelum kirim"</li>
+                <li>• &ldquo;Ambil jam 3 sore&rdquo;</li>
+                <li>• &ldquo;Tolong bungkus rapi&rdquo;</li>
+                <li>• &ldquo;Kirim ke alamat kantor&rdquo;</li>
+                <li>• &ldquo;Hubungi sebelum kirim&rdquo;</li>
               </ul>
             </div>
           </div>

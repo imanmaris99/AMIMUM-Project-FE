@@ -61,9 +61,9 @@ const SearchResults = ({
         <div className="text-sm text-gray-600">
           {isSearching ? (
             <span>
-              Menampilkan hasil untuk: <span className="font-semibold text-[#00764F]">"{searchQuery}"</span>
+              Menampilkan hasil untuk: <span className="font-semibold text-[#00764F]">&ldquo;{searchQuery}&rdquo;</span>
               {brandFilter && (
-                <span> dari merek <span className="font-semibold text-[#00764F]">"{brandFilter}"</span></span>
+                <span> dari merek <span className="font-semibold text-[#00764F]">&ldquo;{brandFilter}&rdquo;</span></span>
               )}
             </span>
           ) : (
@@ -93,9 +93,9 @@ const SearchResults = ({
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak ada produk ditemukan</h3>
           <p className="text-gray-500 text-sm mb-4">
-            Tidak ada produk yang cocok dengan pencarian <span className="font-semibold">"{searchQuery}"</span>
+            Tidak ada produk yang cocok dengan pencarian <span className="font-semibold">&ldquo;{searchQuery}&rdquo;</span>
             {brandFilter && (
-              <span> dari merek <span className="font-semibold">"{brandFilter}"</span></span>
+              <span> dari merek <span className="font-semibold">&ldquo;{brandFilter}&rdquo;</span></span>
             )}
           </p>
           <div className="text-sm text-gray-400">
@@ -113,7 +113,7 @@ const SearchResults = ({
           <p className="text-sm text-gray-600">
             Ditemukan <span className="font-semibold text-[#00764F]">{displayTotalAvailable}</span> produk
             {brandFilter && (
-              <span> dari merek <span className="font-semibold text-[#00764F]">"{brandFilter}"</span></span>
+              <span> dari merek <span className="font-semibold text-[#00764F]">&ldquo;{brandFilter}&rdquo;</span></span>
             )}
           </p>
         </div>

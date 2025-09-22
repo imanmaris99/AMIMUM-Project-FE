@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { GoChevronLeft } from "react-icons/go";
 
@@ -47,11 +48,11 @@ const DetailProductHeader: React.FC<DetailProductHeaderProps> = ({
               onClick={handleQuestion}
               className="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:bg-gray-100 transition-colors"
             >
-              <img
+              <Image
                 src="/message-question.svg"
                 alt="Help"
-                width="20"
-                height="20"
+                width={20}
+                height={20}
                 className="text-[#0D0E09]"
               />
             </button>

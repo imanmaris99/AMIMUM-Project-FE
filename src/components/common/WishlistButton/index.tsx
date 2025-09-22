@@ -7,7 +7,13 @@ import LoginRequiredModal from '../LoginRequiredModal';
 import { SessionManager } from '@/lib/auth';
 
 interface WishlistButtonProps {
-  product: any;
+  product: {
+    id: string;
+    name: string;
+    price: number;
+    image: string;
+    brand?: string;
+  };
   className?: string;
   size?: 'sm' | 'md' | 'lg';
   showVariantModal?: boolean;
@@ -58,7 +64,8 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
           toggleWishlist(product);
         }
       }
-    } catch (error) {
+    } catch {
+      // Ignore wishlist toggle errors
     }
   };
 

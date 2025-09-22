@@ -126,7 +126,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                 <div className="flex items-start space-x-2">
                   <span className="text-gray-600 text-sm">Catatan:</span>
                   <p className="text-gray-900 text-sm flex-1">
-                    "{latestTransaction?.notes || additionalNotes}"
+                    &ldquo;{latestTransaction?.notes || additionalNotes}&rdquo;
                   </p>
                 </div>
               </div>

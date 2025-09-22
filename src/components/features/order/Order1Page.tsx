@@ -98,7 +98,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             const parsedItem = JSON.parse(directItem);
             setDirectCheckoutItem(parsedItem);
             setIsDirectCheckout(true);
-          } catch (error) {
+          } catch {
+            // Ignore parsing errors
           }
         }
       }
@@ -545,10 +546,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                 💡 Contoh catatan yang berguna:
               </p>
               <ul className="text-xs text-blue-700 space-y-1">
-                <li>• "Ambil jam 3 sore"</li>
-                <li>• "Tolong bungkus rapi"</li>
-                <li>• "Kirim ke alamat kantor"</li>
-                <li>• "Hubungi sebelum kirim"</li>
+                <li>• &ldquo;Ambil jam 3 sore&rdquo;</li>
+                <li>• &ldquo;Tolong bungkus rapi&rdquo;</li>
+                <li>• &ldquo;Kirim ke alamat kantor&rdquo;</li>
+                <li>• &ldquo;Hubungi sebelum kirim&rdquo;</li>
               </ul>
             </div>
           </div>

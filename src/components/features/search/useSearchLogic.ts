@@ -51,7 +51,7 @@ const useSearchLogic = () => {
   const dummyProducts = useMemo(() => {
     try {
       return generateCardProductData();
-    } catch (error) {
+    } catch {
       return [];
     }
   }, []);

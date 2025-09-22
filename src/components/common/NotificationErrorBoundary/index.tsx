@@ -23,6 +23,8 @@ class NotificationErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // Log error for debugging
+    console.error('NotificationErrorBoundary caught an error:', error, errorInfo);
   }
 
   render() {

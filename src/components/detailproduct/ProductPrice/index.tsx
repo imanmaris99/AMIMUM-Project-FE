@@ -53,7 +53,8 @@ const ProductPrice = ({
       setShowFeedback(true);
       setTimeout(() => setShowFeedback(false), 3000);
       
-    } catch (error) {
+    } catch {
+      // Ignore add to cart errors
     } finally {
       setIsAdding(false);
     }
@@ -102,7 +103,8 @@ const ProductPrice = ({
       // Navigate to checkout page
       router.push('/order-1?direct=true');
       
-    } catch (error) {
+    } catch {
+      // Ignore add to cart errors
     } finally {
       setIsBuying(false);
     }

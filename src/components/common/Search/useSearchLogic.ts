@@ -10,7 +10,8 @@ function debounce<T extends (...args: unknown[]) => void>(fn: T, delay: number):
     try {
       clearTimeout(timeout);
       timeout = setTimeout(() => fn.apply(this, args), delay);
-    } catch (error) {
+    } catch {
+      // Ignore debounce errors
     }
   } as T;
 }
@@ -30,7 +31,8 @@ const useSearchLogic = () => {
       if (search.trim()) {
         router.push(`/search?q=${search}`);
       }
-    } catch (error) {
+    } catch {
+      // Ignore debounce errors
     }
   };
 
@@ -41,7 +43,8 @@ const useSearchLogic = () => {
       }
       
       router.push(`/detail-product/${productId}`);
-    } catch (error) {
+    } catch {
+      // Ignore debounce errors
     }
   };
 
@@ -49,7 +52,7 @@ const useSearchLogic = () => {
   const dummyProducts = useMemo(() => {
     try {
       return generateCardProductData();
-    } catch (error) {
+    } catch {
       return [];
     }
   }, []);
@@ -100,7 +103,8 @@ const useSearchLogic = () => {
       } else {
         setProducts([]);
       }
-    } catch (error) {
+    } catch {
+      // Ignore debounce errors
     }
   };
 
@@ -109,7 +113,8 @@ const useSearchLogic = () => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setShowDropdown(false);
       }
-    } catch (error) {
+    } catch {
+      // Ignore debounce errors
     }
   }, []);
 
@@ -119,7 +124,8 @@ const useSearchLogic = () => {
       return () => {
         document.removeEventListener("mousedown", handleClickOutside);
       };
-    } catch (error) {
+    } catch {
+      // Ignore debounce errors
     }
   }, [handleClickOutside]);
 

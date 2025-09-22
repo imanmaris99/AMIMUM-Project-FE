@@ -7,7 +7,7 @@ import PackageSpecificationForm from "../edit/PackageSpecificationForm";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
-import { SenderFormData, ReceiverFormData, PackageFormData } from "@/types/shipment";
+// import { SenderFormData, ReceiverFormData, PackageFormData } from "@/types/shipment"; // Removed unused imports
 
 const CreateShipment = () => {
   const router = useRouter();
