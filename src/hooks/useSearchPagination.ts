@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { CardProductProps } from '@/components/common/Search/CardProduct/types';
-import { SearchGetProduct } from '@/API/product';
+import { SearchGetProduct } from '@/services/api/product';
 
 interface UseSearchPaginationProps {
   searchQuery: string;

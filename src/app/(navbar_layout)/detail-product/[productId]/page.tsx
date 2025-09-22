@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import ProductImage from "@/components/detailproduct/ProductImage";
-import TitleProduct from "@/components/detailproduct/TitleProduct";
-import ProductVariants from "@/components/detailproduct/ProductVariants";
-import ProductInformation from "@/components/detailproduct/ProductInformation";
-import ProductDescription from "@/components/detailproduct/ProductDescription";
-import ProductPrice from "@/components/detailproduct/ProductPrice";
+import ProductImage from "@/components/DetailProduct/ProductImage";
+import TitleProduct from "@/components/DetailProduct/TitleProduct";
+import ProductVariants from "@/components/DetailProduct/ProductVariants";
+import ProductInformation from "@/components/DetailProduct/ProductInformation";
+import ProductDescription from "@/components/DetailProduct/ProductDescription";
+import ProductPrice from "@/components/DetailProduct/ProductPrice";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 import { getDetailProduct } from "@/data/dataUtils";
 import { validateDetailProductData } from "@/utils/dataValidation";

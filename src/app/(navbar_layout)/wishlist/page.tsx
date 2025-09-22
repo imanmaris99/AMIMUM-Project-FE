@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { HiOutlineTrash } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 import WishlistList from "@/components/wishlist/molecules/WishlistList";
-import { WishlistItem } from "@/types/wishlist";
+// import { WishlistItem } from "@/types/wishlist";
 import { useWishlist } from "@/contexts/WishlistContext";
 import LoginProtection from "@/components/common/LoginProtection";
 import { toast } from "react-hot-toast";
@@ -12,7 +12,7 @@ import UnifiedHeader from "@/components/common/UnifiedHeader";
 
 const Wishlist = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const { wishlistItems, removeFromWishlist, clearAll } = useWishlist();
+  const { wishlistItems, clearAll } = useWishlist();
   const [totalItems, setTotalItems] = useState(0);
 
   // Update total items when wishlist changes
@@ -20,7 +20,7 @@ const Wishlist = () => {
     setTotalItems(wishlistItems.length);
   }, [wishlistItems]);
 
-  const handleRemoveItem = (itemId: string) => {
+  const handleRemoveItem = (_itemId: string) => {
     // This function is now handled by the context
     // We keep it for backward compatibility with WishlistList
   };

@@ -1,4 +1,4 @@
-import Header from "@/components/homepage/Header_Section";
+import Header from "@/components/homepage/HeaderSection";
 import SearchWithPagination from "@/components/common/Search/SearchWithPagination";
 import { notFound } from "next/navigation";
 

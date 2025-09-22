@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { TrackOrderList, DeliveryAddress, StatusOrder } from "@/components/track-order";
-import { trackOrderDummyData } from "@/data/trackOrderDummyData";
+// import { trackOrderDummyData } from "@/data/trackOrderDummyData";
 import { TrackOrderItem } from "@/types/trackOrder";
+import { Transaction } from "@/types/transaction";
 import { useTransaction } from "@/contexts/TransactionContext";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 import LoginProtection from "@/components/common/LoginProtection";
@@ -13,7 +14,7 @@ const TrackOrderPage: React.FC = () => {
   const [productId, setProductId] = useState<string | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
   const [trackOrderItems, setTrackOrderItems] = useState<TrackOrderItem[]>([]);
-  const [currentTransaction, setCurrentTransaction] = useState<any>(null);
+  const [currentTransaction, setCurrentTransaction] = useState<Transaction | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
   const { transactions } = useTransaction();

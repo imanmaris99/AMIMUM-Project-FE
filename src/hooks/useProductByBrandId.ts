@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { GetProductByBrandId } from "@/API/product";
+import { GetProductByBrandId } from "@/services/api/product";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 
 export const useProductByBrandId = (brandId: number) => {
