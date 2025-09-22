@@ -21,6 +21,14 @@ const Header = () => {
     SessionManager.clearSession();
     setUserEmail("");
     
+    // Force trigger storage event for cross-tab synchronization
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: 'isLoggedIn',
+      newValue: null,
+      oldValue: 'true',
+      storageArea: localStorage
+    }));
+    
     // Show success message
     setShowLogoutMessage(true);
     setTimeout(() => {

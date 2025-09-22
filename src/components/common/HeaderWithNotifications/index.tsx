@@ -50,7 +50,17 @@ const HeaderWithNotifications = ({
   const handleLogout = () => {
     // Use SessionManager to clear session
     SessionManager.clearSession();
+    
+    // Immediately update local state
     setIsLoggedIn(false);
+    
+    // Force trigger storage event for cross-tab synchronization
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: 'isLoggedIn',
+      newValue: null,
+      oldValue: 'true',
+      storageArea: localStorage
+    }));
     
     // Call parent's logout handler if provided
     if (onLogout) {

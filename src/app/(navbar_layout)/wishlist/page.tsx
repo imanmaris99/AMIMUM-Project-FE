@@ -44,7 +44,7 @@ const Wishlist = () => {
   };
 
   return (
-    <LoginProtection>
+    <LoginProtection useModal={true} feature="wishlist">
       <div className="min-h-screen bg-white">
         {/* Unified Header */}
         <UnifiedHeader 

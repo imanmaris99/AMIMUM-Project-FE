@@ -9,6 +9,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { SessionManager } from "@/lib/auth";
+import LoginRequiredModal from "@/components/common/LoginRequiredModal";
 
 interface ProductPriceProps {
   data: DetailProductType | undefined;
@@ -43,6 +44,7 @@ const ProductPrice = ({
   const [showFeedback, setShowFeedback] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const { addToCart, isInCart } = useCart();
   const router = useRouter();
 
@@ -81,8 +83,7 @@ const ProductPrice = ({
     const isLoggedIn = SessionManager.isAuthenticated();
     
     if (!isLoggedIn) {
-      toast.error('Silakan login terlebih dahulu untuk melanjutkan pembelian');
-      router.push('/login');
+      setShowLoginModal(true);
       return;
     }
     
@@ -306,6 +307,15 @@ const ProductPrice = ({
                 </div>
               </div>
             )}
+
+            {/* Login Required Modal */}
+            <LoginRequiredModal
+              isOpen={showLoginModal}
+              onClose={() => setShowLoginModal(false)}
+              feature="checkout"
+              title="Login Diperlukan untuk Pembelian"
+              description="Silakan login terlebih dahulu untuk melanjutkan pembelian dan menyelesaikan checkout dengan aman."
+            />
           </div>
         </div>
       </div>

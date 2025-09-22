@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import LogoutModal from "../molecules/LogoutModal";
+import { SessionManager } from "@/lib/auth";
 
 const ProfileSettings: React.FC = () => {
   const router = useRouter();
@@ -24,15 +25,27 @@ const ProfileSettings: React.FC = () => {
   };
 
   const handleConfirmLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("userEmail");
+    // Use SessionManager to clear session
+    SessionManager.clearSession();
     
-    // Show success message
-    toast.success("Berhasil keluar! Anda masih bisa menjelajahi toko.");
-    
-    // Close modal and reload page
+    // Close modal first
     setIsLogoutModalOpen(false);
-    window.location.reload();
+    
+    // Force trigger storage event for cross-tab synchronization
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: 'isLoggedIn',
+      newValue: null,
+      oldValue: 'true',
+      storageArea: localStorage
+    }));
+    
+    // Show success message after a brief delay
+    setTimeout(() => {
+      toast.success("Berhasil keluar! Anda masih bisa menjelajahi toko.");
+    }, 100);
+    
+    // Redirect to homepage
+    router.push("/");
   };
 
   const handleCloseLogoutModal = () => {

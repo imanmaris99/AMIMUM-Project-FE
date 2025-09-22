@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { useWishlist } from '@/contexts/WishlistContext';
 import WishlistVariantModal from '../WishlistVariantModal';
+import LoginRequiredModal from '../LoginRequiredModal';
+import { SessionManager } from '@/lib/auth';
 
 interface WishlistButtonProps {
   product: any;
@@ -19,6 +21,7 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
 }) => {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const isWishlisted = isInWishlist(product.id);
 
   const sizeClasses = {
@@ -32,6 +35,14 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
     
     try {
       if (!product || !product.id || !product.name) {
+        return;
+      }
+
+      // Check if user is logged in
+      const isLoggedIn = SessionManager.isAuthenticated();
+      
+      if (!isLoggedIn) {
+        setShowLoginModal(true);
         return;
       }
       
@@ -82,6 +93,14 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
         isOpen={isModalOpen}
         onClose={handleModalClose}
         product={product}
+      />
+
+      <LoginRequiredModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        feature="wishlist"
+        title="Login untuk Menyimpan ke Wishlist"
+        description="Silakan login terlebih dahulu untuk menyimpan produk ke wishlist dan mengakses daftar produk favorit Anda."
       />
     </>
   );

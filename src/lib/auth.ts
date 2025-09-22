@@ -104,15 +104,30 @@ export class SessionManager {
   }
   
   static clearSession(): void {
+    // Clear secure storage
     SecureStorage.removeItem(this.SESSION_KEY);
     SecureStorage.removeItem(this.TOKEN_KEY);
+    
     // Clear the flag in regular localStorage
     localStorage.removeItem(this.AUTH_FLAG_KEY);
     localStorage.removeItem('userEmail');
   }
   
   static isAuthenticated(): boolean {
-    return this.getSession() !== null;
+    const session = this.getSession();
+    if (!session) {
+      return false;
+    }
+    
+    // Additional check: verify the session is still valid
+    const now = new Date();
+    if (session.token && session.token.expiresAt && new Date(session.token.expiresAt) < now) {
+      // Token expired, clear session
+      this.clearSession();
+      return false;
+    }
+    
+    return true;
   }
 }
 

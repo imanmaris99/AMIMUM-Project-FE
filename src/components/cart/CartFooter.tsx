@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'react-hot-toast';
 import rupiahFormater from '@/utils/rupiahFormater';
 import { SessionManager } from '@/lib/auth';
+import LoginRequiredModal from '@/components/common/LoginRequiredModal';
 
 interface CartFooterProps {
   onCheckout?: () => void;
@@ -14,6 +15,7 @@ interface CartFooterProps {
 export default function CartFooter({ onCheckout }: CartFooterProps) {
   const router = useRouter();
   const { cartItems, totalPrices, updateActiveStatus } = useCart();
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Calculate totals
   const total = totalPrices.total_all_active_prices;
@@ -36,8 +38,7 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
     const isLoggedIn = SessionManager.isAuthenticated();
     
     if (!isLoggedIn) {
-      toast.error('Silakan login terlebih dahulu untuk melanjutkan checkout');
-      router.push('/login');
+      setShowLoginModal(true);
       return;
     }
     
@@ -88,6 +89,15 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
       <div className="flex justify-center pb-2">
         <div className="w-32 h-1 bg-gray-800 rounded-full"></div>
       </div>
+
+      {/* Login Required Modal */}
+      <LoginRequiredModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        feature="checkout"
+        title="Login Diperlukan untuk Checkout"
+        description="Silakan login terlebih dahulu untuk melanjutkan checkout dan menyelesaikan pembelian Anda dengan aman."
+      />
     </div>
   );
 }

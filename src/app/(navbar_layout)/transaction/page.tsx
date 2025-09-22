@@ -33,7 +33,7 @@ const TransactionPage = () => {
   };
 
   return (
-    <LoginProtection>
+    <LoginProtection useModal={true} feature="transaction">
       <div className="min-h-screen bg-white">
         {/* Unified Header */}
         <UnifiedHeader 

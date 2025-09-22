@@ -34,7 +34,14 @@ const Login = () => {
   // Check if user is already authenticated
   useEffect(() => {
     if (SessionManager.isAuthenticated()) {
-      router.push("/");
+      // Check if there's a redirect URL stored
+      const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+      if (redirectUrl) {
+        sessionStorage.removeItem('redirectAfterLogin');
+        router.push(redirectUrl);
+      } else {
+        router.push("/");
+      }
     }
   }, [router]);
 
@@ -155,7 +162,14 @@ const Login = () => {
         
         // Auto redirect after 2 seconds
         setTimeout(() => {
-          router.push("/");
+          // Check if there's a redirect URL stored
+          const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+          if (redirectUrl) {
+            sessionStorage.removeItem('redirectAfterLogin');
+            router.push(redirectUrl);
+          } else {
+            router.push("/");
+          }
         }, 2000);
       } else {
         setAttempts(prev => prev + 1);
