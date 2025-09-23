@@ -84,25 +84,18 @@ export function validateDetailProductData(product: any): product is DetailProduc
 export function validateCartItemData(item: any): item is CartItemType {
   return !!(
     item &&
-    typeof item.id === 'number' &&
+    typeof item.id === 'string' &&
     typeof item.product_id === 'string' &&
-    typeof item.product_name === 'string' &&
-    typeof item.product_price === 'number' &&
-    item.product_price > 0 &&
     typeof item.variant_id === 'number' &&
-    item.variant_info &&
-    typeof item.variant_info.id === 'number' &&
-    typeof item.variant_info.variant === 'string' &&
-    typeof item.variant_info.name === 'string' &&
-    typeof item.variant_info.img === 'string' &&
-    typeof item.variant_info.discount === 'number' &&
-    item.variant_info.discount >= 0 &&
-    typeof item.variant_info.discounted_price === 'number' &&
-    item.variant_info.discounted_price >= 0 &&
     typeof item.quantity === 'number' &&
     item.quantity > 0 &&
-    typeof item.is_active === 'boolean' &&
-    typeof item.created_at === 'string'
+    typeof item.price === 'number' &&
+    item.price > 0 &&
+    typeof item.product_name === 'string' &&
+    typeof item.variant_name === 'string' &&
+    typeof item.image === 'string' &&
+    typeof item.created_at === 'string' &&
+    typeof item.updated_at === 'string'
   );
 }
 
@@ -115,7 +108,7 @@ export function validateWishlistItemData(item: any): item is WishlistItem {
     typeof item.productId === 'string' &&
     typeof item.name === 'string' &&
     typeof item.variant === 'string' &&
-    typeof item.quantity === 'string' &&
+    typeof item.quantity === 'number' &&
     typeof item.price === 'number' &&
     item.price > 0 &&
     typeof item.image === 'string' &&
@@ -134,6 +127,7 @@ export function sanitizeProductData(product: any): AllProductInfoType | null {
     id: product.id,
     name: product.name,
     price: product.price,
+    image: product.image || "/default-image.jpg",
     brand_info: product.brand_info,
     all_variants: product.all_variants.filter(validateVariantData),
     created_at: product.created_at

@@ -110,7 +110,7 @@ export class UserBehaviorTracker {
       }
 
       // Time to Interactive
-      this.trackEvent('performance', 'web_vitals', 'tti', undefined, navigation.loadEventEnd - navigation.navigationStart);
+      this.trackEvent('performance', 'web_vitals', 'tti', undefined, navigation.loadEventEnd - (navigation as any).navigationStart);
     }
   }
 
@@ -122,7 +122,7 @@ export class UserBehaviorTracker {
       
       if (element) {
         this.trackEvent('interaction', 'click', 'element', element.tagName, undefined, {
-          text: element.textContent?.trim(),
+          text: element.textContent?.trim() || '',
           className: element.className,
           id: element.id
         });
@@ -171,14 +171,14 @@ export class EcommerceTracker {
   static trackProductView(productId: string, productName: string, category?: string) {
     UserBehaviorTracker.trackEvent('ecommerce', 'product', 'view', productName, undefined, {
       productId,
-      category
+      category: category || ''
     });
   }
 
   static trackAddToCart(productId: string, productName: string, quantity: number = 1, price?: number) {
     UserBehaviorTracker.trackEvent('ecommerce', 'cart', 'add', productName, quantity, {
       productId,
-      price
+      price: price || 0
     });
   }
 
@@ -191,7 +191,7 @@ export class EcommerceTracker {
   static trackPurchase(orderId: string, total: number, items: Array<{id: string, name: string, quantity: number, price: number}>) {
     UserBehaviorTracker.trackEvent('ecommerce', 'purchase', 'complete', orderId, total, {
       orderId,
-      items,
+      items: JSON.stringify(items),
       itemCount: items.length
     });
   }
@@ -218,7 +218,7 @@ export class ErrorTracker {
   static trackError(error: Error, context: string, severity: 'low' | 'medium' | 'high' = 'medium') {
     UserBehaviorTracker.trackEvent('error', 'application', 'occurred', error.message, undefined, {
       errorName: error.name,
-      errorStack: error.stack,
+      errorStack: error.stack || '',
       context,
       severity,
       url: window.location.href,
@@ -253,7 +253,7 @@ export class UserFlowTracker {
     const duration = Date.now() - this.flowStartTime;
     
     UserBehaviorTracker.trackEvent('user_flow', 'completion', success ? 'success' : 'failure', this.currentFlow.join(' > '), duration, {
-      flow: this.currentFlow,
+      flow: this.currentFlow.join(' > '),
       duration,
       success
     });
@@ -265,9 +265,9 @@ export class UserFlowTracker {
     const duration = Date.now() - this.flowStartTime;
     
     UserBehaviorTracker.trackEvent('user_flow', 'abandonment', 'abandoned', this.currentFlow.join(' > '), duration, {
-      flow: this.currentFlow,
+      flow: this.currentFlow.join(' > '),
       duration,
-      reason
+      reason: reason || ''
     });
 
     this.currentFlow = [];
@@ -279,9 +279,9 @@ export class PerformanceTracker {
   static trackPageLoad(pageName: string) {
     const timing = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
     
-    UserBehaviorTracker.trackEvent('performance', 'page_load', 'complete', pageName, timing.loadEventEnd - timing.navigationStart, {
-      domContentLoaded: timing.domContentLoadedEventEnd - timing.navigationStart,
-      firstByte: timing.responseStart - timing.navigationStart,
+    UserBehaviorTracker.trackEvent('performance', 'page_load', 'complete', pageName, timing.loadEventEnd - (timing as any).navigationStart, {
+      domContentLoaded: timing.domContentLoadedEventEnd - (timing as any).navigationStart,
+      firstByte: timing.responseStart - (timing as any).navigationStart,
       dns: timing.domainLookupEnd - timing.domainLookupStart,
       tcp: timing.connectEnd - timing.connectStart
     });
@@ -338,9 +338,9 @@ export class MonitoringDashboard {
     const sessions = new Map<string, { start: Date; end: Date }>();
     
     events.forEach(event => {
-      if (!sessions.has(event.sessionId)) {
+      if (event.sessionId && !sessions.has(event.sessionId)) {
         sessions.set(event.sessionId, { start: event.timestamp, end: event.timestamp });
-      } else {
+      } else if (event.sessionId) {
         const session = sessions.get(event.sessionId)!;
         if (event.timestamp < session.start) session.start = event.timestamp;
         if (event.timestamp > session.end) session.end = event.timestamp;

@@ -20,7 +20,7 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
-  // const [attempts] = useState(0); // Removed unused variable
+  const [attempts, setAttempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
 
   // Enhanced credentials with proper hashing (demo purposes)

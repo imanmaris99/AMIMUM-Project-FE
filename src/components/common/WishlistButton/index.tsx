@@ -5,6 +5,7 @@ import { useWishlist } from '@/contexts/WishlistContext';
 import WishlistVariantModal from '../WishlistVariantModal';
 import LoginRequiredModal from '../LoginRequiredModal';
 import { SessionManager } from '@/lib/auth';
+import { WishlistItem } from '@/types/wishlist';
 
 interface WishlistButtonProps {
   product: {
@@ -52,20 +53,28 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
         return;
       }
       
+      // Convert product to WishlistItem format
+      const wishlistItem: WishlistItem = {
+        id: product.id,
+        productId: product.id,
+        name: product.name,
+        variant: "Default", // Default variant since we don't have variant info
+        quantity: 1,
+        price: product.price,
+        image: product.image,
+        addedAt: new Date().toISOString(),
+        brand: product.brand
+      };
+
       if (isWishlisted) {
         // If already in wishlist, remove it directly
-        toggleWishlist(product);
+        toggleWishlist(wishlistItem);
       } else {
-        // If not in wishlist, show variant modal if enabled and product has multiple variants
-        if (showVariantModal && product.all_variants && product.all_variants.length > 1) {
-          setIsModalOpen(true);
-        } else {
-          // If no modal needed or single variant, add directly
-          toggleWishlist(product);
-        }
+        // If not in wishlist, add directly
+        toggleWishlist(wishlistItem);
       }
-    } catch {
-      // Ignore wishlist toggle errors
+    } catch (error) {
+      console.error('Wishlist toggle error:', error);
     }
   };
 
@@ -99,7 +108,7 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
       <WishlistVariantModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
-        product={product}
+        product={null}
       />
 
       <LoginRequiredModal

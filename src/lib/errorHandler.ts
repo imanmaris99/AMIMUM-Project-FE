@@ -181,11 +181,7 @@ export class ErrorHandler {
     // Show user-friendly error message
     const errorConfig = ERROR_MESSAGES[errorType];
     toast.error(`${errorConfig.title}: ${errorConfig.message}`, {
-      duration: 5000,
-      action: {
-        label: errorConfig.action,
-        onClick: () => this.handleErrorAction(errorType, errorInfo)
-      }
+      duration: 5000
     });
   }
 

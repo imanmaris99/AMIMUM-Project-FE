@@ -34,7 +34,7 @@ export function validateToken(token: string): boolean {
   try {
     // Simple token validation for demo purposes
     // In production, use proper JWT validation
-    return token && token.length > 10;
+    return Boolean(token && token.length > 10);
   } catch {
     return false;
   }

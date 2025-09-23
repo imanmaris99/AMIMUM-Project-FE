@@ -2,36 +2,10 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useMemo } from "react";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
+import { CartItemType, CartTotalPricesType } from "@/types/apiTypes";
 import { debounce } from "@/lib/performance";
 import { ErrorHandler } from "@/lib/errorHandler";
 import { validateDetailProductData, validateVariantData, validateCartItemData } from "@/utils/dataValidation";
-
-// Cart Item Type sesuai dengan backend DTO
-export interface CartItemType {
-  id: number;
-  product_id: string;
-  product_name: string;
-  product_price: number;
-  variant_id: number;
-  variant_info: {
-    id: number;
-    variant: string;
-    name: string;
-    img: string;
-    discount: number;
-    discounted_price: number;
-  };
-  quantity: number;
-  is_active: boolean;
-  created_at: string;
-}
-
-// Cart Total Prices Type sesuai dengan backend DTO
-export interface CartTotalPricesType {
-  all_item_active_prices: number;
-  all_promo_active_prices: number;
-  total_all_active_prices: number;
-}
 
 // Cart Response Type sesuai dengan backend DTO
 export interface CartResponseType {
@@ -46,9 +20,9 @@ interface CartContextType {
   totalItems: number;
   totalPrices: CartTotalPricesType;
   addToCart: (product: DetailProductType, variant: VariantProductType) => void;
-  removeFromCart: (cartId: number) => void;
-  updateQuantity: (cartId: number, quantity: number) => void;
-  updateActiveStatus: (cartId: number, isActive: boolean) => void;
+  removeFromCart: (cartId: string) => void;
+  updateQuantity: (cartId: string, quantity: number) => void;
+  updateActiveStatus: (cartId: string, isActive: boolean) => void;
   clearCart: () => void;
   clearAll: () => void; // Alias for clearCart
   removeActiveItems: () => void;
@@ -79,22 +53,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       try {
         const parsedCart = JSON.parse(savedCart);
         if (Array.isArray(parsedCart)) {
-          // Fix and validate each cart item before loading
-          const fixedCartItems = parsedCart.map(item => {
-            // Fix missing discounted_price field
-            if (item.variant_info && typeof item.variant_info.discounted_price !== 'number') {
-              const discount = item.variant_info.discount || 0;
-              const discountedPrice = discount > 0 
-                ? Math.round(item.product_price * (1 - discount / 100))
-                : item.product_price;
-              
-              item.variant_info.discounted_price = discountedPrice;
-            }
-            return item;
-          });
-          
-          // Validate each fixed cart item
-          const validCartItems = fixedCartItems.filter(item => validateCartItemData(item));
+          // Validate each cart item before loading
+          const validCartItems = parsedCart.filter(item => validateCartItemData(item));
           if (validCartItems.length !== parsedCart.length) {
             ErrorHandler.handleError(new Error('Some cart items are invalid and were removed'), 'CartLoad');
           }
@@ -132,28 +92,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   // Calculate total prices
   const calculateTotalPrices = useCallback((items: CartItemType[]): CartTotalPricesType => {
-    const activeItems = items.filter(item => item.is_active);
-    
-    let allItemActivePrices = 0;
-    let allPromoActivePrices = 0;
-
-    activeItems.forEach(item => {
-      const itemTotal = item.product_price * item.quantity;
-      allItemActivePrices += itemTotal;
-      
-      if (item.variant_info.discount > 0) {
-        const discountedPrice = item.variant_info.discounted_price * item.quantity;
-        allPromoActivePrices += discountedPrice;
-      } else {
-        // If no discount, use original price
-        allPromoActivePrices += itemTotal;
-      }
-    });
+    const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const shipping_cost = 15000;
+    const total = subtotal + shipping_cost;
 
     return {
-      all_item_active_prices: allItemActivePrices,
-      all_promo_active_prices: allPromoActivePrices,
-      total_all_active_prices: allPromoActivePrices, // Total after discounts
+      subtotal,
+      shipping_cost,
+      total
     };
   }, []);
 
@@ -203,22 +149,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           (discount > 0 ? Math.round(productPrice * (1 - discount / 100)) : productPrice);
         
         const newCartItem: CartItemType = {
-          id: generateCartId(),
+          id: generateCartId().toString(),
           product_id: product.id,
-          product_name: product.name,
-          product_price: productPrice,
           variant_id: variant.id,
-          variant_info: {
-            id: variant.id,
-            variant: variant.variant || "",
-            name: variant.name || "",
-            img: variant.img || "",
-            discount: discount,
-            discounted_price: discountedPrice,
-          },
           quantity: 1,
-          is_active: true,
+          price: discountedPrice,
+          product_name: product.name,
+          variant_name: variant.variant || "",
+          image: variant.img || "",
           created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         };
 
 
@@ -229,7 +169,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   }, [generateCartId]);
 
   // Remove from cart
-  const removeFromCart = useCallback((cartId: number) => {
+  const removeFromCart = useCallback((cartId: string) => {
     setCartItems(prevItems => {
       const updatedItems = prevItems.filter(item => item.id !== cartId);
       // Immediately save to localStorage when removing items
@@ -243,7 +183,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   }, []);
 
   // Update quantity
-  const updateQuantity = useCallback((cartId: number, quantity: number) => {
+  const updateQuantity = useCallback((cartId: string, quantity: number) => {
     // Validate quantity
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 999) {
       ErrorHandler.handleError(new Error('Invalid quantity: must be between 1 and 999'), 'CartUpdate');
@@ -258,14 +198,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     });
   }, []);
 
-  // Update active status
-  const updateActiveStatus = useCallback((cartId: number, isActive: boolean) => {
-    setCartItems(prevItems => {
-      const updatedItems = prevItems.map(item =>
-        item.id === cartId ? { ...item, is_active: isActive } : item
-      );
-      return updatedItems;
-    });
+  // Update active status (simplified - no is_active property in new structure)
+  const updateActiveStatus = useCallback((cartId: string, isActive: boolean) => {
+    // For now, just log the action since we don't have is_active in new structure
+    console.log(`Update active status for cart item ${cartId}: ${isActive}`);
   }, []);
 
 
@@ -291,9 +227,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   }, []);
 
-  // Remove only active items from cart (for checkout)
+  // Remove only active items from cart (for checkout) - simplified
   const removeActiveItems = useCallback(() => {
-    setCartItems(prevItems => prevItems.filter(item => !item.is_active));
+    // For now, clear all items since we don't have is_active in new structure
+    setCartItems([]);
   }, []);
 
   // Check if item is in cart

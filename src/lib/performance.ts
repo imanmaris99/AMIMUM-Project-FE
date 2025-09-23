@@ -187,7 +187,7 @@ export class PerformanceMonitor {
         const entries = list.getEntries();
         entries.forEach((entry) => {
           // Log FID for monitoring
-          console.log('FID:', entry.processingStart - entry.startTime);
+          console.log('FID:', (entry as any).processingStart - entry.startTime);
         });
       });
       fidObserver.observe({ entryTypes: ['first-input'] });
@@ -231,15 +231,11 @@ export function useMemoryLeakPrevention() {
       
       // Clear any pending timeouts
       const highestTimeoutId = setTimeout(() => {}, 0);
-      for (let i = 0; i < highestTimeoutId; i++) {
-        clearTimeout(i);
-      }
+      clearTimeout(highestTimeoutId);
       
       // Clear any pending intervals
       const highestIntervalId = setInterval(() => {}, 0);
-      for (let i = 0; i < highestIntervalId; i++) {
-        clearInterval(i);
-      }
+      clearInterval(highestIntervalId);
     };
 
     return cleanup;
@@ -328,11 +324,11 @@ export function checkPerformanceBudget() {
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
     
     const metrics = {
-      FCP: navigation.domContentLoadedEventEnd - navigation.navigationStart,
+      FCP: navigation.domContentLoadedEventEnd - (navigation as any).navigationStart,
       LCP: 0, // Would need LCP observer
       FID: 0, // Would need FID observer
       CLS: 0, // Would need CLS observer
-      TTI: navigation.loadEventEnd - navigation.navigationStart,
+      TTI: navigation.loadEventEnd - (navigation as any).navigationStart,
     };
     
     Object.entries(metrics).forEach(([key, value]) => {

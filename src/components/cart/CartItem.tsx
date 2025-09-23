@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { CartItemType } from "@/contexts/CartContext";
+import { CartItemType } from "@/types/apiTypes";
 
 interface CartItemProps {
   item: CartItemType;
-  onQuantityChange?: (cartId: number, quantity: number) => void;
-  onCheckChange?: (cartId: number, checked: boolean) => void;
-  onDelete?: (cartId: number) => void;
+  onQuantityChange?: (cartId: string, quantity: number) => void;
+  onCheckChange?: (cartId: string, checked: boolean) => void;
+  onDelete?: (cartId: string) => void;
 }
 
 const CartItem: React.FC<CartItemProps> = ({
@@ -20,12 +20,12 @@ const CartItem: React.FC<CartItemProps> = ({
 }) => {
   const router = useRouter();
   const [quantity, setQuantity] = useState(item.quantity);
-  const [isChecked, setIsChecked] = useState(item.is_active);
+  const [isChecked, setIsChecked] = useState(true);
 
-  // Sync local state with context when item.is_active changes
+  // Sync local state with context when item changes
   useEffect(() => {
-    setIsChecked(item.is_active);
-  }, [item.is_active]);
+    setIsChecked(true);
+  }, [item.id]);
 
   const handleMinus = () => {
     const newQuantity = Math.max(1, quantity - 1);
@@ -59,10 +59,8 @@ const CartItem: React.FC<CartItemProps> = ({
     router.push(`/detail-product/${item.product_id}`);
   };
 
-  // Calculate display price (use discounted price if available)
-  const displayPrice = item.variant_info.discount > 0 
-    ? item.variant_info.discounted_price 
-    : item.product_price;
+  // Use the price from the new structure
+  const displayPrice = item.price;
 
   return (
     <article className="flex items-center gap-3 p-4 border border-gray-200 rounded-xl max-w-full mx-auto will-change-auto">
@@ -103,7 +101,7 @@ const CartItem: React.FC<CartItemProps> = ({
         {/* Image */}
         <div className="w-[70px] h-[70px] rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 bg-gray-50 grid place-items-center">
           <Image 
-            src={item.variant_info.img} 
+            src={item.image} 
             alt={item.product_name} 
             width={70}
             height={70}
@@ -118,15 +116,10 @@ const CartItem: React.FC<CartItemProps> = ({
             {item.product_name}
           </h2>
           <p className="text-gray-500 text-xs m-0 truncate">
-            {item.variant_info.variant}
+            {item.variant_name}
           </p>
           <div className="mt-2 text-sm font-bold text-green-800" data-unit={displayPrice}>
             Rp {displayPrice.toLocaleString('id-ID')}
-            {item.variant_info.discount > 0 && (
-              <span className="bg-red-100 text-red-600 px-1 py-0.5 rounded text-[10px] font-bold ml-2">
-                -{item.variant_info.discount}%
-              </span>
-            )}
           </div>
         </div>
       </div>

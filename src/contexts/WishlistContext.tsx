@@ -66,9 +66,9 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
         return;
       }
 
-      // Validate product data structure
-      if (!validateProductData(product)) {
-        ErrorHandler.handleError(new Error('Invalid product data structure'), 'WishlistAdd');
+      // Validate wishlist item data structure
+      if (!validateWishlistItemData(product)) {
+        ErrorHandler.handleError(new Error('Invalid wishlist item data structure'), 'WishlistAdd');
         return;
       }
 
@@ -78,31 +78,21 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
         return;
       }
 
-      // Get the first variant or use default variant
-      const firstVariant = product.all_variants?.[0];
-      const variantName = firstVariant?.variant || firstVariant?.name || "Anggur";
-      
-      // Create unique ID that includes variant to allow multiple variants of same product
-      const variantId = firstVariant?.id || 1;
-      const uniqueId = `${product.id}-${variantId}`;
-      
-      // Calculate pricing info
-      const hasDiscount = firstVariant?.discount && firstVariant.discount > 0;
-      const discountedPrice = firstVariant?.discounted_price || (hasDiscount ? product.price * (1 - firstVariant.discount / 100) : product.price);
-      const finalPrice = hasDiscount ? discountedPrice : product.price;
+      // Create unique ID for the wishlist item
+      const uniqueId = `wish-${product.id}-${Date.now()}`;
       
       const wishlistItem: WishlistItem = {
-        id: `wish-${uniqueId}`,
-        productId: product.id,
+        id: uniqueId,
+        productId: product.productId,
         name: product.name,
-        price: finalPrice,
-        image: firstVariant?.img || "/buyungupik_agr-1.svg",
-        variant: variantName,
-        quantity: "1 dus",
+        price: product.price,
+        image: product.image,
+        variant: product.variant,
+        quantity: product.quantity,
         addedAt: new Date().toISOString(),
-        brand: product.brand_info?.name || "Unknown Brand",
-        originalPrice: hasDiscount ? product.price : undefined,
-        discount: firstVariant?.discount || undefined
+        brand: product.brand,
+        originalPrice: product.originalPrice,
+        discount: product.discount
       };
 
       setWishlistItems(prev => {
@@ -146,13 +136,13 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
   const toggleWishlist = (product: WishlistItem) => {
     // Validate product before toggle
-    if (!product || !product.id) {
+    if (!product || !product.productId) {
       ErrorHandler.handleError(new Error('Invalid product for wishlist toggle'), 'WishlistToggle');
       return;
     }
     
-    if (isInWishlist(product.id)) {
-      removeFromWishlist(product.id);
+    if (isInWishlist(product.productId)) {
+      removeFromWishlist(product.productId);
     } else {
       addToWishlist(product);
     }

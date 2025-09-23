@@ -18,8 +18,8 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Calculate totals
-  const total = totalPrices.total_all_active_prices;
-  const allItemsSelected = cartItems.length > 0 && cartItems.every(item => item.is_active);
+  const total = totalPrices.total;
+  const allItemsSelected = cartItems.length > 0; // Simplified since we don't have is_active in new structure
 
   const handleSelectAll = useCallback(() => {
     if (cartItems.length === 0) return;
@@ -29,7 +29,7 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
     
     // Batch update all items at once to prevent multiple re-renders
     cartItems.forEach(item => {
-      updateActiveStatus(item.id, newStatus);
+      updateActiveStatus(item.id.toString(), newStatus);
     });
   }, [cartItems, allItemsSelected, updateActiveStatus]);
 

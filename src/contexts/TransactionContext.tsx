@@ -1,15 +1,15 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
-import { Transaction, TransactionItem } from "@/types/transaction";
-import { CartItemType } from "./CartContext";
+import { Transaction, TransactionItem, TransactionStatus } from "@/types/transaction";
+import { CartItemType } from "@/types/apiTypes";
 import { useNotification } from "./NotificationContext";
 import { validateCartItemData } from "@/utils/dataValidation";
 import { ErrorHandler } from "@/lib/errorHandler";
 
 interface TransactionContextType {
   transactions: Transaction[];
-  addTransaction: (orderData: { shippingAddress: any; paymentMethod: string; notes?: string }, cartItems: CartItemType[]) => Transaction | null;
+  addTransaction: (orderData: { delivery_type: "delivery" | "pickup"; notes?: string; shipment_id?: string; shipment_address?: { address: string }; courier_service?: string }, cartItems: CartItemType[]) => Transaction | null;
   updateTransactionStatus: (transactionId: string, status: string) => void;
   getTransactionById: (transactionId: string) => Transaction | undefined;
   clearTransactions: () => void;
@@ -68,7 +68,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
   }, [transactions]);
 
   // Add new transaction
-  const addTransaction = useCallback((orderData: { shippingAddress: any; paymentMethod: string; notes?: string }, cartItems: CartItemType[]) => {
+  const addTransaction = useCallback((orderData: { delivery_type: "delivery" | "pickup"; notes?: string; shipment_id?: string; shipment_address?: { address: string }; courier_service?: string }, cartItems: CartItemType[]) => {
     try {
       
       // Validate input data
@@ -107,13 +107,13 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         productId: item.product_id,
         name: item.product_name,
         quantity: item.quantity,
-        price: item.variant_info.discounted_price || item.product_price,
-        image: item.variant_info.img || "/default-image.jpg"
+        price: item.price,
+        image: item.image || "/default-image.jpg"
       }));
 
       // Calculate total amount using valid cart items
       const totalAmount = validCartItems.reduce((total, item) => {
-        const itemPrice = item.variant_info.discounted_price || item.product_price;
+        const itemPrice = item.price;
         return total + (itemPrice * item.quantity);
       }, 0);
 
@@ -187,7 +187,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         transaction.transactionId === transactionId 
           ? { 
               ...transaction, 
-              status, 
+              status: status as TransactionStatus, 
               updatedAt: new Date().toISOString() 
             }
           : transaction

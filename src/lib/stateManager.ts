@@ -1,5 +1,5 @@
 // Advanced State Management System
-import { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 // State management types
 export interface StateAction<T = any> {

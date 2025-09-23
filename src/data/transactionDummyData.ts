@@ -18,6 +18,7 @@ export const dummyTransactions: Transaction[] = [
     date: "Sep 9, 2024, 04:30pm",
     status: "cancelled",
     amount: 50000,
+    total: 50000,
     items: transactionItems,
     createdAt: "2024-09-09T16:30:00Z",
     updatedAt: "2024-09-09T16:30:00Z"
@@ -28,6 +29,7 @@ export const dummyTransactions: Transaction[] = [
     date: "Okt 3, 2024, 02:30pm",
     status: "completed",
     amount: 75000,
+    total: 75000,
     items: transactionItems,
     createdAt: "2024-10-03T14:30:00Z",
     updatedAt: "2024-10-03T14:30:00Z"
@@ -38,6 +40,7 @@ export const dummyTransactions: Transaction[] = [
     date: "Okt 3, 2024, 02:30pm",
     status: "pending",
     amount: 100000,
+    total: 100000,
     items: transactionItems,
     createdAt: "2024-10-03T14:30:00Z",
     updatedAt: "2024-10-03T14:30:00Z"
@@ -48,6 +51,7 @@ export const dummyTransactions: Transaction[] = [
     date: "Okt 3, 2024, 02:30pm",
     status: "refund",
     amount: 125000,
+    total: 125000,
     items: transactionItems,
     createdAt: "2024-10-03T14:30:00Z",
     updatedAt: "2024-10-03T14:30:00Z"

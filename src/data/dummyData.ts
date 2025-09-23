@@ -1025,6 +1025,7 @@ function createAllProductInfo(
     id: productId,
     name: productName,
     price: basePrice,
+    image: variants[0]?.img || "/default-image.jpg",
     brand_info: createBrandInfo(brandId),
     all_variants: variants,
     created_at: new Date().toISOString()

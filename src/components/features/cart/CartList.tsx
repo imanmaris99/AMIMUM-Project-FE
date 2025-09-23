@@ -11,15 +11,15 @@ const CartList: React.FC = () => {
   const { cartItems, updateQuantity, updateActiveStatus, removeFromCart } = useCart();
 
 
-  const handleQuantityChange = (cartId: number, quantity: number) => {
+  const handleQuantityChange = (cartId: string, quantity: number) => {
     updateQuantity(cartId, quantity);
   };
 
-  const handleCheckChange = (cartId: number, checked: boolean) => {
+  const handleCheckChange = (cartId: string, checked: boolean) => {
     updateActiveStatus(cartId, checked);
   };
 
-  const handleDelete = (cartId: number) => {
+  const handleDelete = (cartId: string) => {
     removeFromCart(cartId);
   };
 

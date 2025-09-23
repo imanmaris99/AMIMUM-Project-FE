@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import Image from "next/image";
 import { useTransaction } from "@/contexts/TransactionContext";
 import { Transaction } from "@/types/transaction";
 import rupiahFormater from "@/utils/rupiahFormater";
@@ -34,7 +35,9 @@ const TransactionDetailPage: React.FC = () => {
   const handleTrackShipment = () => {
     // Navigate to track order page with transaction ID
     toast.success('Mengarahkan ke halaman pelacakan...');
-    router.push(`/track-order?transactionId=${transaction.id}`);
+    if (transaction) {
+      router.push(`/track-order?transactionId=${transaction.id}`);
+    }
   };
 
   const handleDownloadInvoice = () => {
@@ -183,10 +186,14 @@ const TransactionDetailPage: React.FC = () => {
             <div className="space-y-3">
               {transaction.items.map((item, index) => (
                 <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                    </svg>
+                  <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+                    <Image
+                      src={item.image || "/default-image.jpg"}
+                      alt={item.name}
+                      width={48}
+                      height={48}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-medium text-gray-900 truncate">{item.name}</h4>

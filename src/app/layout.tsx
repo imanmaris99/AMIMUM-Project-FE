@@ -73,14 +73,14 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased font-jakarta" suppressHydrationWarning={true}>
-        <ClientErrorBoundary suppressHydrationWarning={true}>
-          <NotificationErrorBoundary suppressHydrationWarning={true}>
-            <NotificationProvider suppressHydrationWarning={true}>
-              <CartProvider suppressHydrationWarning={true}>
-                <CartWithNotification suppressHydrationWarning={true}>
-                  <WishlistProvider suppressHydrationWarning={true}>
-                    <WishlistWithNotification suppressHydrationWarning={true}>
-                      <TransactionProvider suppressHydrationWarning={true}>
+        <ClientErrorBoundary>
+          <NotificationErrorBoundary>
+            <NotificationProvider>
+              <CartProvider>
+                <CartWithNotification>
+                  <WishlistProvider>
+                    <WishlistWithNotification>
+                      <TransactionProvider>
                         <div suppressHydrationWarning={true}>
                           {children}
                         </div>

@@ -79,7 +79,7 @@ export function getCardProductsBySearch(query: string, brandFilter?: string): Ca
     if (!brand) {
       brand = Object.values(BRAND_DATA).find(b => 
         b.name.toLowerCase().includes(brandFilter.toLowerCase())
-      );
+      ) || BRAND_DATA["1"]; // fallback to default brand
     }
     
     if (brand) {
@@ -224,111 +224,85 @@ export function generateCartData(): CartResponseType {
   // Generate cart items with different variants - sesuai dengan backend structure
   const cartItems: CartItemType[] = [
     {
-      id: 1,
+      id: "1",
+      product_id: "prod-1",
+      variant_id: 1,
+      quantity: 2,
+      price: 15000,
       product_name: "Air Mancur Jamu Beras Kencur",
-      product_price: 15000,
-      variant_info: {
-        id: 1,
-        variant: "Anggur",
-        name: "Anggur",
-        img: "/buyungupik_agr-1.svg",
-        discount: 20
-      },
-      quantity: 2,
-      is_active: true,
-      created_at: "2024-01-15T10:30:00Z"
+      variant_name: "Anggur",
+      image: "/buyungupik_agr-1.svg",
+      created_at: "2024-01-15T10:30:00Z",
+      updated_at: "2024-01-15T10:30:00Z"
     },
     {
-      id: 2,
+      id: "2",
+      product_id: "prod-2",
+      variant_id: 2,
+      quantity: 1,
+      price: 18000,
       product_name: "Aji Mujarab Jamu Kunyit Asam",
-      product_price: 18000,
-      variant_info: {
-        id: 2,
-        variant: "Strawberry",
-        name: "Strawberry",
-        img: "/buyungupik_agr-1.svg",
-        discount: 0
-      },
-      quantity: 1,
-      is_active: true,
-      created_at: "2024-01-14T15:45:00Z"
+      variant_name: "Strawberry",
+      image: "/buyungupik_agr-1.svg",
+      created_at: "2024-01-14T15:45:00Z",
+      updated_at: "2024-01-14T15:45:00Z"
     },
     {
-      id: 3,
-      product_name: "Jamu Jago Jamu Temulawak",
-      product_price: 20000,
-      variant_info: {
-        id: 3,
-        variant: "Cokelat",
-        name: "Cokelat",
-        img: "/buyungupik_agr-1.svg",
-        discount: 25
-      },
+      id: "3",
+      product_id: "prod-3",
+      variant_id: 3,
       quantity: 3,
-      is_active: true,
-      created_at: "2024-01-13T09:20:00Z"
+      price: 20000,
+      product_name: "Jamu Jago Jamu Temulawak",
+      variant_name: "Cokelat",
+      image: "/buyungupik_agr-1.svg",
+      created_at: "2024-01-13T09:20:00Z",
+      updated_at: "2024-01-13T09:20:00Z"
     },
     {
-      id: 4,
-      product_name: "Nyonya Meneer Jamu Jahe Merah",
-      product_price: 25000,
-      variant_info: {
-        id: 4,
-        variant: "Vanilla",
-        name: "Vanilla",
-        img: "/buyungupik_agr-1.svg",
-        discount: 30
-      },
+      id: "4",
+      product_id: "prod-4",
+      variant_id: 4,
       quantity: 1,
-      is_active: false,
-      created_at: "2024-01-12T14:15:00Z"
+      price: 25000,
+      product_name: "Nyonya Meneer Jamu Jahe Merah",
+      variant_name: "Vanilla",
+      image: "/buyungupik_agr-1.svg",
+      created_at: "2024-01-12T14:15:00Z",
+      updated_at: "2024-01-12T14:15:00Z"
     },
     {
-      id: 5,
-      product_name: "Sabdo Palon Jamu Sirih Merah",
-      product_price: 18000,
-      variant_info: {
-        id: 5,
-        variant: "Melon",
-        name: "Melon",
-        img: "/buyungupik_agr-1.svg",
-        discount: 0
-      },
+      id: "5",
+      product_id: "prod-5",
+      variant_id: 5,
       quantity: 2,
-      is_active: true,
-      created_at: "2024-01-11T11:30:00Z"
+      price: 18000,
+      product_name: "Sabdo Palon Jamu Sirih Merah",
+      variant_name: "Melon",
+      image: "/buyungupik_agr-1.svg",
+      created_at: "2024-01-11T11:30:00Z",
+      updated_at: "2024-01-11T11:30:00Z"
     }
   ];
 
   // Calculate total prices
-  const activeItems = cartItems.filter(item => item.is_active);
-  const allItemActivePrices = activeItems.reduce((total, item) => {
-    const discountedPrice = item.variant_info.discount > 0 
-      ? item.product_price * (1 - item.variant_info.discount / 100)
-      : item.product_price;
-    return total + (discountedPrice * item.quantity);
-  }, 0);
-
-  const allPromoActivePrices = activeItems.reduce((total, item) => {
-    if (item.variant_info.discount > 0) {
-      const originalPrice = item.product_price * item.quantity;
-      const discountedPrice = item.product_price * (1 - item.variant_info.discount / 100) * item.quantity;
-      return total + (originalPrice - discountedPrice);
-    }
-    return total;
+  const allItemActivePrices = cartItems.reduce((total, item) => {
+    return total + (item.price * item.quantity);
   }, 0);
 
   const totalPrices: CartTotalPricesType = {
-    all_item_active_prices: allItemActivePrices,
-    all_promo_active_prices: allPromoActivePrices,
-    total_all_active_prices: allItemActivePrices
+    subtotal: allItemActivePrices,
+    shipping_cost: 15000,
+    total: allItemActivePrices + 15000
   };
 
   return {
     status_code: 200,
     message: "Cart data retrieved successfully",
-    data: cartItems,
-    total_prices: totalPrices
+    data: {
+      items: cartItems,
+      total_prices: totalPrices
+    }
   };
 }
 

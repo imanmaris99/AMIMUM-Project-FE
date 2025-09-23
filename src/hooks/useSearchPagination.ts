@@ -36,17 +36,6 @@ const useSearchPagination = ({
 
   const ITEMS_PER_PAGE = 10; // Sesuai dengan backend limit default
 
-  // Reset state when search query changes
-  useEffect(() => {
-    if (searchQuery.trim()) {
-      setProducts([]);
-      setCurrentPage(1);
-      setHasMore(true);
-      setTotalAvailable(0);
-      fetchProducts(searchQuery, 1, true);
-    }
-  }, [searchQuery, brandFilter, fetchProducts]);
-
   const fetchProducts = useCallback(async (
     query: string, 
     page: number, 
@@ -97,6 +86,17 @@ const useSearchPagination = ({
       setIsLoadingMore(false);
     }
   }, [ITEMS_PER_PAGE]);
+
+  // Reset state when search query changes
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      setProducts([]);
+      setCurrentPage(1);
+      setHasMore(true);
+      setTotalAvailable(0);
+      fetchProducts(searchQuery, 1, true);
+    }
+  }, [searchQuery, brandFilter, fetchProducts]);
 
   const loadMore = useCallback(() => {
     if (!isLoadingMore && hasMore && searchQuery.trim()) {

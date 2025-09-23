@@ -18,7 +18,6 @@ const ToastProvider: React.FC = () => {
     <div suppressHydrationWarning={true}>
       <Toaster 
         position="top-center"
-        suppressHydrationWarning={true}
         toastOptions={{
         duration: 3000,
         style: {

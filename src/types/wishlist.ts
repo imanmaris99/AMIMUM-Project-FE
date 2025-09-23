@@ -3,7 +3,7 @@ export interface WishlistItem {
   productId: string;
   name: string;
   variant: string;
-  quantity: string;
+  quantity: number;
   price: number;
   image: string;
   addedAt: string;

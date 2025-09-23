@@ -19,7 +19,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
     ErrorHandler.handleError(new Error('Invalid brand ID parameter'), 'BrandPage');
     return (
       <main className="pb-20">
-        <UnifiedHeader type="back" title="Brand Not Found" />
+        <UnifiedHeader type="main" title="Brand Not Found" />
         <div className="p-4 text-center">
           <p className="text-red-500">Invalid brand ID provided</p>
         </div>
@@ -47,7 +47,12 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
       ErrorHandler.handleError(new Error('Invalid brand data structure'), 'BrandPage');
     } else {
       brandDetail = {
-        data: selectedBrandData
+        status_code: 200,
+        message: "Success",
+        data: {
+          ...selectedBrandData,
+          description_list: [...selectedBrandData.description_list]
+        }
       };
     }
   } else {

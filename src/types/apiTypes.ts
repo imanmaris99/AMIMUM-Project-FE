@@ -93,6 +93,7 @@ export interface AllProductInfoType {
   id: string;
   name: string;
   price: number;
+  image: string;
   brand_info: BrandInfoType;
   all_variants: VariantAllProductType[];
   created_at: string;
@@ -108,4 +109,66 @@ export interface AllProductInfoResponseType {
 export interface ProductListScrollResponseType {
   data: AllProductInfoType[];
   has_more: boolean;
+}
+
+// Cart related types
+export interface CartItemType {
+  id: string;
+  product_id: string;
+  variant_id: number;
+  quantity: number;
+  price: number;
+  product_name: string;
+  variant_name: string;
+  image: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CartTotalPricesType {
+  subtotal: number;
+  shipping_cost: number;
+  total: number;
+}
+
+export interface CartResponseType {
+  status_code: number;
+  message: string;
+  data: {
+    items: CartItemType[];
+    total_prices: CartTotalPricesType;
+  };
+}
+
+export interface TotalCartItemsResponseType {
+  status_code: number;
+  message: string;
+  data: {
+    total_items: number;
+  };
+}
+
+export interface CartItemActPayload {
+  product_id: string;
+  variant_id: number;
+  quantity: number;
+}
+
+export interface CartItemQtyPayload {
+  cart_item_id: string;
+  quantity: number;
+}
+
+// Brand Detail Response Type
+export interface BrandDetailResponseType {
+  status_code: number;
+  message: string;
+  data: {
+    id: number;
+    name: string;
+    photo_url: string;
+    description_list: string[];
+    total_products: number;
+    created_at: string;
+  };
 }

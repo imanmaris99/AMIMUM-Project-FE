@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 import { useWishlist } from "@/contexts/WishlistContext";
+import { WishlistItem } from "@/types/wishlist";
 
 interface WishlistVariantModalProps {
   isOpen: boolean;
@@ -23,16 +24,31 @@ const WishlistVariantModal: React.FC<WishlistVariantModalProps> = ({
   const handleAddToWishlist = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (selectedVariant) {
-      // Create a modified product with selected variant
-      const productWithSelectedVariant = {
-        ...product,
-        all_variants: product.all_variants.filter(variant => 
-          variant.variant === selectedVariant
-        )
-      };
-      addToWishlist(productWithSelectedVariant);
-      onClose();
-      setSelectedVariant(null);
+      // Find the selected variant
+      const selectedVariantData = product.all_variants.find(variant => 
+        variant.variant === selectedVariant
+      );
+      
+      if (selectedVariantData) {
+        // Convert to WishlistItem format
+        const wishlistItem: WishlistItem = {
+          id: `${product.id}-${selectedVariant}`,
+          productId: product.id,
+          name: product.name,
+          variant: selectedVariant,
+          quantity: 1,
+          price: selectedVariantData.discounted_price || product.price,
+          image: selectedVariantData.img || product.image,
+          addedAt: new Date().toISOString(),
+          brand: product.brand_info?.name,
+          originalPrice: product.price,
+          discount: selectedVariantData.discount || 0
+        };
+        
+        addToWishlist(wishlistItem);
+        onClose();
+        setSelectedVariant(null);
+      }
     }
   };
 

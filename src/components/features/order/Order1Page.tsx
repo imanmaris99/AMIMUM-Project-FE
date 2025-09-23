@@ -8,7 +8,8 @@ import { IoCheckmarkCircle, IoWarning } from 'react-icons/io5';
 import { toast } from 'react-hot-toast';
 import rupiahFormater from '@/utils/rupiahFormater';
 import ButtonSpinner from '@/components/ui/ButtonSpinner';
-import { useCart, CartItemType } from '@/contexts/CartContext';
+import { useCart } from '@/contexts/CartContext';
+import { CartItemType } from '@/types/apiTypes';
 import { useTransaction } from '@/contexts/TransactionContext';
 import CourierSelector from './CourierSelector';
 import AddressSelector from './AddressSelector';
@@ -122,7 +123,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   // Calculate totals for direct checkout or cart
   const calculateTotals = () => {
     if (isDirectCheckout && directCheckoutItem) {
-      const itemPrice = directCheckoutItem.variant_info.discounted_price || directCheckoutItem.product_price;
+      const itemPrice = directCheckoutItem.price;
       const subtotal = itemPrice * directCheckoutItem.quantity;
       const discount = 0; // No discount for direct checkout
       const shippingCost = deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0;
@@ -133,14 +134,14 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         total: subtotal + shippingCost
       };
     } else {
-      const subtotal = totalPrices.all_item_active_prices || 0;
-      const discount = totalPrices.all_item_active_prices - totalPrices.total_all_active_prices || 0;
+      const subtotal = totalPrices.subtotal || 0;
+      const discount = 0; // Simplified since we don't have discount calculation in new structure
       const shippingCost = deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0;
       return {
         subtotal,
         discount,
         shipping: shippingCost,
-        total: totalPrices.total_all_active_prices + shippingCost
+        total: totalPrices.total + shippingCost
       };
     }
   };
@@ -238,7 +239,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       }, 500);
       
     } catch (error) {
-      toast.error(`Terjadi kesalahan saat memproses pesanan: ${error.message || 'Unknown error'}`);
+      toast.error(`Terjadi kesalahan saat memproses pesanan: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setIsLoading(false);
     }
   };
@@ -358,7 +359,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                 <div key={item.id} className="flex items-center space-x-3">
                   <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0">
                     <Image 
-                      src={item.variant_info.img || "/default-image.jpg"} 
+                      src={item.image || "/default-image.jpg"} 
                       alt={item.product_name} 
                       width={64}
                       height={64}
@@ -368,27 +369,17 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-medium text-gray-900 text-sm">{item.product_name}</h3>
-                    <p className="text-xs text-gray-600">{item.variant_info.variant}</p>
+                    <p className="text-xs text-gray-600">{item.variant_name}</p>
                     <div className="flex items-center space-x-2 mt-1">
                       <span className="text-sm font-medium text-gray-900">
-                        {rupiahFormater(item.variant_info.discounted_price || item.product_price)}
+                        {rupiahFormater(item.price)}
                       </span>
-                      {item.variant_info.discount > 0 && (
-                        <>
-                          <span className="text-xs text-gray-500 line-through">
-                            {rupiahFormater(item.product_price)}
-                          </span>
-                          <span className="bg-red-100 text-red-600 px-1 py-0.5 rounded text-[10px] font-bold">
-                            -{item.variant_info.discount}%
-                          </span>
-                        </>
-                      )}
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-gray-600">Qty: {item.quantity}</p>
                     <p className="font-medium text-gray-900 text-sm">
-                      {rupiahFormater((item.variant_info.discounted_price || item.product_price) * item.quantity)}
+                      {rupiahFormater(item.price * item.quantity)}
                     </p>
                   </div>
                 </div>

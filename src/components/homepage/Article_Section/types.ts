@@ -1,5 +1,5 @@
 export interface ArticleProps {
-    display_id: number;
+    display_id: string;
     title: string;
     img: string;
     description_list: string[];

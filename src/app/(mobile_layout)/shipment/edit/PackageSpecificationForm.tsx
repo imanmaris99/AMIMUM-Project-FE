@@ -167,8 +167,8 @@ const ShippingCostDetails = ({
       >
         <option value="">Pilih Layanan</option>
         {dummyCouriers.map((courier) => (
-          <option key={`${courier.courierName}-${courier.serviceType}`} value={`${courier.courierName}-${courier.serviceType}`}>
-            {courier.courierName} - {courier.serviceType}
+          <option key={`${courier.courier_name}-${courier.service_type}`} value={`${courier.courier_name}-${courier.service_type}`}>
+            {courier.courier_name} - {courier.service_type}
           </option>
         ))}
       </select>
@@ -203,7 +203,7 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({ onS
     cost: 0,
     estimatedDelivery: ""
   });
-  const [errors, setErrors] = useState<Partial<PackageFormData>>({});
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
   const [selectedService, setSelectedService] = useState("");
@@ -230,7 +230,7 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({ onS
   }, [initialData]);
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<PackageFormData> = {};
+    const newErrors: {[key: string]: string} = {};
 
     if (!formData.courier.trim()) {
       newErrors.courier = "Jasa kurir harus dipilih";
@@ -266,11 +266,12 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({ onS
     }));
     
     // Clear error when user starts typing
-    if (errors[name as keyof PackageFormData]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: undefined
-      }));
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
     }
   };
 
@@ -281,8 +282,8 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({ onS
     if (value) {
       const [courierName, serviceType] = value.split('-');
       const courier = dummyCouriers.find(c => 
-        c.courierName.toLowerCase() === courierName.toLowerCase() && 
-        c.serviceType === serviceType
+        c.courier_name.toLowerCase() === courierName.toLowerCase() && 
+        c.service_type === serviceType
       );
       
       if (courier) {
@@ -290,8 +291,8 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({ onS
           ...prev,
           courier: courierName,
           serviceType: serviceType,
-          cost: courier.cost,
-          estimatedDelivery: courier.estimated_delivery
+          cost: courier.cost || 0,
+          estimatedDelivery: courier.estimated_delivery || ""
         }));
       }
     }

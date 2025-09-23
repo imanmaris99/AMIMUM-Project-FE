@@ -1,5 +1,6 @@
 // Advanced Caching Strategy
 // Comprehensive caching solution for improved performance
+import React from 'react';
 
 export interface CacheConfig {
   ttl: number; // Time to live in milliseconds
@@ -88,7 +89,7 @@ class AdvancedCache<T> {
       
       case 'fifo':
         // First In, First Out
-        keyToEvict = this.cache.keys().next().value;
+        keyToEvict = this.cache.keys().next().value || null;
         break;
       
       case 'lfu':

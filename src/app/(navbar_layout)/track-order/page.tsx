@@ -21,11 +21,11 @@ const TrackOrderPage: React.FC = () => {
 
   useEffect(() => {
     // Get productId or transactionId from URL parameters
-    const productIdParam = searchParams.get("productId");
-    const transactionIdParam = searchParams.get("transactionId");
+    const productIdParam = searchParams?.get("productId");
+    const transactionIdParam = searchParams?.get("transactionId");
     
-    setProductId(productIdParam);
-    setTransactionId(transactionIdParam);
+    setProductId(productIdParam || null);
+    setTransactionId(transactionIdParam || null);
     
     // If no specific transaction, show all active transactions
     if (!transactionIdParam && transactions.length > 0) {
@@ -71,7 +71,7 @@ const TrackOrderPage: React.FC = () => {
     if (transactionId) {
       // If specific transaction ID is provided, find that transaction
       const transaction = transactions.find(t => t.id === transactionId);
-      setCurrentTransaction(transaction);
+      setCurrentTransaction(transaction || null);
     } else if (transactions.length > 0) {
       // If no specific transaction ID, use the most recent transaction
       const mostRecentTransaction = transactions.sort((a, b) => 
@@ -239,7 +239,7 @@ const TrackOrderPage: React.FC = () => {
               {/* Status Order */}
               <div className="w-full max-w-sm">
                 <StatusOrder 
-                  currentStatus={getCurrentStatusIndex(currentTransaction?.status, currentTransaction?.deliveryType)} 
+                  currentStatus={getCurrentStatusIndex(currentTransaction?.status || 'pending', currentTransaction?.deliveryType || 'delivery')} 
                   deliveryType={currentTransaction?.deliveryType}
                 />
               </div>

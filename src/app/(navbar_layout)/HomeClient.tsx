@@ -35,10 +35,10 @@ export default function HomeClient({
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   
   // Extract data from API response structure with comprehensive validation
-  const categoriesData = Array.isArray(categories) ? categories : (categories?.data || []);
-  const productionsData = Array.isArray(productions) ? productions : (productions?.data || []);
-  const promoData = Array.isArray(promo) ? promo : (promo?.data || []);
-  const articlesData = Array.isArray(articles) ? articles : (articles?.data || []);
+  const categoriesData = Array.isArray(categories) ? categories : [];
+  const productionsData = Array.isArray(productions) ? productions : [];
+  const promoData = Array.isArray(promo) ? promo : [];
+  const articlesData = Array.isArray(articles) ? articles : [];
   
   // Validate data arrays
   if (!Array.isArray(categoriesData)) {
@@ -73,7 +73,7 @@ export default function HomeClient({
     
   // Validate productions data with comprehensive error handling
   const validProductions = filteredProductions.filter(validateProductionData);
-  const invalidProductions = filteredProductions.filter(prod => !validateProductionData(prod));
+  const invalidProductions = filteredProductions.filter((prod: any) => !validateProductionData(prod));
   
   // Log validation results
   if (invalidProductions.length > 0) {

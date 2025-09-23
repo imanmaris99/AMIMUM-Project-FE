@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { GoCheckCircle, GoHome, GoPackage, GoCreditCard, GoLocation } from 'react-icons/go';
 import { IoCheckmarkCircle } from 'react-icons/io5';
 import { useTransaction } from '@/contexts/TransactionContext';
+import { Transaction } from '@/types/transaction';
 
 interface OrderConfirmationProps {
   orderId?: string;

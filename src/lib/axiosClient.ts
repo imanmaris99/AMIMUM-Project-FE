@@ -31,7 +31,7 @@ axiosClient.interceptors.request.use(
       config.headers['X-Request-ID'] = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
       // Add timestamp for debugging
-      config.metadata = { startTime: Date.now() };
+      (config as any).metadata = { startTime: Date.now() };
 
       return config;
     } catch (error) {
@@ -48,7 +48,7 @@ axiosClient.interceptors.request.use(
 axiosClient.interceptors.response.use(
   (response: AxiosResponse) => {
     // Log successful requests
-    const duration = Date.now() - (response.config.metadata?.startTime || 0);
+    const duration = Date.now() - ((response.config as any).metadata?.startTime || 0);
     
     // Validate response data structure
     if (!response.data || typeof response.data !== 'object') {
@@ -175,35 +175,35 @@ export const apiClient = {
   async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     return withRetry(async () => {
       const response = await axiosClient.get(url, config);
-      return response;
+      return response as T;
     });
   },
 
   async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     return withRetry(async () => {
       const response = await axiosClient.post(url, data, config);
-      return response;
+      return response as T;
     });
   },
 
   async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     return withRetry(async () => {
       const response = await axiosClient.put(url, data, config);
-      return response;
+      return response as T;
     });
   },
 
   async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     return withRetry(async () => {
       const response = await axiosClient.delete(url, config);
-      return response;
+      return response as T;
     });
   },
 
   async patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     return withRetry(async () => {
       const response = await axiosClient.patch(url, data, config);
-      return response;
+      return response as T;
     });
   }
 };

@@ -23,7 +23,7 @@ const TransactionPage = () => {
 
   const handleClearTransactions = () => {
     if (transactions.length === 0) {
-      toast.info('Tidak ada transaksi untuk dihapus');
+      toast('Tidak ada transaksi untuk dihapus');
       return;
     }
 

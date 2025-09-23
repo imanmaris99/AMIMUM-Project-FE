@@ -34,12 +34,12 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
       setFormData({
         receiverName: dummyAddress.name,
         phoneNumber: dummyAddress.phone,
-        country: dummyAddress.country,
-        province: dummyAddress.state,
-        city: dummyAddress.city,
-        cityId: dummyAddress.cityId.toString(),
-        postalCode: dummyAddress.zipCode,
-        fullAddress: dummyAddress.address
+        country: dummyAddress.country || '',
+        province: dummyAddress.state || '',
+        city: dummyAddress.city || '',
+        cityId: dummyAddress.city_id?.toString() || '',
+        postalCode: dummyAddress.zip_code?.toString() || '',
+        fullAddress: dummyAddress.address || ''
       });
     }
   }, [initialData]);

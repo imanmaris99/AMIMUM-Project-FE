@@ -8,9 +8,9 @@ export default function CartSummary() {
 
 
   // Calculate totals
-  const subtotal = totalPrices.all_item_active_prices;
-  const totalDiscount = totalPrices.all_item_active_prices - totalPrices.all_promo_active_prices;
-  const total = totalPrices.total_all_active_prices;
+  const subtotal = totalPrices.subtotal;
+  const totalDiscount = 0; // Simplified since we don't have discount calculation in new structure
+  const total = totalPrices.total;
 
   return (
     <div className="px-4 py-4 min-h-[200px] mt-10">

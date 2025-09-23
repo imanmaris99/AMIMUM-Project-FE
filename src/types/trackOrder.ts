@@ -3,7 +3,7 @@ export interface TrackOrderItem {
   name: string;
   variant: string;
   size: string;
-  quantity: string;
+  quantity: number;
   price: number;
   image: string;
   status?: string;

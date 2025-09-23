@@ -6,7 +6,7 @@ export const dummyWishlistItems: WishlistItem[] = [
     productId: "prod-1",
     name: "Air Mancur Jamu Beras Kencur",
     variant: "Anggur",
-    quantity: "1 dus",
+    quantity: 1,
     price: 17500,
     image: "/buyungupik_agr-1.svg",
     addedAt: "2024-01-15T10:30:00Z"
@@ -16,7 +16,7 @@ export const dummyWishlistItems: WishlistItem[] = [
     productId: "prod-2",
     name: "Aji Mujarab Jamu Kunyit Asam",
     variant: "Strawberry",
-    quantity: "1 dus",
+    quantity: 1,
     price: 18500,
     image: "/buyungupik_agr-1.svg",
     addedAt: "2024-01-14T15:45:00Z"
@@ -26,7 +26,7 @@ export const dummyWishlistItems: WishlistItem[] = [
     productId: "prod-3", 
     name: "Jamu Jago Jamu Temulawak",
     variant: "Cokelat",
-    quantity: "1 dus",
+    quantity: 1,
     price: 19500,
     image: "/buyungupik_agr-1.svg",
     addedAt: "2024-01-13T09:20:00Z"
@@ -36,7 +36,7 @@ export const dummyWishlistItems: WishlistItem[] = [
     productId: "prod-4", 
     name: "Nyonya Meneer Jamu Jahe Merah",
     variant: "Vanilla",
-    quantity: "1 dus",
+    quantity: 1,
     price: 22500,
     image: "/buyungupik_agr-1.svg",
     addedAt: "2024-01-12T14:15:00Z"
@@ -46,7 +46,7 @@ export const dummyWishlistItems: WishlistItem[] = [
     productId: "prod-5", 
     name: "Sabdo Palon Jamu Sirih Merah",
     variant: "Melon",
-    quantity: "1 dus",
+    quantity: 1,
     price: 16500,
     image: "/buyungupik_agr-1.svg",
     addedAt: "2024-01-11T11:30:00Z"
@@ -56,7 +56,7 @@ export const dummyWishlistItems: WishlistItem[] = [
     productId: "prod-6", 
     name: "Sido Muncul Jamu Pegagan",
     variant: "Susu",
-    quantity: "1 dus",
+    quantity: 1,
     price: 20500,
     image: "/buyungupik_agr-1.svg",
     addedAt: "2024-01-10T16:45:00Z"
@@ -66,7 +66,7 @@ export const dummyWishlistItems: WishlistItem[] = [
     productId: "prod-7", 
     name: "Air Mancur Jamu Temulawak",
     variant: "Mocca",
-    quantity: "1 dus",
+    quantity: 1,
     price: 18500,
     image: "/buyungupik_agr-1.svg",
     addedAt: "2024-01-09T13:20:00Z"

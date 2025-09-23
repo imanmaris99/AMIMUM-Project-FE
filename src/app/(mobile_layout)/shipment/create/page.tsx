@@ -7,15 +7,13 @@ import PackageSpecificationForm from "../edit/PackageSpecificationForm";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
-// import { SenderFormData, ReceiverFormData, PackageFormData } from "@/types/shipment"; // Removed unused imports
+import { PackageFormData } from "@/types/shipment";
 
 const CreateShipment = () => {
   const router = useRouter();
   
   const [currentStep, setCurrentStep] = useState(0);
-  // const [senderData, setSenderData] = useState<SenderFormData | null>(null); // Removed unused variable
-  // const [receiverData, setReceiverData] = useState<ReceiverFormData | null>(null); // Removed unused variable
-  // const [packageData, setPackageData] = useState<PackageFormData | null>(null); // Removed unused variable
+  const [packageData, setPackageData] = useState<PackageFormData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSenderSubmit = (/* data: SenderFormData */) => { // Removed unused parameter

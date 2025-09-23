@@ -7,7 +7,7 @@ export const trackOrderDummyData: TrackOrderData = {
       name: "Buyung Upik",
       variant: "Anggur",
       size: "dus",
-      quantity: "1",
+      quantity: 1,
       price: 17500,
       image: "/buyungupik_agr-1.svg",
       status: "processing"

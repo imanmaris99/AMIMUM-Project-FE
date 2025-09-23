@@ -13,7 +13,7 @@ import { dummyShipments } from "@/data/shipmentDummyData";
 const EditShipment = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const shipmentId = searchParams.get('shipmentId');
+  const shipmentId = searchParams?.get('shipmentId');
   
   const [currentStep, setCurrentStep] = useState(0);
   const [senderData, setSenderData] = useState<SenderFormData | null>(null);
@@ -42,23 +42,23 @@ const EditShipment = () => {
         setReceiverData({
           receiverName: existingShipment.address.name,
           phoneNumber: existingShipment.address.phone,
-          country: existingShipment.address.country,
-          province: existingShipment.address.state,
-          city: existingShipment.address.city,
-          cityId: existingShipment.address.cityId.toString(),
-          postalCode: existingShipment.address.zipCode,
-          fullAddress: existingShipment.address.address
+          country: existingShipment.address.country || '',
+          province: existingShipment.address.state || '',
+          city: existingShipment.address.city || '',
+          cityId: existingShipment.address.city_id?.toString() || '',
+          postalCode: existingShipment.address.zip_code?.toString() || '',
+          fullAddress: existingShipment.address.address || ''
         });
         
         setPackageData({
-          courier: existingShipment.courier.courierName.toLowerCase(),
-          weight: existingShipment.courier.weight,
+          courier: existingShipment.courier.courier_name.toLowerCase(),
+          weight: existingShipment.courier.weight || 0,
           length: 30, // Default values
           width: 20,
           height: 10,
-          serviceType: existingShipment.courier.serviceType,
-          cost: existingShipment.courier.cost,
-          estimatedDelivery: existingShipment.courier.estimatedDelivery
+          serviceType: existingShipment.courier.service_type || '',
+          cost: existingShipment.courier.cost || 0,
+          estimatedDelivery: existingShipment.courier.estimated_delivery || ''
         });
       }
     }

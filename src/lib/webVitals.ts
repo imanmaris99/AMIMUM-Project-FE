@@ -202,8 +202,8 @@ class WebVitalsMonitor {
 
   private sendToAnalytics(report: WebVitalReport) {
     // Send to Google Analytics 4
-    if (typeof gtag !== 'undefined') {
-      gtag('event', 'web_vitals', {
+    if (typeof (window as any).gtag !== 'undefined') {
+      (window as any).gtag('event', 'web_vitals', {
         metric_name: report.metric.name,
         metric_value: report.metric.value,
         metric_rating: report.rating,

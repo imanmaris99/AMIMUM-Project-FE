@@ -81,22 +81,16 @@ const ProductPrice = ({
     try {
       // Create temporary cart item for direct checkout
       const tempCartItem = {
-        id: Date.now(), // Use number instead of string
+        id: Date.now().toString(),
         product_id: data.id,
-        product_name: data.name,
-        product_price: data.price,
         variant_id: datavariant.id,
         quantity: 1,
-        is_active: true,
+        price: datavariant.discounted_price || data.price,
+        product_name: data.name,
+        variant_name: datavariant.variant,
+        image: datavariant.img || "/default-image.jpg",
         created_at: new Date().toISOString(),
-        variant_info: {
-          id: datavariant.id,
-          variant: datavariant.variant,
-          name: datavariant.variant, // Add required name field
-          img: datavariant.img,
-          discount: datavariant.discount,
-          discounted_price: datavariant.discounted_price
-        }
+        updated_at: new Date().toISOString()
       };
       
       // Store temporary item in localStorage for direct checkout

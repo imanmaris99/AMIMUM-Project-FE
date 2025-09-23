@@ -61,7 +61,7 @@ const Shipment = () => {
       setShipments(dummyShipments);
       
       // Memastikan hanya 1 alamat yang aktif
-      const activeStates = dummyShipments.map(shipment => shipment.isActive);
+      const activeStates = dummyShipments.map(shipment => shipment.is_active);
       const activeCount = activeStates.filter(state => state).length;
       
       // Jika lebih dari 1 yang aktif, reset ke hanya yang pertama
@@ -251,10 +251,10 @@ const Shipment = () => {
                   )}
                 </div>
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  {shipment.address.address}, {shipment.address.city}, Kode Pos {shipment.address.zipCode}, {shipment.address.state}, {shipment.address.country}
+                  {shipment.address.address}, {shipment.address.city}, Kode Pos {shipment.address.zip_code}, {shipment.address.state}, {shipment.address.country}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  {shipment.courier.courierName} - {shipment.courier.serviceType} | Rp {shipment.courier.cost.toLocaleString()}
+                  {shipment.courier.courier_name} - {shipment.courier.service_type} | Rp {shipment.courier.cost?.toLocaleString() || '0'}
                 </p>
               </div>
 

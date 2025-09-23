@@ -18,6 +18,7 @@ interface UnifiedHeaderProps {
   showBackButton?: boolean;
   showCart?: boolean;
   showNotifications?: boolean;
+  showSearch?: boolean;
   onBack?: () => void;
   rightAction?: React.ReactNode;
 }
@@ -29,6 +30,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   showBackButton = false,
   showCart = true,
   showNotifications = true,
+  showSearch = true,
   onBack,
   rightAction
 }) => {

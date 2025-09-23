@@ -24,7 +24,15 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
   // }
   
   // Menggunakan centralized data management
-  brandDetail = getBrandForPromo(promoId);
+  const brandDataFromAPI = getBrandForPromo(promoId);
+  brandDetail = brandDataFromAPI ? {
+    status_code: 200,
+    message: "Success",
+    data: {
+      ...brandDataFromAPI.data,
+      description_list: [...brandDataFromAPI.data.description_list]
+    }
+  } : null;
   
   // Mapping brand detail agar field sesuai kebutuhan komponen
   const brandData = brandDetail?.data
@@ -67,13 +75,22 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
                 showNotifications={true}
               />
       <DetailBrand 
-        brandDetail={brandData} 
+        brandDetail={brandDataFromAPI ? {
+          id: brandDataFromAPI.data.id,
+          name: brandDataFromAPI.data.name,
+          photo_url: brandDataFromAPI.data.photo_url,
+          description_list: [...brandDataFromAPI.data.description_list],
+          total_product: brandDataFromAPI.data.total_product,
+          created_at: brandDataFromAPI.data.created_at,
+          category: "Jamu", // Default category
+          total_product_with_promo: products.length
+        } : null} 
         errorMessage={errorMessage} 
         promoProductCount={products.length}
       />
       <ProductListWithPagination 
         products={products} 
-        title={`Produk Promo ${brandData?.name || "Brand"}`}
+        title={`Produk Promo ${brandDataFromAPI?.data?.name || "Brand"}`}
         emptyMessage="Produk promo belum tersedia."
       />
     </div>
