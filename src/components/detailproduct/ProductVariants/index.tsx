@@ -64,18 +64,18 @@ const ProductVariants = ({
                   name="variant"
                   value={variant.variant || variant.name}
                   checked={isSelected}
-                  onChange={() => handleVariantSelect({
-                    id: variant.id,
-                    product: product?.name || "",
-                    name: variant.name,
-                    img: (variant as any).img || "",
-                    variant: variant.variant,
-                    expiration: "",
-                    stock: 0,
-                    discount: variant.discount,
-                    discounted_price: variant.discounted_price,
-                    updated_at: ""
-                  })}
+        onChange={() => handleVariantSelect({
+          id: variant.id,
+          product: product?.name || "",
+          name: variant.name,
+          img: (variant as { img?: string }).img || "",
+          variant: variant.variant,
+          expiration: "",
+          stock: 0,
+          discount: variant.discount,
+          discounted_price: variant.discounted_price,
+          updated_at: ""
+        })}
                   className="form-radio text-primary focus:ring-primary text-sm"
                 />
                 <div className="flex-1">

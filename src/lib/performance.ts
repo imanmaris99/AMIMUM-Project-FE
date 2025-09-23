@@ -217,7 +217,7 @@ export class PerformanceMonitor {
 // Bundle size optimization
 export function createLazyComponent<T extends React.ComponentType<any>>(
   importFunc: () => Promise<{ default: T }>,
-  fallback?: React.ComponentType
+  // fallback?: React.ComponentType
 ): React.LazyExoticComponent<T> {
   return React.lazy(importFunc);
 }

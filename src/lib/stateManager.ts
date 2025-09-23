@@ -1,11 +1,11 @@
 // Advanced State Management System
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 // State management types
-export interface StateAction<T = any> {
+export interface StateAction<T = unknown> {
   type: string;
   payload?: T;
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
 }
 
 export interface StateReducer<T> {
@@ -100,7 +100,7 @@ export class StatePersistence {
     try {
       const serialized = JSON.stringify(state);
       localStorage.setItem(this.STORAGE_PREFIX + key, serialized);
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -110,7 +110,7 @@ export class StatePersistence {
       if (serialized) {
         return JSON.parse(serialized);
       }
-    } catch (error) {
+    } catch {
     }
     return defaultValue;
   }
@@ -166,7 +166,7 @@ export class OptimisticUpdater<T> {
     const id = `opt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
     // Store original state
-    const originalState = this.store.getState();
+    // const originalState = this.store.getState();
     
     // Apply optimistic update
     this.store.dispatch(action);
@@ -273,12 +273,12 @@ export class StateDebugger {
 // State middleware
 export const stateMiddleware = {
   // Logging middleware
-  logging: <T>(action: StateAction, next: () => void) => {
+  logging: (action: StateAction, next: () => void) => {
     next();
   },
 
   // Persistence middleware
-  persistence: <T>(key: string) => (action: StateAction, next: () => void) => {
+  persistence: (key: string) => (action: StateAction, next: () => void) => {
     next();
     // Save state after action is applied
     setTimeout(() => {

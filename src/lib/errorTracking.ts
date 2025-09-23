@@ -149,8 +149,8 @@ class ErrorTracker {
         });
         
         observer.observe({ entryTypes: ['longtask'] });
-      } catch (error) {
-        console.warn('Failed to observe long tasks:', error);
+      } catch {
+        console.warn('Failed to observe long tasks');
       }
     }
   }
@@ -159,7 +159,7 @@ class ErrorTracker {
     if (!error) return 'medium';
     
     const message = error.message?.toLowerCase() || '';
-    const stack = error.stack?.toLowerCase() || '';
+    // const stack = error.stack?.toLowerCase() || '';
     
     // Critical errors
     if (message.includes('chunk') || message.includes('loading') || 
@@ -253,8 +253,8 @@ class ErrorTracker {
 
     try {
       await this.sendToEndpoint('/api/errors', { errors });
-    } catch (error) {
-      console.warn('Failed to send error reports:', error);
+    } catch {
+      console.warn('Failed to send error reports');
       // Re-add errors to queue for retry
       this.errorQueue.unshift(...errors);
     }
@@ -268,8 +268,8 @@ class ErrorTracker {
 
     try {
       await this.sendToEndpoint('/api/performance', { performance });
-    } catch (error) {
-      console.warn('Failed to send performance reports:', error);
+    } catch {
+      console.warn('Failed to send performance reports');
       // Re-add performance to queue for retry
       this.performanceQueue.unshift(...performance);
     }

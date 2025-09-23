@@ -234,7 +234,7 @@ export function useFocusVisible() {
   const [isFocusVisible, setIsFocusVisible] = useState(false);
   
   useEffect(() => {
-    const handleFocus = (e: FocusEvent) => {
+    const handleFocus = (/* e: FocusEvent */) => {
       setIsFocusVisible(true);
     };
     

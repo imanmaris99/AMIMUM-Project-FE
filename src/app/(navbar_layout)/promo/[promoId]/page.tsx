@@ -1,13 +1,13 @@
 import ProductListWithPagination from "@/components/DetailBrand/ProductListWithPagination";
 import DetailBrand from "@/components/DetailBrand";
-import { BrandDetailResponseType } from "@/types/detailProduct";
+// import { BrandDetailResponseType } from "@/types/detailProduct";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 import { getBrandForPromo, getPromoProducts } from "@/data/dataUtils";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 
 export default async function PromoDetailPage({ params }: { params: Promise<{ promoId: string }> }) {
   const { promoId } = await params;
-  let brandDetail: BrandDetailResponseType | null = null;
+  // let brandDetail: BrandDetailResponseType | null = null;
   let products: CardProductProps[] = [];
   const errorMessage: string | null = null;
   
@@ -25,22 +25,22 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
   
   // Menggunakan centralized data management
   const brandDataFromAPI = getBrandForPromo(promoId);
-  brandDetail = brandDataFromAPI ? {
-    status_code: 200,
-    message: "Success",
-    data: {
-      ...brandDataFromAPI.data,
-      description_list: [...brandDataFromAPI.data.description_list]
-    }
-  } : null;
+  // brandDetail = brandDataFromAPI ? {
+  //   status_code: 200,
+  //   message: "Success",
+  //   data: {
+  //     ...brandDataFromAPI.data,
+  //     description_list: [...brandDataFromAPI.data.description_list]
+  //   }
+  // } : null;
   
   // Mapping brand detail agar field sesuai kebutuhan komponen
-  const brandData = brandDetail?.data
-    ? {
-        ...brandDetail.data,
-        // Tidak perlu mapping karena sudah sesuai dengan backend DTO
-      }
-    : null;
+  // const _brandData = brandDetail?.data
+  //   ? {
+  //       ...brandDetail.data,
+  //       // Tidak perlu mapping karena sudah sesuai dengan backend DTO
+  //     }
+  //   : null;
     
   // API call untuk produk promo dinonaktifkan sementara
   // try {

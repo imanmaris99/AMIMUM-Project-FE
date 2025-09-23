@@ -73,7 +73,7 @@ export default function HomeClient({
     
   // Validate productions data with comprehensive error handling
   const validProductions = filteredProductions.filter(validateProductionData);
-  const invalidProductions = filteredProductions.filter((prod: any) => !validateProductionData(prod));
+    const invalidProductions = filteredProductions.filter((prod: unknown) => !validateProductionData(prod));
   
   // Log validation results
   if (invalidProductions.length > 0) {

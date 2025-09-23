@@ -20,7 +20,7 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
-  const [attempts, setAttempts] = useState(0);
+  // const [attempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
 
   // Enhanced credentials with proper hashing (demo purposes)
@@ -172,7 +172,7 @@ const Login = () => {
           }
         }, 2000);
       } else {
-        setAttempts(prev => prev + 1);
+        // setAttempts(prev => prev + 1);
         setErrors({
           general: "Email atau password salah"
         });

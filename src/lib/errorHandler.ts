@@ -150,7 +150,7 @@ export class ErrorHandler {
     // Log error for debugging
 
     // Send error to monitoring service (in production)
-    await this.reportError(errorInfo);
+    await this.reportError();
 
     // Handle retry logic
     if (retryable && retryFunction && errorType === ErrorType.NETWORK) {
@@ -185,17 +185,17 @@ export class ErrorHandler {
     });
   }
 
-  private static async reportError(errorInfo: ErrorInfo): Promise<void> {
+  private static async reportError(/* errorInfo: ErrorInfo */): Promise<void> {
     try {
       // In production, send to monitoring service like Sentry
       if (process.env.NODE_ENV === 'production') {
         // await sentry.captureException(errorInfo);
       }
-    } catch (reportError) {
+    } catch {
     }
   }
 
-  private static handleErrorAction(errorType: ErrorType, errorInfo: ErrorInfo): void {
+  private static handleErrorAction(errorType: ErrorType, /* errorInfo: ErrorInfo */): void {
     switch (errorType) {
       case ErrorType.AUTHENTICATION:
         // Redirect to login

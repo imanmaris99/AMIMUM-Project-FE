@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { WishlistItem } from '@/types/wishlist';
-import { validateProductData, validateWishlistItemData } from '@/utils/dataValidation';
+import { validateWishlistItemData } from '@/utils/dataValidation';
 import { ErrorHandler } from '@/lib/errorHandler';
 
 interface WishlistContextType {

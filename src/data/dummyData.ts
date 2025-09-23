@@ -1070,7 +1070,7 @@ export function generateCardProductData(): CardProductProps[] {
         );
         
         products.push(product);
-      } catch (error) {
+      } catch {
       }
       
       productId++;
@@ -1174,7 +1174,7 @@ export function generateDetailProductData(): { [key: string]: DetailProductType 
           updated_at: new Date().toISOString()
         };
       }
-    } catch (error) {
+    } catch {
     }
   });
 

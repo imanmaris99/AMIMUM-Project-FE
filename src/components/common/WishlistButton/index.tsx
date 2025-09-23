@@ -24,7 +24,7 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
   product, 
   className = "",
   size = 'md',
-  showVariantModal = true
+  // showVariantModal: _showVariantModal = true
 }) => {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const [isModalOpen, setIsModalOpen] = useState(false);

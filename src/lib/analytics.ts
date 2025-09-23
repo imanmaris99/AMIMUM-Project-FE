@@ -74,10 +74,10 @@ export class UserBehaviorTracker {
     }
 
     // Send to analytics service
-    this.sendToAnalytics(event);
+    this.sendToAnalytics();
   }
 
-  private static async sendToAnalytics(event: AnalyticsEvent) {
+  private static async sendToAnalytics(/* event: AnalyticsEvent */) {
     try {
       // In production, send to your analytics service
       if (process.env.NODE_ENV === 'production') {
@@ -88,7 +88,7 @@ export class UserBehaviorTracker {
         //   body: JSON.stringify(event)
         // });
       }
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -153,7 +153,7 @@ export class UserBehaviorTracker {
 
   private static flushEvents() {
     // Send all pending events
-    this.events.forEach(event => this.sendToAnalytics(event));
+    this.events.forEach(() => this.sendToAnalytics());
     this.events = [];
   }
 

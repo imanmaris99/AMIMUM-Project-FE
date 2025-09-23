@@ -30,7 +30,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   showBackButton = false,
   showCart = true,
   showNotifications = true,
-  showSearch = true,
+  // showSearch: _showSearch = true,
   onBack,
   rightAction
 }) => {

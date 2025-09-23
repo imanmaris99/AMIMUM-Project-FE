@@ -18,7 +18,7 @@ const ProfileInfo: React.FC = () => {
     setIsEditProfileModalOpen(false);
   };
 
-  const handleSaveProfile = (profileData: { firstname: string; lastname: string; phone: string; address: string }) => {
+  const handleSaveProfile = (/* _profileData: { firstname: string; lastname: string; phone: string; address: string } */) => {
     // Handle save profile data
     
     // Show success message
@@ -33,7 +33,7 @@ const ProfileInfo: React.FC = () => {
     setIsChangePhotoModalOpen(false);
   };
 
-  const handlePhotoUpload = (file: File) => {
+  const handlePhotoUpload = (/* _file: File */) => {
     // Handle photo upload
     
     // Show success message

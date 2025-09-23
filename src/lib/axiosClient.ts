@@ -48,7 +48,7 @@ axiosClient.interceptors.request.use(
 axiosClient.interceptors.response.use(
   (response: AxiosResponse) => {
     // Log successful requests
-    const duration = Date.now() - ((response.config as any).metadata?.startTime || 0);
+    // const duration = Date.now() - ((response.config as any).metadata?.startTime || 0);
     
     // Validate response data structure
     if (!response.data || typeof response.data !== 'object') {

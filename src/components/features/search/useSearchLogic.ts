@@ -12,7 +12,7 @@ function debounce<T extends (...args: unknown[]) => void>(fn: T, delay: number):
     try {
       clearTimeout(timeout);
       timeout = setTimeout(() => fn.apply(this, args), delay);
-    } catch (error) {
+    } catch {
     }
   } as T;
 }
@@ -32,7 +32,7 @@ const useSearchLogic = () => {
       if (search.trim()) {
         router.push(`/search?q=${search}`);
       }
-    } catch (error) {
+    } catch {
     }
   };
 
@@ -43,7 +43,7 @@ const useSearchLogic = () => {
       }
       
       router.push(`/detail-product/${productId}`);
-    } catch (error) {
+    } catch {
     }
   };
 
@@ -102,7 +102,7 @@ const useSearchLogic = () => {
       } else {
         setProducts([]);
       }
-    } catch (error) {
+    } catch {
     }
   };
 
@@ -111,7 +111,7 @@ const useSearchLogic = () => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setShowDropdown(false);
       }
-    } catch (error) {
+    } catch {
     }
   }, []);
 
@@ -121,7 +121,7 @@ const useSearchLogic = () => {
       return () => {
         document.removeEventListener("mousedown", handleClickOutside);
       };
-    } catch (error) {
+    } catch {
     }
   }, [handleClickOutside]);
 

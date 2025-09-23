@@ -113,7 +113,7 @@ class WebVitalsMonitor {
 
   private setupErrorTracking() {
     // JavaScript Errors
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', (/* event */) => {
       this.reportMetric({
         name: 'JS_ERROR',
         value: 1,
@@ -124,7 +124,7 @@ class WebVitalsMonitor {
     });
 
     // Unhandled Promise Rejections
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', (/* event */) => {
       this.reportMetric({
         name: 'PROMISE_REJECTION',
         value: 1,
