@@ -1,5 +1,4 @@
 import { AiFillStar } from "react-icons/ai";
-// import { RatingProps } from "./types";
 import { DetailProductType } from "@/types/detailProduct";
 import Spinner from "@/components/ui/Spinner";
 
@@ -8,7 +7,6 @@ interface TitleProductProps {
   isError: number | string | null;
   isLoading: boolean;
 }
-// TitleProductSkeleton component removed - not used
 
 const TitleProduct = ({ isError, isLoading, data }: TitleProductProps) => {
   if (isError && typeof isError === "string") {

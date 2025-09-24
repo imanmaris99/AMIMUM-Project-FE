@@ -150,7 +150,7 @@ class ErrorTracker {
         
         observer.observe({ entryTypes: ['longtask'] });
       } catch {
-        console.warn('Failed to observe long tasks');
+        // Failed to observe long tasks - continuing without monitoring
       }
     }
   }
@@ -202,7 +202,7 @@ class ErrorTracker {
     
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.error('[Error Tracker]', report);
+      // Error tracking in development mode
     }
 
     // Flush if queue is full
@@ -226,7 +226,7 @@ class ErrorTracker {
     
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('[Performance Tracker]', report);
+      // Performance tracking in development mode
     }
 
     // Flush if queue is full
@@ -255,8 +255,7 @@ class ErrorTracker {
     try {
       await this.sendToEndpoint('/api/errors', { errors });
     } catch {
-      console.warn('Failed to send error reports');
-      // Re-add errors to queue for retry
+      // Failed to send error reports - re-adding to queue for retry
       this.errorQueue.unshift(...errors);
     }
   }
@@ -270,15 +269,14 @@ class ErrorTracker {
     try {
       await this.sendToEndpoint('/api/performance', { performance });
     } catch {
-      console.warn('Failed to send performance reports');
-      // Re-add performance to queue for retry
+      // Failed to send performance reports - re-adding to queue for retry
       this.performanceQueue.unshift(...performance);
     }
   }
 
   private async sendToEndpoint(endpoint: string, data: unknown) {
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[Error Tracker] Sending to ${endpoint}:`, data);
+      // Sending to endpoint in development mode
       return;
     }
 

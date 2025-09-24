@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-// import { useRouter } from "next/navigation"; // Removed unused import
 import { HiOutlineTrash } from "react-icons/hi";
 import CartList from "@/components/cart/CartList";
 import CartSummary from "@/components/cart/CartSummary";
@@ -14,7 +13,6 @@ import LoginProtection from "@/components/common/LoginProtection";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 
 export default function CartPage() {
-  // const router = useRouter(); // Removed unused variable
   const { totalItems, clearAll, cartItems } = useCart();
   const { resetNotification } = useNotification();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);

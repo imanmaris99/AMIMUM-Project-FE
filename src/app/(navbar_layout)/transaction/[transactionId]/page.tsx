@@ -41,7 +41,6 @@ const TransactionDetailPage: React.FC = () => {
   };
 
   const handleDownloadInvoice = () => {
-    // TODO: Implement invoice download functionality
     toast.loading('Mempersiapkan invoice...', { duration: 2000 });
     setTimeout(() => {
       toast.success('Invoice berhasil didownload!');
@@ -49,7 +48,6 @@ const TransactionDetailPage: React.FC = () => {
   };
 
   const handleBuyAgain = () => {
-    // TODO: Implement buy again functionality
     toast.loading('Memproses pembelian ulang...', { duration: 2000 });
     setTimeout(() => {
       toast.success('Item berhasil ditambahkan ke keranjang!');

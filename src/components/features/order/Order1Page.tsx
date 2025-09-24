@@ -21,8 +21,6 @@ interface Order1PageProps {
 
 // Using CartItemType from CartContext
 
-// Removed local interfaces - now using CourierCompany and CourierService from types/shipment.ts
-
 interface AddressInfo {
   id: string;
   name: string;
@@ -51,14 +49,11 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [showAddressSelector, setShowAddressSelector] = useState(false);
   
-  // Additional notes state
   const [additionalNotes, setAdditionalNotes] = useState<string>('');
   
-  // Address state - using shipment data
   const [addresses, setAddresses] = useState<AddressInfo[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo | null>(null);
 
-  // Load addresses from shipment data
   useEffect(() => {
     const loadAddresses = () => {
       const shipmentAddresses: AddressInfo[] = dummyShipments.map(shipment => ({
@@ -222,7 +217,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       }
       
       
-      // Remove only active items from cart after successful payment (only if not direct checkout)
+      // Remove only active items from cart after successful payment
       if (!isDirectCheckout) {
         removeActiveItems();
       } else {
@@ -505,7 +500,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
           </div>
         )}
 
-        {/* Additional Notes */}
+        {/* Additional Notes Section */}
         <div className="px-4 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Catatan Tambahan</h2>
           <div className="space-y-3">
@@ -535,7 +530,6 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
               </div>
             </div>
             
-            {/* Example notes for better UX */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
               <p className="text-sm text-blue-800 font-medium mb-2">
                 💡 Contoh catatan yang berguna:

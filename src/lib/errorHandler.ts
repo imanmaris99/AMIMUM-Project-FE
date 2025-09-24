@@ -1,6 +1,5 @@
 // Comprehensive Error Handling System
 import { toast } from 'react-hot-toast';
-// import React from 'react'; // Removed unused import
 
 export enum ErrorType {
   NETWORK = 'NETWORK',

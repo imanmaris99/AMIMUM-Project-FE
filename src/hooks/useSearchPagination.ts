@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { CardProductProps } from '@/components/common/Search/CardProduct/types';
-// import { SearchGetProduct } from '@/services/api/product'; // Removed unused import
 
 interface UseSearchPaginationProps {
   searchQuery: string;

@@ -7,27 +7,22 @@ import PackageSpecificationForm from "../edit/PackageSpecificationForm";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
-// import { PackageFormData } from "@/types/shipment";
 
 const CreateShipment = () => {
   const router = useRouter();
   
   const [currentStep, setCurrentStep] = useState(0);
-  // const [packageData] = useState<PackageFormData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSenderSubmit = (/* data: SenderFormData */) => { // Removed unused parameter
-    // setSenderData(data); // Removed unused function call
+  const handleSenderSubmit = () => {
     setCurrentStep(1);
   };
 
-  const handleReceiverSubmit = (/* data: ReceiverFormData */) => { // Removed unused parameter
-    // setReceiverData(data); // Removed unused function call
+  const handleReceiverSubmit = () => {
     setCurrentStep(2);
   };
 
-  const handlePackageSubmit = async (/* data: PackageFormData */) => {
-    // setPackageData(data);
+  const handlePackageSubmit = async () => {
     setIsLoading(true);
     
     try {

@@ -1,6 +1,5 @@
 import ProductListWithPagination from "@/components/DetailBrand/ProductListWithPagination";
 import DetailBrand from "@/components/DetailBrand";
-// import { BrandDetailResponseType } from "@/types/detailProduct";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 import { getBrandForPromo, getPromoProducts } from "@/data/dataUtils";
 import UnifiedHeader from "@/components/common/UnifiedHeader";

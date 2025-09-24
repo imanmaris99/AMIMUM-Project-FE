@@ -73,8 +73,8 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
         // If not in wishlist, add directly
         toggleWishlist(wishlistItem);
       }
-    } catch (error) {
-      console.error('Wishlist toggle error:', error);
+    } catch {
+      // Wishlist toggle error - handle gracefully
     }
   };
 

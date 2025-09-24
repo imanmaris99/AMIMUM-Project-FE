@@ -1,16 +1,12 @@
 "use client";
 
 import React from "react";
-// import { useState, useEffect } from "react";
-// import { useRouter } from "next/navigation";
 import { ProfileInfo } from "@/components/profile";
 import { ProfileSettings } from "@/components/profile";
 import LoginProtection from "@/components/common/LoginProtection";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
-// import { SessionManager } from "@/lib/auth";
 
 const ProfilePage: React.FC = () => {
-  // const router = useRouter();
 
 
 

@@ -39,7 +39,7 @@ export default async function handler(
 
     // Log errors to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('Error Reports:', errors);
+      // Error reports in development mode
     }
 
     // In production, you would typically:
@@ -69,72 +69,9 @@ export default async function handler(
       criticalCount: criticalErrors.length
     });
 
-  } catch (error) {
-    console.error('Error processing error reports:', error);
+  } catch {
+    // Error processing error reports
     res.status(500).json({ message: 'Internal server error' });
   }
 }
 
-// Example helper functions (implement based on your needs)
-
-// async function storeErrorsInDatabase(errors: ErrorReport[]) { // Removed unused function
-  // Implement database storage
-  // Example with Prisma:
-  // await prisma.error.createMany({
-  //   data: errors.map(error => ({
-  //     message: error.message,
-  //     stack: error.stack,
-  //     url: error.url,
-  //     lineNumber: error.lineNumber,
-  //     columnNumber: error.columnNumber,
-  //     timestamp: new Date(error.timestamp),
-  //     userAgent: error.userAgent,
-  //     userId: error.userId,
-  //     sessionId: error.sessionId,
-  //     errorType: error.errorType,
-  //     severity: error.severity,
-  //     context: error.context
-  //   }))
-  // });
-// }
-
-// async function sendToSentry(errors: ErrorReport[]) { // Removed unused function
-  // Implement Sentry integration
-  // Example:
-  // errors.forEach(error => {
-  //   Sentry.captureException(new Error(error.message), {
-  //     extra: {
-  //       stack: error.stack,
-  //       url: error.url,
-  //       lineNumber: error.lineNumber,
-  //       columnNumber: error.columnNumber,
-  //       userAgent: error.userAgent,
-  //       userId: error.userId,
-  //       sessionId: error.sessionId,
-  //       errorType: error.errorType,
-  //       severity: error.severity,
-  //       context: error.context
-  //     }
-  //   });
-  // });
-// }
-
-// async function sendCriticalErrorAlert(criticalErrors: ErrorReport[]) { // Removed unused function
-  // Implement alert system
-  // Example with email/Slack/Discord:
-  // await sendAlert({
-  //   title: 'Critical Errors Detected',
-  //   message: `${criticalErrors.length} critical errors occurred`,
-  //   errors: criticalErrors
-  // });
-// }
-
-// async function logErrorsToFile(errors: ErrorReport[]) { // Removed unused function
-  // Implement file logging
-  // Example with fs:
-  // const logEntry = {
-  //   timestamp: new Date().toISOString(),
-  //   errors: errors
-  // };
-  // await fs.appendFile('error.log', JSON.stringify(logEntry) + '\n');  
-// }

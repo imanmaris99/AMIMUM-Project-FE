@@ -10,7 +10,6 @@ import CartWithNotification from "@/components/common/CartWithNotification";
 import NotificationErrorBoundary from "@/components/common/NotificationErrorBoundary";
 import ToastProvider from "@/components/ui/ToastProvider";
 import { ClientErrorBoundary } from "@/components/common/ClientErrorBoundary";
-// Performance and analytics imports removed - will be initialized in client components
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],

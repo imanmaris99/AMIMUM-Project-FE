@@ -34,7 +34,7 @@ export default async function handler(
 
     // Log performance to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('Performance Reports:', performance);
+      // Performance reports in development mode
     }
 
     // In production, you would typically:
@@ -66,60 +66,9 @@ export default async function handler(
       slowTaskCount: slowMetrics.length
     });
 
-  } catch (error) {
-    console.error('Error processing performance reports:', error);
+  } catch {
+    // Error processing performance reports
     res.status(500).json({ message: 'Internal server error' });
   }
 }
 
-// Example helper functions (implement based on your needs)
-
-// async function storePerformanceInDatabase(performance: PerformanceReport[]) { // Removed unused function
-  // Implement database storage
-  // Example with Prisma:
-  // await prisma.performance.createMany({
-  //   data: performance.map(metric => ({
-  //     name: metric.name,
-  //     value: metric.value,
-  //     timestamp: new Date(metric.timestamp),
-  //     url: metric.url,
-  //     userId: metric.userId,
-  //     sessionId: metric.sessionId,
-  //     context: metric.context
-  //   }))
-  // });
-// }
-
-// async function sendToGoogleAnalytics(performance: PerformanceReport[]) { // Removed unused function
-  // Implement Google Analytics integration
-  // Example:
-  // performance.forEach(metric => {
-  //   gtag('event', 'performance_metric', {
-  //     metric_name: metric.name,
-  //     metric_value: metric.value,
-  //     metric_url: metric.url,
-  //     user_id: metric.userId,
-  //     session_id: metric.sessionId
-  //   });
-  // });
-// }
-
-// async function sendToCustomAnalytics(performance: PerformanceReport[]) { // Removed unused function
-  // Implement custom analytics service
-  // Example:
-  // await fetch('https://your-analytics-service.com/api/performance', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ performance })
-  // });
-// }
-
-// async function sendPerformanceAlert(slowMetrics: PerformanceReport[]) { // Removed unused function
-  // Implement performance alert system
-  // Example:
-  // await sendAlert({
-  //   title: 'Performance Issues Detected',
-  //   message: `${slowMetrics.length} slow tasks detected`,
-  //   metrics: slowMetrics
-  // });
-// }

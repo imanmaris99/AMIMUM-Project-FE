@@ -52,8 +52,8 @@ class AdvancedCache<T> {
         this.cache = new Map(data.cache || []);
         this.stats = data.stats || this.stats;
       }
-    } catch (error) {
-      console.warn('Failed to load cache from storage:', error);
+    } catch {
+      // Failed to load cache from storage - using default values
     }
   }
 
@@ -66,8 +66,8 @@ class AdvancedCache<T> {
         stats: this.stats
       };
       localStorage.setItem(this.storageKey, JSON.stringify(data));
-    } catch (error) {
-      console.warn('Failed to save cache to storage:', error);
+    } catch {
+      // Failed to save cache to storage - continuing without persistence
     }
   }
 

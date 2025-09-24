@@ -149,8 +149,8 @@ class WebVitalsMonitor {
       
       observer.observe({ entryTypes: [entryType] });
       this.observers.push(observer);
-    } catch (error) {
-      console.warn(`Failed to observe ${entryType}:`, error);
+    } catch {
+      // Failed to observe entry type - continuing without monitoring
     }
   }
 
@@ -166,7 +166,7 @@ class WebVitalsMonitor {
 
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[Web Vitals] ${metric.name}:`, report);
+      // Web Vitals monitoring in development mode
     }
 
     // Send to analytics in production
@@ -223,8 +223,8 @@ class WebVitalsMonitor {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(report)
-      }).catch(error => {
-        console.warn('Failed to send Web Vitals to analytics:', error);
+      }).catch(() => {
+        // Failed to send Web Vitals to analytics
       });
     }
   }

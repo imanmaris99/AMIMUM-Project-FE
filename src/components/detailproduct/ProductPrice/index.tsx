@@ -7,7 +7,6 @@ import { getProductRatingSummary } from "@/data/dummyData";
 import RatingDisplay from "@/components/rating/RatingDisplay";
 import { useCart } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
-// toast import removed - not used in this component
 import { SessionManager } from "@/lib/auth";
 import LoginRequiredModal from "@/components/common/LoginRequiredModal";
 
@@ -18,7 +17,6 @@ interface ProductPriceProps {
   isLoading: boolean;
   isSticky?: boolean;
 }
-// ProductPriceSkeleton component removed - not used
 
 const ProductPrice = ({
   isError,

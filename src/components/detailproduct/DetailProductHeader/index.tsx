@@ -23,7 +23,6 @@ const DetailProductHeader: React.FC<DetailProductHeaderProps> = ({
   };
 
   const handleQuestion = () => {
-    // TODO: Implement help/FAQ functionality
   };
 
   return (

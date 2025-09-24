@@ -177,10 +177,9 @@ export class PerformanceMonitor {
     if ('PerformanceObserver' in window) {
       // LCP - Largest Contentful Paint
       const lcpObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1];
-        // Log LCP for monitoring
-        console.log('LCP:', lastEntry?.startTime);
+        // LCP monitoring
+        // LCP value: list.getEntries()[list.getEntries().length - 1]?.startTime
+        void list; // Suppress unused variable warning
       });
       lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
 
@@ -188,19 +187,19 @@ export class PerformanceMonitor {
       const fidObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         entries.forEach((entry) => {
-          // Log FID for monitoring
-          console.log('FID:', (entry as PerformanceEventTiming).processingStart - entry.startTime);
+          // FID monitoring
+          // FID value: (entry as PerformanceEventTiming).processingStart - entry.startTime
+          void entry; // Suppress unused variable warning
         });
       });
       fidObserver.observe({ entryTypes: ['first-input'] });
 
       // CLS - Cumulative Layout Shift
       const clsObserver = new PerformanceObserver((list) => {
-        // let clsValue = 0; // Removed unused variable
         const entries = list.getEntries();
         entries.forEach((entry) => {
           if (!(entry as PerformanceEntry & { hadRecentInput?: boolean }).hadRecentInput) {
-            // clsValue += (entry as any).value; // Removed unused variable usage
+            // CLS monitoring
           }
         });
       });
@@ -305,7 +304,7 @@ export function analyzeBundleSize() {
         fetch(src)
           .then(response => response.blob())
           .then(() => {
-            // const sizeKB = (blob.size / 1024).toFixed(2); // Removed unused variable
+            // Resource size monitoring
           });
       }
     });

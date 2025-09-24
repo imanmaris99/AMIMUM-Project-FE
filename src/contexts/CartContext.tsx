@@ -200,9 +200,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   }, []);
 
   // Update active status (simplified - no is_active property in new structure)
-  const updateActiveStatus = useCallback((cartId: string, isActive: boolean) => {
+  const updateActiveStatus = useCallback(() => {
     // For now, just log the action since we don't have is_active in new structure
-    console.log(`Update active status for cart item ${cartId}: ${isActive}`);
+    // Status update functionality will be implemented when backend supports it
   }, []);
 
 

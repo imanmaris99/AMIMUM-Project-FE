@@ -22,9 +22,9 @@ export class ClientErrorBoundary extends React.Component<ErrorBoundaryProps, Err
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch() {
     // Log error for debugging
-    console.error('ClientErrorBoundary caught an error:', error, errorInfo);
+    // Error caught by ClientErrorBoundary
   }
 
   render() {

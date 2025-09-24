@@ -6,7 +6,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-// import { postForgotPassword } from "@/API/forgot-password";
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/ui/Spinner";
 import React from "react";
