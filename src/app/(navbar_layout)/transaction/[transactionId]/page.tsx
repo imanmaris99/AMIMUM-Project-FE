@@ -41,16 +41,110 @@ const TransactionDetailPage: React.FC = () => {
   };
 
   const handleDownloadInvoice = () => {
-    toast.loading('Mempersiapkan invoice...', { duration: 2000 });
+    // Dismiss any existing toasts first
+    toast.dismiss();
+    
+    toast.custom(() => (
+      <div style={{ 
+        background: '#3B82F6', 
+        color: '#fff', 
+        maxWidth: '400px', 
+        margin: '0 auto', 
+        borderRadius: '8px', 
+        fontSize: '14px', 
+        fontWeight: '500', 
+        padding: '12px 16px', 
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        display: 'flex',
+        alignItems: 'center',
+        pointerEvents: 'auto'
+      }}>
+        <div 
+          className="animate-spin"
+          style={{ 
+            width: '20px', 
+            height: '20px', 
+            border: '2px solid #fff', 
+            borderTop: '2px solid transparent', 
+            borderRadius: '50%', 
+            marginRight: '12px',
+            flexShrink: 0
+          }} 
+        />
+        <p style={{ 
+          fontSize: '14px', 
+          fontWeight: '500', 
+          margin: 0 
+        }}>Mempersiapkan invoice...</p>
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-center',
+      id: 'download-invoice-loading'
+    });
+    
+    // Simulate download process
     setTimeout(() => {
-      toast.success('Invoice berhasil didownload!');
+      // Dismiss loading toast by ID
+      toast.dismiss('download-invoice-loading');
+      // Wait a bit longer to ensure loading toast is completely dismissed
+      setTimeout(() => {
+        toast.success('Invoice berhasil didownload!');
+      }, 300);
     }, 2000);
   };
 
   const handleBuyAgain = () => {
-    toast.loading('Memproses pembelian ulang...', { duration: 2000 });
+    // Dismiss any existing toasts first
+    toast.dismiss();
+    
+    toast.custom(() => (
+      <div style={{ 
+        background: '#3B82F6', 
+        color: '#fff', 
+        maxWidth: '400px', 
+        margin: '0 auto', 
+        borderRadius: '8px', 
+        fontSize: '14px', 
+        fontWeight: '500', 
+        padding: '12px 16px', 
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        display: 'flex',
+        alignItems: 'center',
+        pointerEvents: 'auto'
+      }}>
+        <div 
+          className="animate-spin"
+          style={{ 
+            width: '20px', 
+            height: '20px', 
+            border: '2px solid #fff', 
+            borderTop: '2px solid transparent', 
+            borderRadius: '50%', 
+            marginRight: '12px',
+            flexShrink: 0
+          }} 
+        />
+        <p style={{ 
+          fontSize: '14px', 
+          fontWeight: '500', 
+          margin: 0 
+        }}>Memproses pembelian ulang...</p>
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-center',
+      id: 'buy-again-loading'
+    });
+    
+    // Simulate buy again process
     setTimeout(() => {
-      toast.success('Item berhasil ditambahkan ke keranjang!');
+      // Dismiss loading toast by ID
+      toast.dismiss('buy-again-loading');
+      // Wait a bit longer to ensure loading toast is completely dismissed
+      setTimeout(() => {
+        toast.success('Item berhasil ditambahkan ke keranjang!');
+      }, 300);
     }, 2000);
   };
 
@@ -96,16 +190,9 @@ const TransactionDetailPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white">
-        <UnifiedHeader 
-          type="secondary"
-          title="Detail Transaksi"
-          showBackButton={true}
-          onBack={handleBack}
-        />
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <span className="loader mb-4" aria-label="Memuat..." />
+        <p className="text-gray-600 text-lg font-medium">Memuat halaman, mohon tunggu sebentar...</p>
       </div>
     );
   }

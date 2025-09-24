@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { SessionManager } from '@/lib/auth';
 import LoginRequiredModal from './LoginRequiredModal';
 
@@ -65,8 +64,9 @@ const LoginProtection: React.FC<LoginProtectionProps> = ({
   // Show loading while checking login status
   if (isLoggedIn === null) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <LoadingSpinner size="lg" color="primary" label="Memeriksa status login..." />
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <span className="loader mb-4" aria-label="Memuat..." />
+        <p className="text-gray-600 text-lg font-medium">Memuat halaman, mohon tunggu sebentar...</p>
       </div>
     );
   }
