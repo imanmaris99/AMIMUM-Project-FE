@@ -13,7 +13,7 @@ export interface ErrorReport {
   sessionId: string;
   errorType: 'javascript' | 'promise' | 'resource' | 'network' | 'custom';
   severity: 'low' | 'medium' | 'high' | 'critical';
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 export interface PerformanceReport {
@@ -23,7 +23,7 @@ export interface PerformanceReport {
   url: string;
   userId?: string;
   sessionId: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 class ErrorTracker {
@@ -91,12 +91,12 @@ class ErrorTracker {
     window.addEventListener('error', (event) => {
       if (event.target !== window) {
         this.captureError({
-          message: `Resource loading failed: ${(event.target as any)?.src || (event.target as any)?.href}`,
-          url: (event.target as any)?.src || (event.target as any)?.href || window.location.href,
+          message: `Resource loading failed: ${(event.target as { src?: string; href?: string })?.src || (event.target as { src?: string; href?: string })?.href}`,
+          url: (event.target as { src?: string; href?: string })?.src || (event.target as { src?: string; href?: string })?.href || window.location.href,
           errorType: 'resource',
           severity: 'medium',
           context: {
-            tagName: (event.target as any)?.tagName,
+            tagName: (event.target as { tagName?: string })?.tagName,
             type: event.type
           }
         });
@@ -155,11 +155,12 @@ class ErrorTracker {
     }
   }
 
-  private getSeverity(error: any): 'low' | 'medium' | 'high' | 'critical' {
+  private getSeverity(error: unknown): 'low' | 'medium' | 'high' | 'critical' {
     if (!error) return 'medium';
     
-    const message = error.message?.toLowerCase() || '';
-    // const stack = error.stack?.toLowerCase() || '';
+    const errorMessage = error instanceof Error ? error.message : '';
+    const message = errorMessage.toLowerCase();
+    // const stack = error instanceof Error ? error.stack?.toLowerCase() || '' : '';
     
     // Critical errors
     if (message.includes('chunk') || message.includes('loading') || 
@@ -275,7 +276,7 @@ class ErrorTracker {
     }
   }
 
-  private async sendToEndpoint(endpoint: string, data: any) {
+  private async sendToEndpoint(endpoint: string, data: unknown) {
     if (process.env.NODE_ENV === 'development') {
       console.log(`[Error Tracker] Sending to ${endpoint}:`, data);
       return;
@@ -296,7 +297,7 @@ class ErrorTracker {
   }
 
   // Manual error reporting
-  reportError(error: Error, context?: Record<string, any>) {
+  reportError(error: Error, context?: Record<string, unknown>) {
     this.captureError({
       message: error.message,
       stack: error.stack,
@@ -307,7 +308,7 @@ class ErrorTracker {
   }
 
   // Manual performance reporting
-  reportPerformance(name: string, value: number, context?: Record<string, any>) {
+  reportPerformance(name: string, value: number, context?: Record<string, unknown>) {
     this.capturePerformance({
       name,
       value,

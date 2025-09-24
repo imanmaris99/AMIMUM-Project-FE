@@ -4,6 +4,22 @@ import { PerformanceMonitor } from './performance';
 import { SessionManager } from './auth';
 import { ErrorHandler } from './errorHandler';
 
+interface WindowWithDebug extends Window {
+  AMIMUM_DEBUG?: {
+    PerformanceMonitor: typeof PerformanceMonitor;
+    ErrorHandler: typeof ErrorHandler;
+    SessionManager: typeof SessionManager;
+    clearStorage: () => void;
+    getAnalytics: () => {
+      events: unknown[];
+      performance: unknown;
+    };
+  };
+  analytics?: {
+    getEvents: () => unknown[];
+  };
+}
+
 // Initialize all application services
 export function initializeApp() {
   // Initialize performance monitoring
@@ -179,7 +195,8 @@ export function cleanupApp() {
 // Development tools
 if (process.env.NODE_ENV === 'development') {
   // Expose debugging tools to window
-  (window as any).AMIMUM_DEBUG = {
+  const windowWithDebug = window as WindowWithDebug;
+  windowWithDebug.AMIMUM_DEBUG = {
     PerformanceMonitor,
     ErrorHandler,
     SessionManager,
@@ -190,7 +207,7 @@ if (process.env.NODE_ENV === 'development') {
     getAnalytics: () => {
       // Return analytics data for debugging
       return {
-        events: (window as any).analytics?.getEvents() || [],
+        events: windowWithDebug.analytics?.getEvents() || [],
         performance: PerformanceMonitor.getMetrics()
       };
     }

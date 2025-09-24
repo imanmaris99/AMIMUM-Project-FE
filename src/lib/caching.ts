@@ -206,7 +206,7 @@ class AdvancedCache<T> {
 }
 
 // API Response Cache
-export const apiCache = new AdvancedCache<any>({
+export const apiCache = new AdvancedCache<unknown>({
   ttl: 5 * 60 * 1000, // 5 minutes
   maxSize: 100,
   strategy: 'lru',
@@ -222,7 +222,7 @@ export const imageCache = new AdvancedCache<string>({
 }, 'image_cache');
 
 // User Data Cache
-export const userCache = new AdvancedCache<any>({
+export const userCache = new AdvancedCache<unknown>({
   ttl: 10 * 60 * 1000, // 10 minutes
   maxSize: 20,
   strategy: 'lru',
@@ -230,7 +230,7 @@ export const userCache = new AdvancedCache<any>({
 }, 'user_cache');
 
 // Search Results Cache
-export const searchCache = new AdvancedCache<any>({
+export const searchCache = new AdvancedCache<unknown>({
   ttl: 2 * 60 * 1000, // 2 minutes
   maxSize: 30,
   strategy: 'lru',
@@ -239,14 +239,14 @@ export const searchCache = new AdvancedCache<any>({
 
 // Cache Management Utilities
 export class CacheManager {
-  private caches: Map<string, AdvancedCache<any>> = new Map();
+  private caches: Map<string, AdvancedCache<unknown>> = new Map();
 
   registerCache<T>(name: string, cache: AdvancedCache<T>): void {
     this.caches.set(name, cache);
   }
 
   getCache<T>(name: string): AdvancedCache<T> | undefined {
-    return this.caches.get(name);
+    return this.caches.get(name) as AdvancedCache<T> | undefined;
   }
 
   clearAll(): void {
@@ -288,7 +288,7 @@ if (typeof window !== 'undefined') {
 }
 
 // Cache Decorator for Functions
-export function cached<T extends (...args: any[]) => any>(
+export function cached<T extends (...args: unknown[]) => unknown>(
   cache: AdvancedCache<ReturnType<T>>,
   keyGenerator?: (...args: Parameters<T>) => string
 ) {
@@ -302,7 +302,7 @@ export function cached<T extends (...args: any[]) => any>(
       }
       
       const result = fn(...args);
-      cache.set(key, result);
+      cache.set(key, result as ReturnType<T>);
       return result;
     }) as T;
   };

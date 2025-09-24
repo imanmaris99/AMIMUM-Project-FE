@@ -44,7 +44,7 @@ export function validateToken(token: string): boolean {
 export class SecureStorage {
   private static readonly PREFIX = 'amimum_';
   
-  static setItem(key: string, value: any): void {
+  static setItem<T>(key: string, value: T): void {
     try {
       const encrypted = btoa(JSON.stringify(value));
       localStorage.setItem(this.PREFIX + key, encrypted);

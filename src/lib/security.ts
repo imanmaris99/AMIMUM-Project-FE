@@ -93,21 +93,21 @@ export function validateAddress(address: string): boolean {
 }
 
 // Data sanitization
-export function sanitizeUserInput(input: any): any {
+export function sanitizeUserInput<T>(input: T): T {
   if (typeof input === 'string') {
-    return sanitizeInput(escapeHtml(input));
+    return sanitizeInput(escapeHtml(input)) as T;
   }
   
   if (Array.isArray(input)) {
-    return input.map(sanitizeUserInput);
+    return input.map(sanitizeUserInput) as T;
   }
   
   if (input && typeof input === 'object') {
-    const sanitized: any = {};
+    const sanitized: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(input)) {
       sanitized[sanitizeInput(key)] = sanitizeUserInput(value);
     }
-    return sanitized;
+    return sanitized as T;
   }
   
   return input;

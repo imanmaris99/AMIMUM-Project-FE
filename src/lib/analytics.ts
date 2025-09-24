@@ -110,7 +110,7 @@ export class UserBehaviorTracker {
       }
 
       // Time to Interactive
-      this.trackEvent('performance', 'web_vitals', 'tti', undefined, navigation.loadEventEnd - (navigation as any).navigationStart);
+      this.trackEvent('performance', 'web_vitals', 'tti', undefined, navigation.loadEventEnd - navigation.fetchStart);
     }
   }
 
@@ -279,9 +279,9 @@ export class PerformanceTracker {
   static trackPageLoad(pageName: string) {
     const timing = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
     
-    UserBehaviorTracker.trackEvent('performance', 'page_load', 'complete', pageName, timing.loadEventEnd - (timing as any).navigationStart, {
-      domContentLoaded: timing.domContentLoadedEventEnd - (timing as any).navigationStart,
-      firstByte: timing.responseStart - (timing as any).navigationStart,
+    UserBehaviorTracker.trackEvent('performance', 'page_load', 'complete', pageName, timing.loadEventEnd - timing.fetchStart, {
+      domContentLoaded: timing.domContentLoadedEventEnd - timing.fetchStart,
+      firstByte: timing.responseStart - timing.fetchStart,
       dns: timing.domainLookupEnd - timing.domainLookupStart,
       tcp: timing.connectEnd - timing.connectStart
     });

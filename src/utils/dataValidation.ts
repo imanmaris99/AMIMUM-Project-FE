@@ -8,138 +8,153 @@ import { CartItemType } from '@/types/apiTypes';
 
 // ==================== PRODUCT VALIDATION ====================
 
-export function validateProductData(product: any): product is AllProductInfoType {
+export function validateProductData(product: unknown): product is AllProductInfoType {
+  if (!product || typeof product !== 'object') return false;
+  
+  const p = product as Record<string, unknown>;
   return !!(
-    product &&
-    typeof product.id === 'string' &&
-    typeof product.name === 'string' &&
-    typeof product.price === 'number' &&
-    product.price > 0 &&
-    product.brand_info &&
-    validateBrandInfo(product.brand_info) &&
-    Array.isArray(product.all_variants) &&
-    product.all_variants.every(validateVariantData) &&
-    typeof product.created_at === 'string'
+    typeof p.id === 'string' &&
+    typeof p.name === 'string' &&
+    typeof p.price === 'number' &&
+    p.price > 0 &&
+    p.brand_info &&
+    validateBrandInfo(p.brand_info) &&
+    Array.isArray(p.all_variants) &&
+    p.all_variants.every(validateVariantData) &&
+    typeof p.created_at === 'string'
   );
 }
 
-export function validateVariantData(variant: any): variant is VariantAllProductType {
+export function validateVariantData(variant: unknown): variant is VariantAllProductType {
+  if (!variant || typeof variant !== 'object') return false;
+  
+  const v = variant as Record<string, unknown>;
   return !!(
-    variant &&
-    typeof variant.id === 'number' &&
-    typeof variant.variant === 'string' &&
-    typeof variant.img === 'string' &&
-    typeof variant.discount === 'number' &&
-    variant.discount >= 0 &&
-    typeof variant.discounted_price === 'number' &&
-    variant.discounted_price > 0 &&
-    typeof variant.updated_at === 'string'
+    typeof v.id === 'number' &&
+    typeof v.variant === 'string' &&
+    typeof v.img === 'string' &&
+    typeof v.discount === 'number' &&
+    v.discount >= 0 &&
+    typeof v.discounted_price === 'number' &&
+    v.discounted_price > 0 &&
+    typeof v.updated_at === 'string'
   );
 }
 
-export function validateBrandInfo(brand: any): brand is BrandInfoType {
+export function validateBrandInfo(brand: unknown): brand is BrandInfoType {
+  if (!brand || typeof brand !== 'object') return false;
+  
+  const b = brand as Record<string, unknown>;
   return !!(
-    brand &&
-    typeof brand.id === 'number' &&
-    typeof brand.name === 'string' &&
-    typeof brand.photo_url === 'string'
+    typeof b.id === 'number' &&
+    typeof b.name === 'string' &&
+    typeof b.photo_url === 'string'
   );
 }
 
 // ==================== PRODUCTION VALIDATION ====================
 
-export function validateProductionData(production: any): production is ProductionProps {
+export function validateProductionData(production: unknown): production is ProductionProps {
+  if (!production || typeof production !== 'object') return false;
+  
+  const p = production as Record<string, unknown>;
   return !!(
-    production &&
-    typeof production.id === 'number' &&
-    typeof production.name === 'string' &&
-    typeof production.photo_url === 'string' &&
-    Array.isArray(production.description_list) &&
-    typeof production.category === 'string' &&
-    typeof production.created_at === 'string'
+    typeof p.id === 'number' &&
+    typeof p.name === 'string' &&
+    typeof p.photo_url === 'string' &&
+    Array.isArray(p.description_list) &&
+    typeof p.category === 'string' &&
+    typeof p.created_at === 'string'
   );
 }
 
 // ==================== DETAIL PRODUCT VALIDATION ====================
 
-export function validateDetailProductData(product: any): product is DetailProductType {
+export function validateDetailProductData(product: unknown): product is DetailProductType {
+  if (!product || typeof product !== 'object') return false;
+  
+  const p = product as Record<string, unknown>;
   return !!(
-    product &&
-    typeof product.id === 'string' &&
-    typeof product.name === 'string' &&
-    typeof product.price === 'number' &&
-    product.price > 0 &&
-    typeof product.is_active === 'boolean' &&
-    typeof product.company === 'string' &&
-    Array.isArray(product.variants_list) &&
-    Array.isArray(product.description_list) &&
-    Array.isArray(product.instructions_list) &&
-    typeof product.created_at === 'string' &&
-    typeof product.updated_at === 'string'
+    typeof p.id === 'string' &&
+    typeof p.name === 'string' &&
+    typeof p.price === 'number' &&
+    p.price > 0 &&
+    typeof p.is_active === 'boolean' &&
+    typeof p.company === 'string' &&
+    Array.isArray(p.variants_list) &&
+    Array.isArray(p.description_list) &&
+    Array.isArray(p.instructions_list) &&
+    typeof p.created_at === 'string' &&
+    typeof p.updated_at === 'string'
   );
 }
 
 // ==================== CART VALIDATION ====================
 
-export function validateCartItemData(item: any): item is CartItemType {
+export function validateCartItemData(item: unknown): item is CartItemType {
+  if (!item || typeof item !== 'object') return false;
+  
+  const i = item as Record<string, unknown>;
   return !!(
-    item &&
-    typeof item.id === 'string' &&
-    typeof item.product_id === 'string' &&
-    typeof item.variant_id === 'number' &&
-    typeof item.quantity === 'number' &&
-    item.quantity > 0 &&
-    typeof item.price === 'number' &&
-    item.price > 0 &&
-    typeof item.product_name === 'string' &&
-    typeof item.variant_name === 'string' &&
-    typeof item.image === 'string' &&
-    typeof item.created_at === 'string' &&
-    typeof item.updated_at === 'string'
+    typeof i.id === 'string' &&
+    typeof i.product_id === 'string' &&
+    typeof i.variant_id === 'number' &&
+    typeof i.quantity === 'number' &&
+    i.quantity > 0 &&
+    typeof i.price === 'number' &&
+    i.price > 0 &&
+    typeof i.product_name === 'string' &&
+    typeof i.variant_name === 'string' &&
+    typeof i.image === 'string' &&
+    typeof i.created_at === 'string' &&
+    typeof i.updated_at === 'string'
   );
 }
 
 // ==================== WISHLIST VALIDATION ====================
 
-export function validateWishlistItemData(item: any): item is WishlistItem {
+export function validateWishlistItemData(item: unknown): item is WishlistItem {
+  if (!item || typeof item !== 'object') return false;
+  
+  const i = item as Record<string, unknown>;
   return !!(
-    item &&
-    typeof item.id === 'string' &&
-    typeof item.productId === 'string' &&
-    typeof item.name === 'string' &&
-    typeof item.variant === 'string' &&
-    typeof item.quantity === 'number' &&
-    typeof item.price === 'number' &&
-    item.price > 0 &&
-    typeof item.image === 'string' &&
-    typeof item.addedAt === 'string'
+    typeof i.id === 'string' &&
+    typeof i.productId === 'string' &&
+    typeof i.name === 'string' &&
+    typeof i.variant === 'string' &&
+    typeof i.quantity === 'number' &&
+    typeof i.price === 'number' &&
+    i.price > 0 &&
+    typeof i.image === 'string' &&
+    typeof i.addedAt === 'string'
   );
 }
 
 // ==================== DATA SANITIZATION ====================
 
-export function sanitizeProductData(product: any): AllProductInfoType | null {
+export function sanitizeProductData(product: unknown): AllProductInfoType | null {
   if (!validateProductData(product)) {
     return null;
   }
   
+  const validProduct = product as AllProductInfoType;
   return {
-    id: product.id,
-    name: product.name,
-    price: product.price,
-    image: product.image || "/default-image.jpg",
-    brand_info: product.brand_info,
-    all_variants: product.all_variants.filter(validateVariantData),
-    created_at: product.created_at
+    id: validProduct.id,
+    name: validProduct.name,
+    price: validProduct.price,
+    image: validProduct.image || "/default-image.jpg",
+    brand_info: validProduct.brand_info,
+    all_variants: validProduct.all_variants.filter(validateVariantData),
+    created_at: validProduct.created_at
   };
 }
 
-export function sanitizeDetailProductData(product: any): DetailProductType | null {
+export function sanitizeDetailProductData(product: unknown): DetailProductType | null {
   if (!validateDetailProductData(product)) {
     return null;
   }
   
-  return product;
+  return product as DetailProductType;
 }
 
 // ==================== ERROR HANDLING ====================
@@ -152,8 +167,8 @@ export class DataValidationError extends Error {
 }
 
 export function validateAndThrow<T>(
-  data: any, 
-  validator: (data: any) => data is T, 
+  data: unknown, 
+  validator: (data: unknown) => data is T, 
   errorMessage: string
 ): T {
   if (!validator(data)) {
@@ -164,12 +179,12 @@ export function validateAndThrow<T>(
 
 // ==================== DEBUGGING UTILITIES ====================
 
-export function logValidationErrors(data: any, context: string) {
+export function logValidationErrors(data: unknown, context: string) {
   console.group(`Data Validation Errors - ${context}`);
   console.groupEnd();
 }
 
-export function createValidationReport(data: any[]): {
+export function createValidationReport(data: unknown[]): {
   valid: number;
   invalid: number;
   errors: string[];

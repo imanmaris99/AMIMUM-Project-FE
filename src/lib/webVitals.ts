@@ -1,6 +1,10 @@
 // Web Vitals Monitoring
 // Comprehensive performance monitoring for production
 
+interface WindowWithGtag extends Window {
+  gtag?: (command: string, action: string, parameters: Record<string, unknown>) => void;
+}
+
 export interface WebVitalMetric {
   name: string;
   value: number;
@@ -202,8 +206,9 @@ class WebVitalsMonitor {
 
   private sendToAnalytics(report: WebVitalReport) {
     // Send to Google Analytics 4
-    if (typeof (window as any).gtag !== 'undefined') {
-      (window as any).gtag('event', 'web_vitals', {
+    const windowWithGtag = window as WindowWithGtag;
+    if (typeof windowWithGtag.gtag !== 'undefined') {
+      windowWithGtag.gtag('event', 'web_vitals', {
         metric_name: report.metric.name,
         metric_value: report.metric.value,
         metric_rating: report.rating,

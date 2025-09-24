@@ -70,7 +70,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   // Debounced save to localStorage to prevent excessive writes
   const debouncedSave = useMemo(
-    () => debounce((items: CartItemType[]) => {
+    () => debounce((...args: unknown[]) => {
+      const items = args[0] as CartItemType[];
       try {
         localStorage.setItem('cart', JSON.stringify(items));
       } catch (error) {

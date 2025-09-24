@@ -16,7 +16,7 @@ export interface ErrorInfo {
   type: ErrorType;
   message: string;
   code?: string | number;
-  details?: any;
+  details?: unknown;
   timestamp: Date;
   userId?: string;
   sessionId?: string;
@@ -27,7 +27,7 @@ export interface ErrorInfo {
 export class AppError extends Error {
   public readonly type: ErrorType;
   public readonly code?: string | number;
-  public readonly details?: any;
+  public readonly details?: unknown;
   public readonly timestamp: Date;
   public readonly isOperational: boolean;
 
@@ -35,7 +35,7 @@ export class AppError extends Error {
     message: string,
     type: ErrorType = ErrorType.UNKNOWN,
     code?: string | number,
-    details?: any,
+    details?: unknown,
     isOperational: boolean = true
   ) {
     super(message);
@@ -51,33 +51,48 @@ export class AppError extends Error {
 }
 
 // Error classification
-export function classifyError(error: any): ErrorType {
+export function classifyError(error: unknown): ErrorType {
   if (error instanceof AppError) {
     return error.type;
   }
 
-  if (error.name === 'NetworkError' || error.message?.includes('fetch')) {
-    return ErrorType.NETWORK;
+  if (error instanceof Error) {
+    if (error.name === 'NetworkError' || error.message?.includes('fetch')) {
+      return ErrorType.NETWORK;
+    }
+
+    if (error.name === 'ValidationError' || error.message?.includes('validation')) {
+      return ErrorType.VALIDATION;
+    }
+
+    if (error.message?.includes('unauthorized')) {
+      return ErrorType.AUTHENTICATION;
+    }
+
+    if (error.message?.includes('forbidden')) {
+      return ErrorType.AUTHORIZATION;
+    }
+
+    if (error.message?.includes('server')) {
+      return ErrorType.SERVER;
+    }
   }
 
-  if (error.name === 'ValidationError' || error.message?.includes('validation')) {
-    return ErrorType.VALIDATION;
-  }
-
-  if (error.status === 401 || error.message?.includes('unauthorized')) {
-    return ErrorType.AUTHENTICATION;
-  }
-
-  if (error.status === 403 || error.message?.includes('forbidden')) {
-    return ErrorType.AUTHORIZATION;
-  }
-
-  if (error.status >= 500 || error.message?.includes('server')) {
-    return ErrorType.SERVER;
-  }
-
-  if (error.status >= 400) {
-    return ErrorType.CLIENT;
+  // Check for error with status property
+  if (typeof error === 'object' && error !== null && 'status' in error) {
+    const errorWithStatus = error as { status: number };
+    if (errorWithStatus.status === 401) {
+      return ErrorType.AUTHENTICATION;
+    }
+    if (errorWithStatus.status === 403) {
+      return ErrorType.AUTHORIZATION;
+    }
+    if (errorWithStatus.status >= 500) {
+      return ErrorType.SERVER;
+    }
+    if (errorWithStatus.status >= 400) {
+      return ErrorType.CLIENT;
+    }
   }
 
   return ErrorType.UNKNOWN;
@@ -129,17 +144,22 @@ export class ErrorHandler {
   private static readonly RETRY_DELAY = 1000; // 1 second
 
   static async handleError(
-    error: any,
+    error: unknown,
     context: string = 'Unknown',
     retryable: boolean = false,
-    retryFunction?: () => Promise<any>
+    retryFunction?: () => Promise<unknown>
   ): Promise<void> {
     const errorType = classifyError(error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorCode = (error as { code?: string | number; status?: number })?.code || 
+                     (error as { status?: number })?.status;
+    const errorDetails = (error as { details?: unknown })?.details || error;
+    
     const errorInfo: ErrorInfo = {
       type: errorType,
-      message: error.message || 'Unknown error',
-      code: error.code || error.status,
-      details: error.details || error,
+      message: errorMessage,
+      code: errorCode,
+      details: errorDetails,
       timestamp: new Date(),
       userId: localStorage.getItem('user_id') || undefined,
       sessionId: localStorage.getItem('session_id') || undefined,
@@ -228,7 +248,7 @@ export async function withRetry<T>(
   maxAttempts: number = 3,
   baseDelay: number = 1000
 ): Promise<T> {
-  let lastError: any;
+  let lastError: unknown;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {

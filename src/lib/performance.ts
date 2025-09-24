@@ -2,7 +2,7 @@
 import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react';
 
 // Debounce utility for performance optimization
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number,
   immediate: boolean = false
@@ -25,7 +25,7 @@ export function debounce<T extends (...args: any[]) => any>(
 }
 
 // Throttle utility for performance optimization
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): T {
@@ -41,7 +41,7 @@ export function throttle<T extends (...args: any[]) => any>(
 }
 
 // Memoization utility
-export function memoize<T extends (...args: any[]) => any>(fn: T): T {
+export function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
   const cache = new Map();
   
   return ((...args: Parameters<T>) => {
@@ -81,9 +81,12 @@ export function useVirtualScrolling<T>(
   const offsetY = startIndex * itemHeight;
 
   const handleScroll = useCallback(
-    throttle((e: React.UIEvent<HTMLDivElement>) => {
-      setScrollTop(e.currentTarget.scrollTop);
-    }, 16), // 60fps
+    (e: React.UIEvent<HTMLDivElement>) => {
+      const throttledHandler = throttle(() => {
+        setScrollTop(e.currentTarget.scrollTop);
+      }, 16); // 60fps
+      throttledHandler();
+    },
     []
   );
 
@@ -106,6 +109,9 @@ export function useLazyLoading(
   const ref = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
+    const currentRef = ref.current;
+    if (!currentRef) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !hasLoaded) {
@@ -116,14 +122,10 @@ export function useLazyLoading(
       { threshold, rootMargin }
     );
 
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
+    observer.observe(currentRef);
 
     return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
-      }
+      observer.unobserve(currentRef);
     };
   }, [threshold, rootMargin, hasLoaded]);
 
@@ -187,7 +189,7 @@ export class PerformanceMonitor {
         const entries = list.getEntries();
         entries.forEach((entry) => {
           // Log FID for monitoring
-          console.log('FID:', (entry as any).processingStart - entry.startTime);
+          console.log('FID:', (entry as PerformanceEventTiming).processingStart - entry.startTime);
         });
       });
       fidObserver.observe({ entryTypes: ['first-input'] });
@@ -197,7 +199,7 @@ export class PerformanceMonitor {
         // let clsValue = 0; // Removed unused variable
         const entries = list.getEntries();
         entries.forEach((entry) => {
-          if (!(entry as any).hadRecentInput) {
+          if (!(entry as PerformanceEntry & { hadRecentInput?: boolean }).hadRecentInput) {
             // clsValue += (entry as any).value; // Removed unused variable usage
           }
         });
@@ -215,7 +217,7 @@ export class PerformanceMonitor {
 }
 
 // Bundle size optimization
-export function createLazyComponent<T extends React.ComponentType<any>>(
+export function createLazyComponent<T extends React.ComponentType<unknown>>(
   importFunc: () => Promise<{ default: T }>,
   // fallback?: React.ComponentType
 ): React.LazyExoticComponent<T> {
@@ -252,7 +254,7 @@ export function createOptimizedContext<T>(defaultValue: T) {
   }
   
   const Provider: React.FC<ProviderProps> = ({ children, value }) => {
-    const memoizedValue = useMemo(() => value, [JSON.stringify(value)]);
+    const memoizedValue = useMemo(() => value, [value]);
     
     return React.createElement(
       Context.Provider,
@@ -324,11 +326,11 @@ export function checkPerformanceBudget() {
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
     
     const metrics = {
-      FCP: navigation.domContentLoadedEventEnd - (navigation as any).navigationStart,
+      FCP: navigation.domContentLoadedEventEnd - navigation.fetchStart,
       LCP: 0, // Would need LCP observer
       FID: 0, // Would need FID observer
       CLS: 0, // Would need CLS observer
-      TTI: navigation.loadEventEnd - (navigation as any).navigationStart,
+      TTI: navigation.loadEventEnd - navigation.fetchStart,
     };
     
     Object.entries(metrics).forEach(([key, value]) => {

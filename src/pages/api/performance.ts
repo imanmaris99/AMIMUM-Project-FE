@@ -10,7 +10,7 @@ interface PerformanceReport {
   url: string;
   userId?: string;
   sessionId: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 interface PerformanceRequest {

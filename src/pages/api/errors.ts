@@ -15,7 +15,7 @@ interface ErrorReport {
   sessionId: string;
   errorType: 'javascript' | 'promise' | 'resource' | 'network' | 'custom';
   severity: 'low' | 'medium' | 'high' | 'critical';
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 interface ErrorRequest {

@@ -128,7 +128,7 @@ export class StatePersistence {
 // State synchronization
 export class StateSynchronizer {
   private static instances: Map<string, StateSynchronizer> = new Map();
-  private listeners: Map<string, Set<(data: any) => void>> = new Map();
+  private listeners: Map<string, Set<(data: unknown) => void>> = new Map();
 
   static getInstance(key: string): StateSynchronizer {
     if (!this.instances.has(key)) {
@@ -137,7 +137,7 @@ export class StateSynchronizer {
     return this.instances.get(key)!;
   }
 
-  subscribe(channel: string, listener: (data: any) => void): () => void {
+  subscribe(channel: string, listener: (data: unknown) => void): () => void {
     if (!this.listeners.has(channel)) {
       this.listeners.set(channel, new Set());
     }
@@ -148,7 +148,7 @@ export class StateSynchronizer {
     };
   }
 
-  publish(channel: string, data: any): void {
+  publish(channel: string, data: unknown): void {
     this.listeners.get(channel)?.forEach(listener => listener(data));
   }
 }
@@ -234,7 +234,7 @@ export class StateValidatorManager<T> {
 
 // State debugging
 export class StateDebugger {
-  private static logs: Array<{ timestamp: Date; action: StateAction; state: any }> = [];
+  private static logs: Array<{ timestamp: Date; action: StateAction; state: unknown }> = [];
   private static isEnabled: boolean = process.env.NODE_ENV === 'development';
 
   static log<T>(action: StateAction, state: T): void {
@@ -253,7 +253,7 @@ export class StateDebugger {
 
   }
 
-  static getLogs(): Array<{ timestamp: Date; action: StateAction; state: any }> {
+  static getLogs(): Array<{ timestamp: Date; action: StateAction; state: unknown }> {
     return [...this.logs];
   }
 
@@ -282,7 +282,7 @@ export const stateMiddleware = {
     next();
     // Save state after action is applied
     setTimeout(() => {
-      const state = (action as any).__store?.getState();
+      const state = (action as { __store?: { getState: () => unknown } }).__store?.getState();
       if (state) {
         StatePersistence.save(key, state);
       }
@@ -294,9 +294,9 @@ export const stateMiddleware = {
     next();
     // Validate state after action is applied
     setTimeout(() => {
-      const state = (action as any).__store?.getState();
+      const state = (action as { __store?: { getState: () => unknown } }).__store?.getState();
       if (state) {
-        const result = validator(state);
+        const result = validator(state as T);
         if (!result.valid) {
         }
       }

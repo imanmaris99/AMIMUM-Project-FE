@@ -2,6 +2,12 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { ErrorHandler, withRetry, safeAsync } from "./errorHandler";
 import { SessionManager } from "./auth";
 
+interface AxiosRequestConfigWithMetadata extends AxiosRequestConfig {
+  metadata?: {
+    startTime: number;
+  };
+}
+
 // Enhanced axios client with comprehensive error handling
 const axiosClient = axios.create({
   baseURL: "https://amimumprojectbe-production.up.railway.app",
@@ -31,7 +37,7 @@ axiosClient.interceptors.request.use(
       config.headers['X-Request-ID'] = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
       // Add timestamp for debugging
-      (config as any).metadata = { startTime: Date.now() };
+      (config as AxiosRequestConfigWithMetadata).metadata = { startTime: Date.now() };
 
       return config;
     } catch (error) {

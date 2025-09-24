@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/contexts/CartContext";
 import { TransactionProvider } from "@/contexts/TransactionContext";
@@ -11,6 +12,20 @@ import ToastProvider from "@/components/ui/ToastProvider";
 import { ClientErrorBoundary } from "@/components/common/ClientErrorBoundary";
 // Performance and analytics imports removed - will be initialized in client components
 
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["200", "400", "700", "800"],
+  variable: "--font-plus-jakarta-sans",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["200", "400", "700", "800"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "AmImUm",
   description: "Toko Herbal AmImUm",
@@ -22,12 +37,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html lang="en" suppressHydrationWarning={true} className={`${plusJakartaSans.variable} ${inter.variable}`}>
       <head suppressHydrationWarning={true}>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100;400;700;900&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;700;900&display=swap" rel="stylesheet" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <meta name="viewport" content="width=device-width, initial-scale=1" suppressHydrationWarning={true} />
         <meta name="theme-color" content="#001E14" suppressHydrationWarning={true} />
         <meta name="description" content="Toko Herbal AmImUm - Produk herbal berkualitas tinggi" suppressHydrationWarning={true} />
