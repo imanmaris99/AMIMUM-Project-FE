@@ -48,7 +48,10 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
 
   return (
     <div onClick={() => product.id && handleSelectProduct(product.id)} className="w-40 h-56 rounded-lg shadow-md flex flex-col justify-center items-center gap-2 relative cursor-pointer">
-      <div className="absolute top-2 right-2">
+      <div 
+        className="absolute top-2 right-2"
+        onClick={(e) => e.stopPropagation()}
+      >
         <WishlistButton 
           product={product} 
           className="bg-white rounded-full p-1 hover:bg-gray-50"
