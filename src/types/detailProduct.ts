@@ -63,7 +63,7 @@ export interface ProductType {
 export interface BrandDetailType {
     id: number;
     name: string;
-    photo_url: string;
+    photo_url: string | null;
     description_list: string[];
     category: string;
     total_product: number;

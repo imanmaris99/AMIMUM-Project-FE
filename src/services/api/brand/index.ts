@@ -1,6 +1,7 @@
 import axiosClient from "@/lib/axiosClient";
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/apiConfig";
 import { BrandsResponseType, ProductionProps, PromoProps, PromosResponseType } from "@/types/apiTypes";
+import { BrandDetailType, BrandDetailResponseType } from "@/types/detailProduct";
 
 export const GetAllPromo = async () => {
     try {
@@ -205,17 +206,78 @@ export async function GetAllBrandServer(): Promise<ProductionProps[]> {
   }
 }
 
-export async function GetBrandDetailByIDServer(brandDetailId: number) {
-  const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.BRAND_DETAIL(brandDetailId)}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    // next: { revalidate: 60 }, // jika ingin ISR
-  });
-  if (!res.ok) {
-    throw new Error(`Gagal mengambil data brand: ${res.status}`);
+/**
+ * Fetch brand/production detail by ID (Server-side)
+ * Handles API response structure and error codes according to Swagger documentation:
+ * - 200 OK: Returns brand detail
+ * - 404 Not Found: Throws error with not found message
+ * - 409 Conflict: Throws error with conflict message
+ * - 422 Validation Error: Throws error with validation message
+ * - 500 Internal Server Error: Throws error with server error message
+ * 
+ * @param productionId - ID of the production/brand to fetch
+ * @returns Promise<BrandDetailType> Brand detail data
+ * @throws Error if request fails (404, 409, 422, 500, or network error)
+ */
+export async function GetBrandDetailByIDServer(productionId: number): Promise<BrandDetailType> {
+  try {
+    const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.BRAND_DETAIL(productionId)}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      next: { revalidate: 60 },
+    });
+
+    // Handle different status codes according to API documentation
+    if (res.status === 404) {
+      // Not Found
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage = errorData.message || 'Production with the specified ID was not found.';
+      throw new Error(errorMessage);
+    }
+
+    if (res.status === 409) {
+      // Conflict error
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage = errorData.message || 'A conflict occurred while retrieving production details.';
+      throw new Error(errorMessage);
+    }
+
+    if (res.status === 422) {
+      // Validation Error
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage = errorData.detail?.[0]?.msg || 'Validation error occurred.';
+      throw new Error(errorMessage);
+    }
+
+    if (res.status === 500) {
+      // Internal Server Error
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage = errorData.message || 'An unexpected error occurred while retrieving production details.';
+      throw new Error(errorMessage);
+    }
+
+    if (!res.ok) {
+      // Other errors
+      throw new Error(`Gagal mengambil data brand: ${res.status}`);
+    }
+
+    // Parse response
+    const data: BrandDetailResponseType = await res.json();
+    
+    // Validate response structure
+    if (!data || !data.data) {
+      throw new Error('Invalid response format: data is missing');
+    }
+
+    // Return the brand detail data
+    return data.data;
+  } catch (error) {
+    // Re-throw with more context if needed
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Unknown error occurred while fetching brand detail');
   }
-  const data = await res.json();
-  return data;
 }
