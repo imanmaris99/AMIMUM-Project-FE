@@ -6,14 +6,24 @@ import {
   TotalCartItemsResponseType,
   ArticlesResponseType,
   ArticleProps,
+  CategoriesResponseType,
+  CategoryProps,
 } from "@/types/apiTypes";
 import { API_ENDPOINTS } from "@/lib/apiConfig";
 
-export const fetchCategories = async () => {
+export const fetchCategories = async (): Promise<CategoryProps[]> => {
   try {
-    const response = await axiosClient.get(API_ENDPOINTS.CATEGORIES_ALL);
-    return response.data ? response.data : response;
+    const response: CategoriesResponseType = await axiosClient.get(API_ENDPOINTS.CATEGORIES_ALL);
+    
+    // Validate response structure
+    if (!response || !response.data || !Array.isArray(response.data)) {
+      throw new Error('Invalid response format: data is not an array');
+    }
+    
+    // Return the categories array from response.data
+    return response.data;
   } catch (error) {
+    // Error handling is done by axiosClient interceptor
     throw error;
   }
 };

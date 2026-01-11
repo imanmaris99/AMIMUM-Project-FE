@@ -1,6 +1,2 @@
-export interface CategoryProps {
-    id: number;
-    name: string;
-    description_list: string[];
-    created_at: string;
-}
+// Import from centralized types to ensure consistency with API
+export type { CategoryProps } from "@/types/apiTypes";

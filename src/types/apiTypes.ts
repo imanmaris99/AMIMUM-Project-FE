@@ -1,8 +1,14 @@
 export interface CategoryProps {
   id: number;
   name: string;
-  description_list: string[];
+  description: string;
   created_at: string;
+}
+
+export interface CategoriesResponseType {
+  status_code: number;
+  message: string;
+  data: CategoryProps[];
 }
 
 export interface UserProfileProps {
