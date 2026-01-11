@@ -59,7 +59,7 @@ const DetailBrand = ({ brandDetail, errorMessage, promoProductCount }: DetailBra
               alt={brandDetail.name || "brand"}
               width={70}
               height={70}
-              style={{ width: "auto", height: "auto" }}
+              style={{ width: "70px", height: "70px", objectFit: "contain" }}
               unoptimized
             />
           ) : (
@@ -71,7 +71,7 @@ const DetailBrand = ({ brandDetail, errorMessage, promoProductCount }: DetailBra
               alt={brandDetail.name || "brand"}
               width={70}
               height={70}
-              style={{ width: "auto", height: "auto", maxWidth: "70px", maxHeight: "70px" }}
+              style={{ width: "70px", height: "70px", objectFit: "contain" }}
               className="object-contain"
               onError={handleImageError}
               loading="lazy"
