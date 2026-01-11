@@ -1,9 +1,9 @@
 import { FiPackage, FiLayers, FiAlertCircle } from "react-icons/fi";
-import { VariantType } from "@/types/detailProduct";
+import { VariantProductType } from "@/types/detailProduct";
 import Spinner from "@/components/ui/Spinner";
 
 interface ProductInformationProps {
-  datavariant: VariantType | undefined;
+  datavariant: VariantProductType | undefined;
   isError: number;
   isLoading: boolean;
 }
@@ -53,6 +53,17 @@ const ProductInformation = ({
     }
   }
 
+  // Show message if variant is not selected
+  if (!datavariant) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm">
+        <div className="p-4 text-center text-gray-500 text-sm">
+          <p>Pilih varian produk untuk melihat informasi lengkap</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-sm">
       <div className="p-4 space-y-2 text-gray-500 text-sm">
@@ -62,11 +73,13 @@ const ProductInformation = ({
         </div>
         <div className="flex items-center space-x-2">
           <FiLayers className="text-gray-500" />
-          <span>Stock: {datavariant?.stock} pack</span>
+          <span>Stock: {datavariant.stock} pack</span>
         </div>
         <div className="flex items-center space-x-2">
           <FiAlertCircle className="text-gray-500" />
-          <span>Baik dikonsumsi hingga {datavariant?.expiration}</span>
+          <span>
+            Baik dikonsumsi hingga {datavariant.expiration || "Tidak tersedia"}
+          </span>
         </div>
       </div>
     </div>

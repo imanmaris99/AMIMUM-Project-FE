@@ -104,7 +104,8 @@ export async function GetProductsByProductionIdServer(productionId: number): Pro
     // API response may not have 'image' field, so we derive it from all_variants[0].img
     const mappedProducts: AllProductInfoType[] = data.data.map((product) => {
       // Ensure image is always present - derive from first variant if not provided
-      const productImage = (product as any).image || 
+      const productWithImage = product as AllProductInfoType & { image?: string };
+      const productImage = productWithImage.image || 
         (product.all_variants && product.all_variants.length > 0 && product.all_variants[0]?.img
           ? product.all_variants[0].img
           : "/default-image.jpg");
