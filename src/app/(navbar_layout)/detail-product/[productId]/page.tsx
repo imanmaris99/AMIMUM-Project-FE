@@ -1,23 +1,7 @@
-import { Suspense } from "react";
 import DetailProductClient from "./DetailProductClient";
 import { getDetailProductServer } from "@/services/api/detail-product";
 import { ErrorHandler } from "@/lib/errorHandler";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
-
-async function DetailProductContent({ productId }: { productId: string }) {
-  let detailProduct = null;
-  let errorMessage: string | null = null;
-
-  try {
-    detailProduct = await getDetailProductServer(productId);
-  } catch (error) {
-    errorMessage = error instanceof Error ? error.message : 'Gagal mengambil detail produk.';
-    console.error('Error fetching product detail:', error);
-    ErrorHandler.handleError(error instanceof Error ? error : new Error(String(error)), 'DetailProduct');
-  }
-
-  return <DetailProductClient detailProduct={detailProduct} errorMessage={errorMessage} />;
-}
 
 export default async function DetailProduct({ params }: { params: Promise<{ productId: string }> }) {
   const { productId } = await params;
@@ -39,21 +23,16 @@ export default async function DetailProduct({ params }: { params: Promise<{ prod
     );
   }
 
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-white">
-        <UnifiedHeader 
-          type="secondary"
-          title="Detail Item"
-          subtitle="Informasi lengkap produk"
-          showBackButton={true}
-        />
-        <div className="px-4 py-6 text-center">
-          <p>Memuat detail produk...</p>
-        </div>
-      </div>
-    }>
-      <DetailProductContent productId={productId} />
-    </Suspense>
-  );
+  let detailProduct = null;
+  let errorMessage: string | null = null;
+
+  try {
+    detailProduct = await getDetailProductServer(productId);
+  } catch (error) {
+    errorMessage = error instanceof Error ? error.message : 'Gagal mengambil detail produk.';
+    console.error('Error fetching product detail:', error);
+    ErrorHandler.handleError(error instanceof Error ? error : new Error(String(error)), 'DetailProduct');
+  }
+
+  return <DetailProductClient detailProduct={detailProduct} errorMessage={errorMessage} />;
 }

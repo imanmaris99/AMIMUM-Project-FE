@@ -31,7 +31,6 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
 
   // Validate product data if available
   const isValidProduct = detailProduct && validateDetailProductData(detailProduct);
-  const isLoading = detailProduct === null && errorMessage === null;
   const isError = errorMessage ? 500 : 0;
 
   // Show error state
@@ -47,24 +46,6 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
         />
         <div className="px-4 py-6 text-center">
           <p className="text-red-500">{errorMessage}</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white">
-        <UnifiedHeader 
-          type="secondary"
-          title="Detail Item"
-          subtitle="Informasi lengkap produk"
-          showBackButton={true}
-          onBack={handleBack}
-        />
-        <div className="px-4 py-6 text-center">
-          <p>Memuat detail produk...</p>
         </div>
       </div>
     );
@@ -103,7 +84,7 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
       <div className="px-4 py-6 pb-56">
         <div className="max-w-sm mx-auto space-y-4">
           <ProductImage detailProduct={detailProduct || undefined} />
-          <TitleProduct isLoading={isLoading} isError={isError} data={detailProduct || undefined} />
+          <TitleProduct isLoading={false} isError={isError} data={detailProduct || undefined} />
           
           {/* Variants Selection */}
           <ProductVariants 
@@ -115,7 +96,7 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
           />
           
           {/* Variant Selection Prompt */}
-          {!selectedVariant && !isLoading && detailProduct?.variants_list && detailProduct.variants_list.length > 0 && (
+          {!selectedVariant && detailProduct?.variants_list && detailProduct.variants_list.length > 0 && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
               <p className="text-blue-700 text-sm font-medium">
                 📦 Pilih varian produk untuk melihat harga dan menambahkan ke keranjang
@@ -123,17 +104,17 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
             </div>
           )}
           
-          <ProductInformation isLoading={isLoading} isError={isError} datavariant={selectedVariant} />
-          <ProductDescription isLoading={isLoading} isError={isError} data={detailProduct || undefined} />
+          <ProductInformation isLoading={false} isError={isError} datavariant={selectedVariant} />
+          <ProductDescription isLoading={false} isError={isError} data={detailProduct || undefined} />
         </div>
       </div>
 
       {/* Sticky Cart Section - Only show when variant is selected */}
-      {!isLoading && selectedVariant && detailProduct && (
+      {selectedVariant && detailProduct && (
         <div className="fixed bottom-14 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-30" style={{ maxWidth: '440px', margin: '0 auto' }}>
           <div className="px-4 py-3">
             <ProductPrice 
-              isLoading={isLoading} 
+              isLoading={false} 
               isError={isError} 
               data={detailProduct} 
               datavariant={selectedVariant}
