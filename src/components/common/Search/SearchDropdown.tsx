@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useMemo, useState } from "react";
 import { PulseLoader } from "react-spinners";
 import Image from "next/image";
 import { CardProductProps } from "./CardProduct/types";
@@ -10,6 +12,71 @@ interface SearchDropdownProps {
   errorMessage: string;
   handleSelectProduct: (productId: string) => void;
 }
+
+const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardProductProps; handleSelectProduct: (productId: string) => void }) => {
+  const [imageError, setImageError] = useState(false);
+  const imageUrl = product.all_variants[0]?.img || "/buyungupik_agr-1.svg";
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  // Check if URL is external (http/https) - simple string check
+  // Use regular img tag for ALL external images to prevent Next.js Image optimizer retry loops
+  const isExternalUrl = useMemo(() => {
+    if (!imageUrl || imageError || imageUrl.startsWith('/')) {
+      return false; // Use Next.js Image for local images
+    }
+    
+    // Simple check: if URL starts with http:// or https://, it's external
+    const url = imageUrl.trim();
+    return url.startsWith('http://') || url.startsWith('https://');
+  }, [imageUrl, imageError]);
+
+  return (
+    <li
+      className="p-2 hover:bg-gray-100 cursor-pointer"
+      onClick={() => handleSelectProduct(product.id)}
+    >
+      <div className="flex items-center gap-2">
+        <div className="w-10 h-10 rounded-lg flex justify-center items-center bg-gray-100 p-1">
+          {!isExternalUrl ? (
+            // Use Next.js Image ONLY for local images (no server-side fetch issues)
+            <Image
+              src={imageUrl}
+              alt={product.name}
+              width={50}
+              height={50}
+              onError={(e) => {
+                e.currentTarget.src = "/buyungupik_agr-1.svg";
+              }}
+              unoptimized
+            />
+          ) : (
+            // Use regular img tag for ALL external images (http/https) to prevent Next.js Image optimizer retry loops
+            // This completely avoids server-side fetch attempts that cause infinite retry loops
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imageUrl}
+              alt={product.name}
+              width={50}
+              height={50}
+              style={{ maxWidth: "50px", maxHeight: "50px", objectFit: "contain" }}
+              onError={handleImageError}
+              loading="lazy"
+            />
+          )}
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-medium">{product.name}</p>
+          <p className="text-xs text-gray-500">
+            {product.all_variants.length} varian tersedia
+          </p>
+        </div>
+      </div>
+    </li>
+  );
+};
 
 const SearchDropdown: React.FC<SearchDropdownProps> = ({
   products,
@@ -31,31 +98,11 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
         </li>
       ) : (
         products?.slice(0, 5).map((product: CardProductProps) => (
-          <li
+          <SearchDropdownItem
             key={product.id}
-            className="p-2 hover:bg-gray-100 cursor-pointer"
-            onClick={() => handleSelectProduct(product.id)}
-          >
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-lg flex justify-center items-center bg-gray-100 p-1">
-                <Image
-                  src={product.all_variants[0]?.img || "/buyungupik_agr-1.svg"}
-                  alt={product.name}
-                  width={50}
-                  height={50}
-                  onError={(e) => {
-                    e.currentTarget.src = "/buyungupik_agr-1.svg";
-                  }}
-                />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">{product.name}</p>
-                <p className="text-xs text-gray-500">
-                  {product.all_variants.length} varian tersedia
-                </p>
-              </div>
-            </div>
-          </li>
+            product={product}
+            handleSelectProduct={handleSelectProduct}
+          />
         ))
       )}
     </ul>

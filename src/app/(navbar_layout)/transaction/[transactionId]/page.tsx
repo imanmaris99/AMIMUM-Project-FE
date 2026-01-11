@@ -269,24 +269,46 @@ const TransactionDetailPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">Item Pesanan</h3>
             <div className="space-y-3">
-              {transaction.items.map((item, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
-                    <Image
-                      src={item.image || "/default-image.jpg"}
-                      alt={item.name}
-                      width={48}
-                      height={48}
-                      className="w-full h-full object-cover"
-                    />
+              {transaction.items.map((item, index) => {
+                const imageUrl = item.image || "/default-image.jpg";
+                // Check if URL is external (http/https) - simple string check (no hook needed)
+                const isExternalUrl = imageUrl && !imageUrl.startsWith('/') && 
+                  (imageUrl.trim().startsWith('http://') || imageUrl.trim().startsWith('https://'));
+
+                return (
+                  <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+                      {!isExternalUrl ? (
+                        // Use Next.js Image ONLY for local images (no server-side fetch issues)
+                        <Image
+                          src={imageUrl}
+                          alt={item.name}
+                          width={48}
+                          height={48}
+                          className="w-full h-full object-cover"
+                          unoptimized
+                        />
+                      ) : (
+                        // Use regular img tag for ALL external images (http/https) to prevent Next.js Image optimizer retry loops
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={imageUrl}
+                          alt={item.name}
+                          width={48}
+                          height={48}
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          loading="lazy"
+                        />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-gray-900 truncate">{item.name}</h4>
+                      <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                      <p className="text-sm font-medium text-gray-900">{rupiahFormater(item.price)}</p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-medium text-gray-900 truncate">{item.name}</h4>
-                    <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
-                    <p className="text-sm font-medium text-gray-900">{rupiahFormater(item.price)}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 

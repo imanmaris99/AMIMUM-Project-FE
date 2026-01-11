@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import { BrandDetailType } from "@/types/detailProduct";
 import Spinner from "@/components/ui/Spinner";
+import { useMemo, useState } from "react";
 
 interface DetailBrandProps {
   brandDetail: BrandDetailType | null;
@@ -9,6 +12,24 @@ interface DetailBrandProps {
 }
 
 const DetailBrand = ({ brandDetail, errorMessage, promoProductCount }: DetailBrandProps) => {
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  // Check if URL is external (http/https) - simple string check
+  // Use regular img tag for ALL external images to prevent Next.js Image optimizer retry loops
+  const isExternalUrl = useMemo(() => {
+    if (!brandDetail?.photo_url || imageError) {
+      return false; // Use fallback (local image)
+    }
+    
+    // Simple check: if URL starts with http:// or https://, it's external
+    const url = brandDetail.photo_url.trim();
+    return url.startsWith('http://') || url.startsWith('https://');
+  }, [brandDetail?.photo_url, imageError]);
+
   if (errorMessage) {
     return <div className="text-red-500 text-center mt-4">{errorMessage}</div>;
   }
@@ -31,13 +52,31 @@ const DetailBrand = ({ brandDetail, errorMessage, promoProductCount }: DetailBra
       </div>
       <div className="bg-customGreen4 p-4 rounded-lg mt-4 min-h-24 flex items-center">
         <div className="flex items-center gap-4">
-          <Image
-            src={brandDetail.photo_url || "/default-image.jpg"}
-            alt={brandDetail.name || "brand"}
-            width={70}
-            height={70}
-            style={{ width: "auto", height: "auto" }}
-          />
+          {!isExternalUrl ? (
+            // Use Next.js Image ONLY for local images (no server-side fetch issues)
+            <Image
+              src="/default-image.jpg"
+              alt={brandDetail.name || "brand"}
+              width={70}
+              height={70}
+              style={{ width: "auto", height: "auto" }}
+              unoptimized
+            />
+          ) : (
+            // Use regular img tag for ALL external images (http/https) to prevent Next.js Image optimizer retry loops
+            // This completely avoids server-side fetch attempts that cause infinite retry loops
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={brandDetail.photo_url || "/default-image.jpg"}
+              alt={brandDetail.name || "brand"}
+              width={70}
+              height={70}
+              style={{ width: "auto", height: "auto", maxWidth: "70px", maxHeight: "70px" }}
+              className="object-contain"
+              onError={handleImageError}
+              loading="lazy"
+            />
+          )}
           <div>
             <h1 className="font-bold">{brandDetail.name || "Brand Name"}</h1>
             <p className="text-xs text-gray-500">{brandDetail.category || "Brand Category"}</p>

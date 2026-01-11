@@ -75,9 +75,10 @@ export default function HomeClient({
   const validProductions = filteredProductions.filter(validateProductionData);
     const invalidProductions = filteredProductions.filter((prod: unknown) => !validateProductionData(prod));
   
-  // Log validation results
+  // Log validation results (silently, without showing toast to user)
   if (invalidProductions.length > 0) {
-    ErrorHandler.handleError(new Error(`${invalidProductions.length} invalid productions found and filtered out`), 'HomepageValidation');
+    // Only log to console, don't show toast notification
+    console.warn(`${invalidProductions.length} invalid productions found and filtered out`);
   }
   
   // Use valid productions only, with fallback to empty array if none valid

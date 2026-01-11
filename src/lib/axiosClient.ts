@@ -57,18 +57,21 @@ axiosClient.interceptors.response.use(
     // Log successful requests
     // const duration = Date.now() - ((response.config as any).metadata?.startTime || 0);
     
-    // Validate response data structure
+    // Validate response data structure (soft validation - don't throw for minor issues)
     if (!response.data || typeof response.data !== 'object') {
-      throw new Error('Invalid response format: response data is not an object');
+      console.warn('Warning: Response data is not an object', response.data);
+      // Don't throw, just return the data as-is
+      return response.data;
     }
 
-    // Validate common API response structure
-    if (response.data.status_code && typeof response.data.status_code !== 'number') {
-      throw new Error('Invalid response format: status_code must be a number');
+    // Soft validation - only log warnings, don't throw errors
+    // This prevents unnecessary error notifications for minor format issues
+    if (response.data.status_code !== undefined && typeof response.data.status_code !== 'number') {
+      console.warn('Warning: status_code is not a number', response.data.status_code);
     }
 
-    if (response.data.message && typeof response.data.message !== 'string') {
-      throw new Error('Invalid response format: message must be a string');
+    if (response.data.message !== undefined && typeof response.data.message !== 'string') {
+      console.warn('Warning: message is not a string', response.data.message);
     }
 
     // Log response validation

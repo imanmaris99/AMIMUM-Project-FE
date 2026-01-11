@@ -5,9 +5,29 @@ import { CardProductProps } from "./types";
 import rupiahFormater from "@/utils/rupiahFormater";
 import useSearchLogic from "../useSearchLogic";
 import WishlistButton from "@/components/common/WishlistButton";
+import { useMemo, useState } from "react";
 
 const CardProduct = ({ product }: { product: CardProductProps }) => {
   const { handleSelectProduct } = useSearchLogic();
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  const imageUrl = product.all_variants[0]?.img || "/buyungupik_agr-1.svg";
+  
+  // Check if URL is external (http/https) - simple string check
+  // Use regular img tag for ALL external images to prevent Next.js Image optimizer retry loops
+  const isExternalUrl = useMemo(() => {
+    if (!imageUrl || imageError || imageUrl.startsWith('/')) {
+      return false; // Use Next.js Image for local images
+    }
+    
+    // Simple check: if URL starts with http:// or https://, it's external
+    const url = imageUrl.trim();
+    return url.startsWith('http://') || url.startsWith('https://');
+  }, [imageUrl, imageError]);
 
   // Validate product data
   if (!product || !product.all_variants || product.all_variants.length === 0) {
@@ -68,19 +88,37 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
 
       <div className="flex flex-col justify-center items-center">
         <div className="bg-gray-100 w-32 h-28 rounded-lg flex justify-center items-center">
-          <Image
-            src={product.all_variants[0]?.img || "/buyungupik_agr-1.svg"}
-            alt={product.name}
-            width={100}
-            height={100}
-            className="rounded-lg"
-            loading="lazy"
-            placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-            onError={(e) => {
-              e.currentTarget.src = "/buyungupik_agr-1.svg";
-            }}
-          />
+          {!isExternalUrl ? (
+            // Use Next.js Image ONLY for local images (no server-side fetch issues)
+            <Image
+              src={imageUrl}
+              alt={product.name}
+              width={100}
+              height={100}
+              className="rounded-lg"
+              loading="lazy"
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+              onError={(e) => {
+                e.currentTarget.src = "/buyungupik_agr-1.svg";
+              }}
+              unoptimized
+            />
+          ) : (
+            // Use regular img tag for ALL external images (http/https) to prevent Next.js Image optimizer retry loops
+            // This completely avoids server-side fetch attempts that cause infinite retry loops
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imageUrl}
+              alt={product.name}
+              width={100}
+              height={100}
+              className="rounded-lg"
+              style={{ maxWidth: "100px", maxHeight: "100px", objectFit: "contain" }}
+              onError={handleImageError}
+              loading="lazy"
+            />
+          )}
         </div>
       </div>
       <div className="flex flex-col justify-center w-32 min-h-20">

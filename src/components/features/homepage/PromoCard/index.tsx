@@ -4,13 +4,31 @@ import Image from "next/image";
 import { PromoProps } from "./types";
 import styles from "./PromoCard.module.css";
 import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 
 const PromoCard = ({ promo }: { promo: PromoProps }) => {
   const router = useRouter();
+  const [imageError, setImageError] = useState(false);
 
   const handleCardClick = () => {
     router.push(`/promo/${promo.id}`);
   };
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  // Check if URL is external (http/https) - simple string check
+  // Use regular img tag for ALL external images to prevent Next.js Image optimizer retry loops
+  const isExternalUrl = useMemo(() => {
+    if (!promo.photo_url || imageError) {
+      return false; // Use fallback (local image)
+    }
+    
+    // Simple check: if URL starts with http:// or https://, it's external
+    const url = promo.photo_url.trim();
+    return url.startsWith('http://') || url.startsWith('https://');
+  }, [promo.photo_url, imageError]);
 
   return (
     <>
@@ -19,14 +37,32 @@ const PromoCard = ({ promo }: { promo: PromoProps }) => {
         className="bg-customGreen5 rounded-lg h-36 flex flex-col items-center justify-center w-24 cursor-pointer"
       >
         <div className="bg-white rounded-lg px-3 py-2 flex flex-col justify-center items-center w-20 h-20">
-          <Image
-            src={promo.photo_url || "/default-image.jpg"}
-            alt="promo"
-            width={50}
-            height={50}
-            style={{ width: "auto", height: "auto" }}
-            priority
-          />
+          {!isExternalUrl ? (
+            // Use Next.js Image ONLY for local images (no server-side fetch issues)
+            <Image
+              src="/default-image.jpg"
+              alt="promo"
+              width={50}
+              height={50}
+              style={{ width: "auto", height: "auto" }}
+              priority
+              unoptimized
+            />
+          ) : (
+            // Use regular img tag for ALL external images (http/https) to prevent Next.js Image optimizer retry loops
+            // This completely avoids server-side fetch attempts that cause infinite retry loops
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={promo.photo_url || "/default-image.jpg"}
+              alt="promo"
+              width={50}
+              height={50}
+              style={{ width: "auto", height: "auto", maxWidth: "50px", maxHeight: "50px" }}
+              className="object-contain"
+              onError={handleImageError}
+              loading="lazy"
+            />
+          )}
         </div>
 
         <div className="flex flex-col justify-center items-center mt-2 gap-1">

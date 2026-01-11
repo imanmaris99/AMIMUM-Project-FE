@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { CartItemType } from "@/types/apiTypes";
@@ -62,6 +62,25 @@ const CartItem: React.FC<CartItemProps> = ({
   // Use the price from the new structure
   const displayPrice = item.price;
 
+  const imageUrl = item.image || "/default-image.jpg";
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  // Check if URL is external (http/https) - simple string check
+  // Use regular img tag for ALL external images to prevent Next.js Image optimizer retry loops
+  const isExternalUrl = useMemo(() => {
+    if (!imageUrl || imageError || imageUrl.startsWith('/')) {
+      return false; // Use Next.js Image for local images
+    }
+    
+    // Simple check: if URL starts with http:// or https://, it's external
+    const url = imageUrl.trim();
+    return url.startsWith('http://') || url.startsWith('https://');
+  }, [imageUrl, imageError]);
+
   return (
     <article className="flex items-center gap-3 p-4 border border-gray-200 rounded-xl max-w-full mx-auto will-change-auto">
       {/* Checkbox */}
@@ -100,14 +119,31 @@ const CartItem: React.FC<CartItemProps> = ({
       >
         {/* Image */}
         <div className="w-[70px] h-[70px] rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 bg-gray-50 grid place-items-center">
-          <Image 
-            src={item.image} 
-            alt={item.product_name} 
-            width={70}
-            height={70}
-            className="w-full h-full object-cover"
-            sizes="70px"
-          />
+          {!isExternalUrl ? (
+            // Use Next.js Image ONLY for local images (no server-side fetch issues)
+            <Image 
+              src={imageUrl} 
+              alt={item.product_name} 
+              width={70}
+              height={70}
+              className="w-full h-full object-cover"
+              sizes="70px"
+              unoptimized
+            />
+          ) : (
+            // Use regular img tag for ALL external images (http/https) to prevent Next.js Image optimizer retry loops
+            // This completely avoids server-side fetch attempts that cause infinite retry loops
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imageUrl}
+              alt={item.product_name}
+              width={70}
+              height={70}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              onError={handleImageError}
+              loading="lazy"
+            />
+          )}
         </div>
 
         {/* Text */}

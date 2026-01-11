@@ -37,10 +37,16 @@ export interface PromoProps {
 export interface ProductionProps {
   id: number;
   name: string;
-  photo_url: string;
+  photo_url: string | null;
   description_list: string[];
   category: string;
   created_at: string;
+}
+
+export interface BrandsResponseType {
+  status_code: number;
+  message: string;
+  data: ProductionProps[];
 }
 
 // Tipe data yang sesuai dengan backend DetailProductionDto

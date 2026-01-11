@@ -1,8 +1,2 @@
-export interface ProductionProps {
-    id: number;
-    name: string;
-    photo_url: string;
-    description_list: string[];
-    category: string;
-    created_at: string;
-}
+// Import from centralized types to ensure consistency with API
+export type { ProductionProps } from "@/types/apiTypes";
