@@ -70,7 +70,13 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
     <div onClick={() => product.id && handleSelectProduct(product.id)} className="w-40 h-56 rounded-lg shadow-md flex flex-col justify-center items-center gap-2 relative cursor-pointer">
       <div className="absolute top-2 right-2">
         <WishlistButton 
-          product={product} 
+          product={{
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image || (product.all_variants && product.all_variants.length > 0 ? product.all_variants[0].img : "/default-image.jpg"),
+            brand: product.brand_info?.name,
+          }} 
           className="bg-white rounded-full p-1 hover:bg-gray-50"
           size="md"
         />

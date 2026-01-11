@@ -3,10 +3,10 @@ import ProductListWithPagination from "@/components/DetailBrand/ProductListWithP
 import SearchProductByBrand from "@/components/DetailBrand/SearchProductByBrand";
 import { BrandDetailType } from "@/types/detailProduct";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
-import { getCardProductsByBrand } from "@/data/dataUtils";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 import { validateProductData } from "@/utils/dataValidation";
 import { GetBrandDetailByIDServer } from "@/services/api/brand";
+import { GetProductsByProductionIdServer } from "@/services/api/product";
 
 export default async function BrandPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params;
@@ -47,19 +47,27 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
     console.error('Error fetching brand detail:', error);
   }
     
-  // Fetch products (still using dummy data for now, can be updated later)
-  // TODO: Integrate with API endpoint /product/production/{brandId} when ready
-  const allProducts = getCardProductsByBrand(brandId);
-  
-  // Validate products data
-  const validProducts = allProducts.filter(validateProductData);
-  const invalidProducts = allProducts.filter(prod => !validateProductData(prod));
-  
-  if (invalidProducts.length > 0) {
-    console.warn(`${invalidProducts.length} invalid products found and filtered out`);
+  // Fetch products from API
+  try {
+    const allProducts = await GetProductsByProductionIdServer(productionId);
+    
+    // Log for debugging
+    console.log('Fetched products:', allProducts.length, allProducts);
+    
+    // Validate products data
+    const validProducts = allProducts.filter(validateProductData);
+    const invalidProducts = allProducts.filter(prod => !validateProductData(prod));
+    
+    if (invalidProducts.length > 0) {
+      console.warn(`${invalidProducts.length} invalid products found and filtered out:`, invalidProducts);
+    }
+    
+    products = validProducts;
+  } catch (error) {
+    // Error fetching products is not fatal - page can still show brand detail
+    console.error('Error fetching products:', error);
+    products = [];
   }
-  
-  products = validProducts;
   
   return (
     <main className="pb-20">

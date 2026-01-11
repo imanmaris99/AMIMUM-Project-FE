@@ -12,17 +12,44 @@ export function validateProductData(product: unknown): product is AllProductInfo
   if (!product || typeof product !== 'object') return false;
   
   const p = product as Record<string, unknown>;
-  return !!(
-    typeof p.id === 'string' &&
-    typeof p.name === 'string' &&
-    typeof p.price === 'number' &&
-    p.price > 0 &&
-    p.brand_info &&
-    validateBrandInfo(p.brand_info) &&
-    Array.isArray(p.all_variants) &&
-    p.all_variants.every(validateVariantData) &&
-    typeof p.created_at === 'string'
-  );
+  
+  // Check required fields
+  if (
+    typeof p.id !== 'string' ||
+    typeof p.name !== 'string' ||
+    typeof p.price !== 'number' ||
+    p.price <= 0 ||
+    !p.brand_info ||
+    !Array.isArray(p.all_variants) ||
+    typeof p.created_at !== 'string'
+  ) {
+    return false;
+  }
+  
+  // Validate brand_info (photo_url is optional in API response)
+  const brandInfo = p.brand_info as Record<string, unknown>;
+  if (
+    typeof brandInfo.id !== 'number' ||
+    typeof brandInfo.name !== 'string'
+  ) {
+    return false;
+  }
+  
+  // Validate variants - at least one variant must be valid
+  if (p.all_variants.length === 0) {
+    return false;
+  }
+  
+  // Validate that at least one variant is valid (not all variants need to be valid)
+  const hasValidVariant = p.all_variants.some(validateVariantData);
+  if (!hasValidVariant) {
+    return false;
+  }
+  
+  // image field is optional in raw API response but will be derived from variants
+  // After mapping in service API, image will always be present
+  
+  return true;
 }
 
 export function validateVariantData(variant: unknown): variant is VariantAllProductType {
@@ -45,10 +72,11 @@ export function validateBrandInfo(brand: unknown): brand is BrandInfoType {
   if (!brand || typeof brand !== 'object') return false;
   
   const b = brand as Record<string, unknown>;
+  // photo_url is optional in API response, so we make it optional in validation
   return !!(
     typeof b.id === 'number' &&
     typeof b.name === 'string' &&
-    typeof b.photo_url === 'string'
+    (typeof b.photo_url === 'string' || b.photo_url === undefined || b.photo_url === null)
   );
 }
 

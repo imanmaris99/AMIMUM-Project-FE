@@ -101,7 +101,7 @@ export interface BrandFilteredLoader {
 export interface BrandInfoType {
   id: number;
   name: string;
-  photo_url: string;
+  photo_url?: string; // Optional - not always present in API response
 }
 
 export interface VariantAllProductType {
@@ -117,7 +117,7 @@ export interface AllProductInfoType {
   id: string;
   name: string;
   price: number;
-  image: string;
+  image: string; // Always present - derived from all_variants[0].img if not provided by API
   brand_info: BrandInfoType;
   all_variants: VariantAllProductType[];
   created_at: string;

@@ -73,7 +73,13 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <WishlistButton 
-          product={product} 
+          product={{
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image || (product.all_variants && product.all_variants.length > 0 ? product.all_variants[0].img : "/default-image.jpg"),
+            brand: product.brand_info?.name,
+          }} 
           className="bg-white rounded-full p-1 hover:bg-gray-50"
           size="md"
         />

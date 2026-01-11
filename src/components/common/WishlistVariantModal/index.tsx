@@ -38,7 +38,7 @@ const WishlistVariantModal: React.FC<WishlistVariantModalProps> = ({
           variant: selectedVariant,
           quantity: 1,
           price: selectedVariantData.discounted_price || product.price,
-          image: selectedVariantData.img || product.image,
+          image: selectedVariantData.img || product.image || (product.all_variants && product.all_variants.length > 0 ? product.all_variants[0].img : "/default-image.jpg"),
           addedAt: new Date().toISOString(),
           brand: product.brand_info?.name,
           originalPrice: product.price,
