@@ -1,6 +1,6 @@
 import axiosClient from "@/lib/axiosClient";
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/apiConfig";
-import { BrandsResponseType, ProductionProps } from "@/types/apiTypes";
+import { BrandsResponseType, ProductionProps, PromoProps, PromosResponseType } from "@/types/apiTypes";
 
 export const GetAllPromo = async () => {
     try {
@@ -80,20 +80,70 @@ export const GetBrandFilterLoader = async (categoryId: number, skip = 0, limit =
     }
 }
 
-// Fetcher untuk Server Component (tanpa axios, tanpa localStorage, tanpa Swal)
-export async function GetAllPromoServer() {
-  const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.BRAND_PROMO}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    next: { revalidate: 60 },
-  });
-  if (!res.ok) {
-    throw new Error(`Gagal mengambil data promo: ${res.status}`);
+/**
+ * Fetch all promos (Server-side)
+ * Handles API response structure and error codes according to Swagger documentation:
+ * - 200 OK: Returns promos array
+ * - 404 Not Found: Throws error with not found message
+ * - 409 Conflict: Throws error with conflict message
+ * - 500 Internal Server Error: Throws error with server error message
+ * 
+ * @returns Promise<PromoProps[]> Array of promos
+ * @throws Error if request fails (404, 409, 500, or network error)
+ */
+export async function GetAllPromoServer(): Promise<PromoProps[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.BRAND_PROMO}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      next: { revalidate: 60 },
+    });
+
+    // Handle different status codes according to API documentation
+    if (res.status === 404) {
+      // Not Found - return empty array instead of throwing error
+      // This is a valid response when no promos are available
+      return [];
+    }
+
+    if (res.status === 409) {
+      // Conflict error
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage = errorData.message || 'Konflik terjadi saat mencoba mengambil data promosi.';
+      throw new Error(errorMessage);
+    }
+
+    if (res.status === 500) {
+      // Internal Server Error
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage = errorData.message || 'Kesalahan tak terduga saat mengambil data promosi.';
+      throw new Error(errorMessage);
+    }
+
+    if (!res.ok) {
+      // Other errors
+      throw new Error(`Gagal mengambil data promo: ${res.status}`);
+    }
+
+    // Parse response
+    const data: PromosResponseType = await res.json();
+    
+    // Validate response structure
+    if (!data || !data.data || !Array.isArray(data.data)) {
+      throw new Error('Invalid response format: data is not an array');
+    }
+
+    // Return the promos array from response.data
+    return data.data;
+  } catch (error) {
+    // Re-throw with more context if needed
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Unknown error occurred while fetching promos');
   }
-  const data = await res.json();
-  return data;
 }
 
 /**

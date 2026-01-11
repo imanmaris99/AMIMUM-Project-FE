@@ -30,8 +30,14 @@ export interface UserProfileProps {
 export interface PromoProps {
   id: number;
   name: string;
-  photo_url: string;
+  photo_url: string | null;
   promo_special: number;
+}
+
+export interface PromosResponseType {
+  status_code: number;
+  message: string;
+  data: PromoProps[];
 }
 
 export interface ProductionProps {

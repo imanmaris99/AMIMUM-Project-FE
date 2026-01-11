@@ -1,11 +1,7 @@
 import HomeClient from "./HomeClient";
-import { getHomepageData } from "@/data/dataUtils";
 import { fetchArticlesServer } from "@/services/api/articles";
 import { fetchCategoriesServer } from "@/services/api/tag-categories";
-import { GetAllBrandServer } from "@/services/api/brand";
-
-// Menggunakan centralized data management untuk promo
-const homepageData = getHomepageData();
+import { GetAllBrandServer, GetAllPromoServer } from "@/services/api/brand";
 
 export default async function Home() {
   // Fetch categories from API
@@ -32,6 +28,18 @@ export default async function Home() {
     console.error('Error fetching productions:', error);
   }
 
+  // Fetch promos from API
+  let promos = null;
+  let promoError: string | null = null;
+  
+  try {
+    promos = await GetAllPromoServer();
+  } catch (error) {
+    promoError = error instanceof Error ? error.message : 'Gagal mengambil data promo';
+    // Log error for debugging
+    console.error('Error fetching promos:', error);
+  }
+
   // Fetch articles from API
   let articles = null;
   let articleError: string | null = null;
@@ -50,8 +58,8 @@ export default async function Home() {
       productions={productions}
       categoryError={categoryError}
       productionError={productionError}
-      promo={homepageData.promo.data}
-      promoError={null}
+      promo={promos}
+      promoError={promoError}
       articles={articles}
       articleError={articleError}
     />
