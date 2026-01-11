@@ -1,9 +1,10 @@
 import axiosClient from "@/lib/axiosClient";
 import { DetailProductResponseType } from "@/types/detailProduct";
+import { API_BASE_URL, API_ENDPOINTS } from "@/lib/apiConfig";
 
 export const getDetailProduct = async (productId: string) => {
     try {
-        const response: DetailProductResponseType = await axiosClient.get(`/product/detail/${productId}`);
+        const response: DetailProductResponseType = await axiosClient.get(API_ENDPOINTS.PRODUCT_DETAIL(productId));
         return response.data;
     } catch (error) {
         throw error;
@@ -12,7 +13,7 @@ export const getDetailProduct = async (productId: string) => {
 
 // Fungsi khusus untuk SSR/Server Component
 export async function getDetailProductServer(productId: string) {
-  const res = await fetch(`https://amimumprojectbe-production.up.railway.app/product/detail/${productId}`, {
+  const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.PRODUCT_DETAIL(productId)}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     // next: { revalidate: 60 }, // optional: ISR

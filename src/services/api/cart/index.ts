@@ -1,5 +1,7 @@
+import { API_BASE_URL, API_ENDPOINTS } from "@/lib/apiConfig";
+
 export async function getCartServer() {
-  const res = await fetch("https://amimumprojectbe-production.up.railway.app/cart", {
+  const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.CART_MY_CART}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

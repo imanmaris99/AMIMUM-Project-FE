@@ -1,5 +1,6 @@
 // Security Configuration and Utilities
 import { escapeHtml, sanitizeInput } from './auth';
+import { API_BASE_URL } from './apiConfig';
 
 // Content Security Policy configuration
 export const CSP_CONFIG = {
@@ -8,7 +9,7 @@ export const CSP_CONFIG = {
   'style-src': ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
   'font-src': ["'self'", "https://fonts.gstatic.com"],
   'img-src': ["'self'", "data:", "https:"],
-  'connect-src': ["'self'", "https://amimumprojectbe-production.up.railway.app"],
+  'connect-src': ["'self'", API_BASE_URL],
   'frame-src': ["'none'"],
   'object-src': ["'none'"],
   'base-uri': ["'self'"],

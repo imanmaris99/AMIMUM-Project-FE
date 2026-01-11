@@ -1,8 +1,9 @@
 import axiosClient from "@/lib/axiosClient";
+import { API_BASE_URL, API_ENDPOINTS } from "@/lib/apiConfig";
 
 export const fetchCategories = async () => {
     try {
-        const response = await axiosClient.get("/categories/all");
+        const response = await axiosClient.get(API_ENDPOINTS.CATEGORIES_ALL);
         return response.data;
     } catch (error) {
         throw error;
@@ -11,7 +12,7 @@ export const fetchCategories = async () => {
 
 // Fetcher untuk Server Component (tanpa axios, tanpa localStorage, tanpa Swal)
 export async function fetchCategoriesServer() {
-  const res = await fetch("https://amimumprojectbe-production.up.railway.app/categories/all", {
+  const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.CATEGORIES_ALL}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

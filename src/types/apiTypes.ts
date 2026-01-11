@@ -56,10 +56,16 @@ export interface ProductionDetailResponseType {
 }
 
 export interface ArticleProps {
-  display_id: string;
+  display_id: number;
   title: string;
   img: string;
   description_list: string[];
+}
+
+export interface ArticlesResponseType {
+  status_code: number;
+  message: string;
+  data: ArticleProps[];
 }
 
 

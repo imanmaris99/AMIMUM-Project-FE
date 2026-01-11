@@ -1,8 +1,9 @@
 import axiosClient from "@/lib/axiosClient";
+import { API_BASE_URL, API_ENDPOINTS } from "@/lib/apiConfig";
 
 export const GetAllPromo = async () => {
     try {
-        const response = await axiosClient.get("/brand/promo");
+        const response = await axiosClient.get(API_ENDPOINTS.BRAND_PROMO);
         return response.data;
     } catch (error) {
         throw error;
@@ -11,7 +12,7 @@ export const GetAllPromo = async () => {
 
 export const GetAllBrand = async () => {
     try {
-        const response = await axiosClient.get("/brand/all");
+        const response = await axiosClient.get(API_ENDPOINTS.BRAND_ALL);
         return response.data;
     } catch (error) {
         throw error;
@@ -20,7 +21,7 @@ export const GetAllBrand = async () => {
 
 export const GetBrandDetailByID = async (BrandDetailId: number) => {
     try {
-        const response = await axiosClient.get(`/brand/detail/${BrandDetailId}`);
+        const response = await axiosClient.get(API_ENDPOINTS.BRAND_DETAIL(BrandDetailId));
         return response.data;
     } catch (error) {
         throw error;
@@ -29,7 +30,7 @@ export const GetBrandDetailByID = async (BrandDetailId: number) => {
 
 export const GetBrandLoader = async (skip = 0, limit = 8) => {
     try {
-        const response = await axiosClient.get("/brand/loader", {
+        const response = await axiosClient.get(API_ENDPOINTS.BRAND_LOADER, {
             params: {
                 skip,
                 limit
@@ -48,7 +49,7 @@ export const GetBrandLoader = async (skip = 0, limit = 8) => {
 
 export const GetBrandFilterLoader = async (categoryId: number, skip = 0, limit = 8) => {
     try {
-        const response = await axiosClient.get(`/brand/loader/categories/${categoryId}`, {
+        const response = await axiosClient.get(API_ENDPOINTS.BRAND_LOADER_CATEGORIES(categoryId), {
             params: {
                 skip,
                 limit
@@ -67,7 +68,7 @@ export const GetBrandFilterLoader = async (categoryId: number, skip = 0, limit =
 
 // Fetcher untuk Server Component (tanpa axios, tanpa localStorage, tanpa Swal)
 export async function GetAllPromoServer() {
-  const res = await fetch("https://amimumprojectbe-production.up.railway.app/brand/promo", {
+  const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.BRAND_PROMO}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -83,7 +84,7 @@ export async function GetAllPromoServer() {
 
 // Fetcher untuk Server Component (tanpa axios, tanpa localStorage, tanpa Swal)
 export async function GetAllBrandServer() {
-  const res = await fetch("https://amimumprojectbe-production.up.railway.app/brand/all", {
+  const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.BRAND_ALL}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -98,7 +99,7 @@ export async function GetAllBrandServer() {
 }
 
 export async function GetBrandDetailByIDServer(brandDetailId: number) {
-  const res = await fetch(`https://amimumprojectbe-production.up.railway.app/brand/detail/${brandDetailId}`, {
+  const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.BRAND_DETAIL(brandDetailId)}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

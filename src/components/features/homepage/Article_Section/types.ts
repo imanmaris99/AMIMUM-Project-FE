@@ -1,6 +1,2 @@
-export interface ArticleProps {
-    display_id: string;
-    title: string;
-    img: string;
-    description_list: string[];
-}
+// Import from centralized types to ensure consistency with API
+export type { ArticleProps } from "@/types/apiTypes";

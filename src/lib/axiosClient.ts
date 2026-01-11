@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { ErrorHandler, withRetry, safeAsync } from "./errorHandler";
 import { SessionManager } from "./auth";
+import { API_BASE_URL } from "./apiConfig";
 
 interface AxiosRequestConfigWithMetadata extends AxiosRequestConfig {
   metadata?: {
@@ -10,7 +11,7 @@ interface AxiosRequestConfigWithMetadata extends AxiosRequestConfig {
 
 // Enhanced axios client with comprehensive error handling
 const axiosClient = axios.create({
-  baseURL: "https://amimumprojectbe-production.up.railway.app",
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
