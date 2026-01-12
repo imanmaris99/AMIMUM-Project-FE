@@ -39,7 +39,7 @@ const Login = () => {
         router.push("/");
       }
     }
-  }, [router]);
+  }, [router, isSuccess]); // Add isSuccess as dependency to re-check after login
 
   // Check rate limiting
   useEffect(() => {
@@ -198,15 +198,21 @@ const Login = () => {
         setIsSuccess(true);
         toast.success(result.message || "Login dengan Google berhasil! Mengarahkan ke halaman utama...");
 
+        // Use shorter timeout and ensure redirect happens
         setTimeout(() => {
-          const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
-          if (redirectUrl) {
-            sessionStorage.removeItem('redirectAfterLogin');
-            router.push(redirectUrl);
+          // Double check authentication before redirect
+          if (SessionManager.isAuthenticated()) {
+            const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+            if (redirectUrl) {
+              sessionStorage.removeItem('redirectAfterLogin');
+              router.push(redirectUrl);
+            } else {
+              router.push("/");
+            }
           } else {
             router.push("/");
           }
-        }, 2000);
+        }, 1500);
       } else {
         setApiError(result.message || "Login dengan Google gagal. Silakan coba lagi.");
         toast.error(result.message || "Login dengan Google gagal. Silakan coba lagi.");

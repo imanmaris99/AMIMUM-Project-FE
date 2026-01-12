@@ -54,8 +54,14 @@ export const postGoogleLogin = async (data: GoogleLoginRequest): Promise<GoogleL
       const status = error.response.status;
       const errorData = error.response.data as GoogleLoginErrorResponse;
 
+      let errorMessage = errorData.message;
+      if (errorData.detail && typeof errorData.detail === 'object' && 'message' in errorData.detail) {
+        const detailObj = errorData.detail as { message?: string };
+        errorMessage = detailObj.message || errorMessage;
+      }
+
       if (status === 401) {
-        throw new Error(errorData.message || "Token tidak valid atau login gagal.");
+        throw new Error(errorMessage || "Token tidak valid atau login gagal.");
       }
 
       if (status === 404) {
@@ -73,6 +79,10 @@ export const postGoogleLogin = async (data: GoogleLoginRequest): Promise<GoogleL
       }
 
       throw new Error(errorData.message || "Login dengan Google gagal. Silakan coba lagi.");
+    }
+
+    if (axios.isAxiosError(error) && error.request) {
+      throw new Error("Tidak dapat terhubung ke server. Periksa koneksi internet Anda.");
     }
 
     if (error instanceof Error) {

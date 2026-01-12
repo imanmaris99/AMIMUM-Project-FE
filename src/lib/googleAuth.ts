@@ -20,24 +20,20 @@ export interface GoogleAuthResult {
 
 export const handleGoogleLogin = async (): Promise<GoogleAuthResult> => {
   try {
-    // Sign in with Google using Firebase
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
-    // Get ID token from Firebase
     const idToken = await user.getIdToken();
 
     if (!idToken) {
       throw new Error("Gagal mendapatkan token dari Google.");
     }
 
-    // Call backend API with ID token
     const response = await postGoogleLogin({
       id_token: idToken,
     });
 
     if (response.status_code === 200 && response.data) {
-      // Create session from API response
       const sessionUser = {
         id: response.data.id,
         email: response.data.email,
@@ -49,11 +45,10 @@ export const handleGoogleLogin = async (): Promise<GoogleAuthResult> => {
 
       const token = {
         token: generateSecureToken(),
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
         refreshToken: generateSecureToken(),
       };
 
-      // Store secure session
       SessionManager.setSession(sessionUser, token);
 
       return {
@@ -66,11 +61,17 @@ export const handleGoogleLogin = async (): Promise<GoogleAuthResult> => {
     throw new Error("Login dengan Google gagal. Silakan coba lagi.");
   } catch (error: unknown) {
     if (error instanceof Error) {
-      // Check if it's a Firebase error
-      if (error.message.includes("popup") || error.message.includes("cancelled")) {
+      if (error.message.includes("popup") || error.message.includes("cancelled") || error.message.includes("auth/popup-closed-by-user")) {
         return {
           success: false,
           message: "Login dengan Google dibatalkan.",
+        };
+      }
+
+      if (error.message.includes("auth/") || error.name === "FirebaseError") {
+        return {
+          success: false,
+          message: `Error autentikasi: ${error.message}`,
         };
       }
 
