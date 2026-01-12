@@ -1,97 +1,76 @@
 import ProductListWithPagination from "@/components/DetailBrand/ProductListWithPagination";
 import DetailBrand from "@/components/DetailBrand";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
-import { getBrandForPromo, getPromoProducts } from "@/data/dataUtils";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
+import { GetBrandDetailByIDServer } from "@/services/api/brand";
+import { GetProductDiscountByBrandIdServer } from "@/services/api/product";
+import { validateProductData } from "@/utils/dataValidation";
+import { BrandDetailType } from "@/types/detailProduct";
 
 export default async function PromoDetailPage({ params }: { params: Promise<{ promoId: string }> }) {
   const { promoId } = await params;
-  // let brandDetail: BrandDetailResponseType | null = null;
+  let brandData: BrandDetailType | null = null;
   let products: CardProductProps[] = [];
-  const errorMessage: string | null = null;
+  let errorMessage: string | null = null;
   
-  // API calls dinonaktifkan sementara karena server sedang down
-  // try {
-  //   const res = await fetch(`https://amimumprojectbe-production.up.railway.app/brand/detail/${promoId}`, {
-  //     method: "GET",
-  //     headers: { "Content-Type": "application/json" },
-  //   });
-  //   if (!res.ok) throw new Error(`Gagal mengambil data brand: ${res.status}`);
-  //   brandDetail = await res.json();
-  // } catch (err) {
-  //   errorMessage = err instanceof Error ? err.message : String(err);
-  // }
+  // Validate promoId parameter
+  if (!promoId || typeof promoId !== 'string') {
+    return (
+      <main className="pb-20">
+        <UnifiedHeader type="main" title="Promo Not Found" />
+        <div className="p-4 text-center">
+          <p className="text-red-500">Invalid promo ID provided</p>
+        </div>
+      </main>
+    );
+  }
+
+  // Parse promoId to number
+  const productionId = parseInt(promoId, 10);
+  if (isNaN(productionId)) {
+    return (
+      <main className="pb-20">
+        <UnifiedHeader type="main" title="Promo Not Found" />
+        <div className="p-4 text-center">
+          <p className="text-red-500">Invalid promo ID format</p>
+        </div>
+      </main>
+    );
+  }
   
-  // Menggunakan centralized data management
-  const brandDataFromAPI = getBrandForPromo(promoId);
-  // brandDetail = brandDataFromAPI ? {
-  //   status_code: 200,
-  //   message: "Success",
-  //   data: {
-  //     ...brandDataFromAPI.data,
-  //     description_list: [...brandDataFromAPI.data.description_list]
-  //   }
-  // } : null;
-  
-  // Mapping brand detail agar field sesuai kebutuhan komponen
-  // const _brandData = brandDetail?.data
-  //   ? {
-  //       ...brandDetail.data,
-  //       // Tidak perlu mapping karena sudah sesuai dengan backend DTO
-  //     }
-  //   : null;
+  // Fetch brand detail from API
+  try {
+    brandData = await GetBrandDetailByIDServer(productionId);
+  } catch (error) {
+    errorMessage = error instanceof Error ? error.message : 'Gagal mengambil data brand';
+  }
     
-  // API call untuk produk promo dinonaktifkan sementara
-  // try {
-  //   const res = await fetch(`https://amimumprojectbe-production.up.railway.app/product/discount/production/${promoId}`, {
-  //     method: "GET",
-  //     headers: { "Content-Type": "application/json" },
-  //   });
-  //   if (res.ok) {
-  //     const data = await res.json();
-  //     products = Array.isArray(data?.data)
-  //       ? data.data.map((prod: any) => ({
-  //           id: prod.id,
-  //           name: prod.name,
-  //           price: prod.price,
-  //           all_variants: prod.all_variants,
-  //           created_at: prod.created_at,
-  //         }))
-  //       : [];
-  //   }
-  // } catch {
-  //   // error produk tidak fatal
-  // }
-  
-  // Menggunakan centralized data management
-  products = getPromoProducts(promoId);
+  // Fetch products with discount from API
+  try {
+    const allProducts = await GetProductDiscountByBrandIdServer(productionId);
+    const validProducts = allProducts.filter(validateProductData);
+    products = validProducts;
+  } catch {
+    products = [];
+  }
   
   return (
-    <div className="pb-20">
-              <UnifiedHeader 
-                type="main"
-                showCart={true}
-                showNotifications={true}
-              />
+    <main className="pb-20">
+      <UnifiedHeader 
+        type="main"
+        showCart={true}
+        showNotifications={true}
+      />
       <DetailBrand 
-        brandDetail={brandDataFromAPI ? {
-          id: brandDataFromAPI.data.id,
-          name: brandDataFromAPI.data.name,
-          photo_url: brandDataFromAPI.data.photo_url,
-          description_list: [...brandDataFromAPI.data.description_list],
-          total_product: brandDataFromAPI.data.total_product,
-          created_at: brandDataFromAPI.data.created_at,
-          category: "Jamu", // Default category
-          total_product_with_promo: products.length
-        } : null} 
-        errorMessage={errorMessage} 
+        brandDetail={brandData} 
+        errorMessage={errorMessage}
         promoProductCount={products.length}
       />
       <ProductListWithPagination 
         products={products} 
-        title={`Produk Promo ${brandDataFromAPI?.data?.name || "Brand"}`}
+        title={`Produk Promo ${brandData?.name || "Brand"}`}
         emptyMessage="Produk promo belum tersedia."
       />
-    </div>
+    </main>
   );
 }

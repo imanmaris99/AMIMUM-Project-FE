@@ -69,7 +69,12 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
       />
       <SearchProductByBrand 
         brandId={productionId} 
-        brandName={brandData?.name || ""} 
+        brandName={brandData?.name || ""}
+        brandData={brandData ? {
+          id: brandData.id,
+          name: brandData.name,
+          photo_url: brandData.photo_url || undefined,
+        } : null}
       />
       <ProductListWithPagination 
         products={products} 

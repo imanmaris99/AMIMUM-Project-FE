@@ -161,6 +161,24 @@ export interface ProductSearchResponseType {
   data: ProductSearchItemType[];
 }
 
+// Response type for /product/production/{production_id}/{product_name}
+export interface ProductSearchByBrandItemType {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  highest_promo?: number;
+  avg_rating?: number;
+  stock?: number;
+  production_id: number;
+}
+
+export interface ProductSearchByBrandResponseType {
+  status_code: number;
+  message: string;
+  data: ProductSearchByBrandItemType[];
+}
+
 export interface ProductListScrollResponseType {
   data: AllProductInfoType[];
   has_more: boolean;

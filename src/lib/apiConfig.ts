@@ -66,6 +66,7 @@ export const API_ENDPOINTS = {
   PRODUCT_SEARCH: (name: string) => `/product/${encodeURIComponent(name)}`,
   PRODUCT_DETAIL: (productId: string) => `/product/detail/${productId}`,
   PRODUCT_BY_BRAND: (brandId: number) => `/product/production/${brandId}`,
+  PRODUCT_SEARCH_BY_BRAND: (brandId: number, productName: string) => `/product/production/${brandId}/${encodeURIComponent(productName)}`,
   PRODUCT_DISCOUNT_BY_BRAND: (brandId: number) => `/product/discount/production/${brandId}`,
   
   // Articles

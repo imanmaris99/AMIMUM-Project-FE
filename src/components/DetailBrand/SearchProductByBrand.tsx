@@ -4,34 +4,73 @@ import { useState } from 'react';
 import { CiSearch } from 'react-icons/ci';
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { SearchGetProductByBrand } from "@/services/api/product";
+import { CardProductProps } from "@/components/common/Search/CardProduct/types";
+import ListProductSection from "@/components/common/Search/List_Product_Section";
 
 interface SearchProductByBrandProps {
   brandId: number;
   brandName?: string;
+  brandData?: {
+    id: number;
+    name: string;
+    photo_url?: string;
+  } | null;
 }
 
-const SearchProductByBrand = ({ brandId, brandName }: SearchProductByBrandProps) => {
+const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductByBrandProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<CardProductProps[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
   const router = useRouter();
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      setIsSearching(true);
-      // Search produk dari brand tertentu
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}&brand=${encodeURIComponent(brandName || `ID ${brandId}`)}`);
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      return;
+    }
+
+    setIsSearching(true);
+    setHasSearched(true);
+    setSearchResults([]);
+
+    try {
+      // Search produk menggunakan API khusus untuk brand tertentu
+      const brandProducts = await SearchGetProductByBrand(brandId, searchQuery.trim());
+      
+      // Fill brand_info.name from props since API doesn't return it
+      const productsWithBrandInfo = brandProducts.map(product => ({
+        ...product,
+        brand_info: {
+          ...product.brand_info,
+          id: brandId,
+          name: brandData?.name || brandName || "",
+          photo_url: brandData?.photo_url || undefined,
+        },
+      }));
+      
+      setSearchResults(productsWithBrandInfo);
+    } catch {
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !isSearching) {
       handleSearch();
     }
   };
 
   const handleCheckPromo = () => {
-    // Navigate to specific promo page (using brandId as promoId for now)
     router.push(`/promo/${brandId}`);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery("");
+    setSearchResults([]);
+    setHasSearched(false);
   };
 
   return (
@@ -65,21 +104,57 @@ const SearchProductByBrand = ({ brandId, brandName }: SearchProductByBrandProps)
         </div>
       )}
 
+      {/* Search Results */}
+      {hasSearched && !isSearching && (
+        <div className="mt-2">
+          {searchResults.length > 0 ? (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm text-gray-600">
+                  Ditemukan <span className="font-semibold text-[#00764F]">{searchResults.length}</span> produk
+                </p>
+                <button
+                  onClick={handleClearSearch}
+                  className="text-sm text-[#00764F] hover:underline"
+                >
+                  Hapus pencarian
+                </button>
+              </div>
+              <ListProductSection products={searchResults} />
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-gray-50 rounded-lg">
+              <p className="text-gray-600 text-sm mb-1">Tidak ada produk ditemukan</p>
+              <p className="text-gray-500 text-xs">
+                Tidak ada produk yang cocok dengan &ldquo;{searchQuery}&rdquo; dari merek {brandName}
+              </p>
+              <button
+                onClick={handleClearSearch}
+                className="mt-3 text-sm text-[#00764F] hover:underline"
+              >
+                Hapus pencarian
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Promo Section */}
-      <div className="flex justify-center items-center gap-2 mt-2">
-        <p className="text-gray-500 text-sm font-jakarta font-semibold">
-          Mau tau info produk yang sedang promo?
-        </p>
-        <Button 
-          variant="destructive" 
-          type="button"
-          onClick={handleCheckPromo}
-          className="bg-red-500 hover:bg-red-600 text-white transition-colors"
-        >
-          Cek Disini!
-        </Button>
-      </div>
+      {!hasSearched && (
+        <div className="flex justify-center items-center gap-2 mt-2">
+          <p className="text-gray-500 text-sm font-jakarta font-semibold">
+            Mau tau info produk yang sedang promo?
+          </p>
+          <Button 
+            variant="destructive" 
+            type="button"
+            onClick={handleCheckPromo}
+            className="bg-red-500 hover:bg-red-600 text-white transition-colors"
+          >
+            Cek Disini!
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
