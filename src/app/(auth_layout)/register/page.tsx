@@ -6,6 +6,8 @@ import { EyeOff } from "./EyeOff";
 import { HeaderRegister } from "@/components";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { postRegister } from "@/services/api/register";
+import toast from "react-hot-toast";
 
 const Register = () => {
   const router = useRouter();
@@ -24,14 +26,7 @@ const Register = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
-
-  // Dummy data untuk simulasi
-  const existingEmails = [
-    "admin@amimum.com",
-    "user@amimum.com", 
-    "test@amimum.com",
-    "demo@amimum.com"
-  ];
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
@@ -56,8 +51,6 @@ const Register = () => {
       newErrors.email = "Email harus diisi";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Format email tidak valid";
-    } else if (existingEmails.includes(formData.email.toLowerCase())) {
-      newErrors.email = "Email sudah terdaftar";
     }
 
     // Validasi nomor HP
@@ -108,18 +101,41 @@ const Register = () => {
     }
 
     setIsSubmitting(true);
+    setApiError(null);
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsSuccess(true);
-    
-    // Auto redirect after 3 seconds
-    setTimeout(() => {
-      router.push("/login");
-    }, 3000);
-    
-    setIsSubmitting(false);
+    try {
+      // Map gender dari "laki-laki"/"perempuan" ke "male"/"female"
+      const genderMap: { [key: string]: "male" | "female" } = {
+        "laki-laki": "male",
+        "perempuan": "female",
+      };
+
+      const registerData = {
+        firstname: formData.namaDepan.trim(),
+        lastname: formData.namaBelakang.trim(),
+        gender: genderMap[formData.jenisKelamin] || "male",
+        email: formData.email.trim(),
+        phone: formData.nomorHp.trim(),
+        password: formData.password,
+      };
+
+      const response = await postRegister(registerData);
+      
+      if (response.status_code === 201) {
+        setIsSuccess(true);
+        toast.success(response.message || "Registrasi berhasil!");
+        
+        setTimeout(() => {
+          router.push("/verify-account");
+        }, 3000);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Gagal mendaftar. Silakan coba lagi.";
+      setApiError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -150,10 +166,10 @@ const Register = () => {
               <h3 className="text-lg font-semibold text-green-800 mb-2">Akun Berhasil Dibuat</h3>
               <p className="text-green-700 text-sm mb-3">
                 Selamat! Akun Anda telah berhasil dibuat. 
-                Silakan login dengan email dan password yang telah Anda daftarkan.
+                Silakan verifikasi akun Anda untuk melanjutkan.
               </p>
               <p className="text-green-600 text-xs">
-                Anda akan diarahkan ke halaman login dalam beberapa detik...
+                Anda akan diarahkan ke halaman verifikasi dalam beberapa detik...
               </p>
             </div>
           </div>
@@ -181,6 +197,8 @@ const Register = () => {
                 placeholder="Nama Depan"
                 className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1 ${errors.namaDepan ? 'text-red-500' : ''}`}
                 aria-label="First Name"
+                autoComplete="given-name"
+                name="firstname"
               />
               <div className={`w-full h-px absolute bottom-0 left-0 ${errors.namaDepan ? 'bg-red-500' : 'bg-gray-300'}`}></div>
               {errors.namaDepan && (
@@ -197,6 +215,8 @@ const Register = () => {
                 placeholder="Nama Belakang"
                 className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1 ${errors.namaBelakang ? 'text-red-500' : ''}`}
                 aria-label="Last Name"
+                autoComplete="family-name"
+                name="lastname"
               />
               <div className={`w-full h-px absolute bottom-0 left-0 ${errors.namaBelakang ? 'bg-red-500' : 'bg-gray-300'}`}></div>
               {errors.namaBelakang && (
@@ -211,6 +231,8 @@ const Register = () => {
                 onChange={(e) => handleInputChange("jenisKelamin", e.target.value)}
                 className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm appearance-none py-3 pb-1 ${errors.jenisKelamin ? 'text-red-500' : ''}`}
                 aria-label="Gender"
+                autoComplete="sex"
+                name="gender"
               >
                 <option value="" disabled>
                   Jenis Kelamin
@@ -233,6 +255,8 @@ const Register = () => {
                 placeholder="Email"
                 className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1 ${errors.email ? 'text-red-500' : ''}`}
                 aria-label="Email"
+                autoComplete="email"
+                name="email"
               />
               <div className={`w-full h-px absolute bottom-0 left-0 ${errors.email ? 'bg-red-500' : 'bg-gray-300'}`}></div>
               {errors.email && (
@@ -249,6 +273,8 @@ const Register = () => {
                 placeholder="Nomor Hp"
                 className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1 ${errors.nomorHp ? 'text-red-500' : ''}`}
                 aria-label="Phone Number"
+                autoComplete="tel"
+                name="phone"
               />
               <div className={`w-full h-px absolute bottom-0 left-0 ${errors.nomorHp ? 'bg-red-500' : 'bg-gray-300'}`}></div>
               {errors.nomorHp && (
@@ -265,6 +291,9 @@ const Register = () => {
                 placeholder="Password"
                 className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm pr-10 py-3 pb-1 ${errors.password ? 'text-red-500' : ''}`}
                 aria-label="Password"
+                autoComplete="new-password"
+                name="password"
+                id="password"
               />
               <button
                 type="button"
@@ -293,6 +322,9 @@ const Register = () => {
                 placeholder="Cek Password"
                 className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm pr-10 py-3 pb-1 ${errors.cekPassword ? 'text-red-500' : ''}`}
                 aria-label="Confirm Password"
+                autoComplete="new-password"
+                name="confirmPassword"
+                id="confirmPassword"
               />
               <button
                 type="button"
@@ -311,6 +343,13 @@ const Register = () => {
                 <p className="text-red-500 text-xs mt-1">{errors.cekPassword}</p>
               )}
             </div>
+
+            {/* API Error Message */}
+            {apiError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+                <p className="text-red-600 text-sm">{apiError}</p>
+              </div>
+            )}
 
             {/* Submit Button */}
             <button
