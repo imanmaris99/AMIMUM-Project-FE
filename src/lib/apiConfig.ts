@@ -49,6 +49,7 @@ export const API_ENDPOINTS = {
   USER_REGISTER: '/user/register',
   USER_LOGIN: '/user/login',
   USER_FORGOT_PASSWORD: '/user/forgot-password',
+  USER_RESET_PASSWORD: '/user/reset-password',
   USER_VERIFY_EMAIL: '/user/verify-email',
   
   // Production/Brand
