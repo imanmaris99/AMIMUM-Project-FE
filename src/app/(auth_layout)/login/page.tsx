@@ -9,6 +9,7 @@ import Image from "next/image";
 import { SessionManager, generateSecureToken, validateEmail } from "@/lib/auth";
 import { RateLimiter, validatePassword, sanitizeUserInput } from "@/lib/security";
 import { toast } from "react-hot-toast";
+import { postLogin } from "@/services/api/login";
 
 const Login = () => {
   const router = useRouter();
@@ -22,14 +23,7 @@ const Login = () => {
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   // const [attempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
-
-  // Enhanced credentials with proper hashing (demo purposes)
-  const validCredentials = [
-    { email: "admin@amimum.com", password: "Admin123!@#" },
-    { email: "user@amimum.com", password: "User123!@#" },
-    { email: "test@amimum.com", password: "Test123!@#" },
-    { email: "demo@amimum.com", password: "Demo123!@#" }
-  ];
+  const [apiError, setApiError] = useState<string | null>(null);
 
   // Check if user is already authenticated
   useEffect(() => {
@@ -112,6 +106,7 @@ const Login = () => {
     }
 
     setIsSubmitting(true);
+    setApiError(null);
     
     try {
       // Rate limiting check
@@ -119,28 +114,27 @@ const Login = () => {
       if (!RateLimiter.checkLimit(clientId)) {
         setIsLocked(true);
         toast.error('Terlalu banyak percobaan login. Coba lagi dalam 15 menit.');
+        setIsSubmitting(false);
         return;
       }
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Sanitize and validate inputs
       const sanitizedEmail = sanitizeUserInput(formData.email).toLowerCase();
       const sanitizedPassword = sanitizeUserInput(formData.password);
       
-      // Check credentials with enhanced security
-      const isValid = validCredentials.some(
-        cred => cred.email === sanitizedEmail && cred.password === sanitizedPassword
-      );
+      // Call login API
+      const response = await postLogin({
+        email: sanitizedEmail,
+        password: sanitizedPassword,
+      });
       
-      if (isValid) {
+      if (response.status_code === 200) {
         // Create secure session
         const user = {
           id: generateSecureToken(),
           email: sanitizedEmail,
           name: sanitizedEmail.split('@')[0],
-          role: sanitizedEmail.includes('admin') ? 'admin' as const : 'user' as const,
+          role: 'user' as const,
           createdAt: new Date(),
           lastLogin: new Date(),
         };
@@ -158,7 +152,7 @@ const Login = () => {
         RateLimiter.resetLimit(clientId);
         
         setIsSuccess(true);
-        toast.success('Login berhasil! Mengarahkan ke halaman utama...');
+        toast.success(response.message || 'Login berhasil! Mengarahkan ke halaman utama...');
         
         // Auto redirect after 2 seconds
         setTimeout(() => {
@@ -171,15 +165,14 @@ const Login = () => {
             router.push("/");
           }
         }, 2000);
-      } else {
-        // setAttempts(prev => prev + 1);
-        setErrors({
-          general: "Email atau password salah"
-        });
-        toast.error('Kredensial tidak valid. Silakan coba lagi.');
       }
-    } catch {
-      toast.error('Terjadi kesalahan saat login. Silakan coba lagi.');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Login gagal. Silakan coba lagi.";
+      setApiError(errorMessage);
+      setErrors({
+        general: errorMessage
+      });
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -255,22 +248,18 @@ const Login = () => {
             Login
           </h1>
 
-          {/* Testing Information */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-blue-800 text-sm font-medium mb-2">Credentials untuk testing:</p>
-            <div className="text-blue-700 text-xs space-y-1">
-              <p>• admin@amimum.com / Admin123!@#</p>
-              <p>• user@amimum.com / User123!@#</p>
-              <p>• test@amimum.com / Test123!@#</p>
-              <p>• demo@amimum.com / Demo123!@#</p>
-            </div>
-          </div>
-
           <form onSubmit={handleLogin} className="space-y-4">
             {/* General Error */}
             {errors.general && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
                 <p className="text-red-600 text-sm">{errors.general}</p>
+              </div>
+            )}
+
+            {/* API Error */}
+            {apiError && !errors.general && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+                <p className="text-red-600 text-sm">{apiError}</p>
               </div>
             )}
 
@@ -283,6 +272,8 @@ const Login = () => {
                 placeholder="Email"
                 className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1 ${errors.email ? 'text-red-500' : ''}`}
                 aria-label="Email"
+                autoComplete="email"
+                name="email"
                 required
               />
               <div className={`w-full h-px absolute bottom-0 left-0 ${errors.email ? 'bg-red-500' : 'bg-gray-300'}`}></div>
@@ -301,6 +292,9 @@ const Login = () => {
                   placeholder="Password"
                   className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1 pr-20 ${errors.password ? 'text-red-500' : ''}`}
                   aria-label="Password"
+                  autoComplete="current-password"
+                  name="password"
+                  id="password"
                   required
                 />
                 <div className="flex items-center gap-2 absolute right-0 top-1/2 transform -translate-y-1/2">
