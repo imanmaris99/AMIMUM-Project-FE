@@ -63,16 +63,15 @@ axiosClient.interceptors.response.use(
     const errorMessage = error.response?.data?.message || error.message;
     const requestUrl = originalRequest?.url || '';
     
-    // Check if this is a search endpoint - 404 is expected (no products found)
-    // Search endpoint pattern: /product/{product_name} (not /product/detail/, /product/production/, or /product/discount/)
-    // Remove base URL and query params, then check if it matches /product/{name} pattern
     const urlPath = typeof requestUrl === 'string' 
       ? requestUrl.replace(API_BASE_URL, '').split('?')[0]
       : '';
-    const isSearchEndpoint = /^\/product\/[^\/]+$/.test(urlPath) && 
-                             !urlPath.includes('/product/detail/') &&
-                             !urlPath.includes('/product/production/') &&
-                             !urlPath.includes('/product/discount/');
+    const isSearchEndpoint = (
+      /^\/product\/[^\/]+$/.test(urlPath) || 
+      /^\/product\/production\/\d+\/[^\/]+$/.test(urlPath)
+    ) && 
+    !urlPath.includes('/product/detail/') &&
+    !urlPath.includes('/product/discount/');
     
     if (error.response) {
       switch (status) {

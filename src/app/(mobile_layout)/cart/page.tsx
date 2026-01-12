@@ -24,7 +24,6 @@ export default function CartPage() {
 
   const handleClearAll = () => {
     if (cartItems.length === 0) {
-      toast.error("Keranjang sudah kosong");
       return;
     }
     setShowConfirmDialog(true);

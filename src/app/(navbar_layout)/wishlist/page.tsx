@@ -26,7 +26,6 @@ const Wishlist = () => {
 
   const handleClearAll = () => {
     if (wishlistItems.length === 0) {
-      toast.error("Wishlist sudah kosong");
       return;
     }
     setShowConfirmDialog(true);
