@@ -48,6 +48,7 @@ export const API_ENDPOINTS = {
   USER_PROFILE: '/user/profile',
   USER_REGISTER: '/user/register',
   USER_LOGIN: '/user/login',
+  USER_GOOGLE_LOGIN: '/user/auth/google-login',
   USER_FORGOT_PASSWORD: '/user/forgot-password',
   USER_RESET_PASSWORD: '/user/reset-password',
   USER_VERIFY_EMAIL: '/user/verify-email',

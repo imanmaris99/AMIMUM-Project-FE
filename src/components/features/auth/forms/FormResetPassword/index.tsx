@@ -13,6 +13,7 @@ import { postResetPassword } from "@/services/api/reset-password";
 import toast from "react-hot-toast";
 import { Eye } from "@/app/(auth_layout)/register/Eye";
 import { EyeOff } from "@/app/(auth_layout)/register/EyeOff";
+import { useGoogleLogin } from "@/hooks/useGoogleLogin";
 
 // Password validation schema sesuai kriteria API
 const passwordSchema = z
@@ -42,6 +43,7 @@ const FormResetPassword = () => {
   const [apiError, setApiError] = React.useState<string | null>(null);
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const { login: handleGoogleLogin, isLoading: isGoogleLoading } = useGoogleLogin();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -312,14 +314,27 @@ const FormResetPassword = () => {
 
       {/* Google Login */}
       <button
-        onClick={() => {}}
-        className="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded font-medium hover:bg-gray-50 transition-colors mb-4"
+        onClick={handleGoogleLogin}
+        disabled={isGoogleLoading}
+        className="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded font-medium hover:bg-gray-50 transition-colors mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <div className="flex items-center justify-center gap-2">
-          <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-            G
-          </div>
-          Log In dengan Google
+          {isGoogleLoading ? (
+            <>
+              <svg className="animate-spin h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>Memproses...</span>
+            </>
+          ) : (
+            <>
+              <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                G
+              </div>
+              Log In dengan Google
+            </>
+          )}
         </div>
       </button>
 
