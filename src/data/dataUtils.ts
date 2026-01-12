@@ -1,6 +1,3 @@
-// Data Utility Functions
-// Memudahkan akses dan sinkronisasi data antar komponen
-
 import {
   generateDetailProductData,
   generateCardProductData,
@@ -22,18 +19,15 @@ import { CardProductProps } from '@/components/common/Search/CardProduct/types';
 import { CartResponseType, CartItemType, CartTotalPricesType } from '@/types/apiTypes';
 import { validateDetailProductData, validateProductData } from '@/utils/dataValidation';
 
-// ==================== CACHED DATA ====================
 let cachedDetailProducts: { [key: string]: DetailProductType } | null = null;
 let cachedCardProducts: CardProductProps[] | null = null;
 
-// ==================== DETAIL PRODUCT UTILITIES ====================
 export function getDetailProduct(productId: string): DetailProductType | undefined {
   if (!cachedDetailProducts) {
     cachedDetailProducts = generateDetailProductData();
   }
   const product = cachedDetailProducts[productId];
   
-  // Validate product data before returning
   if (product && !validateDetailProductData(product)) {
     return undefined;
   }
@@ -54,7 +48,6 @@ export function getAllCardProducts(): CardProductProps[] {
     cachedCardProducts = generateCardProductData();
   }
   
-  // Filter out invalid products
   return cachedCardProducts.filter(validateProductData);
 }
 
@@ -70,12 +63,9 @@ export function getCardProductsBySearch(query: string, brandFilter?: string): Ca
   const allProducts = getAllCardProducts();
   let filteredProducts = allProducts;
   
-  // Filter by brand if specified (brandFilter can be brandId or brandName)
   if (brandFilter) {
-    // First try to find by brandId
     let brand = BRAND_DATA[brandFilter as keyof typeof BRAND_DATA];
     
-    // If not found by ID, try to find by name
     if (!brand) {
       brand = Object.values(BRAND_DATA).find(b => 
         b.name.toLowerCase().includes(brandFilter.toLowerCase())
@@ -91,7 +81,6 @@ export function getCardProductsBySearch(query: string, brandFilter?: string): Ca
     }
   }
   
-  // Filter by search query
   if (query.trim()) {
     filteredProducts = filteredProducts.filter(product =>
       product.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -129,28 +118,21 @@ export function getBrandForPromo(promoId: string) {
 // ==================== PROMO UTILITIES ====================
 export function getPromoProducts(brandId: string): CardProductProps[] {
   try {
-    // Use cached data to prevent duplication
     const allProducts = getAllCardProducts();
     const brand = BRAND_DATA[brandId as keyof typeof BRAND_DATA];
     
   if (!brand) {
     return [];
   }
-    
-    // Filter products by brand ID and only include those with discount
+  
     const promoProducts = allProducts.filter(product => {
       const isFromBrand = product.brand_info.id === brand.id;
       if (!isFromBrand) return false;
       
-      // Check if any variant has discount > 0
       const hasDiscount = product.all_variants.some(variant => variant.discount > 0);
-      
-      
       return hasDiscount;
     });
     
-    
-    // Add brand's highest discount to each product for consistent display
     return promoProducts.map(product => ({
       ...product,
       brand_highest_discount: brand.promo_special

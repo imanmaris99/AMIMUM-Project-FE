@@ -55,7 +55,6 @@ export interface BrandsResponseType {
   data: ProductionProps[];
 }
 
-// Tipe data yang sesuai dengan backend DetailProductionDto
 export interface DetailProductionType {
   id: number;
   name: string;
@@ -97,7 +96,6 @@ export interface BrandFilteredLoader {
   has_more: boolean;
 }
 
-// Tipe data yang sesuai dengan backend DTO
 export interface BrandInfoType {
   id: number;
   name: string;
@@ -130,7 +128,6 @@ export interface AllProductInfoResponseType {
   data: AllProductInfoType[];
 }
 
-// Search API response structure (actual structure from Swagger)
 export interface ProductSearchItemType {
   id: string;
   name: string;
@@ -161,7 +158,6 @@ export interface ProductSearchResponseType {
   data: ProductSearchItemType[];
 }
 
-// Response type for /product/production/{production_id}/{product_name}
 export interface ProductSearchByBrandItemType {
   id: string;
   name: string;
@@ -184,7 +180,6 @@ export interface ProductListScrollResponseType {
   has_more: boolean;
 }
 
-// Cart related types
 export interface CartItemType {
   id: string;
   product_id: string;
@@ -232,7 +227,6 @@ export interface CartItemQtyPayload {
   quantity: number;
 }
 
-// Brand Detail Response Type
 export interface BrandDetailResponseType {
   status_code: number;
   message: string;

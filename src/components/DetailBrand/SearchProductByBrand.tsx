@@ -35,10 +35,8 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
     setSearchResults([]);
 
     try {
-      // Search produk menggunakan API khusus untuk brand tertentu
       const brandProducts = await SearchGetProductByBrand(brandId, searchQuery.trim());
       
-      // Fill brand_info.name from props since API doesn't return it
       const productsWithBrandInfo = brandProducts.map(product => ({
         ...product,
         brand_info: {

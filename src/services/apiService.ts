@@ -15,15 +15,12 @@ export const fetchCategories = async (): Promise<CategoryProps[]> => {
   try {
     const response: CategoriesResponseType = await axiosClient.get(API_ENDPOINTS.CATEGORIES_ALL);
     
-    // Validate response structure
     if (!response || !response.data || !Array.isArray(response.data)) {
       throw new Error('Invalid response format: data is not an array');
     }
     
-    // Return the categories array from response.data
     return response.data;
   } catch (error) {
-    // Error handling is done by axiosClient interceptor
     throw error;
   }
 };
@@ -59,12 +56,10 @@ export const fetchArticles = async (): Promise<ArticleProps[]> => {
   try {
     const response: ArticlesResponseType = await axiosClient.get(API_ENDPOINTS.ARTICLES_ALL);
     
-    // Validate response structure
     if (!response || !response.data || !Array.isArray(response.data)) {
       throw new Error('Invalid response format: data is not an array');
     }
     
-    // Return the articles array from response.data
     return response.data;
   } catch (error) {
     // Error handling is done by axiosClient interceptor
@@ -108,7 +103,6 @@ export const editCartQty = async (updatedCartItem: CartItemQtyPayload) => {
 
 export const editCartActive = async (updatedCartItem: CartItemActPayload) => {
   try {
-    // Note: CartItemActPayload doesn't have cart_id, 
     // but the endpoint might need it. Adjust based on your backend API.
     // If backend expects cart_id in URL, you may need to add it to the payload type.
     // For now, using empty string as placeholder - update this based on your API requirements

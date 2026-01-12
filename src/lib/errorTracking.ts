@@ -160,21 +160,17 @@ class ErrorTracker {
     
     const errorMessage = error instanceof Error ? error.message : '';
     const message = errorMessage.toLowerCase();
-    // const stack = error instanceof Error ? error.stack?.toLowerCase() || '' : '';
     
-    // Critical errors
     if (message.includes('chunk') || message.includes('loading') || 
         message.includes('network') || message.includes('timeout')) {
       return 'critical';
     }
     
-    // High severity errors
     if (message.includes('uncaught') || message.includes('reference') ||
         message.includes('type') || message.includes('syntax')) {
       return 'high';
     }
     
-    // Medium severity errors
     if (message.includes('warning') || message.includes('deprecated')) {
       return 'medium';
     }

@@ -46,14 +46,12 @@ interface CartProviderProps {
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItemType[]>([]);
 
-  // Load cart from localStorage on mount
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
       try {
         const parsedCart = JSON.parse(savedCart);
         if (Array.isArray(parsedCart)) {
-          // Validate each cart item before loading
           const validCartItems = parsedCart.filter(item => validateCartItemData(item));
           if (validCartItems.length !== parsedCart.length) {
             ErrorHandler.handleError(new Error('Some cart items are invalid and were removed'), 'CartLoad');
@@ -62,7 +60,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         }
       } catch (error) {
         ErrorHandler.handleError(error, 'CartLoad');
-        // Clear corrupted cart data
         localStorage.removeItem('cart');
       }
     }
@@ -81,7 +78,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     []
   );
 
-  // Save cart to localStorage whenever it changes (including when empty)
   useEffect(() => {
     debouncedSave(cartItems);
   }, [cartItems, debouncedSave]);
@@ -183,9 +179,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     });
   }, []);
 
-  // Update quantity
   const updateQuantity = useCallback((cartId: string, quantity: number) => {
-    // Validate quantity
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 999) {
       ErrorHandler.handleError(new Error('Invalid quantity: must be between 1 and 999'), 'CartUpdate');
       return;
@@ -199,17 +193,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     });
   }, []);
 
-  // Update active status (simplified - no is_active property in new structure)
   const updateActiveStatus = useCallback(() => {
-    // For now, just log the action since we don't have is_active in new structure
-    // Status update functionality will be implemented when backend supports it
   }, []);
 
-
-  // Clear cart
   const clearCart = useCallback(() => {
     setCartItems([]);
-    // Immediately clear localStorage
     try {
       localStorage.removeItem('cart');
     } catch (error) {
@@ -217,10 +205,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   }, []);
 
-  // Clear all items (alias for clearCart)
   const clearAll = useCallback(() => {
     setCartItems([]);
-    // Immediately clear localStorage
     try {
       localStorage.removeItem('cart');
     } catch (error) {
@@ -228,18 +214,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   }, []);
 
-  // Remove only active items from cart (for checkout) - simplified
   const removeActiveItems = useCallback(() => {
-    // For now, clear all items since we don't have is_active in new structure
     setCartItems([]);
   }, []);
 
-  // Check if item is in cart
   const isInCart = useCallback((productId: string, variantId: number) => {
     return cartItems.some(item => item.product_id === productId && item.variant_id === variantId);
   }, [cartItems]);
 
-  // Memoized calculations to prevent unnecessary re-renders
   const totalItems = useMemo(() => cartItems.length, [cartItems.length]);
   const totalPrices = useMemo(() => calculateTotalPrices(cartItems), [cartItems, calculateTotalPrices]);
 

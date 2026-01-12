@@ -14,7 +14,6 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   let errorMessage: string | null = null;
   let products: CardProductProps[] = [];
   
-  // Validate brandId parameter
   if (!brandId || typeof brandId !== 'string') {
     return (
       <main className="pb-20">
@@ -26,7 +25,6 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
     );
   }
 
-  // Parse brandId to number
   const productionId = parseInt(brandId, 10);
   if (isNaN(productionId)) {
     return (
@@ -39,14 +37,12 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
     );
   }
   
-  // Fetch brand detail from API
   try {
     brandData = await GetBrandDetailByIDServer(productionId);
   } catch (error) {
     errorMessage = error instanceof Error ? error.message : 'Gagal mengambil data brand';
   }
     
-  // Fetch products from API
   try {
     const allProducts = await GetProductsByProductionIdServer(productionId);
     const validProducts = allProducts.filter(validateProductData);

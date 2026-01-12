@@ -13,7 +13,6 @@ export function validateProductData(product: unknown): product is AllProductInfo
   
   const p = product as Record<string, unknown>;
   
-  // Check required fields
   if (
     typeof p.id !== 'string' ||
     typeof p.name !== 'string' ||
@@ -26,7 +25,6 @@ export function validateProductData(product: unknown): product is AllProductInfo
     return false;
   }
   
-  // Validate brand_info (photo_url is optional in API response)
   const brandInfo = p.brand_info as Record<string, unknown>;
   if (
     typeof brandInfo.id !== 'number' ||
@@ -35,12 +33,10 @@ export function validateProductData(product: unknown): product is AllProductInfo
     return false;
   }
   
-  // Validate variants - at least one variant must be valid
   if (p.all_variants.length === 0) {
     return false;
   }
   
-  // Validate that at least one variant is valid (not all variants need to be valid)
   const hasValidVariant = p.all_variants.some(validateVariantData);
   if (!hasValidVariant) {
     return false;
@@ -203,32 +199,4 @@ export function validateAndThrow<T>(
     throw new DataValidationError(errorMessage);
   }
   return data;
-}
-
-// ==================== DEBUGGING UTILITIES ====================
-
-export function logValidationErrors(data: unknown, context: string) {
-  console.group(`Data Validation Errors - ${context}`);
-  console.groupEnd();
-}
-
-export function createValidationReport(data: unknown[]): {
-  valid: number;
-  invalid: number;
-  errors: string[];
-} {
-  const errors: string[] = [];
-  let valid = 0;
-  let invalid = 0;
-
-  data.forEach((item, index) => {
-    if (validateProductData(item)) {
-      valid++;
-    } else {
-      invalid++;
-      errors.push(`Item at index ${index} failed validation`);
-    }
-  });
-
-  return { valid, invalid, errors };
 }

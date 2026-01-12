@@ -49,9 +49,6 @@ axiosClient.interceptors.request.use(
 // Response interceptor with comprehensive error handling
 axiosClient.interceptors.response.use(
   (response: AxiosResponse) => {
-    // Log successful requests
-    // const duration = Date.now() - ((response.config as any).metadata?.startTime || 0);
-    
     if (!response.data || typeof response.data !== 'object') {
       return response.data;
     }

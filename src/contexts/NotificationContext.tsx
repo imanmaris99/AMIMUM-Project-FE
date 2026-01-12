@@ -40,13 +40,11 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     cart: { count: 0, isViewed: true }
   });
 
-  // Load notifications from localStorage on mount
   useEffect(() => {
     const savedNotifications = localStorage.getItem('notifications');
     if (savedNotifications) {
       try {
         const parsed = JSON.parse(savedNotifications);
-        // Validate parsed data structure
         if (parsed && typeof parsed === 'object') {
           const validatedNotifications = {
             tracking: parsed.tracking || { count: 0, isViewed: true },
@@ -57,18 +55,15 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
           setNotifications(validatedNotifications);
         }
       } catch {
-        // Reset to default state on error
         setNotifications({
           tracking: { count: 0, isViewed: true },
           transaction: { count: 0, isViewed: true },
           wishlist: { count: 0, isViewed: true },
           cart: { count: 0, isViewed: true }
         });
-        // Clear corrupted data
         localStorage.removeItem('notifications');
       }
     } else {
-      // Initialize with default state if no saved data
       setNotifications({
         tracking: { count: 0, isViewed: true },
         transaction: { count: 0, isViewed: true },
@@ -78,12 +73,10 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     }
   }, []);
 
-  // Save notifications to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('notifications', JSON.stringify(notifications));
   }, [notifications]);
 
-  // Add notification (increment counter if not viewed, or set to 1 if viewed)
   const addNotification = useCallback((type: NotificationType) => {
     setNotifications(prev => ({
       ...prev,
@@ -94,7 +87,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     }));
   }, []);
 
-  // Reset notification counter to 0
   const resetNotification = useCallback((type: NotificationType) => {
     setNotifications(prev => ({
       ...prev,
@@ -105,7 +97,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     }));
   }, []);
 
-  // Mark notification as viewed (but keep counter)
   const markAsViewed = useCallback((type: NotificationType) => {
     setNotifications(prev => ({
       ...prev,
@@ -116,12 +107,10 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     }));
   }, []);
 
-  // Get notification count
   const getNotificationCount = useCallback((type: NotificationType) => {
     return notifications[type].count;
   }, [notifications]);
 
-  // Check if notification is viewed
   const isNotificationViewed = useCallback((type: NotificationType) => {
     return notifications[type].isViewed;
   }, [notifications]);

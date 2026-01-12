@@ -15,14 +15,12 @@
  * @returns API base URL string
  */
 export function getApiBaseUrl(): string {
-  // Try NEXT_PUBLIC_ first (for client-side)
   if (typeof window !== 'undefined') {
     return process.env.NEXT_PUBLIC_API_BASE_URL || 
            process.env.NEXT_PUBLIC_API_URL || 
            'https://amimumprojectbe-production.up.railway.app';
   }
   
-  // Server-side: try both with and without NEXT_PUBLIC_ prefix
   return process.env.API_BASE_URL || 
          process.env.NEXT_PUBLIC_API_BASE_URL || 
          process.env.API_URL ||

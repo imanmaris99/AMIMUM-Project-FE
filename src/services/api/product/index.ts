@@ -5,12 +5,6 @@ import { AllProductInfoType, AllProductInfoResponseType, ProductSearchResponseTy
 
 /**
  * Search products by name (Client-side)
- * Handles API response structure and error codes according to Swagger documentation:
- * - 200 OK: Returns products array
- * - 404 Not Found: Returns empty array (no products found)
- * - 422 Validation Error: Throws error with validation message
- * - 500 Internal Server Error: Throws error with server error message
- * 
  * @param productName - Name of the product to search for
  * @returns Promise<AllProductInfoType[]> Array of products
  * @throws Error if request fails (422, 500, or network error)
@@ -25,18 +19,12 @@ export const SearchGetProduct = async (productName: string): Promise<AllProductI
       API_ENDPOINTS.PRODUCT_SEARCH(productName.trim())
     );
 
-    // axiosClient interceptor returns response.data directly (see axiosClient.ts line 61)
-    // So response is already ProductSearchResponseType with structure: { status_code, message, data }
-    // We don't need to access .data property because response IS the API response
     const responseData = response as unknown as ProductSearchResponseType;
     
     if (responseData && responseData.status_code === 200 && responseData.data && Array.isArray(responseData.data)) {
-      // Map API response to AllProductInfoType format
       const mappedProducts: AllProductInfoType[] = responseData.data.map((product: ProductSearchItemType) => {
-        // Use actual variants from API if available, otherwise create minimal variant
         let variants = product.all_variants || [];
         
-        // If no variants from API, create a minimal variant
         if (variants.length === 0) {
           const highestDiscount = product.highest_promo || 0;
           variants = [{
@@ -51,12 +39,10 @@ export const SearchGetProduct = async (productName: string): Promise<AllProductI
           }];
         }
 
-        // Get image from first variant if available
         const productImage = variants.length > 0 && variants[0].img 
           ? variants[0].img 
           : "/default-image.jpg";
 
-        // Calculate highest discount from all variants
         const highestDiscount = variants.length > 0
           ? Math.max(...variants.map(v => v.discount || 0))
           : (product.highest_promo || 0);
@@ -125,17 +111,7 @@ export const GetProductByBrandId = async (brandId: number) => {
 
 /**
  * Search products by production ID and product name (Client-side)
- * Handles API response structure and error codes according to Swagger documentation:
- * - 200 OK: Returns products array
- * - 404 Not Found: Returns empty array (no products found)
- * - 422 Validation Error: Throws error with validation message
- * - 500 Internal Server Error: Throws error with server error message
- * 
- * Note: Response structure is different from /product/{name}:
- * - Does NOT include brand_info (use production_id parameter instead)
- * - Does NOT include all_variants (create default variant from highest_promo)
- * - Includes production_id in response
- * 
+ * Response does not include brand_info or all_variants, so they are constructed from parameters.
  * @param productionId - ID of the production/brand
  * @param productName - Name of the product to search for
  * @returns Promise<AllProductInfoType[]> Array of products
@@ -151,14 +127,10 @@ export const SearchGetProductByBrand = async (productionId: number, productName:
       API_ENDPOINTS.PRODUCT_SEARCH_BY_BRAND(productionId, productName.trim())
     );
 
-    // axiosClient interceptor returns response.data directly
     const responseData = response as unknown as ProductSearchByBrandResponseType;
     
     if (responseData && responseData.status_code === 200 && responseData.data && Array.isArray(responseData.data)) {
-      // Map API response to AllProductInfoType format
-      // Note: Response does not include brand_info or all_variants, so we need to construct them
       const mappedProducts: AllProductInfoType[] = responseData.data.map((product: ProductSearchByBrandItemType) => {
-        // Create default variant from highest_promo (since all_variants is not in response)
         const highestDiscount = product.highest_promo || 0;
         const variants = [{
           id: 0,
@@ -171,7 +143,6 @@ export const SearchGetProductByBrand = async (productionId: number, productName:
           updated_at: new Date().toISOString(),
         }];
 
-        // Use default image since variants don't have img in this response
         const productImage = "/default-image.jpg";
 
         return {
@@ -179,14 +150,13 @@ export const SearchGetProductByBrand = async (productionId: number, productName:
           name: product.name,
           price: product.price,
           image: productImage,
-          // brand_info is not in response, use production_id from parameter
           brand_info: {
             id: productionId,
-            name: "", // Will be filled by component if needed
+            name: "",
             photo_url: undefined,
           },
           all_variants: variants,
-          created_at: new Date().toISOString(), // Not in response, use current date
+          created_at: new Date().toISOString(),
           brand_highest_discount: highestDiscount > 0 ? highestDiscount : undefined,
         };
       });

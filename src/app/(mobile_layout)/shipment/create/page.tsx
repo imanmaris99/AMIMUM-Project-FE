@@ -26,20 +26,7 @@ const CreateShipment = () => {
     setIsLoading(true);
     
     try {
-      // Simulasi API call untuk create shipment baru
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Simulasi data shipment baru
-      // const newShipment = { // Removed unused variable
-      //   id: `ship-${Date.now()}`,
-      //   sender: senderData,
-      //   receiver: receiverData,
-      //   package: data,
-      //   createdAt: new Date().toISOString()
-      // };
-      
-      
-      // Redirect ke halaman shipment dengan pesan sukses
       router.push("/shipment?created=true");
     } catch {
       toast.error("Gagal membuat alamat pengiriman. Silakan coba lagi.");
@@ -47,11 +34,6 @@ const CreateShipment = () => {
       setIsLoading(false);
     }
   };
-
-  // const handleNextStep = (event: React.FormEvent) => { // Removed unused function
-  //   event.preventDefault();
-  //   setCurrentStep((prevStep) => prevStep + 1);
-  // };
 
   const handlePreviousStep = () => {
     setCurrentStep((prevStep) => prevStep - 1);

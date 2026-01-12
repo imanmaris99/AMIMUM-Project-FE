@@ -79,20 +79,7 @@ const EditShipment = () => {
     setIsLoading(true);
     
     try {
-      // Simulasi API call untuk update shipment
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Simulasi data shipment yang diupdate
-      // const updatedShipment = { // Removed unused variable
-      //   id: shipmentId,
-      //   sender: senderData,
-      //   receiver: receiverData,
-      //   package: data,
-      //   updatedAt: new Date().toISOString()
-      // };
-      
-      
-      // Show success message
       setShowSuccessMessage(true);
       
       // Redirect ke halaman shipment setelah 2 detik
@@ -106,11 +93,6 @@ const EditShipment = () => {
       setIsLoading(false);
     }
   };
-
-  // const handleNextStep = (event: React.FormEvent) => { // Removed unused function
-  //   event.preventDefault();
-  //   setCurrentStep((prevStep) => prevStep + 1);
-  // };
 
   const handlePreviousStep = () => {
     setCurrentStep((prevStep) => prevStep - 1);

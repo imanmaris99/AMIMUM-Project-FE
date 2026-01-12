@@ -59,7 +59,6 @@ const RegisterForm = () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword, ...registerData } = values;
       await postRegister(registerData);
-      // const successMessage = response?.message
       toast.success("Silahkan Verifikasi Akun")
       setTimeout(() => {
         router.push("/verify-account");

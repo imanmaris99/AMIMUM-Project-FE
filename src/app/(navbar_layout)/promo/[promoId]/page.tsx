@@ -13,7 +13,6 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
   let products: CardProductProps[] = [];
   let errorMessage: string | null = null;
   
-  // Validate promoId parameter
   if (!promoId || typeof promoId !== 'string') {
     return (
       <main className="pb-20">
@@ -25,7 +24,6 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
     );
   }
 
-  // Parse promoId to number
   const productionId = parseInt(promoId, 10);
   if (isNaN(productionId)) {
     return (
@@ -38,14 +36,12 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
     );
   }
   
-  // Fetch brand detail from API
   try {
     brandData = await GetBrandDetailByIDServer(productionId);
   } catch (error) {
     errorMessage = error instanceof Error ? error.message : 'Gagal mengambil data brand';
   }
     
-  // Fetch products with discount from API
   try {
     const allProducts = await GetProductDiscountByBrandIdServer(productionId);
     const validProducts = allProducts.filter(validateProductData);

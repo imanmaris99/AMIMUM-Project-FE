@@ -23,7 +23,6 @@ export class ClientErrorBoundary extends React.Component<ErrorBoundaryProps, Err
   }
 
   componentDidCatch() {
-    // Log error for debugging
     // Error caught by ClientErrorBoundary
   }
 
@@ -39,7 +38,6 @@ export class ClientErrorBoundary extends React.Component<ErrorBoundaryProps, Err
 
 // Default error fallback component
 function DefaultErrorFallback({ error }: { error: Error }) {
-  // Use error parameter for display
   const errorMessage = error?.message || 'An unexpected error occurred';
   
   return React.createElement(

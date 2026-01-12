@@ -22,15 +22,12 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
-  // const [attempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
-  // Check if user is already authenticated
   useEffect(() => {
     if (SessionManager.isAuthenticated()) {
-      // Check if there's a redirect URL stored
       const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
       if (redirectUrl) {
         sessionStorage.removeItem('redirectAfterLogin');
@@ -86,7 +83,6 @@ const Login = () => {
       [field]: value
     }));
     
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
@@ -131,7 +127,6 @@ const Login = () => {
       });
       
       if (response.status_code === 200) {
-        // Create secure session
         const user = {
           id: generateSecureToken(),
           email: sanitizedEmail,
@@ -147,18 +142,13 @@ const Login = () => {
           refreshToken: generateSecureToken(),
         };
         
-        // Store secure session
         SessionManager.setSession(user, token);
-        
-        // Reset rate limiting on successful login
         RateLimiter.resetLimit(clientId);
         
         setIsSuccess(true);
         toast.success(response.message || 'Login berhasil! Mengarahkan ke halaman utama...');
         
-        // Auto redirect after 2 seconds
         setTimeout(() => {
-          // Check if there's a redirect URL stored
           const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
           if (redirectUrl) {
             sessionStorage.removeItem('redirectAfterLogin');
@@ -198,9 +188,7 @@ const Login = () => {
         setIsSuccess(true);
         toast.success(result.message || "Login dengan Google berhasil! Mengarahkan ke halaman utama...");
 
-        // Use shorter timeout and ensure redirect happens
         setTimeout(() => {
-          // Double check authentication before redirect
           if (SessionManager.isAuthenticated()) {
             const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
             if (redirectUrl) {

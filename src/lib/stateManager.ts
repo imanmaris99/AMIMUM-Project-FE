@@ -165,10 +165,6 @@ export class OptimisticUpdater<T> {
   optimisticUpdate(action: StateAction, optimisticState: T, rollbackAction: StateAction): string {
     const id = `opt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
-    // Store original state
-    // const originalState = this.store.getState();
-    
-    // Apply optimistic update
     this.store.dispatch(action);
     
     // Store rollback information
@@ -232,55 +228,13 @@ export class StateValidatorManager<T> {
   }
 }
 
-// State debugging
-export class StateDebugger {
-  private static logs: Array<{ timestamp: Date; action: StateAction; state: unknown }> = [];
-  private static isEnabled: boolean = process.env.NODE_ENV === 'development';
-
-  static log<T>(action: StateAction, state: T): void {
-    if (!this.isEnabled) return;
-
-    this.logs.push({
-      timestamp: new Date(),
-      action,
-      state: JSON.parse(JSON.stringify(state)) // Deep clone
-    });
-
-    // Keep only last 100 logs
-    if (this.logs.length > 100) {
-      this.logs = this.logs.slice(-100);
-    }
-
-  }
-
-  static getLogs(): Array<{ timestamp: Date; action: StateAction; state: unknown }> {
-    return [...this.logs];
-  }
-
-  static clearLogs(): void {
-    this.logs = [];
-  }
-
-  static enable(): void {
-    this.isEnabled = true;
-  }
-
-  static disable(): void {
-    this.isEnabled = false;
-  }
-}
-
-// State middleware
 export const stateMiddleware = {
-  // Logging middleware
   logging: (action: StateAction, next: () => void) => {
     next();
   },
 
-  // Persistence middleware
   persistence: (key: string) => (action: StateAction, next: () => void) => {
     next();
-    // Save state after action is applied
     setTimeout(() => {
       const state = (action as { __store?: { getState: () => unknown } }).__store?.getState();
       if (state) {
@@ -289,10 +243,8 @@ export const stateMiddleware = {
     }, 0);
   },
 
-  // Validation middleware
   validation: <T>(validator: StateValidator<T>) => (action: StateAction, next: () => void) => {
     next();
-    // Validate state after action is applied
     setTimeout(() => {
       const state = (action as { __store?: { getState: () => unknown } }).__store?.getState();
       if (state) {
@@ -317,27 +269,22 @@ export function createEnhancedContext<T>(
 ) {
   const store = new AdvancedStateStore(initialState);
   
-  // Add reducers
   Object.entries(reducers).forEach(([type, reducer]) => {
     store.addReducer(type, reducer);
   });
 
-  // Add middleware
   if (options?.middleware) {
     options.middleware.forEach(middleware => store.addMiddleware(middleware));
   }
 
-  // Add persistence middleware
   if (options?.persist && options?.persistKey) {
     store.addMiddleware(stateMiddleware.persistence(options.persistKey));
   }
 
-  // Add validation middleware
   if (options?.validate) {
     store.addMiddleware(stateMiddleware.validation(options.validate));
   }
 
-  // Add logging middleware in development
   if (process.env.NODE_ENV === 'development') {
     store.addMiddleware(stateMiddleware.logging);
   }
