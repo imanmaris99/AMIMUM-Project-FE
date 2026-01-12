@@ -7,10 +7,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { postVerifyAccount } from "@/services/api/verify-account";
+import { postResendVerification } from "@/services/api/resend-verification";
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/ui/Spinner";
 import React from "react";
 import { useGoogleLogin } from "@/hooks/useGoogleLogin";
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Format email tidak valid" }),
@@ -20,15 +22,72 @@ const formSchema = z.object({
 const FormVerifyAccount = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isResending, setIsResending] = React.useState(false);
+  const [resendCooldown, setResendCooldown] = React.useState(0);
   const { login: handleGoogleLogin, isLoading: isGoogleLoading } = useGoogleLogin();
+
+  const getInitialEmail = () => {
+    if (typeof window !== 'undefined') {
+      const savedEmail = sessionStorage.getItem('verifyEmail');
+      if (savedEmail) {
+        sessionStorage.removeItem('verifyEmail');
+        return savedEmail;
+      }
+    }
+    return "";
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      email: getInitialEmail(),
       code: "",
     },
   });
+
+  React.useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (resendCooldown > 0) {
+      interval = setInterval(() => {
+        setResendCooldown((prev) => {
+          if (prev <= 1) {
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [resendCooldown]);
+
+  const handleResendVerification = async () => {
+    const email = form.getValues('email');
+    
+    if (!email) {
+      toast.error("Silakan masukkan email terlebih dahulu");
+      form.setError('email', { message: 'Email harus diisi' });
+      return;
+    }
+
+    if (resendCooldown > 0) {
+      toast.error(`Tunggu ${resendCooldown} detik sebelum mengirim ulang`);
+      return;
+    }
+
+    setIsResending(true);
+    try {
+      await postResendVerification({ email: email.trim().toLowerCase() });
+      toast.success("Email verifikasi telah dikirim ulang. Silakan cek email Anda.");
+      setResendCooldown(60);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Gagal mengirim ulang email verifikasi. Silakan coba lagi.";
+      toast.error(errorMessage);
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
@@ -100,11 +159,25 @@ const FormVerifyAccount = () => {
                       <input
                         id="code"
                         placeholder="Kode Verifikasi dari Email"
-                        className="w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1"
+                        className="w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1 pr-32"
                         aria-label="Verification Code"
                         {...field}
                       />
                       <div className="w-full h-px bg-gray-300 absolute bottom-0 left-0"></div>
+                      <button
+                        type="button"
+                        onClick={handleResendVerification}
+                        disabled={isResending || resendCooldown > 0 || !form.watch('email')}
+                        className="absolute right-0 top-1/2 transform -translate-y-1/2 text-primary text-xs font-medium hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isResending ? (
+                          "Mengirim..."
+                        ) : resendCooldown > 0 ? (
+                          `Kirim ulang (${resendCooldown}s)`
+                        ) : (
+                          "Kirim ulang"
+                        )}
+                      </button>
                     </div>
                   </FormControl>
                   <FormMessage />

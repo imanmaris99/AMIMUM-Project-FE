@@ -17,31 +17,90 @@ export const CSP_CONFIG = {
   'frame-ancestors': ["'none'"],
 };
 
-// Rate limiting configuration
 export class RateLimiter {
-  private static attempts: Map<string, { count: number; resetTime: number }> = new Map();
   private static readonly MAX_ATTEMPTS = 5;
-  private static readonly WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+  private static readonly WINDOW_MS = 15 * 60 * 1000;
+  private static readonly STORAGE_KEY_PREFIX = 'rate_limit_';
+
+  private static getStorageKey(identifier: string): string {
+    return `${this.STORAGE_KEY_PREFIX}${identifier}`;
+  }
 
   static checkLimit(identifier: string): boolean {
-    const now = Date.now();
-    const attempt = this.attempts.get(identifier);
+    if (typeof window === 'undefined') return true;
 
-    if (!attempt || now > attempt.resetTime) {
-      this.attempts.set(identifier, { count: 1, resetTime: now + this.WINDOW_MS });
+    const now = Date.now();
+    const storageKey = this.getStorageKey(identifier);
+    const stored = localStorage.getItem(storageKey);
+
+    if (!stored) {
       return true;
     }
 
-    if (attempt.count >= this.MAX_ATTEMPTS) {
-      return false;
+    try {
+      const attempt = JSON.parse(stored);
+      
+      if (now > attempt.resetTime) {
+        localStorage.removeItem(storageKey);
+        return true;
+      }
+
+      return attempt.count < this.MAX_ATTEMPTS;
+    } catch {
+      localStorage.removeItem(storageKey);
+      return true;
+    }
+  }
+
+  static incrementAttempt(identifier: string): boolean {
+    if (typeof window === 'undefined') return true;
+
+    const now = Date.now();
+    const storageKey = this.getStorageKey(identifier);
+    const stored = localStorage.getItem(storageKey);
+
+    let attempt: { count: number; resetTime: number };
+
+    if (!stored) {
+      attempt = { count: 1, resetTime: now + this.WINDOW_MS };
+    } else {
+      try {
+        attempt = JSON.parse(stored);
+        
+        if (now > attempt.resetTime) {
+          attempt = { count: 1, resetTime: now + this.WINDOW_MS };
+        } else {
+          attempt.count++;
+        }
+      } catch {
+        attempt = { count: 1, resetTime: now + this.WINDOW_MS };
+      }
     }
 
-    attempt.count++;
-    return true;
+    localStorage.setItem(storageKey, JSON.stringify(attempt));
+    return attempt.count < this.MAX_ATTEMPTS;
+  }
+
+  static getRemainingTime(identifier: string): number {
+    if (typeof window === 'undefined') return 0;
+
+    const storageKey = this.getStorageKey(identifier);
+    const stored = localStorage.getItem(storageKey);
+
+    if (!stored) return 0;
+
+    try {
+      const attempt = JSON.parse(stored);
+      const remaining = attempt.resetTime - Date.now();
+      return remaining > 0 ? remaining : 0;
+    } catch {
+      return 0;
+    }
   }
 
   static resetLimit(identifier: string): void {
-    this.attempts.delete(identifier);
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(this.getStorageKey(identifier));
   }
 }
 

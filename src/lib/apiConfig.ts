@@ -50,6 +50,7 @@ export const API_ENDPOINTS = {
   USER_FORGOT_PASSWORD: '/user/forgot-password',
   USER_RESET_PASSWORD: '/user/reset-password',
   USER_VERIFY_EMAIL: '/user/verify-email',
+  USER_RESEND_VERIFICATION: '/user/resend-verification',
   
   // Production/Brand
   PRODUCTION_ALL: '/production/all',

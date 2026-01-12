@@ -11,6 +11,7 @@ import { RateLimiter, validatePassword, sanitizeUserInput } from "@/lib/security
 import { toast } from "react-hot-toast";
 import { postLogin } from "@/services/api/login";
 import { handleGoogleLogin as handleGoogleAuth } from "@/lib/googleAuth";
+import axios, { AxiosError } from "axios";
 
 const Login = () => {
   const router = useRouter();
@@ -25,6 +26,9 @@ const Login = () => {
   const [isLocked, setIsLocked] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(0);
+  const [isAccountInactive, setIsAccountInactive] = useState(false);
+  const [inactiveEmail, setInactiveEmail] = useState<string>("");
 
   useEffect(() => {
     if (SessionManager.isAuthenticated()) {
@@ -36,17 +40,24 @@ const Login = () => {
         router.push("/");
       }
     }
-  }, [router, isSuccess]); // Add isSuccess as dependency to re-check after login
+  }, [router, isSuccess]);
 
-  // Check rate limiting
   useEffect(() => {
     const clientId = localStorage.getItem('client_id') || generateSecureToken();
     localStorage.setItem('client_id', clientId);
     
-    if (!RateLimiter.checkLimit(clientId)) {
-      setIsLocked(true);
-      toast.error('Terlalu banyak percobaan login. Coba lagi dalam 15 menit.');
-    }
+    const checkLockStatus = () => {
+      const remaining = RateLimiter.getRemainingTime(clientId);
+      const isCurrentlyLocked = !RateLimiter.checkLimit(clientId);
+      
+      setIsLocked(isCurrentlyLocked);
+      setRemainingTime(remaining);
+    };
+
+    checkLockStatus();
+    const interval = setInterval(checkLockStatus, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const validateForm = () => {
@@ -107,20 +118,21 @@ const Login = () => {
     setApiError(null);
     
     try {
-      // Rate limiting check
       const clientId = localStorage.getItem('client_id') || generateSecureToken();
+      localStorage.setItem('client_id', clientId);
+      
       if (!RateLimiter.checkLimit(clientId)) {
         setIsLocked(true);
-        toast.error('Terlalu banyak percobaan login. Coba lagi dalam 15 menit.');
+        const remaining = RateLimiter.getRemainingTime(clientId);
+        const minutes = Math.ceil(remaining / 60000);
+        toast.error(`Terlalu banyak percobaan login. Coba lagi dalam ${minutes} menit.`);
         setIsSubmitting(false);
         return;
       }
       
-      // Sanitize and validate inputs
       const sanitizedEmail = sanitizeUserInput(formData.email).toLowerCase();
       const sanitizedPassword = sanitizeUserInput(formData.password);
       
-      // Call login API
       const response = await postLogin({
         email: sanitizedEmail,
         password: sanitizedPassword,
@@ -138,7 +150,7 @@ const Login = () => {
         
         const token = {
           token: generateSecureToken(),
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
           refreshToken: generateSecureToken(),
         };
         
@@ -160,11 +172,56 @@ const Login = () => {
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Login gagal. Silakan coba lagi.";
-      setApiError(errorMessage);
-      setErrors({
-        general: errorMessage
-      });
-      toast.error(errorMessage);
+      
+      let isInactiveError = false;
+      
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError;
+        if (axiosError.response?.status === 403) {
+          isInactiveError = true;
+        }
+      }
+      
+      if (!isInactiveError) {
+        const errorLower = errorMessage.toLowerCase();
+        isInactiveError = (error as any)?.isAccountInactive === true || 
+                          (error as any)?.statusCode === 403 ||
+                          errorLower.includes("tidak aktif") || 
+                          errorLower.includes("not active") ||
+                          errorLower.includes("belum terverifikasi") ||
+                          errorLower.includes("not verified") ||
+                          errorLower.includes("account is not active") ||
+                          errorLower.includes("akun anda tidak aktif") ||
+                          errorLower.includes("your account is not active") ||
+                          errorLower.includes("please contact support") ||
+                          errorLower.includes("akun anda") && errorLower.includes("aktif") ||
+                          errorLower.includes("account") && errorLower.includes("active");
+      }
+      
+      if (isInactiveError) {
+        setIsAccountInactive(true);
+        setInactiveEmail(formData.email.trim().toLowerCase());
+        setApiError("");
+        setErrors({});
+        toast.error("Akun belum terverifikasi. Silakan cek email Anda untuk kode verifikasi.");
+      } else {
+        const clientId = localStorage.getItem('client_id') || generateSecureToken();
+        const isStillAllowed = RateLimiter.incrementAttempt(clientId);
+        
+        if (!isStillAllowed) {
+          setIsLocked(true);
+          const remaining = RateLimiter.getRemainingTime(clientId);
+          const minutes = Math.ceil(remaining / 60000);
+          const rateLimitMessage = `Terlalu banyak percobaan login. Coba lagi dalam ${minutes} menit.`;
+          setApiError(rateLimitMessage);
+          setErrors({ general: rateLimitMessage });
+          toast.error(rateLimitMessage);
+        } else {
+          setApiError(errorMessage);
+          setErrors({ general: errorMessage });
+          toast.error(errorMessage);
+        }
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -276,15 +333,49 @@ const Login = () => {
           </h1>
 
           <form onSubmit={handleLogin} className="space-y-4">
-            {/* General Error */}
-            {errors.general && (
+            {isLocked && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+                <p className="text-red-600 text-sm font-semibold mb-1">
+                  Akun terkunci karena terlalu banyak percobaan login
+                </p>
+                {remainingTime > 0 && (
+                  <p className="text-red-500 text-xs">
+                    Coba lagi dalam {Math.ceil(remainingTime / 60000)} menit {Math.ceil((remainingTime % 60000) / 1000)} detik
+                  </p>
+                )}
+              </div>
+            )}
+
+            {isAccountInactive && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+                <p className="text-yellow-800 text-sm font-semibold mb-2">
+                  Akun Anda belum terverifikasi
+                </p>
+                <p className="text-yellow-700 text-xs mb-3">
+                  Silakan cek email Anda untuk kode verifikasi. Jika tidak menerima email, klik tombol di bawah untuk verifikasi akun.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (inactiveEmail) {
+                      sessionStorage.setItem('verifyEmail', inactiveEmail);
+                    }
+                    router.push("/verify-account");
+                  }}
+                  className="bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium px-4 py-2 rounded transition-colors"
+                >
+                  Verifikasi Akun
+                </button>
+              </div>
+            )}
+
+            {errors.general && !isLocked && !isAccountInactive && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
                 <p className="text-red-600 text-sm">{errors.general}</p>
               </div>
             )}
 
-            {/* API Error */}
-            {apiError && !errors.general && (
+            {apiError && !errors.general && !isLocked && !isAccountInactive && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
                 <p className="text-red-600 text-sm">{apiError}</p>
               </div>
@@ -353,7 +444,7 @@ const Login = () => {
 
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLocked}
               className="w-full bg-primary text-white py-3 rounded font-medium hover:bg-primary/90 transition-colors mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {isSubmitting ? (

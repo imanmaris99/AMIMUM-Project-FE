@@ -46,7 +46,10 @@ export const postLogin = async (data: LoginRequest): Promise<LoginResponse> => {
       }
 
       if (status === 403) {
-        throw new Error(errorData.message || "Akun Anda tidak aktif. Silakan hubungi support.");
+        const inactiveError = new Error(errorData.message || "Akun Anda belum terverifikasi. Silakan verifikasi email Anda terlebih dahulu.");
+        (inactiveError as any).isAccountInactive = true;
+        (inactiveError as any).statusCode = 403;
+        throw inactiveError;
       }
 
       if (status === 404) {
@@ -57,6 +60,10 @@ export const postLogin = async (data: LoginRequest): Promise<LoginResponse> => {
         const validationErrors = errorData.detail || [];
         const errorMessages = validationErrors.map((err) => err.msg).join(", ");
         throw new Error(errorMessages || "Kesalahan validasi. Silakan periksa email dan password yang Anda masukkan.");
+      }
+
+      if (status === 429) {
+        throw new Error(errorData.message || "Terlalu banyak percobaan login. Silakan coba lagi nanti.");
       }
 
       if (status === 500) {
