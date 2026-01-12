@@ -9,15 +9,18 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/ui/Spinner";
 import React from "react";
+import { postForgotPassword } from "@/services/api/forgot-password";
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
+  email: z.string().email({ message: "Format email tidak valid" }),
 });
 
 const FormForgotPassword = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
+  const [apiError, setApiError] = React.useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -26,38 +29,35 @@ const FormForgotPassword = () => {
     },
   });
 
-  // Dummy email list untuk simulasi
-  const dummyEmails = [
-    "admin@amimum.com",
-    "user@amimum.com", 
-    "test@amimum.com",
-    "demo@amimum.com"
-  ];
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
+    setApiError(null);
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Check if email exists in dummy data
-    const emailExists = dummyEmails.includes(values.email.toLowerCase());
-    
-    if (emailExists) {
-      setIsSuccess(true);
-      // Auto redirect after 3 seconds
-      setTimeout(() => {
-        router.push("/login");
-      }, 3000);
-    } else {
-      // Show error for non-existent email
+    try {
+      const response = await postForgotPassword({
+        email: values.email.trim().toLowerCase(),
+      });
+      
+      if (response.status_code === 200) {
+        setIsSuccess(true);
+        toast.success(response.message || "Email reset password telah dikirim. Silakan cek email Anda.");
+        
+        // Auto redirect after 3 seconds
+        setTimeout(() => {
+          router.push("/login");
+        }, 3000);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Gagal mengirim email reset password. Silakan coba lagi.";
+      setApiError(errorMessage);
       form.setError("email", {
         type: "manual",
-        message: "Email tidak terdaftar dalam sistem"
+        message: errorMessage
       });
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    setIsSubmitting(false);
   };
 
   // Show success message if request was successful
@@ -99,15 +99,9 @@ const FormForgotPassword = () => {
       {/* Card informasi */}
       <Card className="bg-white bg-opacity-25 rounded-[5px] border-none">
         <CardContent className="p-5">
-          <p className="text-[#828282] text-center text-sm leading-tight mb-3">
+          <p className="text-[#828282] text-center text-sm leading-tight">
             Kirim permintaan ganti passwordmu melalui email yang sudah terdaftar disini !!
           </p>
-          <div className="bg-blue-50 border border-blue-200 rounded p-3">
-            <p className="text-blue-800 text-xs font-medium mb-1">Email untuk testing:</p>
-            <p className="text-blue-700 text-xs">
-              admin@amimum.com, user@amimum.com, test@amimum.com, demo@amimum.com
-            </p>
-          </div>
         </CardContent>
       </Card>
 
@@ -115,6 +109,13 @@ const FormForgotPassword = () => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-4 mt-20">
+            {/* API Error Message */}
+            {apiError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+                <p className="text-red-600 text-sm">{apiError}</p>
+              </div>
+            )}
+
             {/* Email Field */}
             <FormField
               control={form.control}
