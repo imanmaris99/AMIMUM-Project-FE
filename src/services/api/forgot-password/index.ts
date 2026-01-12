@@ -38,9 +38,23 @@ export const postForgotPassword = async (data: ForgotPasswordRequest): Promise<F
 
     throw new Error(response.data.message || "Gagal mengirim email reset password. Silakan coba lagi.");
   } catch (error: unknown) {
+    if (axios.isAxiosError(error) && !error.response) {
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        throw new Error("Request timeout. Silakan coba lagi.");
+      }
+      if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
+        throw new Error("Tidak dapat terhubung ke server. Periksa koneksi internet Anda.");
+      }
+      throw new Error("Terjadi kesalahan jaringan. Silakan coba lagi.");
+    }
+
     if (axios.isAxiosError(error) && error.response) {
       const status = error.response.status;
       const errorData = error.response.data as ForgotPasswordErrorResponse;
+
+      if (status === 400) {
+        throw new Error(errorData.message || "Email domain tidak didukung. Gunakan email dari gmail.com, yahoo.com, atau outlook.com.");
+      }
 
       if (status === 404) {
         throw new Error(errorData.message || "Email tidak ditemukan.");

@@ -43,8 +43,6 @@ const FormForgotPassword = () => {
       if (response.status_code === 200) {
         setIsSuccess(true);
         toast.success(response.message || "Email reset password telah dikirim. Silakan cek email Anda.");
-        
-        // Auto redirect after 3 seconds
         setTimeout(() => {
           router.push("/login");
         }, 3000);
@@ -62,7 +60,6 @@ const FormForgotPassword = () => {
     }
   };
 
-  // Show success message if request was successful
   if (isSuccess) {
     return (
       <div className="space-y-6">
@@ -93,12 +90,10 @@ const FormForgotPassword = () => {
 
   return (
     <div className="space-y-6">
-      {/* Judul Lupa Password */}
       <div className="text-center">
         <h1 className="text-[#00764F] text-[38px] font-bold">Lupa Password</h1>
       </div>
 
-      {/* Card informasi */}
       <Card className="bg-white bg-opacity-25 rounded-[5px] border-none">
         <CardContent className="p-5">
           <p className="text-[#828282] text-center text-sm leading-tight">
@@ -107,18 +102,15 @@ const FormForgotPassword = () => {
         </CardContent>
       </Card>
 
-      {/* Form */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-4 mt-20">
-            {/* API Error Message */}
             {apiError && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
                 <p className="text-red-600 text-sm">{apiError}</p>
               </div>
             )}
 
-            {/* Email Field */}
             <FormField
               control={form.control}
               name="email"
@@ -143,7 +135,6 @@ const FormForgotPassword = () => {
               )}
             />
 
-            {/* Submit Button */}
             <Button 
               type="submit" 
               className="w-full h-10 bg-[#00764F] hover:bg-[#00764F]/90 text-white rounded-[4px] font-normal"
@@ -162,14 +153,12 @@ const FormForgotPassword = () => {
         </form>
       </Form>
 
-      {/* Divider */}
       <div className="flex items-center gap-4 my-4 mt-6">
         <div className="flex-1 h-px bg-gray-300"></div>
         <span className="text-slate-500 text-sm">atau Log In menggunakan</span>
         <div className="flex-1 h-px bg-gray-300"></div>
       </div>
 
-      {/* Google Login */}
       <button
         onClick={handleGoogleLogin}
         disabled={isGoogleLoading}
@@ -195,7 +184,6 @@ const FormForgotPassword = () => {
         </div>
       </button>
 
-      {/* Register Link */}
       <div className="text-center">
         <p className="text-sm text-gray-600">
           Belum memiliki akun? 

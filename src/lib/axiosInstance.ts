@@ -3,9 +3,10 @@ import { API_BASE_URL } from "./apiConfig"
 
 const axiosInstance = axios.create({
     baseURL: API_BASE_URL,
-    headers:{
+    headers: {
         "Content-Type": 'application/json'
-    }
+    },
+    timeout: 10000,
 })
 
 export default axiosInstance
