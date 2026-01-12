@@ -1,39 +1,72 @@
-"use client";
-
-import { useGetProductDiscountByBrandId } from "@/hooks/useGetProductDiscountByBrandId";
-import Header from "@/components/homepage/Header_Section";
-import ProductList from "@/components/DetailBrand/ProductList";
+import ProductListWithPagination from "@/components/DetailBrand/ProductListWithPagination";
 import DetailBrand from "@/components/DetailBrand";
-import { PulseLoader } from "react-spinners";
+import { CardProductProps } from "@/components/common/Search/CardProduct/types";
+import UnifiedHeader from "@/components/common/UnifiedHeader";
+import { GetBrandDetailByIDServer } from "@/services/api/brand";
+import { GetProductDiscountByBrandIdServer } from "@/services/api/product";
+import { validateProductData } from "@/utils/dataValidation";
+import { BrandDetailType } from "@/types/detailProduct";
 
-const PromoDetailPage = ({ params }: { params: { promoId: string } }) => {
-  const { isLoading, errorMessage } = useGetProductDiscountByBrandId(
-    Number(params.promoId)
-  );
-
-  if (isLoading)
+export default async function PromoDetailPage({ params }: { params: Promise<{ promoId: string }> }) {
+  const { promoId } = await params;
+  let brandData: BrandDetailType | null = null;
+  let products: CardProductProps[] = [];
+  let errorMessage: string | null = null;
+  
+  if (!promoId || typeof promoId !== 'string') {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <PulseLoader color="hsl(var(--primary))" size={10} />
-      </div>
+      <main className="pb-20">
+        <UnifiedHeader type="main" title="Promo Not Found" />
+        <div className="p-4 text-center">
+          <p className="text-red-500">Invalid promo ID provided</p>
+        </div>
+      </main>
     );
+  }
 
-  if (errorMessage)
+  const productionId = parseInt(promoId, 10);
+  if (isNaN(productionId)) {
     return (
-      <div className="pb-20">
-        <Header />
-        <DetailBrand brandDetailId={Number(params.promoId)} />
-        <ProductList brandId={Number(params.promoId)} />
-      </div>
+      <main className="pb-20">
+        <UnifiedHeader type="main" title="Promo Not Found" />
+        <div className="p-4 text-center">
+          <p className="text-red-500">Invalid promo ID format</p>
+        </div>
+      </main>
     );
-
+  }
+  
+  try {
+    brandData = await GetBrandDetailByIDServer(productionId);
+  } catch (error) {
+    errorMessage = error instanceof Error ? error.message : 'Gagal mengambil data brand';
+  }
+    
+  try {
+    const allProducts = await GetProductDiscountByBrandIdServer(productionId);
+    const validProducts = allProducts.filter(validateProductData);
+    products = validProducts;
+  } catch {
+    products = [];
+  }
+  
   return (
-    <div className="pb-20">
-      <Header />
-      <DetailBrand brandDetailId={Number(params.promoId)} />
-      <ProductList brandId={Number(params.promoId)} />
-    </div>
+    <main className="pb-20">
+      <UnifiedHeader 
+        type="main"
+        showCart={true}
+        showNotifications={true}
+      />
+      <DetailBrand 
+        brandDetail={brandData} 
+        errorMessage={errorMessage}
+        promoProductCount={products.length}
+      />
+      <ProductListWithPagination 
+        products={products} 
+        title={`Produk Promo ${brandData?.name || "Brand"}`}
+        emptyMessage="Produk promo belum tersedia."
+      />
+    </main>
   );
-};
-
-export default PromoDetailPage;
+}

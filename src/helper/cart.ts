@@ -1,24 +1,14 @@
 import { CartItemType } from "@/types/apiTypes";
 
 export const recalculateCartTotals = (cartList: CartItemType[]) => {
-  const all_item_active_prices = cartList
-    .filter((item) => item.is_active)
-    .reduce((sum, item) => sum + item.product_price * item.quantity, 0);
-  const all_promo_active_prices = cartList
-    .filter((item) => item.is_active && item.variant_info.discount)
-    .reduce(
-      (sum, item) =>
-        sum +
-        (item.variant_info.discount / 100) * item.product_price * item.quantity,
-      0
-    );
-  const total_all_active_prices =
-    all_item_active_prices - all_promo_active_prices;
+  const subtotal = cartList.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const shipping_cost = 15000;
+  const total = subtotal + shipping_cost;
 
   return {
-    all_item_active_prices,
-    all_promo_active_prices,
-    total_all_active_prices,
+    subtotal,
+    shipping_cost,
+    total,
   };
 };
 
@@ -31,16 +21,9 @@ export const updateCartItem = (
   );
 };
 
-export const toggleSelectAll = (
-  cartItems: CartItemType[],
-  isActive: boolean
-): CartItemType[] => {
-  return cartItems.map((item) => ({ ...item, is_active: isActive }));
-};
-
 export const removeCartItem = (
   cartItems: CartItemType[],
-  cartItemId: number
+  cartItemId: string
 ): CartItemType[] => {
   return cartItems.filter((item) => item.id !== cartItemId);
 };

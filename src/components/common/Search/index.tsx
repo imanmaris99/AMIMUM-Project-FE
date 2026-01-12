@@ -13,6 +13,7 @@ const Search = () => {
     isLoading,
     errorMessage,
     showDropdown,
+    setShowDropdown,
     handleSelectProduct,
     searchRef,
     handleInputChange,
@@ -29,8 +30,13 @@ const Search = () => {
           placeholder="Cari produk"
           value={search}
           onChange={handleInputChange}
+          onFocus={() => {
+            if (search.length > 0) {
+              setShowDropdown(true);
+            }
+          }}
         />
-        <Button onClick={handleSearch} variant="default" disabled={!search}>
+        <Button onClick={handleSearch} variant="default" disabled={!search.trim()}>
           Cari
         </Button>
       </div>
@@ -41,7 +47,10 @@ const Search = () => {
           isLoading={isLoading}
           isError={isError}
           errorMessage={errorMessage || ""}
-          handleSelectProduct={handleSelectProduct}
+          handleSelectProduct={(productId) => {
+            handleSelectProduct(productId);
+            setShowDropdown(false);
+          }}
         />
       )}
     </div>
