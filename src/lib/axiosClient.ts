@@ -64,6 +64,19 @@ axiosClient.interceptors.response.use(
     const originalRequest = error.config;
     const status = error.response?.status;
     const errorMessage = error.response?.data?.message || error.message;
+    const requestUrl = originalRequest?.url || '';
+    
+    // Check if this is a search endpoint - 404 is expected (no products found)
+    // Search endpoint pattern: /product/{product_name} (not /product/detail/, /product/production/, or /product/discount/)
+    // Remove base URL and query params, then check if it matches /product/{name} pattern
+    const urlPath = typeof requestUrl === 'string' 
+      ? requestUrl.replace(API_BASE_URL, '').split('?')[0]
+      : '';
+    const isSearchEndpoint = /^\/product\/[^\/]+$/.test(urlPath) && 
+                             !urlPath.includes('/product/detail/') &&
+                             !urlPath.includes('/product/production/') &&
+                             !urlPath.includes('/product/discount/');
+    
     if (error.response) {
       switch (status) {
         case 401:
@@ -88,11 +101,14 @@ axiosClient.interceptors.response.use(
           break;
 
         case 404:
-          await ErrorHandler.handleError(
-            new Error('Resource not found'),
-            'API_404',
-            false
-          );
+          // Skip ErrorHandler for search endpoints - 404 is expected (no products found)
+          if (!isSearchEndpoint) {
+            await ErrorHandler.handleError(
+              new Error('Resource not found'),
+              'API_404',
+              false
+            );
+          }
           break;
 
         case 422:
