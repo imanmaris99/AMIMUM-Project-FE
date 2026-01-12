@@ -38,3 +38,6 @@ next-env.d.ts
 
 # cursor
 .cursor_rules
+
+#folder
+/Backend

@@ -1,17 +1,10 @@
+import Spinner from "@/components/ui/Spinner";
+
 const TagSkeleton = () => {
   return (
-    <div className="mx-6 mt-6">
-      <h6 className="font-semibold font-jakarta">Kategori</h6>
-      <div className="mt-6 flex gap-2 overflow-x-auto hide-scrollbar whitespace-nowrap">
-        {[...Array(5)].map((_, index) => (
-          <div
-            key={index}
-            className="border border-gray-200 rounded-full px-4 py-2 w-fit bg-gray-300 animate-pulse"
-          >
-            <p className="font-jakarta text-xs text-transparent">Loading</p>
-          </div>
-        ))}
-      </div>
+    <div className="mx-6 mt-6 flex flex-col items-center justify-center min-h-[80px]">
+      <Spinner className="mb-2" size={28} label="Memuat kategori..." />
+      <p className="text-gray-600 text-sm">Memuat kategori...</p>
     </div>
   );
 };

@@ -2,8 +2,15 @@ import { useState, useEffect } from "react";
 
 const useCarousel = (items: React.ReactNode[], itemsToShow: number, interval: number) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+    
     const slideInterval = setInterval(() => {
       setActiveIndex((prevIndex) => {
         const nextIndex = prevIndex + itemsToShow;
@@ -12,7 +19,7 @@ const useCarousel = (items: React.ReactNode[], itemsToShow: number, interval: nu
     }, interval);
 
     return () => clearInterval(slideInterval);
-  }, [itemsToShow, items.length, interval]);
+  }, [itemsToShow, items.length, interval, isMounted]);
 
   return { activeIndex, setActiveIndex };
 };

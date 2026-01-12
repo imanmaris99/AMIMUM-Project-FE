@@ -1,19 +1,22 @@
 import { AccordionExpandDefault } from "@/components";
-import { useArticles } from "@/hooks/useArticles";
 import { ArticleProps } from "./types";
 import AccordionSkeleton from "@/components/ui/AccordionExpandDefault/AccordionSkeleton";
 import Footer from "../../layout/Footer";
+import React from "react";
 
-const ArticleSection = () => {
-  const { articles, isLoading, isError, errorMessage } = useArticles();
+interface ArticleSectionProps {
+  articles: ArticleProps[] | null;
+  errorMessage?: string | null;
+}
 
-  if (isError) {
+const ArticleSection = ({ articles, errorMessage }: ArticleSectionProps) => {
+  if (errorMessage) {
     return (
       <>
         <div className="mx-6 mt-6">
           <h6 className="font-semibold font-jakarta">Artikel</h6>
         </div>
-        <div className="mx-6 mt-6 text-red-500 font-semibold">
+        <div className="mx-6 mt-6 text-red-500 font-semibold flex justify-center items-center">
           {errorMessage}
         </div>
       </>
@@ -27,11 +30,11 @@ const ArticleSection = () => {
       </div>
 
       <div className="mx-6 mt-6 flex flex-col gap-2">
-        {isLoading
-          ? Array.from({ length: articles?.length || 4 }, (_, index) => (
+        {!articles
+          ? Array.from({ length: 4 }, (_, index) => (
               <AccordionSkeleton key={index} />
             ))
-          : articles?.map((article: ArticleProps) => (
+          : articles.map((article: ArticleProps) => (
               <AccordionExpandDefault
                 key={article.display_id}
                 article={article}
@@ -46,4 +49,4 @@ const ArticleSection = () => {
   );
 };
 
-export default ArticleSection;
+export default React.memo(ArticleSection);
