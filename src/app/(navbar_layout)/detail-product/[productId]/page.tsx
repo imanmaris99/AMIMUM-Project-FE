@@ -6,7 +6,6 @@ import UnifiedHeader from "@/components/common/UnifiedHeader";
 export default async function DetailProduct({ params }: { params: Promise<{ productId: string }> }) {
   const { productId } = await params;
 
-  // Validate productId parameter
   if (!productId || typeof productId !== 'string') {
     return (
       <div className="min-h-screen bg-white">
@@ -30,7 +29,6 @@ export default async function DetailProduct({ params }: { params: Promise<{ prod
     detailProduct = await getDetailProductServer(productId);
   } catch (error) {
     errorMessage = error instanceof Error ? error.message : 'Gagal mengambil detail produk.';
-    console.error('Error fetching product detail:', error);
     ErrorHandler.handleError(error instanceof Error ? error : new Error(String(error)), 'DetailProduct');
   }
 

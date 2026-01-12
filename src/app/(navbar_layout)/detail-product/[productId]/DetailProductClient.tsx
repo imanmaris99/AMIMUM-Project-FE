@@ -29,11 +29,9 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
     router.back();
   };
 
-  // Validate product data if available
   const isValidProduct = detailProduct && validateDetailProductData(detailProduct);
   const isError = errorMessage ? 500 : 0;
 
-  // Show error state
   if (errorMessage && !detailProduct) {
     return (
       <div className="min-h-screen bg-white">
@@ -51,7 +49,6 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
     );
   }
 
-  // Show invalid data state
   if (detailProduct && !isValidProduct) {
     return (
       <div className="min-h-screen bg-white">

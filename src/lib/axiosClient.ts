@@ -22,22 +22,17 @@ const axiosClient = axios.create({
 axiosClient.interceptors.request.use(
   async (config) => {
     try {
-      // Add authentication token
       const session = SessionManager.getSession();
       if (session?.token) {
         config.headers.Authorization = `Bearer ${session.token.token}`;
       }
 
-      // Add CSRF token
       const csrfToken = localStorage.getItem('csrf_token');
       if (csrfToken) {
         config.headers['X-CSRF-Token'] = csrfToken;
       }
 
-      // Add request ID for tracking
       config.headers['X-Request-ID'] = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-      // Add timestamp for debugging
       (config as AxiosRequestConfigWithMetadata).metadata = { startTime: Date.now() };
 
       return config;
@@ -57,21 +52,8 @@ axiosClient.interceptors.response.use(
     // Log successful requests
     // const duration = Date.now() - ((response.config as any).metadata?.startTime || 0);
     
-    // Validate response data structure (soft validation - don't throw for minor issues)
     if (!response.data || typeof response.data !== 'object') {
-      console.warn('Warning: Response data is not an object', response.data);
-      // Don't throw, just return the data as-is
       return response.data;
-    }
-
-    // Soft validation - only log warnings, don't throw errors
-    // This prevents unnecessary error notifications for minor format issues
-    if (response.data.status_code !== undefined && typeof response.data.status_code !== 'number') {
-      console.warn('Warning: status_code is not a number', response.data.status_code);
-    }
-
-    if (response.data.message !== undefined && typeof response.data.message !== 'string') {
-      console.warn('Warning: message is not a string', response.data.message);
     }
 
     // Log response validation
@@ -82,10 +64,6 @@ axiosClient.interceptors.response.use(
     const originalRequest = error.config;
     const status = error.response?.status;
     const errorMessage = error.response?.data?.message || error.message;
-
-    // Log error details
-
-    // Handle different error types
     if (error.response) {
       switch (status) {
         case 401:
@@ -102,7 +80,6 @@ axiosClient.interceptors.response.use(
           break;
 
         case 403:
-          // Forbidden - insufficient permissions
           await ErrorHandler.handleError(
             new Error('Access forbidden'),
             'API_403',
@@ -111,7 +88,6 @@ axiosClient.interceptors.response.use(
           break;
 
         case 404:
-          // Not found
           await ErrorHandler.handleError(
             new Error('Resource not found'),
             'API_404',
@@ -120,7 +96,6 @@ axiosClient.interceptors.response.use(
           break;
 
         case 422:
-          // Validation error
           await ErrorHandler.handleError(
             new Error(errorMessage || 'Validation failed'),
             'API_422',
@@ -129,7 +104,6 @@ axiosClient.interceptors.response.use(
           break;
 
         case 429:
-          // Rate limited
           await ErrorHandler.handleError(
             new Error('Rate limit exceeded'),
             'API_429',
@@ -142,7 +116,6 @@ axiosClient.interceptors.response.use(
         case 502:
         case 503:
         case 504:
-          // Server errors - retry with exponential backoff
           await ErrorHandler.handleError(
             new Error('Server error'),
             'API_5xx',
@@ -152,7 +125,6 @@ axiosClient.interceptors.response.use(
           break;
 
         default:
-          // Other client errors
           await ErrorHandler.handleError(
             new Error(errorMessage || 'Request failed'),
             'API_4xx',
@@ -160,7 +132,6 @@ axiosClient.interceptors.response.use(
           );
       }
     } else if (error.request) {
-      // Network error - retry with exponential backoff
       await ErrorHandler.handleError(
         new Error('Network error - no response received'),
         'API_NETWORK',
@@ -168,7 +139,6 @@ axiosClient.interceptors.response.use(
         () => axiosClient(originalRequest)
       );
     } else {
-      // Other errors
       await ErrorHandler.handleError(
         new Error(errorMessage || 'Request setup error'),
         'API_SETUP',
@@ -234,7 +204,6 @@ export const safeApiClient = {
   },
 
   async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T | undefined> {
-    // Validate request data before sending
     if (data && typeof data !== 'object') {
       ErrorHandler.handleError(new Error('Request data must be an object'), 'SafeAPIPut');
       return undefined;
@@ -247,7 +216,6 @@ export const safeApiClient = {
   },
 
   async patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T | undefined> {
-    // Validate request data before sending
     if (data && typeof data !== 'object') {
       ErrorHandler.handleError(new Error('Request data must be an object'), 'SafeAPIPatch');
       return undefined;

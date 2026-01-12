@@ -44,28 +44,14 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
     brandData = await GetBrandDetailByIDServer(productionId);
   } catch (error) {
     errorMessage = error instanceof Error ? error.message : 'Gagal mengambil data brand';
-    console.error('Error fetching brand detail:', error);
   }
     
   // Fetch products from API
   try {
     const allProducts = await GetProductsByProductionIdServer(productionId);
-    
-    // Log for debugging
-    console.log('Fetched products:', allProducts.length, allProducts);
-    
-    // Validate products data
     const validProducts = allProducts.filter(validateProductData);
-    const invalidProducts = allProducts.filter(prod => !validateProductData(prod));
-    
-    if (invalidProducts.length > 0) {
-      console.warn(`${invalidProducts.length} invalid products found and filtered out:`, invalidProducts);
-    }
-    
     products = validProducts;
-  } catch (error) {
-    // Error fetching products is not fatal - page can still show brand detail
-    console.error('Error fetching products:', error);
+  } catch {
     products = [];
   }
   

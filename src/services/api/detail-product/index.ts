@@ -33,45 +33,36 @@ export async function getDetailProductServer(productId: string): Promise<DetailP
       next: { revalidate: 60 },
     });
 
-    // Handle different status codes according to API documentation
     if (res.status === 404) {
-      // Not Found
       const errorData = await res.json().catch(() => ({}));
       const errorMessage = errorData.message || 'Produk dengan ID yang diberikan tidak ditemukan.';
       throw new Error(errorMessage);
     }
 
     if (res.status === 422) {
-      // Validation Error
       const errorData = await res.json().catch(() => ({}));
       const errorMessage = errorData.detail?.[0]?.msg || 'Kesalahan validasi saat mengambil detail produk.';
       throw new Error(errorMessage);
     }
 
     if (res.status === 500) {
-      // Internal Server Error
       const errorData = await res.json().catch(() => ({}));
       const errorMessage = errorData.message || 'Kesalahan tak terduga saat mengambil detail produk.';
       throw new Error(errorMessage);
     }
 
     if (!res.ok) {
-      // Other errors
       throw new Error(`Gagal mengambil detail produk: ${res.status}`);
     }
 
-    // Parse response
     const data: DetailProductResponseType = await res.json();
     
-    // Validate response structure
     if (!data || !data.data) {
       throw new Error('Invalid response format: data is missing');
     }
 
-    // Return product data - image_url normalization is handled in components if needed
     return data.data;
   } catch (error) {
-    // Re-throw with more context if needed
     if (error instanceof Error) {
       throw error;
     }

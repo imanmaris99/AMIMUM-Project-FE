@@ -8,8 +8,6 @@ interface ProductInformationProps {
   isLoading: boolean;
 }
 
-// ProductInformationSkeleton component removed - not used
-
 const ProductInformation = ({
   isError,
   isLoading,
@@ -53,7 +51,6 @@ const ProductInformation = ({
     }
   }
 
-  // Show message if variant is not selected
   if (!datavariant) {
     return (
       <div className="bg-white rounded-lg shadow-sm">

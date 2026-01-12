@@ -47,7 +47,6 @@ const useSearchLogic = () => {
     }
   };
 
-  // Menggunakan data dari centralized dummy data yang sudah sesuai dengan backend
   const dummyProducts = useMemo(() => {
     try {
       return generateCardProductData();
@@ -56,30 +55,23 @@ const useSearchLogic = () => {
     }
   }, []);
 
-  // Ganti handleInputChange dengan versi debounce - dinonaktifkan sementara
   const debouncedFetch = useMemo(() => debounce(async (...args: unknown[]) => {
     const value = args[0] as string;
     setIsLoading(true);
     setIsError(false);
     setErrorMessage("");
     try {
-      // API call dinonaktifkan sementara karena server sedang down
-      // const res = await axios.get(`/api/product/search?name=${encodeURIComponent(value)}`);
-      // setProducts(Array.isArray(res.data?.data) ? res.data.data : []);
-      
-      // Menggunakan dummy data sementara dengan validasi
       const filteredProducts = dummyProducts
         .filter(product => 
           validateProductData(product) && 
           product.name.toLowerCase().includes(value.toLowerCase())
         )
         .sort((a, b) => {
-          // Urutkan berdasarkan relevansi: yang cocok di awal nama lebih relevan
           const aIndex = a.name.toLowerCase().indexOf(value.toLowerCase());
           const bIndex = b.name.toLowerCase().indexOf(value.toLowerCase());
           return aIndex - bIndex;
         })
-        .slice(0, 5); // Batasi maksimal 5 hasil
+        .slice(0, 5);
       
       setProducts(filteredProducts);
     } catch (err: unknown) {
