@@ -47,6 +47,7 @@ export const API_ENDPOINTS = {
   // User
   USER_PROFILE: '/user/profile',
   USER_REGISTER: '/user/register',
+  USER_VERIFY_EMAIL: '/user/verify-email',
   
   // Production/Brand
   PRODUCTION_ALL: '/production/all',

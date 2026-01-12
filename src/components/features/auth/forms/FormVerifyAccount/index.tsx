@@ -12,8 +12,8 @@ import Spinner from "@/components/ui/Spinner";
 import React from "react";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
-  code: z.string(),
+  email: z.string().email({ message: "Format email tidak valid" }),
+  code: z.string().min(1, { message: "Kode verifikasi harus diisi" }),
 });
 
 const FormVerifyAccount = () => {
