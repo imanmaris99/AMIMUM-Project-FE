@@ -15,7 +15,7 @@ interface SearchDropdownProps {
 
 const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardProductProps; handleSelectProduct: (productId: string) => void }) => {
   const [imageError, setImageError] = useState(false);
-  const imageUrl = product.all_variants[0]?.img || "/buyungupik_agr-1.svg";
+  const imageUrl = product.image || product.all_variants[0]?.img || "/buyungupik_agr-1.svg";
 
   const handleImageError = () => {
     setImageError(true);
@@ -70,7 +70,9 @@ const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardPro
         <div className="flex-1">
           <p className="text-sm font-medium">{product.name}</p>
           <p className="text-xs text-gray-500">
-            {product.all_variants.length} varian tersedia
+            {product.all_variants && product.all_variants.length > 0 
+              ? `${product.all_variants.length} varian tersedia`
+              : "Produk tersedia"}
           </p>
         </div>
       </div>

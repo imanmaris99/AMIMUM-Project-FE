@@ -130,6 +130,37 @@ export interface AllProductInfoResponseType {
   data: AllProductInfoType[];
 }
 
+// Search API response structure (actual structure from Swagger)
+export interface ProductSearchItemType {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  stock?: number;
+  highest_promo?: number;
+  avg_rating?: number;
+  brand_info?: {
+    id: number;
+    name: string;
+    photo_url?: string;
+  };
+  all_variants?: Array<{
+    id: number;
+    variant: string;
+    img: string;
+    discount: number;
+    discounted_price: number;
+    updated_at: string;
+  }>;
+  created_at?: string;
+}
+
+export interface ProductSearchResponseType {
+  status_code: number;
+  message: string;
+  data: ProductSearchItemType[];
+}
+
 export interface ProductListScrollResponseType {
   data: AllProductInfoType[];
   has_more: boolean;

@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { CardProductProps } from "./CardProduct/types";
-import { generateCardProductData } from "@/data/dummyData";
-import { validateProductData } from "@/utils/dataValidation";
+import { SearchGetProduct } from "@/services/api/product";
 
 function debounce<T extends (...args: unknown[]) => void>(fn: T, delay: number): T {
   let timeout: ReturnType<typeof setTimeout>;
@@ -48,52 +47,54 @@ const useSearchLogic = () => {
     }
   };
 
-  const dummyProducts = useMemo(() => {
-    try {
-      return generateCardProductData();
-    } catch {
-      return [];
-    }
-  }, []);
-
   const debouncedFetch = useMemo(() => debounce(async (...args: unknown[]) => {
     const value = args[0] as string;
+    
+    if (!value || value.trim().length === 0) {
+      setProducts([]);
+      setIsLoading(false);
+      setShowDropdown(false);
+      return;
+    }
+
     setIsLoading(true);
     setIsError(false);
     setErrorMessage("");
+    setShowDropdown(true);
+    
     try {
-      const filteredProducts = dummyProducts
-        .filter(product => 
-          validateProductData(product) && 
-          product.name.toLowerCase().includes(value.toLowerCase())
-        )
-        .sort((a, b) => {
-          const aIndex = a.name.toLowerCase().indexOf(value.toLowerCase());
-          const bIndex = b.name.toLowerCase().indexOf(value.toLowerCase());
-          return aIndex - bIndex;
-        })
-        .slice(0, 5);
+      const products = await SearchGetProduct(value.trim());
       
-      setProducts(filteredProducts);
+      // Limit to 5 products for dropdown
+      const limitedProducts = products.slice(0, 5);
+      
+      setProducts(limitedProducts);
+      setIsError(false);
+      setShowDropdown(true);
     } catch (err: unknown) {
       setIsError(true);
       setErrorMessage(err instanceof Error ? err.message : "Gagal mengambil data produk.");
       setProducts([]);
+      setShowDropdown(true);
     } finally {
       setIsLoading(false);
     }
-  }, 400), [dummyProducts]);
+  }, 400), []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const value = e.target.value;
       setSearch(value);
-      setShowDropdown(value.length > 0);
       
       if (value.length > 0) {
+        setShowDropdown(true);
         debouncedFetch(value);
       } else {
         setProducts([]);
+        setShowDropdown(false);
+        setIsLoading(false);
+        setIsError(false);
+        setErrorMessage("");
       }
     } catch {
       // Silent error handling

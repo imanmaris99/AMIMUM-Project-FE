@@ -15,7 +15,7 @@ interface SearchDropdownProps {
 
 const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardProductProps; handleSelectProduct: (productId: string) => void }) => {
   const [imageError, setImageError] = useState(false);
-  const imageUrl = product.all_variants[0]?.img || "/buyungupik_agr-1.svg";
+  const imageUrl = product.image || product.all_variants[0]?.img || "/buyungupik_agr-1.svg";
 
   const handleImageError = () => {
     setImageError(true);
@@ -70,7 +70,9 @@ const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardPro
         <div className="flex-1">
           <p className="text-sm font-medium">{product.name}</p>
           <p className="text-xs text-gray-500">
-            {product.all_variants.length} varian tersedia
+            {product.all_variants && product.all_variants.length > 0 
+              ? `${product.all_variants.length} varian tersedia`
+              : "Produk tersedia"}
           </p>
         </div>
       </div>
@@ -85,26 +87,46 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
   errorMessage,
   handleSelectProduct,
 }) => {
-  return (
-    <ul className="absolute w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg z-10">
-      {isLoading ? (
+  if (isLoading) {
+    return (
+      <ul className="absolute w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg z-10">
         <li className="p-2 flex flex-col items-center justify-center">
           <PulseLoader color="hsl(var(--primary))" size={10} />
           <span className="text-gray-500 text-xs mt-2">Mencari produk...</span>
         </li>
-      ) : isError ? (
+      </ul>
+    );
+  }
+
+  if (isError) {
+    return (
+      <ul className="absolute w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg z-10">
         <li className="p-2 text-gray-500 flex justify-center">
-          {errorMessage}
+          {errorMessage || "Gagal mengambil data produk"}
         </li>
-      ) : (
-        products?.slice(0, 5).map((product: CardProductProps) => (
-          <SearchDropdownItem
-            key={product.id}
-            product={product}
-            handleSelectProduct={handleSelectProduct}
-          />
-        ))
-      )}
+      </ul>
+    );
+  }
+
+  if (!products || products.length === 0) {
+    return (
+      <ul className="absolute w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg z-10">
+        <li className="p-2 text-gray-500 flex justify-center">
+          Produk tidak ditemukan
+        </li>
+      </ul>
+    );
+  }
+
+  return (
+    <ul className="absolute w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg z-10">
+      {products.slice(0, 5).map((product: CardProductProps) => (
+        <SearchDropdownItem
+          key={product.id}
+          product={product}
+          handleSelectProduct={handleSelectProduct}
+        />
+      ))}
     </ul>
   );
 };

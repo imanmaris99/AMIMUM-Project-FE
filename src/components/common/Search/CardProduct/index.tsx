@@ -15,7 +15,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
     setImageError(true);
   };
 
-  const imageUrl = product.all_variants[0]?.img || "/buyungupik_agr-1.svg";
+  const imageUrl = product.image || product.all_variants[0]?.img || "/buyungupik_agr-1.svg";
   
   // Check if URL is external (http/https) - simple string check
   // Use regular img tag for ALL external images to prevent Next.js Image optimizer retry loops
@@ -29,28 +29,34 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
     return url.startsWith('http://') || url.startsWith('https://');
   }, [imageUrl, imageError]);
 
-  // Validate product data
-  if (!product || !product.all_variants || product.all_variants.length === 0) {
+  // Validate product data - allow products with at least minimal variant data
+  if (!product || !product.id || !product.name) {
     return null;
   }
 
   // Calculate highest discount from all variants
   // If brand_highest_discount is available (for promo pages), use it instead
-  const highestDiscount = product.brand_highest_discount || product.all_variants.reduce((max, variant) => {
-    const discount = variant.discount || 0;
-    return discount > max ? discount : max;
-  }, 0);
+  const highestDiscount = product.brand_highest_discount || (product.all_variants && product.all_variants.length > 0
+    ? product.all_variants.reduce((max, variant) => {
+        const discount = variant.discount || 0;
+        return discount > max ? discount : max;
+      }, 0)
+    : 0);
 
   // Calculate lowest discounted price from all variants
-  const lowestDiscountedPrice = product.all_variants.reduce((min, variant) => {
-    const discountedPrice = variant.discounted_price || product.price;
-    return discountedPrice < min ? discountedPrice : min;
-  }, product.price);
+  const lowestDiscountedPrice = product.all_variants && product.all_variants.length > 0
+    ? product.all_variants.reduce((min, variant) => {
+        const discountedPrice = variant.discounted_price || product.price;
+        return discountedPrice < min ? discountedPrice : min;
+      }, product.price)
+    : product.price;
 
   // Find the variant with lowest discounted price to get its original price
-  const lowestPriceVariant = product.all_variants.find(variant => 
-    variant.discounted_price === lowestDiscountedPrice
-  );
+  const lowestPriceVariant = product.all_variants && product.all_variants.length > 0
+    ? product.all_variants.find(variant => 
+        variant.discounted_price === lowestDiscountedPrice
+      )
+    : null;
   
   // Use the original price of the variant with lowest discounted price
   // If using brand_highest_discount, calculate original price based on that discount
@@ -133,7 +139,9 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
             {product.name}
           </p>
           <p className="text-gray-500 text-[10px]">
-            {product.all_variants.length} varian tersedia
+            {product.all_variants && product.all_variants.length > 0 
+              ? `${product.all_variants.length} varian tersedia`
+              : "Produk tersedia"}
           </p>
           <div className="flex items-center gap-2">
             <p className="text-[10px] text-gray-500">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { CardProductProps } from '@/components/common/Search/CardProduct/types';
+import { SearchGetProduct } from '@/services/api/product';
 
 interface UseSearchPaginationProps {
   searchQuery: string;
@@ -49,20 +50,16 @@ const useSearchPagination = ({
         setIsLoadingMore(true);
       }
 
-      // Simulate API call - replace with actual API call when backend is ready
-      // const response = await SearchGetProduct(query);
+      const allProducts = await SearchGetProduct(query);
       
-      // For now, use dummy data with pagination simulation
-      const allProducts = await import('@/data/dummyData').then(module => 
-        module.generateCardProductData()
-      );
-      
-      const filteredProducts = allProducts.filter(product => 
-        product.name?.toLowerCase().includes(query.toLowerCase()) ||
-        product.brand_info?.name?.toLowerCase().includes(query.toLowerCase())
-      );
+      // Apply brand filter if provided
+      const filteredProducts = brandFilter
+        ? allProducts.filter(product => 
+            product.brand_info?.name?.toLowerCase().includes(brandFilter.toLowerCase())
+          )
+        : allProducts;
 
-      // Simulate pagination
+      // Client-side pagination (since API doesn't support pagination)
       const startIndex = (page - 1) * ITEMS_PER_PAGE;
       const endIndex = startIndex + ITEMS_PER_PAGE;
       const pageProducts = filteredProducts.slice(startIndex, endIndex);
@@ -84,7 +81,7 @@ const useSearchPagination = ({
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [ITEMS_PER_PAGE]);
+  }, [ITEMS_PER_PAGE, brandFilter]);
 
   // Reset state when search query changes
   useEffect(() => {

@@ -3,8 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { CardProductProps } from "./CardProduct/types";
-import { generateCardProductData } from "@/data/dummyData";
-import { validateProductData } from "@/utils/dataValidation";
+import { SearchGetProduct } from "@/services/api/product";
 
 function debounce<T extends (...args: unknown[]) => void>(fn: T, delay: number): T {
   let timeout: ReturnType<typeof setTimeout>;
@@ -47,33 +46,18 @@ const useSearchLogic = () => {
     }
   };
 
-  const dummyProducts = useMemo(() => {
-    try {
-      return generateCardProductData();
-    } catch {
-      return [];
-    }
-  }, []);
-
   const debouncedFetch = useMemo(() => debounce(async (...args: unknown[]) => {
     const value = args[0] as string;
     setIsLoading(true);
     setIsError(false);
     setErrorMessage("");
     try {
-      const filteredProducts = dummyProducts
-        .filter(product => 
-          validateProductData(product) && 
-          product.name.toLowerCase().includes(value.toLowerCase())
-        )
-        .sort((a, b) => {
-          const aIndex = a.name.toLowerCase().indexOf(value.toLowerCase());
-          const bIndex = b.name.toLowerCase().indexOf(value.toLowerCase());
-          return aIndex - bIndex;
-        })
-        .slice(0, 5);
+      const products = await SearchGetProduct(value);
       
-      setProducts(filteredProducts);
+      // Limit to 5 products for dropdown
+      const limitedProducts = products.slice(0, 5);
+      
+      setProducts(limitedProducts);
     } catch (err: unknown) {
       setIsError(true);
       setErrorMessage(err instanceof Error ? err.message : "Gagal mengambil data produk.");
@@ -81,7 +65,7 @@ const useSearchLogic = () => {
     } finally {
       setIsLoading(false);
     }
-  }, 400), [dummyProducts]);
+  }, 400), []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
