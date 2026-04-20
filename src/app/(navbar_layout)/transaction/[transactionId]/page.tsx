@@ -8,6 +8,7 @@ import UnifiedHeader from "@/components/common/UnifiedHeader";
 import rupiahFormater from "@/utils/rupiahFormater";
 import { getPaymentMethodLabel } from "@/lib/paymentMethods";
 import { Transaction } from "@/types/transaction";
+import { SessionManager } from "@/lib/auth";
 import {
   getOrderDetail,
   mapOrderDetailToTransaction,
@@ -27,6 +28,13 @@ const TransactionDetailPage: React.FC = () => {
   useEffect(() => {
     const loadOrderDetail = async () => {
       if (!transactionId) {
+        setIsLoading(false);
+        return;
+      }
+
+      if (!SessionManager.isAuthenticated()) {
+        setTransaction(null);
+        setErrorMessage(null);
         setIsLoading(false);
         return;
       }

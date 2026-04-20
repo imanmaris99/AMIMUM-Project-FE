@@ -7,6 +7,7 @@ import TransactionList from "@/components/transaction/molecules/TransactionList"
 import LoginProtection from "@/components/common/LoginProtection";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 import { Transaction } from "@/types/transaction";
+import { SessionManager } from "@/lib/auth";
 import {
   getMyOrders,
   mapOrderSummaryToTransaction,
@@ -22,6 +23,13 @@ const TransactionPage = () => {
 
   useEffect(() => {
     const loadOrders = async () => {
+      if (!SessionManager.isAuthenticated()) {
+        setApiTransactions([]);
+        setIsLoading(false);
+        setErrorMessage(null);
+        return;
+      }
+
       setIsLoading(true);
       setErrorMessage(null);
 

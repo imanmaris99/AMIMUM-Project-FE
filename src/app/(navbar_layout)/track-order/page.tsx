@@ -11,6 +11,7 @@ import { TrackOrderItem } from "@/types/trackOrder";
 import { Transaction } from "@/types/transaction";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 import LoginProtection from "@/components/common/LoginProtection";
+import { SessionManager } from "@/lib/auth";
 import {
   getMyOrders,
   getOrderDetail,
@@ -34,6 +35,14 @@ const TrackOrderPage: React.FC = () => {
 
   useEffect(() => {
     const loadOrders = async () => {
+      if (!SessionManager.isAuthenticated()) {
+        setApiOrders([]);
+        setCurrentTransaction(null);
+        setIsLoading(false);
+        setErrorMessage(null);
+        return;
+      }
+
       setIsLoading(true);
       setErrorMessage(null);
 

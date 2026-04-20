@@ -12,6 +12,7 @@ import React, {
 import { toast } from "react-hot-toast";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 import { CartItemType, CartTotalPricesType } from "@/types/apiTypes";
+import { SessionManager } from "@/lib/auth";
 import {
   addCartProduct,
   deleteCartProduct,
@@ -143,6 +144,19 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const refreshCart = useCallback(async () => {
     setIsLoading(true);
 
+    if (!SessionManager.isAuthenticated()) {
+      setCartItems([]);
+      setTotalItems(0);
+      setTotalPrices({
+        subtotal: 0,
+        shipping_cost: 0,
+        total: 0,
+        promo_total: 0,
+      });
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const [cartResponse, totalResponse] = await Promise.all([
         getMyCartProducts(),
@@ -189,6 +203,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         throw new Error("Produk atau varian tidak valid.");
       }
 
+      if (!SessionManager.isAuthenticated()) {
+        throw new Error("Login diperlukan untuk menambahkan produk ke keranjang.");
+      }
+
       await addCartProduct({
         productId: product.id,
         variantId: variant.id,
@@ -208,6 +226,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   const removeFromCart = useCallback(
     async (cartId: string) => {
+      if (!SessionManager.isAuthenticated()) {
+        throw new Error("Login diperlukan untuk mengubah keranjang.");
+      }
+
       await deleteCartProduct(cartId);
       await refreshCart();
     },
@@ -218,6 +240,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     async (cartId: string, quantity: number) => {
       if (!Number.isInteger(quantity) || quantity < 1) {
         throw new Error("Jumlah produk tidak valid.");
+      }
+
+      if (!SessionManager.isAuthenticated()) {
+        throw new Error("Login diperlukan untuk mengubah keranjang.");
       }
 
       await updateCartQuantityApi({
@@ -231,6 +257,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   const updateActiveStatus = useCallback(
     async (cartId: string, isActive: boolean) => {
+      if (!SessionManager.isAuthenticated()) {
+        throw new Error("Login diperlukan untuk mengubah keranjang.");
+      }
+
       await updateCartActivation({
         cartId,
         isActive,
@@ -242,6 +272,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   const updateAllActiveStatus = useCallback(
     async (isActive: boolean) => {
+      if (!SessionManager.isAuthenticated()) {
+        throw new Error("Login diperlukan untuk mengubah keranjang.");
+      }
+
       await updateAllCartActivation(isActive);
       await refreshCart();
     },
@@ -249,6 +283,18 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   );
 
   const clearCart = useCallback(async () => {
+    if (!SessionManager.isAuthenticated()) {
+      setCartItems([]);
+      setTotalItems(0);
+      setTotalPrices({
+        subtotal: 0,
+        shipping_cost: 0,
+        total: 0,
+        promo_total: 0,
+      });
+      return;
+    }
+
     await Promise.all(cartItems.map((item) => deleteCartProduct(item.id)));
     await refreshCart();
   }, [cartItems, refreshCart]);
@@ -258,6 +304,18 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   }, [clearCart]);
 
   const removeActiveItems = useCallback(async () => {
+    if (!SessionManager.isAuthenticated()) {
+      setCartItems([]);
+      setTotalItems(0);
+      setTotalPrices({
+        subtotal: 0,
+        shipping_cost: 0,
+        total: 0,
+        promo_total: 0,
+      });
+      return;
+    }
+
     const activeItems = cartItems.filter((item) => item.is_active !== false);
 
     await Promise.all(activeItems.map((item) => deleteCartProduct(item.id)));

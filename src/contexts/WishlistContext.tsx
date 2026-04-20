@@ -4,6 +4,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 import { WishlistItem } from '@/types/wishlist';
 import { validateWishlistItemData } from '@/utils/dataValidation';
 import { ErrorHandler } from '@/lib/errorHandler';
+import { SessionManager } from '@/lib/auth';
 import {
   addWishlistProduct,
   deleteWishlistProduct,
@@ -76,6 +77,12 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   }, [getProductIdCache]);
 
   const refreshWishlist = useCallback(async () => {
+    if (!SessionManager.isAuthenticated()) {
+      setWishlistItems([]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await getMyWishlistProducts();
       const mappedItems = response.data.map(mapApiWishlistToItem);
@@ -97,6 +104,10 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       if (!product || !product.productId) {
         ErrorHandler.handleError(new Error('Product ID is required'), 'WishlistAdd');
         return;
+      }
+
+      if (!SessionManager.isAuthenticated()) {
+        throw new Error('Login diperlukan untuk menambahkan wishlist.');
       }
 
       if (!validateWishlistItemData(product)) {
@@ -127,6 +138,10 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     }
 
     try {
+      if (!SessionManager.isAuthenticated()) {
+        throw new Error('Login diperlukan untuk mengubah wishlist.');
+      }
+
       const targetItem = wishlistItems.find(
         (item) =>
           item.id === wishlistIdOrProductId ||
@@ -151,6 +166,12 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   };
 
   const clearAll = async () => {
+    if (!SessionManager.isAuthenticated()) {
+      setWishlistItems([]);
+      saveProductIdCache({});
+      return;
+    }
+
     for (const item of wishlistItems) {
       if (item.wishlistId) {
         await deleteWishlistProduct(item.wishlistId);
