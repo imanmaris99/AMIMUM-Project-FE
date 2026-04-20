@@ -1,37 +1,95 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
 interface ChangePhotoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpload: (file: File) => void;
+  onUpload: (file: File) => Promise<void>;
 }
 
 const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({ isOpen, onClose, onUpload }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+      const maxSizeInBytes = 300 * 1024;
+
+      if (!allowedTypes.includes(file.type)) {
+        setSubmitError(
+          "Format file tidak didukung. Gunakan png, jpeg, jpg, atau webp."
+        );
+        setSelectedFile(null);
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
+        }
+        setPreviewUrl(null);
+        return;
+      }
+
+      if (file.size > maxSizeInBytes) {
+        setSubmitError("Ukuran file melebihi 300 KB.");
+        setSelectedFile(null);
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
+        }
+        setPreviewUrl(null);
+        return;
+      }
+
+      setSubmitError(null);
       setSelectedFile(file);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
     }
   };
 
-  const handleUpload = () => {
-    if (selectedFile) {
-      onUpload(selectedFile);
-      onClose();
+  const handleUpload = async () => {
+    if (!selectedFile || isUploading) {
+      return;
+    }
+
+    setIsUploading(true);
+    setSubmitError(null);
+
+    try {
+      await onUpload(selectedFile);
+      handleClose();
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Gagal mengunggah foto profil."
+      );
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const handleClose = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
     setSelectedFile(null);
     setPreviewUrl(null);
+    setSubmitError(null);
     onClose();
   };
 
@@ -52,6 +110,12 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({ isOpen, onClose, on
               
               {/* Divider Line */}
               <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
+
+              {submitError && (
+                <div className="rounded-lg bg-red-50 px-4 py-3 text-center">
+                  <p className="text-sm text-red-600">{submitError}</p>
+                </div>
+              )}
               
               {/* Upload Area */}
               <div className="bg-[#F8F8F8] rounded-lg p-4 relative">
@@ -76,7 +140,7 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({ isOpen, onClose, on
                 {/* Hidden File Input */}
                 <input
                   type="file"
-                  accept="image/*"
+                  accept=".png,.jpeg,.jpg,.webp,image/png,image/jpeg,image/webp"
                   onChange={handleFileChange}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
@@ -85,12 +149,10 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({ isOpen, onClose, on
               {/* Preview Image */}
               {previewUrl && (
                 <div className="flex justify-center">
-                  <Image
+                  <img
                     src={previewUrl}
                     alt="Preview"
-                    width={100}
-                    height={100}
-                    className="rounded-lg object-cover"
+                    className="h-[100px] w-[100px] rounded-lg object-cover"
                   />
                 </div>
               )}
@@ -101,20 +163,21 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({ isOpen, onClose, on
           <div className="flex gap-3">
             <button
               onClick={handleClose}
+              disabled={isUploading}
               className="flex-1 py-4 px-6 rounded-2xl text-lg font-medium bg-white text-[#006A47] border border-[#006A47] hover:bg-[#E6F2F0] transition-colors"
             >
               Batal
             </button>
             <button
               onClick={handleUpload}
-              disabled={!selectedFile}
+              disabled={!selectedFile || isUploading}
               className={`flex-1 py-4 px-6 rounded-2xl text-lg font-medium transition-colors ${
-                selectedFile 
+                selectedFile && !isUploading
                   ? "bg-[#006A47] text-white hover:bg-[#005A3C]" 
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >
-              Upload
+              {isUploading ? "Mengunggah..." : "Upload"}
             </button>
           </div>
         </div>

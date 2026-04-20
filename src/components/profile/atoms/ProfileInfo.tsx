@@ -3,12 +3,15 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { toast } from "react-hot-toast";
-import EditProfileModal from "../molecules/EditProfileModal";
+import EditProfileModal, { ProfileData } from "../molecules/EditProfileModal";
 import ChangePhotoModal from "../molecules/ChangePhotoModal";
 import {
   getUserProfile,
+  updateUserPhoto,
+  updateUserProfile,
   UserProfile,
 } from "@/services/api/profile";
+import { SessionManager } from "@/lib/auth";
 
 const ProfileInfo: React.FC = () => {
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
@@ -32,6 +35,7 @@ const ProfileInfo: React.FC = () => {
         }
 
         setProfile(response.data);
+        syncSessionProfile(response.data);
       } catch (error) {
         if (!isMounted) {
           return;
@@ -64,8 +68,38 @@ const ProfileInfo: React.FC = () => {
     setIsEditProfileModalOpen(false);
   };
 
-  const handleSaveProfile = () => {
-    toast("Perubahan profil belum terhubung ke endpoint update profile.");
+  const handleSaveProfile = async (profileData: ProfileData) => {
+    if (!profile) {
+      throw new Error("Data profil belum tersedia.");
+    }
+
+    const firstname = profileData.firstname.trim();
+    const lastname = profileData.lastname.trim();
+    const phone = profileData.phone.trim();
+    const address = profileData.address.trim();
+    const fullname = `${firstname} ${lastname}`.trim();
+
+    const response = await updateUserProfile({
+      fullname,
+      firstname,
+      lastname,
+      phone,
+      address,
+    });
+
+    const updatedProfile = {
+      ...profile,
+      firstname: response.data.firstname,
+      lastname: response.data.lastname,
+      phone: response.data.phone,
+      address: response.data.address,
+      updated_at: new Date().toISOString(),
+    };
+
+    setProfile(updatedProfile);
+    syncSessionProfile(updatedProfile);
+
+    toast.success(response.message || "Profil berhasil diperbarui.");
   };
 
   const handleChangePhotoClick = () => {
@@ -76,8 +110,56 @@ const ProfileInfo: React.FC = () => {
     setIsChangePhotoModalOpen(false);
   };
 
-  const handlePhotoUpload = () => {
-    toast("Ganti foto belum terhubung ke endpoint upload foto profile.");
+  const handlePhotoUpload = async (file: File) => {
+    if (!profile) {
+      throw new Error("Data profil belum tersedia.");
+    }
+
+    const response = await updateUserPhoto(file);
+
+    const updatedProfile = {
+      ...profile,
+      photo_url: response.data.photo_url,
+      updated_at: new Date().toISOString(),
+    };
+
+    setProfile(updatedProfile);
+    syncSessionProfile(updatedProfile);
+
+    toast.success(response.message || "Foto profil berhasil diperbarui.");
+  };
+
+  const syncSessionProfile = (nextProfile: UserProfile) => {
+    const session = SessionManager.getSession();
+
+    if (!session) {
+      return;
+    }
+
+    SessionManager.setSession(
+      {
+        ...session.user,
+        email: nextProfile.email,
+        name:
+          `${nextProfile.firstname ?? ""} ${nextProfile.lastname ?? ""}`.trim() ||
+          session.user.name,
+        firstname: nextProfile.firstname || session.user.firstname,
+        photoUrl: nextProfile.photo_url || "",
+      },
+      session.token
+    );
+
+    window.dispatchEvent(
+      new StorageEvent("storage", {
+        key: "userProfile",
+        newValue: JSON.stringify({
+          email: nextProfile.email,
+          firstname: nextProfile.firstname,
+          photo_url: nextProfile.photo_url,
+        }),
+        storageArea: localStorage,
+      })
+    );
   };
 
   const displayName = useMemo(() => {
@@ -159,7 +241,7 @@ const ProfileInfo: React.FC = () => {
           <button 
             onClick={handleEditProfileClick}
             disabled={isLoading || Boolean(errorMessage)}
-            className="bg-[#007A4F] text-[#E6F2F0] px-4 py-2 rounded-2xl text-sm font-medium border border-[#A2A2A2] flex items-center gap-2 hover:bg-[#005A3C] transition-colors"
+            className="bg-[#007A4F] text-[#E6F2F0] px-4 py-2 rounded-2xl text-sm font-medium border border-[#A2A2A2] flex items-center gap-2 hover:bg-[#005A3C] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Image
               src="/edit.svg"
@@ -174,7 +256,7 @@ const ProfileInfo: React.FC = () => {
           <button 
             onClick={handleChangePhotoClick}
             disabled={isLoading || Boolean(errorMessage)}
-            className="bg-[#E6F2F0] text-[#0D0E09] px-4 py-2 rounded-2xl text-sm font-medium border border-[#A2A2A2] flex items-center gap-2 hover:bg-[#D4E8E0] transition-colors"
+            className="bg-[#E6F2F0] text-[#0D0E09] px-4 py-2 rounded-2xl text-sm font-medium border border-[#A2A2A2] flex items-center gap-2 hover:bg-[#D4E8E0] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Image
               src="/gallery-export.svg"

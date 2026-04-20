@@ -44,6 +44,8 @@ export const API_ENDPOINTS = {
   
   // User
   USER_PROFILE: '/user/profile',
+  USER_EDIT_INFO: '/user/edit-info',
+  USER_EDIT_PHOTO: '/user/edit-photo',
   USER_REGISTER: '/user/register',
   USER_LOGIN: '/user/login',
   USER_GOOGLE_LOGIN: '/user/auth/google-login',

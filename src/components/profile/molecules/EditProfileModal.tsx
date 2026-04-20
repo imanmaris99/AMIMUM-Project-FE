@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface EditProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (profileData: ProfileData) => void;
+  onSave: (profileData: ProfileData) => Promise<void>;
   initialData?: ProfileData;
 }
 
-interface ProfileData {
+export interface ProfileData {
   firstname: string;
   lastname: string;
   phone: string;
@@ -28,6 +28,13 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   }
 }) => {
   const [formData, setFormData] = useState<ProfileData>(initialData);
+  const [isSaving, setIsSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setFormData(initialData);
+    setSubmitError(null);
+  }, [initialData, isOpen]);
 
   const handleInputChange = (field: keyof ProfileData, value: string) => {
     setFormData(prev => ({
@@ -36,9 +43,25 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     }));
   };
 
-  const handleSave = () => {
-    onSave(formData);
-    onClose();
+  const handleSave = async () => {
+    if (isSaving) {
+      return;
+    }
+
+    setIsSaving(true);
+    setSubmitError(null);
+    try {
+      await onSave(formData);
+      onClose();
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Gagal menyimpan perubahan profil."
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -61,6 +84,12 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               
               {/* Form Fields */}
               <div className="space-y-6">
+                {submitError && (
+                  <div className="rounded-lg bg-red-50 px-4 py-3 text-center">
+                    <p className="text-sm text-red-600">{submitError}</p>
+                  </div>
+                )}
+
                 {/* Firstname Field */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
@@ -128,15 +157,17 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
           <div className="flex gap-3">
             <button
               onClick={onClose}
+              disabled={isSaving}
               className="flex-1 py-4 px-6 rounded-2xl text-lg font-medium bg-white text-[#006A47] border border-[#006A47] hover:bg-[#E6F2F0] transition-colors"
             >
               Batal
             </button>
             <button
               onClick={handleSave}
-              className="flex-1 py-4 px-6 rounded-2xl text-lg font-medium bg-[#006A47] text-white hover:bg-[#005A3C] transition-colors"
+              disabled={isSaving}
+              className="flex-1 py-4 px-6 rounded-2xl text-lg font-medium bg-[#006A47] text-white hover:bg-[#005A3C] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Save
+              {isSaving ? "Menyimpan..." : "Save"}
             </button>
           </div>
         </div>

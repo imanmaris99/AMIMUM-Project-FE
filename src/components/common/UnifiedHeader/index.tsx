@@ -39,6 +39,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [userDisplayName, setUserDisplayName] = useState("");
+  const [userPhotoUrl, setUserPhotoUrl] = useState("");
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
@@ -54,12 +55,15 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
         const email = session?.user?.email || "";
         const firstname = session?.user?.firstname?.trim();
         const derivedName = session?.user?.name?.trim() || (email ? email.split('@')[0] : "");
+        const photoUrl = session?.user?.photoUrl?.trim() || "";
 
         setUserEmail(email);
         setUserDisplayName(firstname || derivedName);
+        setUserPhotoUrl(photoUrl);
       } else {
         setUserEmail("");
         setUserDisplayName("");
+        setUserPhotoUrl("");
       }
     };
 
@@ -67,7 +71,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
     
     // Listen for storage changes (login/logout from other tabs)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'isLoggedIn' || e.key === 'userEmail') {
+      if (e.key === 'isLoggedIn' || e.key === 'userEmail' || e.key === 'userProfile') {
         checkAuth();
       }
     };
@@ -104,6 +108,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
     setIsLoggedIn(false);
     setUserEmail("");
     setUserDisplayName("");
+    setUserPhotoUrl("");
     setShowProfileDropdown(false);
     setShowMobileMenu(false);
     
@@ -161,10 +166,18 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                     
                     {/* Profile Avatar with Notification Badge */}
                     <div className="relative">
-                      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                        <span className="text-white text-sm font-medium">
-                          {(userDisplayName.charAt(0) || userEmail.charAt(0)).toUpperCase()}
-                        </span>
+                      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center overflow-hidden">
+                        {userPhotoUrl ? (
+                          <img
+                            src={userPhotoUrl}
+                            alt={userDisplayName || userEmail || "User"}
+                            className="h-8 w-8 object-cover"
+                          />
+                        ) : (
+                          <span className="text-white text-sm font-medium">
+                            {(userDisplayName.charAt(0) || userEmail.charAt(0)).toUpperCase()}
+                          </span>
+                        )}
                       </div>
                       {/* Combined notification badge on avatar */}
                       {(getNotificationCount("cart") > 0 || getNotificationCount("tracking") + getNotificationCount("transaction") > 0) && (
