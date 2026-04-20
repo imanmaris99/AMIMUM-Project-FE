@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { GoChevronLeft } from "react-icons/go";
 import { toast } from "react-hot-toast";
 import EditAddressModal from "../../../components/profile/molecules/EditAddressModal";
+import DeleteAddressModal from "../../../components/profile/molecules/DeleteAddressModal";
 import AddAddressModal, {
   AddressFormData,
 } from "../../../components/profile/molecules/AddAddressModal";
@@ -21,10 +22,12 @@ const SavedAddressesPage: React.FC = () => {
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [addresses, setAddresses] = useState<ShipmentAddress[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [deletingAddressId, setDeletingAddressId] = useState<number | null>(null);
+  const [addressPendingDelete, setAddressPendingDelete] = useState<ShipmentAddress | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -138,25 +141,37 @@ const SavedAddressesPage: React.FC = () => {
     setIsAddModalOpen(false);
   };
 
-  const handleDeleteAddress = async (address: ShipmentAddress) => {
-    const confirmed = window.confirm(
-      `Hapus alamat "${address.name}" dari daftar alamat tersimpan?`
-    );
+  const handleOpenDeleteModal = (address: ShipmentAddress) => {
+    setAddressPendingDelete(address);
+    setIsDeleteModalOpen(true);
+  };
 
-    if (!confirmed) {
+  const handleCloseDeleteModal = () => {
+    if (deletingAddressId) {
       return;
     }
 
-    setDeletingAddressId(address.id);
+    setIsDeleteModalOpen(false);
+    setAddressPendingDelete(null);
+  };
+
+  const handleDeleteAddress = async () => {
+    if (!addressPendingDelete) {
+      return;
+    }
+
+    setDeletingAddressId(addressPendingDelete.id);
 
     try {
-      await deleteShipmentAddress(address.id);
+      await deleteShipmentAddress(addressPendingDelete.id);
 
       setAddresses((prev) => {
-        const remainingAddresses = prev.filter((item) => item.id !== address.id);
+        const remainingAddresses = prev.filter(
+          (item) => item.id !== addressPendingDelete.id
+        );
 
         setSelectedAddress((currentSelected) => {
-          if (currentSelected !== address.id.toString()) {
+          if (currentSelected !== addressPendingDelete.id.toString()) {
             return currentSelected;
           }
 
@@ -167,6 +182,8 @@ const SavedAddressesPage: React.FC = () => {
       });
 
       toast.success("Alamat pengiriman berhasil dihapus.");
+      setIsDeleteModalOpen(false);
+      setAddressPendingDelete(null);
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -324,7 +341,7 @@ const SavedAddressesPage: React.FC = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        void handleDeleteAddress(item);
+                        handleOpenDeleteModal(item);
                       }}
                       disabled={deletingAddressId === item.id}
                       className="text-sm font-medium text-red-600 transition-colors hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-60"
@@ -381,6 +398,16 @@ const SavedAddressesPage: React.FC = () => {
                 isOpen={isAddModalOpen}
                 onClose={handleCloseAddModal}
                 onSave={handleSaveNewAddress}
+              />
+
+              <DeleteAddressModal
+                isOpen={isDeleteModalOpen}
+                addressName={addressPendingDelete?.name ?? ""}
+                isDeleting={Boolean(deletingAddressId)}
+                onClose={handleCloseDeleteModal}
+                onConfirm={() => {
+                  void handleDeleteAddress();
+                }}
               />
             </div>
           );
