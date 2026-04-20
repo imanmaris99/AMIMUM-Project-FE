@@ -6,7 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Spinner from "@/components/ui/Spinner";
 import React from "react";
 import { postResetPassword } from "@/services/api/reset-password";
@@ -14,6 +14,11 @@ import toast from "react-hot-toast";
 import { Eye } from "@/app/(auth_layout)/register/Eye";
 import { EyeOff } from "@/app/(auth_layout)/register/EyeOff";
 import { useGoogleLogin } from "@/hooks/useGoogleLogin";
+import {
+  AUTH_FLOW_STORAGE_KEYS,
+  resolveAuthFlowEmail,
+  saveAuthFlowEmail,
+} from "@/lib/authFlow";
 
 // Password validation schema sesuai kriteria API
 const passwordSchema = z
@@ -38,42 +43,67 @@ const formSchema = z
 
 const FormResetPassword = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
   const [apiError, setApiError] = React.useState<string | null>(null);
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const { login: handleGoogleLogin, isLoading: isGoogleLoading } = useGoogleLogin();
+  const initialEmail = React.useMemo(
+    () =>
+      resolveAuthFlowEmail(
+        searchParams?.get("email") ?? null,
+        AUTH_FLOW_STORAGE_KEYS.resetEmail
+      ),
+    [searchParams]
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      email: initialEmail,
       code: "",
       new_password: "",
       confirm_password: "",
     },
   });
 
+  React.useEffect(() => {
+    if (initialEmail && form.getValues("email") !== initialEmail) {
+      form.setValue("email", initialEmail, { shouldValidate: true });
+    }
+  }, [form, initialEmail]);
+
+  React.useEffect(() => {
+    if (!isSuccess) {
+      return;
+    }
+
+    const redirectTimer = window.setTimeout(() => {
+      const loginEmail = form.getValues("email").trim().toLowerCase();
+      router.push(`/login?email=${encodeURIComponent(loginEmail)}`);
+    }, 1500);
+
+    return () => window.clearTimeout(redirectTimer);
+  }, [form, isSuccess, router]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     setApiError(null);
 
     try {
-      const response = await postResetPassword({
-        email: values.email.trim().toLowerCase(),
+      const normalizedEmail = values.email.trim().toLowerCase();
+      await postResetPassword({
+        email: normalizedEmail,
         code: values.code.trim(),
         new_password: values.new_password,
       });
 
-      if (response.status_code === 200) {
-        setIsSuccess(true);
-        toast.success(response.message || "Password berhasil direset. Silakan login dengan password baru.");
-
-        setTimeout(() => {
-          router.push("/login");
-        }, 3000);
-      }
+      setIsSuccess(true);
+      toast.success("Password berhasil direset. Silakan login dengan password baru.");
+      saveAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.resetEmail, "");
+      saveAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.loginEmail, normalizedEmail);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Gagal reset password. Silakan coba lagi.";
@@ -83,6 +113,19 @@ const FormResetPassword = () => {
       setIsSubmitting(false);
     }
   };
+
+  React.useEffect(() => {
+    const subscription = form.watch((values, info) => {
+      if (info.name === "email" && typeof values.email === "string") {
+        saveAuthFlowEmail(
+          AUTH_FLOW_STORAGE_KEYS.resetEmail,
+          values.email
+        );
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   // Show success message if request was successful
   if (isSuccess) {

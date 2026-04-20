@@ -9,7 +9,7 @@ export interface ResetPasswordRequest {
 }
 
 export interface ResetPasswordResponse {
-  status_code: number;
+  status_code: number | string;
   message: string;
   data: {
     email: string;
@@ -36,8 +36,14 @@ export const postResetPassword = async (data: ResetPasswordRequest): Promise<Res
       data
     );
 
-    if (response.data.status_code === 200) {
-      return response.data;
+    if (response.status === 200) {
+      return {
+        ...response.data,
+        status_code:
+          typeof response.data?.status_code !== "undefined"
+            ? response.data.status_code
+            : response.status,
+      };
     }
 
     throw new Error(response.data.message || "Gagal reset password. Silakan coba lagi.");

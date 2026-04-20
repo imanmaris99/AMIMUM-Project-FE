@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { postRegister } from "@/services/api/register";
 import toast from "react-hot-toast";
+import { AUTH_FLOW_STORAGE_KEYS, saveAuthFlowEmail } from "@/lib/authFlow";
 
 const Register = () => {
   const router = useRouter();
@@ -124,9 +125,15 @@ const Register = () => {
       if (response.status_code === 201) {
         setIsSuccess(true);
         toast.success(response.message || "Registrasi berhasil!");
+        saveAuthFlowEmail(
+          AUTH_FLOW_STORAGE_KEYS.verifyEmail,
+          registerData.email
+        );
         
         setTimeout(() => {
-          router.push("/verify-account");
+          router.push(
+            `/verify-account?email=${encodeURIComponent(registerData.email)}`
+          );
         }, 3000);
       }
     } catch (error) {

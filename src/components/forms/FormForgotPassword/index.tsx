@@ -12,6 +12,7 @@ import React from "react";
 import { postForgotPassword } from "@/services/api/forgot-password";
 import toast from "react-hot-toast";
 import { useGoogleLogin } from "@/hooks/useGoogleLogin";
+import { AUTH_FLOW_STORAGE_KEYS, saveAuthFlowEmail } from "@/lib/authFlow";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Format email tidak valid" }),
@@ -36,15 +37,22 @@ const FormForgotPassword = () => {
     setApiError(null);
     
     try {
+      const normalizedEmail = values.email.trim().toLowerCase();
       const response = await postForgotPassword({
-        email: values.email.trim().toLowerCase(),
+        email: normalizedEmail,
       });
       
       if (response.status_code === 200) {
         setIsSuccess(true);
         toast.success(response.message || "Email reset password telah dikirim. Silakan cek email Anda.");
+        saveAuthFlowEmail(
+          AUTH_FLOW_STORAGE_KEYS.resetEmail,
+          normalizedEmail
+        );
         setTimeout(() => {
-          router.push("/login");
+          router.push(
+            `/reset-password?email=${encodeURIComponent(normalizedEmail)}`
+          );
         }, 3000);
       }
     } catch (error) {
@@ -76,11 +84,11 @@ const FormForgotPassword = () => {
             </div>
             <h3 className="text-lg font-semibold text-green-800 mb-2">Permintaan Berhasil Dikirim</h3>
             <p className="text-green-700 text-sm">
-              Kami telah mengirimkan link reset password ke email Anda. 
-              Silakan periksa inbox dan ikuti instruksi yang diberikan.
+              Kami telah mengirimkan kode reset password ke email Anda.
+              Silakan periksa inbox lalu lanjutkan ke form reset password.
             </p>
             <p className="text-green-600 text-xs mt-3">
-              Anda akan diarahkan ke halaman login dalam beberapa detik...
+              Anda akan diarahkan ke halaman reset password dalam beberapa detik...
             </p>
           </CardContent>
         </Card>

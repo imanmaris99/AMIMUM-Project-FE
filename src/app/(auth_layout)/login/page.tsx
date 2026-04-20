@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { HeaderLogin } from "@/components";
 import { Eye } from "../register/Eye";
 import { EyeOff } from "../register/EyeOff";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { SessionManager, generateSecureToken, validateEmail } from "@/lib/auth";
 import { RateLimiter, validatePassword, sanitizeUserInput } from "@/lib/security";
@@ -15,6 +15,12 @@ import axios, { AxiosError } from "axios";
 import axiosInstance from "@/lib/axiosInstance";
 import { API_ENDPOINTS } from "@/lib/apiConfig";
 import { getTokenExpiry, parseLoginResult, UserProfileResponseShape } from "@/lib/loginParser";
+import {
+  AUTH_FLOW_STORAGE_KEYS,
+  resolveAuthFlowEmail,
+  saveAuthFlowEmail,
+  takeAuthFlowEmail,
+} from "@/lib/authFlow";
 
 type LoginFlowError = Error & {
   isAccountInactive?: boolean;
@@ -23,6 +29,7 @@ type LoginFlowError = Error & {
 
 const Login = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -37,6 +44,14 @@ const Login = () => {
   const [remainingTime, setRemainingTime] = useState(0);
   const [isAccountInactive, setIsAccountInactive] = useState(false);
   const [inactiveEmail, setInactiveEmail] = useState<string>("");
+  const pendingLoginEmail = React.useMemo(
+    () =>
+      resolveAuthFlowEmail(
+        searchParams?.get("email") ?? null,
+        AUTH_FLOW_STORAGE_KEYS.loginEmail
+      ),
+    [searchParams]
+  );
 
   useEffect(() => {
     if (SessionManager.isAuthenticated()) {
@@ -49,6 +64,25 @@ const Login = () => {
       }
     }
   }, [router, isSuccess]);
+
+  useEffect(() => {
+    if (!pendingLoginEmail) {
+      return;
+    }
+
+    setFormData((prev) => {
+      if (prev.email === pendingLoginEmail) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        email: pendingLoginEmail,
+      };
+    });
+
+    takeAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.loginEmail);
+  }, [pendingLoginEmail]);
 
   useEffect(() => {
     const clientId = localStorage.getItem('client_id') || generateSecureToken();
@@ -402,9 +436,14 @@ const Login = () => {
                   type="button"
                   onClick={() => {
                     if (inactiveEmail) {
-                      sessionStorage.setItem('verifyEmail', inactiveEmail);
+                      saveAuthFlowEmail(
+                        AUTH_FLOW_STORAGE_KEYS.verifyEmail,
+                        inactiveEmail
+                      );
                     }
-                    router.push("/verify-account");
+                    router.push(
+                      `/verify-account?email=${encodeURIComponent(inactiveEmail)}`
+                    );
                   }}
                   className="bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium px-4 py-2 rounded transition-colors"
                 >

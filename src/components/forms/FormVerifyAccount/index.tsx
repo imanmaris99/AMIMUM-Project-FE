@@ -8,11 +8,16 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { postVerifyAccount } from "@/services/api/verify-account";
 import { postResendVerification } from "@/services/api/resend-verification";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Spinner from "@/components/ui/Spinner";
 import React from "react";
 import { useGoogleLogin } from "@/hooks/useGoogleLogin";
 import toast from "react-hot-toast";
+import {
+  AUTH_FLOW_STORAGE_KEYS,
+  resolveAuthFlowEmail,
+  saveAuthFlowEmail,
+} from "@/lib/authFlow";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Format email tidak valid" }),
@@ -21,29 +26,34 @@ const formSchema = z.object({
 
 const FormVerifyAccount = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isResending, setIsResending] = React.useState(false);
   const [resendCooldown, setResendCooldown] = React.useState(0);
   const { login: handleGoogleLogin, isLoading: isGoogleLoading } = useGoogleLogin();
 
-  const getInitialEmail = () => {
-    if (typeof window !== 'undefined') {
-      const savedEmail = sessionStorage.getItem('verifyEmail');
-      if (savedEmail) {
-        sessionStorage.removeItem('verifyEmail');
-        return savedEmail;
-      }
-    }
-    return "";
-  };
+  const initialEmail = React.useMemo(
+    () =>
+      resolveAuthFlowEmail(
+        searchParams?.get("email") ?? null,
+        AUTH_FLOW_STORAGE_KEYS.verifyEmail
+      ),
+    [searchParams]
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: getInitialEmail(),
+      email: initialEmail,
       code: "",
     },
   });
+
+  React.useEffect(() => {
+    if (initialEmail && form.getValues("email") !== initialEmail) {
+      form.setValue("email", initialEmail, { shouldValidate: true });
+    }
+  }, [form, initialEmail]);
 
   React.useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -79,6 +89,7 @@ const FormVerifyAccount = () => {
     setIsResending(true);
     try {
       await postResendVerification({ email: email.trim().toLowerCase() });
+      saveAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.verifyEmail, email);
       toast.success("Email verifikasi telah dikirim ulang. Silakan cek email Anda.");
       setResendCooldown(60);
     } catch (error) {
@@ -91,11 +102,37 @@ const FormVerifyAccount = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
-    await postVerifyAccount(values, () => {
-      router.push("/login");
-    });
+    const normalizedEmail = values.email.trim().toLowerCase();
+    saveAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.verifyEmail, normalizedEmail);
+
+    await postVerifyAccount(
+      {
+        ...values,
+        email: normalizedEmail,
+        code: values.code.trim(),
+      },
+      () => {
+        saveAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.verifyEmail, "");
+        saveAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.loginEmail, normalizedEmail);
+        router.push(`/login?email=${encodeURIComponent(normalizedEmail)}`);
+      }
+    );
+
     setIsSubmitting(false);
   };
+
+  React.useEffect(() => {
+    const subscription = form.watch((values, info) => {
+      if (info.name === "email" && typeof values.email === "string") {
+        saveAuthFlowEmail(
+          AUTH_FLOW_STORAGE_KEYS.verifyEmail,
+          values.email
+        );
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   return (
     <div className="space-y-6">
