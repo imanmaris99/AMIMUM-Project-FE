@@ -8,13 +8,28 @@ export interface VariantType {
     stock: number;
     discount: number;
     discounted_price: number;
+    updated_at: string;
+}
+
+// Tipe data yang sesuai dengan backend VariantProductDto
+export interface VariantProductType {
+    id: number;
+    product: string;
+    name: string;
+    img: string;
+    variant: string;
+    expiration: string;
+    stock: number;
+    discount: number;
+    discounted_price: number;
+    updated_at: string;
 }
 
 export interface DetailProductType {
     id: string;
     name: string;
     info: string;
-    variants_list: VariantType[];
+    variants_list: VariantProductType[];
     description_list: string[];
     instructions_list: string[];
     price: number;  
@@ -22,6 +37,8 @@ export interface DetailProductType {
     company: string;
     avg_rating: number;
     total_rater: number;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface DetailProductResponseType {
@@ -32,4 +49,30 @@ export interface DetailProductResponseType {
 
 export interface DetailProductRequestType {
     product_id: string;
+}
+
+export interface ProductType {
+    id: number;
+    name: string;
+    image_url: string;
+    price: number;
+    is_active: boolean;
+    // tambahkan field lain sesuai kebutuhan
+}
+
+export interface BrandDetailType {
+    id: number;
+    name: string;
+    photo_url: string | null;
+    description_list: string[];
+    category: string;
+    total_product: number;
+    total_product_with_promo: number;
+    created_at: string;
+}
+
+export interface BrandDetailResponseType {
+    status_code: number;
+    message: string;
+    data: BrandDetailType;
 }

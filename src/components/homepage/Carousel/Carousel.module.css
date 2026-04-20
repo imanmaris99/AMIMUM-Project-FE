@@ -6,13 +6,14 @@
 
 .carouselItems {
   display: flex;
-  transition: transform 1s ease-in-out;
+  transition: transform 1s ease-in-out !important;
+  will-change: transform;
 }
+
 
 .carouselItem {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex: 0 0 33.33%;
   box-sizing: border-box;
 }

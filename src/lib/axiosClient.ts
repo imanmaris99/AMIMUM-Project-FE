@@ -1,79 +1,239 @@
-import axios from "axios";
-import Swal from "sweetalert2";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { ErrorHandler, withRetry, safeAsync } from "./errorHandler";
+import { SessionManager, isJwtToken } from "./auth";
+import { API_BASE_URL } from "./apiConfig";
 
+interface AxiosRequestConfigWithMetadata extends AxiosRequestConfig {
+  metadata?: {
+    startTime: number;
+  };
+}
+
+// Enhanced axios client with comprehensive error handling
 const axiosClient = axios.create({
-  baseURL: "https://amimumprojectbe-production.up.railway.app",
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
+  timeout: 10000, // 10 seconds timeout
 });
 
+// Request interceptor with enhanced security
 axiosClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("access_token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+  async (config) => {
+    try {
+      const session = SessionManager.getSession();
+      if (session?.token && isJwtToken(session.token.token)) {
+        config.headers.Authorization = `Bearer ${session.token.token}`;
+      }
+
+      const csrfToken = localStorage.getItem('csrf_token');
+      if (csrfToken) {
+        config.headers['X-CSRF-Token'] = csrfToken;
+      }
+
+      config.headers['X-Request-ID'] = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      (config as AxiosRequestConfigWithMetadata).metadata = { startTime: Date.now() };
+
+      return config;
+    } catch (error) {
+      return Promise.reject(error);
     }
-    return config;
   },
   (error) => {
+    ErrorHandler.handleError(error, 'RequestInterceptor');
     return Promise.reject(error);
   }
 );
 
+// Response interceptor with comprehensive error handling
 axiosClient.interceptors.response.use(
-  (response) => response.data,
-  (error) => {
-    if (error.response) {
-        const status = error.response.status;
-
-        switch (status) {
-            case 401:
-                localStorage.removeItem("access_token");
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Sesi Berakhir',
-                    text: 'Silakan login kembali untuk melanjutkan.',
-                    confirmButtonText: 'Login',
-                    customClass: {
-                        popup: 'swal-mobile-popup'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.replace("/login");
-                    }
-                });
-                break;
-            case 403:
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Tidak Dapat Mengakses',
-                    text: 'Anda tidak memiliki izin untuk mengakses sumber daya ini.',
-                    confirmButtonText: 'Kembali ke Beranda',
-                    customClass: {
-                        popup: 'swal-mobile-popup'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.replace("/");
-                    }
-                });
-                break;
-            case 500:
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Kesalahan Server',
-                    text: 'Terjadi masalah pada server kami. Mohon coba lagi nanti.',
-                    confirmButtonText: 'OK',
-                    customClass: {
-                        popup: 'swal-mobile-popup'
-                    }
-                });
-                break;
-        }
+  (response: AxiosResponse) => {
+    if (!response.data || typeof response.data !== 'object') {
+      return response.data;
     }
+
+    // Log response validation
+    
+    return response.data;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+    const status = error.response?.status;
+    const errorMessage = error.response?.data?.message || error.message;
+    const requestUrl = originalRequest?.url || '';
+    
+    const urlPath = typeof requestUrl === 'string' 
+      ? requestUrl.replace(API_BASE_URL, '').split('?')[0]
+      : '';
+    const isSearchEndpoint = (
+      /^\/product\/[^\/]+$/.test(urlPath) || 
+      /^\/product\/production\/\d+\/[^\/]+$/.test(urlPath)
+    ) && 
+    !urlPath.includes('/product/detail/') &&
+    !urlPath.includes('/product/discount/');
+    
+    if (error.response) {
+      switch (status) {
+        case 401:
+          // Unauthorized - clear session and redirect
+          SessionManager.clearSession();
+          await ErrorHandler.handleError(
+            new Error('Session expired'),
+            'API_401',
+            false
+          );
+          setTimeout(() => {
+            window.location.replace("/login");
+          }, 2000);
+          break;
+
+        case 403:
+          await ErrorHandler.handleError(
+            new Error('Access forbidden'),
+            'API_403',
+            false
+          );
+          break;
+
+        case 404:
+          // Skip ErrorHandler for search endpoints - 404 is expected (no products found)
+          if (!isSearchEndpoint) {
+            await ErrorHandler.handleError(
+              new Error('Resource not found'),
+              'API_404',
+              false
+            );
+          }
+          break;
+
+        case 422:
+          await ErrorHandler.handleError(
+            new Error(errorMessage || 'Validation failed'),
+            'API_422',
+            false
+          );
+          break;
+
+        case 429:
+          await ErrorHandler.handleError(
+            new Error('Rate limit exceeded'),
+            'API_429',
+            true,
+            () => axiosClient(originalRequest)
+          );
+          break;
+
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          await ErrorHandler.handleError(
+            new Error('Server error'),
+            'API_5xx',
+            true,
+            () => axiosClient(originalRequest)
+          );
+          break;
+
+        default:
+          await ErrorHandler.handleError(
+            new Error(errorMessage || 'Request failed'),
+            'API_4xx',
+            false
+          );
+      }
+    } else if (error.request) {
+      await ErrorHandler.handleError(
+        new Error('Network error - no response received'),
+        'API_NETWORK',
+        true,
+        () => axiosClient(originalRequest)
+      );
+    } else {
+      await ErrorHandler.handleError(
+        new Error(errorMessage || 'Request setup error'),
+        'API_SETUP',
+        false
+      );
+    }
+
     return Promise.reject(error);
   }
 );
+
+// Enhanced API methods with retry and error handling
+export const apiClient = {
+  async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    return withRetry(async () => {
+      const response = await axiosClient.get(url, config);
+      return response as T;
+    });
+  },
+
+  async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+    return withRetry(async () => {
+      const response = await axiosClient.post(url, data, config);
+      return response as T;
+    });
+  },
+
+  async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+    return withRetry(async () => {
+      const response = await axiosClient.put(url, data, config);
+      return response as T;
+    });
+  },
+
+  async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    return withRetry(async () => {
+      const response = await axiosClient.delete(url, config);
+      return response as T;
+    });
+  },
+
+  async patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+    return withRetry(async () => {
+      const response = await axiosClient.patch(url, data, config);
+      return response as T;
+    });
+  }
+};
+
+// Safe API methods that return undefined on error
+export const safeApiClient = {
+  async get<T>(url: string, config?: AxiosRequestConfig): Promise<T | undefined> {
+    return safeAsync(() => apiClient.get<T>(url, config), `GET ${url}`);
+  },
+
+  async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T | undefined> {
+    // Validate request data before sending
+    if (data && typeof data !== 'object') {
+      ErrorHandler.handleError(new Error('Request data must be an object'), 'SafeAPIPost');
+      return undefined;
+    }
+    return safeAsync(() => apiClient.post<T>(url, data, config), `POST ${url}`);
+  },
+
+  async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T | undefined> {
+    if (data && typeof data !== 'object') {
+      ErrorHandler.handleError(new Error('Request data must be an object'), 'SafeAPIPut');
+      return undefined;
+    }
+    return safeAsync(() => apiClient.put<T>(url, data, config), `PUT ${url}`);
+  },
+
+  async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T | undefined> {
+    return safeAsync(() => apiClient.delete<T>(url, config), `DELETE ${url}`);
+  },
+
+  async patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T | undefined> {
+    if (data && typeof data !== 'object') {
+      ErrorHandler.handleError(new Error('Request data must be an object'), 'SafeAPIPatch');
+      return undefined;
+    }
+    return safeAsync(() => apiClient.patch<T>(url, data, config), `PATCH ${url}`);
+  }
+};
 
 export default axiosClient;

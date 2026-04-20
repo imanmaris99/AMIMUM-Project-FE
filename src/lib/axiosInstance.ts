@@ -1,10 +1,12 @@
 import axios from "axios"
+import { API_BASE_URL } from "./apiConfig"
 
 const axiosInstance = axios.create({
-    baseURL: "https://amimumprojectbe-production.up.railway.app",
-    headers:{
+    baseURL: API_BASE_URL,
+    headers: {
         "Content-Type": 'application/json'
-    }
+    },
+    timeout: 10000,
 })
 
 export default axiosInstance
