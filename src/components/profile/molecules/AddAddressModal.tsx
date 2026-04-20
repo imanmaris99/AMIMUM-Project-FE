@@ -1,19 +1,21 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+
+export interface AddressFormData {
+  name: string;
+  phone: string;
+  address: string;
+  city: string;
+  province: string;
+  country: string;
+  postalCode: string;
+}
 
 interface AddAddressModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (addressData: {
-    name: string;
-    phone: string;
-    address: string;
-    city: string;
-    province: string;
-    country: string;
-    postalCode: string;
-  }) => void;
+  onSave: (addressData: AddressFormData) => Promise<void>;
 }
 
 const AddAddressModal: React.FC<AddAddressModalProps> = ({ 
@@ -21,15 +23,25 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
   onClose, 
   onSave 
 }) => {
-  const [formData, setFormData] = useState({
+  const emptyForm: AddressFormData = {
     name: "",
     phone: "",
     address: "",
     city: "",
     province: "",
     country: "",
-    postalCode: ""
-  });
+    postalCode: "",
+  };
+
+  const [formData, setFormData] = useState<AddressFormData>(emptyForm);
+  const [isSaving, setIsSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setSubmitError(null);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -37,19 +49,27 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
-    onSave(formData);
-    onClose();
-    // Reset form after save
-    setFormData({
-      name: "",
-      phone: "",
-      address: "",
-      city: "",
-      province: "",
-      country: "",
-      postalCode: ""
-    });
+  const handleSave = async () => {
+    if (isSaving) {
+      return;
+    }
+
+    setIsSaving(true);
+    setSubmitError(null);
+
+    try {
+      await onSave(formData);
+      onClose();
+      setFormData(emptyForm);
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Gagal menyimpan alamat baru."
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -65,6 +85,12 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
           
           {/* Form Fields */}
           <div className="space-y-6 mt-6">
+            {submitError && (
+              <div className="rounded-lg bg-red-50 px-4 py-3 text-center">
+                <p className="text-sm text-red-600">{submitError}</p>
+              </div>
+            )}
+
             {/* Nama Field */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -177,15 +203,17 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
           <div className="flex gap-3">
             <button
               onClick={onClose}
+              disabled={isSaving}
               className="flex-1 py-4 px-6 rounded-2xl text-lg font-medium bg-white text-[#006A47] border border-[#006A47] hover:bg-[#E6F2F0] transition-colors"
             >
               Batal
             </button>
             <button
               onClick={handleSave}
-              className="flex-1 py-4 px-6 rounded-2xl text-lg font-medium bg-[#006A47] text-white hover:bg-[#005A3C] transition-colors"
+              disabled={isSaving}
+              className="flex-1 py-4 px-6 rounded-2xl text-lg font-medium bg-[#006A47] text-white hover:bg-[#005A3C] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Save
+              {isSaving ? "Menyimpan..." : "Save"}
             </button>
           </div>
         </div>

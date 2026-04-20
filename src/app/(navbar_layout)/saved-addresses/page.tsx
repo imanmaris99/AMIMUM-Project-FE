@@ -1,17 +1,72 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { GoChevronLeft } from "react-icons/go";
 import { toast } from "react-hot-toast";
 import EditAddressModal from "../../../components/profile/molecules/EditAddressModal";
-import AddAddressModal from "../../../components/profile/molecules/AddAddressModal";
+import AddAddressModal, {
+  AddressFormData,
+} from "../../../components/profile/molecules/AddAddressModal";
+import {
+  createShipmentAddress,
+  deleteShipmentAddress,
+  getMyShipmentAddresses,
+  ShipmentAddress,
+  updateShipmentAddress,
+} from "@/services/api/shipment-address";
 
 const SavedAddressesPage: React.FC = () => {
   const router = useRouter();
-  const [selectedAddress, setSelectedAddress] = useState<string>("1"); // Default select first address
+  const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [addresses, setAddresses] = useState<ShipmentAddress[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [deletingAddressId, setDeletingAddressId] = useState<number | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadAddresses = async () => {
+      setIsLoading(true);
+      setErrorMessage(null);
+
+      try {
+        const response = await getMyShipmentAddresses();
+
+        if (!isMounted) {
+          return;
+        }
+
+        setAddresses(response.data);
+        setSelectedAddress((prev) =>
+          prev || response.data[0]?.id?.toString() || ""
+        );
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Gagal memuat alamat pengiriman."
+        );
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadAddresses();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleBack = () => {
     router.back();
@@ -29,11 +84,50 @@ const SavedAddressesPage: React.FC = () => {
     setIsEditModalOpen(false);
   };
 
-  const handleSaveAddress = () => { // Removed unused parameter
-    // Handle save address data
-    
-    // Show success message
-    toast.success("Alamat berhasil diperbarui!");
+  const handleSaveAddress = async (addressData: AddressFormData) => {
+    if (!selectedAddressData) {
+      throw new Error("Alamat yang akan diperbarui tidak ditemukan.");
+    }
+
+    const normalizedPhone = addressData.phone.trim();
+    const normalizedPostalCode = addressData.postalCode.trim();
+
+    if (!/^\+62\d{10,11}$/.test(normalizedPhone)) {
+      throw new Error(
+        "Nomor telepon harus diawali +62 dan berisi 10-11 digit setelahnya."
+      );
+    }
+
+    if (normalizedPostalCode && !/^\d+$/.test(normalizedPostalCode)) {
+      throw new Error("Kode pos harus berupa angka.");
+    }
+
+    const response = await updateShipmentAddress({
+      address_id: selectedAddressData.id,
+      name: addressData.name.trim(),
+      phone: normalizedPhone,
+      address: addressData.address.trim(),
+      city: addressData.city.trim(),
+      state: addressData.province.trim(),
+      country: addressData.country.trim(),
+      city_id: selectedAddressData.city_id,
+      zip_code: normalizedPostalCode
+        ? Number(normalizedPostalCode)
+        : undefined,
+    });
+
+    setAddresses((prev) =>
+      prev.map((item) =>
+        item.id === selectedAddressData.id
+          ? {
+              ...item,
+              ...response.data,
+            }
+          : item
+      )
+    );
+
+    toast.success("Alamat pengiriman berhasil diperbarui.");
   };
 
   const handleAddAddress = () => {
@@ -44,12 +138,83 @@ const SavedAddressesPage: React.FC = () => {
     setIsAddModalOpen(false);
   };
 
-  const handleSaveNewAddress = () => { // Removed unused parameter
-    // Handle save new address data
-    
-    // Show success message
-    toast.success("Alamat baru berhasil ditambahkan!");
+  const handleDeleteAddress = async (address: ShipmentAddress) => {
+    const confirmed = window.confirm(
+      `Hapus alamat "${address.name}" dari daftar alamat tersimpan?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingAddressId(address.id);
+
+    try {
+      await deleteShipmentAddress(address.id);
+
+      setAddresses((prev) => {
+        const remainingAddresses = prev.filter((item) => item.id !== address.id);
+
+        setSelectedAddress((currentSelected) => {
+          if (currentSelected !== address.id.toString()) {
+            return currentSelected;
+          }
+
+          return remainingAddresses[0]?.id?.toString() || "";
+        });
+
+        return remainingAddresses;
+      });
+
+      toast.success("Alamat pengiriman berhasil dihapus.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Gagal menghapus alamat pengiriman."
+      );
+    } finally {
+      setDeletingAddressId(null);
+    }
   };
+
+  const handleSaveNewAddress = async (addressData: AddressFormData) => {
+    const normalizedPhone = addressData.phone.trim();
+    const normalizedPostalCode = addressData.postalCode.trim();
+
+    if (!/^\+62\d{10,11}$/.test(normalizedPhone)) {
+      throw new Error(
+        "Nomor telepon harus diawali +62 dan berisi 10-11 digit setelahnya."
+      );
+    }
+
+    if (normalizedPostalCode && !/^\d+$/.test(normalizedPostalCode)) {
+      throw new Error("Kode pos harus berupa angka.");
+    }
+
+    const response = await createShipmentAddress({
+      name: addressData.name.trim(),
+      phone: normalizedPhone,
+      address: addressData.address.trim(),
+      city: addressData.city.trim(),
+      state: addressData.province.trim(),
+      country: addressData.country.trim(),
+      city_id: undefined,
+      zip_code: normalizedPostalCode
+        ? Number(normalizedPostalCode)
+        : undefined,
+    });
+
+    setAddresses((prev) => [response.data, ...prev]);
+    setSelectedAddress(response.data.id.toString());
+    toast.success("Alamat baru berhasil ditambahkan.");
+  };
+
+  const selectedAddressData = useMemo(() => {
+    return (
+      addresses.find((item) => item.id.toString() === selectedAddress) ?? null
+    );
+  }, [addresses, selectedAddress]);
 
   return (
     <div className="flex flex-col justify-between min-h-screen bg-gray-100">
@@ -68,127 +233,111 @@ const SavedAddressesPage: React.FC = () => {
 
       {/* Content */}
       <div className="flex flex-col justify-center items-center gap-4 mt-20 mb-8 px-4">
-        {/* Address Cards */}
         <div className="w-full max-w-sm space-y-4">
-          {/* Address Card 1 */}
-          <div 
-            className={`bg-white rounded-lg p-4 relative cursor-pointer transition-colors ${
-              selectedAddress === "1" ? "ring-2 ring-[#006A47]" : ""
-            }`}
-            onClick={() => handleSelectAddress("1")}
-          >
-            <div className="flex items-start gap-4">
-              {/* Checkbox */}
-              <div className="w-6 h-6 flex items-center justify-center mt-2">
-                <div 
-                  className={`w-5 h-5 border-2 rounded-md flex items-center justify-center cursor-pointer transition-colors ${
-                    selectedAddress === "1" 
-                      ? "bg-[#006A47] border-[#006A47]" 
-                      : "border-gray-300 hover:border-[#006A47]"
-                  }`}
-                  onClick={() => handleSelectAddress("1")}
-                >
-                  {selectedAddress === "1" && (
-                    <svg 
-                      className="w-3 h-3 text-white" 
-                      fill="currentColor" 
-                      viewBox="0 0 20 20"
-                    >
-                      <path 
-                        fillRule="evenodd" 
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" 
-                        clipRule="evenodd" 
-                      />
-                    </svg>
-                  )}
-                </div>
-              </div>
-
-              {/* Address Info */}
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-[#313131] mb-1">
-                  Jl. Sunan Kalijaga
-                </h3>
-                <p className="text-sm text-[#A2A2A2] leading-relaxed">
-                  Kpg. Nelayan No. 220, Pati, Jawa Tengah.
-                </p>
-              </div>
-
-              {/* Edit Button */}
-              <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditAddress();
-                        }}
-                className="bg-[#006A47] text-white px-3 py-1.5 rounded-2xl text-sm font-medium hover:bg-[#005A3C] transition-colors"
-              >
-                Edit
-              </button>
+          {isLoading ? (
+            <div className="rounded-lg bg-white p-6 text-center">
+              <p className="text-sm text-[#A2A2A2]">
+                Mengambil alamat pengiriman dari server...
+              </p>
             </div>
-
-            {/* Divider Line */}
-            <div className="w-full h-[1.5px] bg-[#C4C4C4] mt-4"></div>
-          </div>
-
-          {/* Address Card 2 */}
-          <div 
-            className={`bg-white rounded-lg p-4 relative cursor-pointer transition-colors ${
-              selectedAddress === "2" ? "ring-2 ring-[#006A47]" : ""
-            }`}
-            onClick={() => handleSelectAddress("2")}
-          >
-            <div className="flex items-start gap-4">
-              {/* Checkbox */}
-              <div className="w-6 h-6 flex items-center justify-center mt-2">
-                <div 
-                  className={`w-5 h-5 border-2 rounded-md flex items-center justify-center cursor-pointer transition-colors ${
-                    selectedAddress === "2" 
-                      ? "bg-[#006A47] border-[#006A47]" 
-                      : "border-gray-300 hover:border-[#006A47]"
-                  }`}
-                  onClick={() => handleSelectAddress("2")}
-                >
-                  {selectedAddress === "2" && (
-                    <svg 
-                      className="w-3 h-3 text-white" 
-                      fill="currentColor" 
-                      viewBox="0 0 20 20"
-                    >
-                      <path 
-                        fillRule="evenodd" 
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" 
-                        clipRule="evenodd" 
-                      />
-                    </svg>
-                  )}
-                </div>
-              </div>
-
-              {/* Address Info */}
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-[#313131] mb-1">
-                  Jl. Sunan Kalijaga
-                </h3>
-                <p className="text-sm text-[#A2A2A2] leading-relaxed">
-                  Kpg. Nelayan No. 220, Pati, Jawa Tengah.
-                </p>
-              </div>
-
-              {/* Edit Button */}
-              <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditAddress();
-                        }}
-                className="bg-[#006A47] text-white px-3 py-1.5 rounded-2xl text-sm font-medium hover:bg-[#005A3C] transition-colors"
-              >
-                Edit
-              </button>
+          ) : errorMessage ? (
+            <div className="rounded-lg bg-red-50 p-6 text-center">
+              <p className="text-sm text-red-600">{errorMessage}</p>
             </div>
+          ) : addresses.length === 0 ? (
+            <div className="rounded-lg bg-white p-6 text-center">
+              <p className="text-sm text-[#A2A2A2]">
+                Belum ada alamat pengiriman tersimpan.
+              </p>
+            </div>
+          ) : (
+            addresses.map((item) => {
+              const addressId = item.id.toString();
+              const isSelected = selectedAddress === addressId;
+              const addressSummary = [
+                item.address,
+                item.city,
+                item.state,
+                item.country,
+                item.zip_code ? String(item.zip_code) : "",
+              ]
+                .filter(Boolean)
+                .join(", ");
 
-            {/* Divider Line */}
-            <div className="w-full h-[1.5px] bg-[#C4C4C4] mt-4"></div>
-          </div>
+              return (
+                <div
+                  key={item.id}
+                  className={`bg-white rounded-lg p-4 relative cursor-pointer transition-colors ${
+                    isSelected ? "ring-2 ring-[#006A47]" : ""
+                  }`}
+                  onClick={() => handleSelectAddress(addressId)}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-6 h-6 flex items-center justify-center mt-2">
+                      <div
+                        className={`w-5 h-5 border-2 rounded-md flex items-center justify-center cursor-pointer transition-colors ${
+                          isSelected
+                            ? "bg-[#006A47] border-[#006A47]"
+                            : "border-gray-300 hover:border-[#006A47]"
+                        }`}
+                        onClick={() => handleSelectAddress(addressId)}
+                      >
+                        {isSelected && (
+                          <svg
+                            className="w-3 h-3 text-white"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-[#313131] mb-1">
+                        {item.name}
+                      </h3>
+                      <p className="text-sm text-[#313131] mb-1">{item.phone}</p>
+                      <p className="text-sm text-[#A2A2A2] leading-relaxed">
+                        {addressSummary}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedAddress(addressId);
+                        handleEditAddress();
+                      }}
+                      className="bg-[#006A47] text-white px-3 py-1.5 rounded-2xl text-sm font-medium hover:bg-[#005A3C] transition-colors"
+                    >
+                      Edit
+                    </button>
+                  </div>
+
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        void handleDeleteAddress(item);
+                      }}
+                      disabled={deletingAddressId === item.id}
+                      className="text-sm font-medium text-red-600 transition-colors hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {deletingAddressId === item.id ? "Menghapus..." : "Hapus"}
+                    </button>
+                  </div>
+
+                  <div className="w-full h-[1.5px] bg-[#C4C4C4] mt-4"></div>
+                </div>
+              );
+            })
+          )}
         </div>
 
         {/* Add Address Button */}
@@ -217,13 +366,13 @@ const SavedAddressesPage: React.FC = () => {
                 onClose={handleCloseEditModal}
                 onSave={handleSaveAddress}
                 initialData={{
-                  name: "Faisal Jaya",
-                  phone: "+62 877 877 3455",
-                  address: "Jl. Sunan Kalijaga",
-                  city: "Pati",
-                  province: "Jawa Tengah",
-                  country: "Indonesia",
-                  postalCode: "59114"
+                  name: selectedAddressData?.name ?? "",
+                  phone: selectedAddressData?.phone ?? "",
+                  address: selectedAddressData?.address ?? "",
+                  city: selectedAddressData?.city ?? "",
+                  province: selectedAddressData?.state ?? "",
+                  country: selectedAddressData?.country ?? "",
+                  postalCode: selectedAddressData?.zip_code?.toString() ?? ""
                 }}
               />
 

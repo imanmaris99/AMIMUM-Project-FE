@@ -53,6 +53,8 @@ export const API_ENDPOINTS = {
   USER_RESET_PASSWORD: '/user/password-reset/confirm',
   USER_VERIFY_EMAIL: '/user/verify-email',
   USER_RESEND_VERIFICATION: '/user/resend-verification',
+  SHIPMENT_ADDRESS_CREATE: '/shipment-address/create',
+  SHIPMENT_ADDRESS_MY_ADDRESS: '/shipment-address/my-address',
   
   // Production/Brand
   PRODUCTION_ALL: '/production/all',
