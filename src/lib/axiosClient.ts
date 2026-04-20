@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { ErrorHandler, withRetry, safeAsync } from "./errorHandler";
-import { SessionManager } from "./auth";
+import { SessionManager, isJwtToken } from "./auth";
 import { API_BASE_URL } from "./apiConfig";
 
 interface AxiosRequestConfigWithMetadata extends AxiosRequestConfig {
@@ -23,7 +23,7 @@ axiosClient.interceptors.request.use(
   async (config) => {
     try {
       const session = SessionManager.getSession();
-      if (session?.token) {
+      if (session?.token && isJwtToken(session.token.token)) {
         config.headers.Authorization = `Bearer ${session.token.token}`;
       }
 

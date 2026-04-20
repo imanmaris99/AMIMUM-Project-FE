@@ -12,6 +12,14 @@ import { toast } from "react-hot-toast";
 import { postLogin } from "@/services/api/login";
 import { handleGoogleLogin as handleGoogleAuth } from "@/lib/googleAuth";
 import axios, { AxiosError } from "axios";
+import axiosInstance from "@/lib/axiosInstance";
+import { API_ENDPOINTS } from "@/lib/apiConfig";
+import { getTokenExpiry, parseLoginResult, UserProfileResponseShape } from "@/lib/loginParser";
+
+type LoginFlowError = Error & {
+  isAccountInactive?: boolean;
+  statusCode?: number;
+};
 
 const Login = () => {
   const router = useRouter();
@@ -139,22 +147,57 @@ const Login = () => {
       });
       
       if (response.status_code === 200) {
+        const { user: parsedUser, backendToken } = parseLoginResult(response, sanitizedEmail);
+
         const user = {
           id: generateSecureToken(),
-          email: sanitizedEmail,
-          name: sanitizedEmail.split('@')[0],
-          role: 'user' as const,
+          email: parsedUser.email,
+          name: parsedUser.name,
+          firstname: parsedUser.firstname,
+          role: parsedUser.role,
           createdAt: new Date(),
           lastLogin: new Date(),
         };
         
         const token = {
-          token: generateSecureToken(),
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+          token: backendToken || generateSecureToken(),
+          expiresAt: backendToken ? getTokenExpiry(backendToken) : new Date(Date.now() + 24 * 60 * 60 * 1000),
           refreshToken: generateSecureToken(),
         };
         
         SessionManager.setSession(user, token);
+
+        if (backendToken) {
+          try {
+            const profileResponse = await axiosInstance.get<UserProfileResponseShape>(
+              API_ENDPOINTS.USER_PROFILE,
+              {
+                headers: {
+                  Authorization: `Bearer ${backendToken}`,
+                },
+              }
+            );
+            const profile = profileResponse?.data?.data;
+            const profileFirstname = profile?.firstname?.trim() || profile?.first_name?.trim();
+            const profileLastname = profile?.lastname?.trim() || profile?.last_name?.trim();
+            const profileEmail = profile?.email?.trim() || user.email;
+            const profileName = `${profileFirstname ?? ''} ${profileLastname ?? ''}`.trim() || user.name;
+
+            SessionManager.setSession(
+              {
+                ...user,
+                email: profileEmail,
+                name: profileName,
+                firstname: profileFirstname || user.firstname,
+                role: profile?.role === 'admin' ? ('admin' as const) : user.role,
+              },
+              token
+            );
+          } catch {
+            // Keep login successful even when profile sync fails.
+          }
+        }
+
         RateLimiter.resetLimit(clientId);
         
         setIsSuccess(true);
@@ -172,6 +215,7 @@ const Login = () => {
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Login gagal. Silakan coba lagi.";
+      const typedError = error as LoginFlowError;
       
       let isInactiveError = false;
       
@@ -184,8 +228,8 @@ const Login = () => {
       
       if (!isInactiveError) {
         const errorLower = errorMessage.toLowerCase();
-        isInactiveError = (error as any)?.isAccountInactive === true || 
-                          (error as any)?.statusCode === 403 ||
+        isInactiveError = typedError?.isAccountInactive === true || 
+                          typedError?.statusCode === 403 ||
                           errorLower.includes("tidak aktif") || 
                           errorLower.includes("not active") ||
                           errorLower.includes("belum terverifikasi") ||

@@ -5,6 +5,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  firstname?: string;
   role: 'user' | 'admin';
   createdAt: Date;
   lastLogin?: Date;
@@ -14,6 +15,10 @@ export interface AuthToken {
   token: string;
   expiresAt: Date;
   refreshToken: string;
+}
+
+export function isJwtToken(token: string): boolean {
+  return /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token);
 }
 
 // Secure token generation
@@ -32,8 +37,7 @@ export function hashPassword(password: string): string {
 // JWT-like token validation
 export function validateToken(token: string): boolean {
   try {
-    // Simple token validation for demo purposes
-    // In production, use proper JWT validation
+    // Session token can be either backend JWT or fallback local token.
     return Boolean(token && token.length > 10);
   } catch {
     return false;

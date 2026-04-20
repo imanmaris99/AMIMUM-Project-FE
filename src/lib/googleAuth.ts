@@ -12,6 +12,7 @@ export interface GoogleAuthResult {
     id: string;
     email: string;
     name: string;
+    firstname?: string;
     role: 'user' | 'admin';
     createdAt: Date;
     lastLogin: Date;
@@ -34,10 +35,14 @@ export const handleGoogleLogin = async (): Promise<GoogleAuthResult> => {
     });
 
     if (response.status_code === 200 && response.data) {
+      const fallbackName = response.data.email.split('@')[0];
+      const firstname = response.data.firstname?.trim();
+      const lastname = response.data.lastname?.trim();
       const sessionUser = {
         id: response.data.id,
         email: response.data.email,
-        name: `${response.data.firstname} ${response.data.lastname}`.trim() || response.data.email.split('@')[0],
+        name: `${firstname ?? ''} ${lastname ?? ''}`.trim() || fallbackName,
+        firstname: firstname || fallbackName,
         role: response.data.role === 'admin' ? ('admin' as const) : ('user' as const),
         createdAt: new Date(response.data.created_at),
         lastLogin: new Date(),

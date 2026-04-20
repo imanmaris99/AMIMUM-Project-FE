@@ -38,6 +38,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   const { getNotificationCount } = useNotification();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [userDisplayName, setUserDisplayName] = useState("");
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
@@ -50,9 +51,15 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
       
       if (isAuthenticated) {
         const session = SessionManager.getSession();
-        setUserEmail(session?.user?.email || "");
+        const email = session?.user?.email || "";
+        const firstname = session?.user?.firstname?.trim();
+        const derivedName = session?.user?.name?.trim() || (email ? email.split('@')[0] : "");
+
+        setUserEmail(email);
+        setUserDisplayName(firstname || derivedName);
       } else {
         setUserEmail("");
+        setUserDisplayName("");
       }
     };
 
@@ -96,6 +103,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
     // Immediately update local state
     setIsLoggedIn(false);
     setUserEmail("");
+    setUserDisplayName("");
     setShowProfileDropdown(false);
     setShowMobileMenu(false);
     
@@ -148,14 +156,14 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                   >
                     {/* Username */}
                     <span className="hidden md:block text-sm text-gray-700 max-w-20 truncate">
-                      {userEmail.split('@')[0]}
+                      {userDisplayName}
                     </span>
                     
                     {/* Profile Avatar with Notification Badge */}
                     <div className="relative">
                       <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                         <span className="text-white text-sm font-medium">
-                          {userEmail.charAt(0).toUpperCase()}
+                          {(userDisplayName.charAt(0) || userEmail.charAt(0)).toUpperCase()}
                         </span>
                       </div>
                       {/* Combined notification badge on avatar */}

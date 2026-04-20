@@ -24,6 +24,11 @@ export interface LoginErrorResponse {
   }>;
 }
 
+type AccountInactiveError = Error & {
+  isAccountInactive?: boolean;
+  statusCode?: number;
+};
+
 export const postLogin = async (data: LoginRequest): Promise<LoginResponse> => {
   try {
     const response = await axiosInstance.post<LoginResponse>(
@@ -46,9 +51,11 @@ export const postLogin = async (data: LoginRequest): Promise<LoginResponse> => {
       }
 
       if (status === 403) {
-        const inactiveError = new Error(errorData.message || "Akun Anda belum terverifikasi. Silakan verifikasi email Anda terlebih dahulu.");
-        (inactiveError as any).isAccountInactive = true;
-        (inactiveError as any).statusCode = 403;
+        const inactiveError: AccountInactiveError = new Error(
+          errorData.message || "Akun Anda belum terverifikasi. Silakan verifikasi email Anda terlebih dahulu."
+        );
+        inactiveError.isAccountInactive = true;
+        inactiveError.statusCode = 403;
         throw inactiveError;
       }
 
