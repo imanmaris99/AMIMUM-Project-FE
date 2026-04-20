@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import RajaOngkirLocationFields from "./RajaOngkirLocationFields";
 
 export interface AddressFormData {
   name: string;
   phone: string;
   address: string;
   city: string;
+  cityId: string;
   province: string;
   country: string;
   postalCode: string;
@@ -28,8 +30,9 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
     phone: "",
     address: "",
     city: "",
+    cityId: "",
     province: "",
-    country: "",
+    country: "Indonesia",
     postalCode: "",
   };
 
@@ -136,35 +139,14 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
               <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
             </div>
 
-            {/* Kota Field */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm text-[#999999]">Kota</label>
-              </div>
-              <input
-                type="text"
-                value={formData.city}
-                onChange={(e) => handleInputChange('city', e.target.value)}
-                className="w-full text-sm text-[#0D0E09] bg-transparent border-none outline-none placeholder-[#999999]"
-                placeholder="Masukkan kota"
-              />
-              <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
-            </div>
-
-            {/* Provinsi Field */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm text-[#999999]">Provinsi</label>
-              </div>
-              <input
-                type="text"
-                value={formData.province}
-                onChange={(e) => handleInputChange('province', e.target.value)}
-                className="w-full text-sm text-[#0D0E09] bg-transparent border-none outline-none placeholder-[#999999]"
-                placeholder="Masukkan provinsi"
-              />
-              <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
-            </div>
+            <RajaOngkirLocationFields
+              value={{
+                province: formData.province,
+                city: formData.city,
+                cityId: formData.cityId,
+              }}
+              onChange={(field, nextValue) => handleInputChange(field, nextValue)}
+            />
 
             {/* Negara Field */}
             <div className="space-y-2">

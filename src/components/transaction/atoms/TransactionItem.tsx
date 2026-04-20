@@ -14,9 +14,31 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
 }) => {
   const getStatusConfig = (status: string) => {
     switch (status) {
+      case 'processing':
+        return {
+          text: 'Diproses',
+          bgColor: 'bg-blue-100',
+          textColor: 'text-blue-600',
+          borderColor: 'border-blue-200'
+        };
+      case 'pending':
+        return {
+          text: 'Menunggu Bayar',
+          bgColor: 'bg-yellow-100',
+          textColor: 'text-yellow-700',
+          borderColor: 'border-yellow-200'
+        };
+      case 'shipped':
+        return {
+          text: 'Dikirim',
+          bgColor: 'bg-indigo-100',
+          textColor: 'text-indigo-600',
+          borderColor: 'border-indigo-200'
+        };
+      case 'delivered':
       case 'completed':
         return {
-          text: 'Lunas',
+          text: status === 'delivered' ? 'Selesai' : 'Lunas',
           bgColor: 'bg-green-100',
           textColor: 'text-green-600',
           borderColor: 'border-green-200'
@@ -27,13 +49,6 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
           bgColor: 'bg-red-100',
           textColor: 'text-red-600',
           borderColor: 'border-red-200'
-        };
-      case 'pending':
-        return {
-          text: 'Pending',
-          bgColor: 'bg-yellow-100',
-          textColor: 'text-yellow-600',
-          borderColor: 'border-yellow-200'
         };
       case 'refund':
         return {
@@ -87,6 +102,18 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
             </p>
             <p className="text-xs text-gray-500">
               {transaction.date}
+            </p>
+            <p className="text-xs text-gray-600">
+              {transaction.deliveryType === 'delivery'
+                ? `${transaction.shipmentAddress?.courier || 'Kurir'} ${transaction.shipmentAddress?.service || ''}`.trim()
+                : 'Ambil di toko'}
+            </p>
+            <p className="text-sm font-semibold text-gray-900">
+              {new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                maximumFractionDigits: 0
+              }).format(transaction.total)}
             </p>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { GoCheckCircle, GoHome, GoPackage, GoCreditCard, GoLocation } from 'reac
 import { IoCheckmarkCircle } from 'react-icons/io5';
 import { useTransaction } from '@/contexts/TransactionContext';
 import { Transaction } from '@/types/transaction';
+import { getPaymentMethodLabel } from '@/lib/paymentMethods';
 
 interface OrderConfirmationProps {
   orderId?: string;
@@ -28,6 +29,26 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
       setLatestTransaction(transactions[0]); // First transaction is the latest
     }
   }, [transactions]);
+
+  const getStatusLabel = (status?: string) => {
+    switch (status) {
+      case 'pending':
+        return 'Menunggu Pembayaran';
+      case 'processing':
+        return 'Pesanan Diproses';
+      case 'shipped':
+        return 'Dalam pengiriman';
+      case 'delivered':
+      case 'completed':
+        return 'Selesai';
+      case 'cancelled':
+        return 'Batal';
+      case 'refund':
+        return 'Refund';
+      default:
+        return 'Menunggu Pembayaran';
+    }
+  };
 
   const handleBackToHome = () => {
     if (onBack) {
@@ -100,8 +121,8 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Status</span>
-              <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
-                Menunggu Pembayaran
+              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                {getStatusLabel(latestTransaction?.status)}
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -110,10 +131,18 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                 {latestTransaction?.deliveryType === 'delivery' ? 'Kirim ke tujuan' : 'Ambil di toko'}
               </span>
             </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Metode Pembayaran</span>
+              <span className="text-gray-900">
+                {getPaymentMethodLabel(latestTransaction?.paymentMethod)}
+              </span>
+            </div>
             {latestTransaction?.deliveryType === 'delivery' && (
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Estimasi Pengiriman</span>
-                <span className="text-gray-900">2-3 hari kerja</span>
+                <span className="text-gray-900">
+                  {latestTransaction.shipmentAddress?.estimatedDelivery || 'Belum tersedia'}
+                </span>
               </div>
             )}
             {latestTransaction?.deliveryType === 'pickup' && (
@@ -144,14 +173,34 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                 <GoCreditCard className="w-4 h-4 text-blue-600" />
               </div>
               <div>
-                <p className="font-medium text-gray-900">Lakukan Pembayaran</p>
+                <p className="font-medium text-gray-900">
+                  {latestTransaction?.status === 'pending'
+                    ? 'Menunggu Pembayaran'
+                    : 'Pembayaran Tersimulasi'}
+                </p>
                 <p className="text-sm text-gray-600">
-                  Selesaikan pembayaran untuk memproses pesanan Anda
+                  {latestTransaction?.status === 'pending'
+                    ? `Silakan selesaikan pembayaran ${getPaymentMethodLabel(latestTransaction?.paymentMethod).toLowerCase()} untuk melanjutkan pesanan`
+                    : 'Pesanan sudah tercatat menggunakan data checkout terbaru tanpa pembayaran real'}
                 </p>
               </div>
             </div>
             
-            {latestTransaction?.deliveryType === 'delivery' ? (
+            {latestTransaction?.status === 'pending' && (
+              <div className="flex items-start space-x-3">
+                <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <GoPackage className="w-4 h-4 text-orange-600" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">Setelah Pembayaran Berhasil</p>
+                  <p className="text-sm text-gray-600">
+                    Pesanan akan masuk ke proses penyiapan dan siap dipantau dari halaman transaksi
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {latestTransaction?.status !== 'pending' && latestTransaction?.deliveryType === 'delivery' && (
               <div className="flex items-start space-x-3">
                 <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <GoPackage className="w-4 h-4 text-orange-600" />
@@ -159,11 +208,15 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                 <div>
                   <p className="font-medium text-gray-900">Pesanan Diproses</p>
                   <p className="text-sm text-gray-600">
-                    Kami akan memproses dan mengirim pesanan Anda
+                    {latestTransaction?.shipmentAddress
+                      ? `${latestTransaction.shipmentAddress.courier} ${latestTransaction.shipmentAddress.service} akan memproses pengiriman`
+                      : 'Kami akan memproses dan mengirim pesanan Anda'}
                   </p>
                 </div>
               </div>
-            ) : (
+            )}
+
+            {latestTransaction?.status !== 'pending' && latestTransaction?.deliveryType === 'pickup' && (
               <div className="flex items-start space-x-3">
                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <GoLocation className="w-4 h-4 text-green-600" />

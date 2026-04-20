@@ -1,4 +1,38 @@
-export type TransactionStatus = 'pending' | 'completed' | 'cancelled' | 'refund';
+export type TransactionStatus =
+  | 'pending'
+  | 'processing'
+  | 'shipped'
+  | 'delivered'
+  | 'completed'
+  | 'cancelled'
+  | 'refund';
+
+export type TransactionPaymentMethod =
+  | 'bca_va'
+  | 'mandiri_va'
+  | 'bni_va'
+  | 'bri_va'
+  | 'bsi_va'
+  | 'permata_va'
+  | 'gopay'
+  | 'ovo'
+  | 'dana'
+  | 'qris'
+  | 'alfamart'
+  | 'indomaret'
+  | 'cod'
+  | 'pay_at_store';
+
+export interface TransactionShipmentAddress {
+  recipientName: string;
+  phone: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  courier: string;
+  service: string;
+  estimatedDelivery?: string;
+}
 
 export interface Transaction {
   id: string;
@@ -10,20 +44,21 @@ export interface Transaction {
   items: TransactionItem[];
   createdAt: string;
   updatedAt: string;
+  subtotal: number;
+  shippingCost: number;
   // Additional order data
   deliveryType?: string;
+  paymentMethod?: TransactionPaymentMethod;
   notes?: string;
   shipmentId?: string;
-  shipmentAddress?: {
-    address: string;
-    courier: string;
-  };
+  shipmentAddress?: TransactionShipmentAddress;
 }
 
 export interface TransactionItem {
   id: string;
   productId: string;
   name: string;
+  variantName?: string;
   quantity: number;
   price: number;
   image: string;

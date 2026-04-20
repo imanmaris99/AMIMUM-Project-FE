@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { LuContact, LuPhone, LuMapPin } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { ReceiverFormData } from "@/types/shipment";
-import { dummyShipmentAddresses } from "@/data/shipmentDummyData";
+import { getMyShipmentAddresses } from "@/services/api/shipment-address";
+import { toast } from "react-hot-toast";
 
 interface ReceiverFormProps {
   onSubmit: (data: ReceiverFormData) => void;
@@ -23,25 +24,44 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
   });
   const [errors, setErrors] = useState<Partial<ReceiverFormData>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
-  // Load data dummy atau initial data
   useEffect(() => {
-    if (initialData) {
-      setFormData(initialData);
-    } else {
-      // Load data dummy dari alamat pengiriman pertama
-      const dummyAddress = dummyShipmentAddresses[0];
-      setFormData({
-        receiverName: dummyAddress.name,
-        phoneNumber: dummyAddress.phone,
-        country: dummyAddress.country || '',
-        province: dummyAddress.state || '',
-        city: dummyAddress.city || '',
-        cityId: dummyAddress.city_id?.toString() || '',
-        postalCode: dummyAddress.zip_code?.toString() || '',
-        fullAddress: dummyAddress.address || ''
-      });
-    }
+    const loadShipmentAddress = async () => {
+      if (initialData) {
+        setFormData(initialData);
+        return;
+      }
+
+      setIsFetching(true);
+      try {
+        const response = await getMyShipmentAddresses();
+        const firstAddress = response.data[0];
+
+        if (firstAddress) {
+          setFormData({
+            receiverName: firstAddress.name || "",
+            phoneNumber: firstAddress.phone || "",
+            country: firstAddress.country || "",
+            province: firstAddress.state || "",
+            city: firstAddress.city || "",
+            cityId: firstAddress.city_id?.toString() || "",
+            postalCode: firstAddress.zip_code?.toString() || "",
+            fullAddress: firstAddress.address || "",
+          });
+        }
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Gagal mengambil alamat penerima."
+        );
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
+    loadShipmentAddress();
   }, [initialData]);
 
   const validateForm = (): boolean => {
@@ -280,10 +300,10 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
         </Button>
         <Button 
           type="submit" 
-          disabled={isLoading}
+          disabled={isLoading || isFetching}
           className="bg-primary text-white px-4 py-2 rounded-lg w-48 mt-10 h-14 text-lg disabled:opacity-50"
         >
-          {isLoading ? "Memproses..." : "Selanjutnya"}
+          {isLoading || isFetching ? "Memproses..." : "Selanjutnya"}
         </Button>
       </div>
     </form>

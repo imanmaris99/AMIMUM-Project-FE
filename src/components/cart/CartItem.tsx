@@ -20,12 +20,13 @@ const CartItem: React.FC<CartItemProps> = ({
 }) => {
   const router = useRouter();
   const [quantity, setQuantity] = useState(item.quantity);
-  const [isChecked, setIsChecked] = useState(true);
+  const [isChecked, setIsChecked] = useState(item.is_active !== false);
 
   // Sync local state with context when item changes
   useEffect(() => {
-    setIsChecked(true);
-  }, [item.id]);
+    setQuantity(item.quantity);
+    setIsChecked(item.is_active !== false);
+  }, [item.id, item.quantity, item.is_active]);
 
   const handleMinus = () => {
     const newQuantity = Math.max(1, quantity - 1);
@@ -56,6 +57,9 @@ const CartItem: React.FC<CartItemProps> = ({
   };
 
   const handleItemClick = () => {
+    if (!item.product_id) {
+      return;
+    }
     router.push(`/detail-product/${item.product_id}`);
   };
 
@@ -113,9 +117,11 @@ const CartItem: React.FC<CartItemProps> = ({
       </label>
 
       {/* Clickable Area - Image and Text */}
-      <div 
+      <div
         onClick={handleItemClick}
-        className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors"
+        className={`flex items-center gap-3 flex-1 min-w-0 rounded-lg p-2 -m-2 transition-colors ${
+          item.product_id ? 'cursor-pointer hover:bg-gray-50' : 'cursor-default'
+        }`}
       >
         {/* Image */}
         <div className="w-[70px] h-[70px] rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 bg-gray-50 grid place-items-center">

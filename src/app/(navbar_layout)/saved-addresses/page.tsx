@@ -105,6 +105,10 @@ const SavedAddressesPage: React.FC = () => {
       throw new Error("Kode pos harus berupa angka.");
     }
 
+    if (!addressData.cityId.trim()) {
+      throw new Error("Kota/Kabupaten harus dipilih dari data RajaOngkir.");
+    }
+
     const response = await updateShipmentAddress({
       address_id: selectedAddressData.id,
       name: addressData.name.trim(),
@@ -113,7 +117,7 @@ const SavedAddressesPage: React.FC = () => {
       city: addressData.city.trim(),
       state: addressData.province.trim(),
       country: addressData.country.trim(),
-      city_id: selectedAddressData.city_id,
+      city_id: Number(addressData.cityId),
       zip_code: normalizedPostalCode
         ? Number(normalizedPostalCode)
         : undefined,
@@ -209,6 +213,10 @@ const SavedAddressesPage: React.FC = () => {
       throw new Error("Kode pos harus berupa angka.");
     }
 
+    if (!addressData.cityId.trim()) {
+      throw new Error("Kota/Kabupaten harus dipilih dari data RajaOngkir.");
+    }
+
     const response = await createShipmentAddress({
       name: addressData.name.trim(),
       phone: normalizedPhone,
@@ -216,7 +224,7 @@ const SavedAddressesPage: React.FC = () => {
       city: addressData.city.trim(),
       state: addressData.province.trim(),
       country: addressData.country.trim(),
-      city_id: undefined,
+      city_id: Number(addressData.cityId),
       zip_code: normalizedPostalCode
         ? Number(normalizedPostalCode)
         : undefined,
@@ -387,6 +395,7 @@ const SavedAddressesPage: React.FC = () => {
                   phone: selectedAddressData?.phone ?? "",
                   address: selectedAddressData?.address ?? "",
                   city: selectedAddressData?.city ?? "",
+                  cityId: selectedAddressData?.city_id?.toString() ?? "",
                   province: selectedAddressData?.state ?? "",
                   country: selectedAddressData?.country ?? "",
                   postalCode: selectedAddressData?.zip_code?.toString() ?? ""

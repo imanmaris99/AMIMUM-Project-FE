@@ -13,12 +13,13 @@ interface CartFooterProps {
 
 export default function CartFooter({ onCheckout }: CartFooterProps) {
   const router = useRouter();
-  const { cartItems, totalPrices, updateActiveStatus } = useCart();
+  const { cartItems, totalPrices, updateAllActiveStatus } = useCart();
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Calculate totals
   const total = totalPrices.total;
-  const allItemsSelected = cartItems.length > 0; // Simplified since we don't have is_active in new structure
+  const allItemsSelected =
+    cartItems.length > 0 && cartItems.every((item) => item.is_active !== false);
 
   const handleSelectAll = useCallback(() => {
     if (cartItems.length === 0) return;
@@ -26,11 +27,8 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
     // Toggle all items - if all selected, deselect all; if not all selected, select all
     const newStatus = !allItemsSelected;
     
-    // Batch update all items at once to prevent multiple re-renders
-    cartItems.forEach(item => {
-      updateActiveStatus(item.id.toString(), newStatus);
-    });
-  }, [cartItems, allItemsSelected, updateActiveStatus]);
+    void updateAllActiveStatus(newStatus);
+  }, [cartItems.length, allItemsSelected, updateAllActiveStatus]);
 
   const handleCheckout = () => {
     // Check if user is logged in using SessionManager

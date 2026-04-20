@@ -40,7 +40,7 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    try {
+    const runToggle = async () => {
       if (!product || !product.id || !product.name) {
         return;
       }
@@ -66,16 +66,12 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
         brand: product.brand
       };
 
-      if (isWishlisted) {
-        // If already in wishlist, remove it directly
-        toggleWishlist(wishlistItem);
-      } else {
-        // If not in wishlist, add directly
-        toggleWishlist(wishlistItem);
-      }
-    } catch {
+      await toggleWishlist(wishlistItem);
+    };
+
+    void runToggle().catch(() => {
       // Wishlist toggle error - handle gracefully
-    }
+    });
   };
 
   const handleModalClose = () => {

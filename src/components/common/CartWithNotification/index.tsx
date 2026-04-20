@@ -15,6 +15,10 @@ const CartWithNotification: React.FC<CartWithNotificationProps> = ({ children })
 
   // Track previous cart length to detect new additions
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     const prevLength = parseInt(localStorage.getItem('cart_prev_length') || '0');
     const currentLength = cartItems.length;
     

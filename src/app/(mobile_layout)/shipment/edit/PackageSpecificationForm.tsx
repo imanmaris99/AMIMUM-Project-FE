@@ -2,14 +2,20 @@ import { Button } from "@/components/ui/button";
 import { HiOutlineTruck } from "react-icons/hi2";
 import { PiPackageThin } from "react-icons/pi";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { PackageFormData } from "@/types/shipment";
-import { dummyCouriers } from "@/data/shipmentDummyData";
+import {
+  getRajaOngkirShippingCost,
+  RajaOngkirShippingDetail,
+  SUPPORTED_COURIERS,
+} from "@/services/api/rajaongkir";
+import { toast } from "react-hot-toast";
 
 interface PackageSpecificationFormProps {
   onSubmit: (data: PackageFormData) => void;
   onBack: () => void;
   initialData?: PackageFormData;
+  originCityId?: string;
+  destinationCityId?: string;
 }
 
 const CourierSelection = ({ 
@@ -34,9 +40,11 @@ const CourierSelection = ({
       }`}
     >
       <option value="">Pilih Kurir</option>
-      <option value="jne">JNE</option>
-      <option value="jnt">J&T</option>
-      <option value="sicepat">Si Cepat</option>
+      {SUPPORTED_COURIERS.map((courier) => (
+        <option key={courier.id} value={courier.id}>
+          {courier.name}
+        </option>
+      ))}
     </select>
     {error && (
       <p className="text-red-500 text-xs mt-1">{error}</p>
@@ -140,12 +148,14 @@ const ShippingCostCalculation = ({
 );
 
 const ShippingCostDetails = ({ 
+  couriers,
   selectedService, 
   onServiceChange, 
   cost, 
   estimatedDelivery, 
   serviceType 
 }: { 
+  couriers: RajaOngkirShippingDetail[];
   selectedService: string;
   onServiceChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   cost: number;
@@ -166,9 +176,9 @@ const ShippingCostDetails = ({
         className="w-full border border-gray-300 rounded-md outline-none px-2 py-1 bg-gray-200"
       >
         <option value="">Pilih Layanan</option>
-        {dummyCouriers.map((courier) => (
-          <option key={`${courier.courier_name}-${courier.service_type}`} value={`${courier.courier_name}-${courier.service_type}`}>
-            {courier.courier_name} - {courier.service_type}
+        {couriers.map((courier) => (
+          <option key={courier.service} value={courier.service}>
+            {courier.service} - {courier.description}
           </option>
         ))}
       </select>
@@ -191,8 +201,13 @@ const ShippingCostDetails = ({
   </div>
 );
 
-const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({ onSubmit, onBack, initialData }) => {
-  const router = useRouter();
+const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
+  onSubmit,
+  onBack,
+  initialData,
+  originCityId,
+  destinationCityId,
+}) => {
   const [formData, setFormData] = useState<PackageFormData>({
     courier: "",
     weight: 0,
@@ -207,26 +222,27 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({ onS
   const [isLoading, setIsLoading] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
   const [selectedService, setSelectedService] = useState("");
+  const [availableServices, setAvailableServices] = useState<RajaOngkirShippingDetail[]>([]);
 
-  // Load data dummy atau initial data
   useEffect(() => {
     if (initialData) {
       setFormData(initialData);
-      setSelectedService(`${initialData.courier}-${initialData.serviceType}`);
-    } else {
-      // Load data dummy
-      setFormData({
-        courier: "jne",
-        weight: 1000,
-        length: 30,
-        width: 20,
-        height: 10,
-        serviceType: "REG",
-        cost: 15000,
-        estimatedDelivery: "1-2 hari"
-      });
-      setSelectedService("jne-REG");
+      setSelectedService(initialData.serviceType);
+      setAvailableServices([
+        {
+          service: initialData.serviceType,
+          description: "Layanan tersimpan",
+          cost: initialData.cost,
+          etd: initialData.estimatedDelivery,
+        },
+      ]);
+      return;
     }
+
+    setFormData((prev) => ({
+      ...prev,
+      courier: prev.courier || SUPPORTED_COURIERS[0].id,
+    }));
   }, [initialData]);
 
   const validateForm = (): boolean => {
@@ -280,41 +296,59 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({ onS
     setSelectedService(value);
     
     if (value) {
-      const [courierName, serviceType] = value.split('-');
-      const courier = dummyCouriers.find(c => 
-        c.courier_name.toLowerCase() === courierName.toLowerCase() && 
-        c.service_type === serviceType
-      );
+      const courier = availableServices.find((item) => item.service === value);
       
       if (courier) {
         setFormData(prev => ({
           ...prev,
-          courier: courierName,
-          serviceType: serviceType,
+          serviceType: courier.service,
           cost: courier.cost || 0,
-          estimatedDelivery: courier.estimated_delivery || ""
+          estimatedDelivery: courier.etd || ""
         }));
       }
     }
   };
 
   const handleCalculate = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    if (!originCityId || !destinationCityId) {
+      toast.error("Data kota asal dan tujuan belum lengkap.");
+      return;
+    }
+
     setIsCalculating(true);
-    
-    // Simulasi delay kalkulasi
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Simulasi kalkulasi biaya berdasarkan berat dan dimensi
-    const baseCost = formData.weight > 1000 ? 20000 : 15000;
-    const dimensionCost = (formData.length * formData.width * formData.height) / 1000;
-    const totalCost = Math.round(baseCost + dimensionCost);
-    
-    setFormData(prev => ({
-      ...prev,
-      cost: totalCost
-    }));
-    
-    setIsCalculating(false);
+
+    try {
+      const response = await getRajaOngkirShippingCost({
+        origin: Number(originCityId),
+        destination: Number(destinationCityId),
+        weight: formData.weight,
+        courier: formData.courier,
+      });
+
+      setAvailableServices(response.details);
+
+      const firstService = response.details[0];
+      setFormData((prev) => ({
+        ...prev,
+        serviceType: firstService?.service || prev.serviceType,
+        cost: firstService?.cost || prev.cost,
+        estimatedDelivery: firstService?.etd || prev.estimatedDelivery,
+      }));
+      setSelectedService(firstService?.service || "");
+      toast.success("Biaya pengiriman berhasil dihitung.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Gagal menghitung biaya pengiriman."
+      );
+    } finally {
+      setIsCalculating(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -326,12 +360,8 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({ onS
 
     setIsLoading(true);
     
-    // Simulasi delay API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
     onSubmit(formData);
     setIsLoading(false);
-    router.push("/shipment");
   };
 
   return (
@@ -365,6 +395,7 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({ onS
           isLoading={isCalculating}
         />
         <ShippingCostDetails 
+          couriers={availableServices}
           selectedService={selectedService}
           onServiceChange={handleServiceChange}
           cost={formData.cost}

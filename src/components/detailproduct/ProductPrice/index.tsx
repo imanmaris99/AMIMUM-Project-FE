@@ -3,7 +3,6 @@ import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 import Spinner from "@/components/ui/Spinner";
 import ButtonSpinner from "@/components/ui/ButtonSpinner";
 import { useState } from "react";
-import { getProductRatingSummary } from "@/data/dummyData";
 import RatingDisplay from "@/components/rating/RatingDisplay";
 import { useCart } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
@@ -44,7 +43,7 @@ const ProductPrice = ({
     
     try {
       // Add to cart using CartContext
-      addToCart(data, datavariant);
+      await addToCart(data, datavariant);
       
       
       // Show feedback
@@ -155,7 +154,7 @@ const ProductPrice = ({
         {/* Rating Section - Only show in non-sticky mode */}
         {!isSticky && data?.id && (
           <RatingDisplay
-            ratingData={getProductRatingSummary(data.id) || {
+            ratingData={{
               avg_rating: data.avg_rating || 0,
               total_rater: data.total_rater || 0,
               rating_distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },

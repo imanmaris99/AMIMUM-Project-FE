@@ -7,29 +7,68 @@ import PackageSpecificationForm from "../edit/PackageSpecificationForm";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { SenderFormData, ReceiverFormData, PackageFormData } from "@/types/shipment";
+import { createShipment } from "@/services/api/shipment";
 
 const CreateShipment = () => {
   const router = useRouter();
   
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [senderData, setSenderData] = useState<SenderFormData | null>(null);
+  const [receiverData, setReceiverData] = useState<ReceiverFormData | null>(null);
+  const [packageData, setPackageData] = useState<PackageFormData | null>(null);
 
-  const handleSenderSubmit = () => {
+  const handleSenderSubmit = (data: SenderFormData) => {
+    setSenderData(data);
     setCurrentStep(1);
   };
 
-  const handleReceiverSubmit = () => {
+  const handleReceiverSubmit = (data: ReceiverFormData) => {
+    setReceiverData(data);
     setCurrentStep(2);
   };
 
-  const handlePackageSubmit = async () => {
+  const handlePackageSubmit = async (data: PackageFormData) => {
+    setPackageData(data);
     setIsLoading(true);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (!receiverData) {
+        throw new Error("Data penerima belum lengkap.");
+      }
+
+      await createShipment({
+        address: {
+          name: receiverData.receiverName,
+          phone: receiverData.phoneNumber,
+          address: receiverData.fullAddress,
+          city: receiverData.city,
+          city_id: Number(receiverData.cityId),
+          state: receiverData.province,
+          country: receiverData.country,
+          zip_code: Number(receiverData.postalCode),
+        },
+        courier: {
+          courier_name: data.courier,
+          weight: data.weight,
+          length: data.length,
+          width: data.width,
+          height: data.height,
+          service_type: data.serviceType,
+          cost: data.cost,
+          estimated_delivery: data.estimatedDelivery,
+        },
+      });
+
+      toast.success("Alamat pengiriman berhasil dibuat.");
       router.push("/shipment?created=true");
-    } catch {
-      toast.error("Gagal membuat alamat pengiriman. Silakan coba lagi.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Gagal membuat alamat pengiriman. Silakan coba lagi."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -67,19 +106,24 @@ const CreateShipment = () => {
       <div className="flex justify-center items-center">
         {currentStep === 0 && (
           <SenderForm 
-            onSubmit={handleSenderSubmit} 
+            onSubmit={handleSenderSubmit}
+            initialData={senderData || undefined}
           />
         )}
         {currentStep === 1 && (
           <ReceiverForm 
-            onSubmit={handleReceiverSubmit} 
+            onSubmit={handleReceiverSubmit}
             onBack={handlePreviousStep}
+            initialData={receiverData || undefined}
           />
         )}
         {currentStep === 2 && (
           <PackageSpecificationForm 
-            onSubmit={handlePackageSubmit} 
+            onSubmit={handlePackageSubmit}
             onBack={handlePreviousStep}
+            initialData={packageData || undefined}
+            originCityId={senderData?.cityId}
+            destinationCityId={receiverData?.cityId}
           />
         )}
       </div>

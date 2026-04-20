@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { AddressFormData } from "./AddAddressModal";
+import RajaOngkirLocationFields from "./RajaOngkirLocationFields";
 
 interface EditAddressModalProps {
   isOpen: boolean;
@@ -119,35 +120,14 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
               <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
             </div>
 
-            {/* Kota Field */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm text-[#999999]">Kota</label>
-              </div>
-              <input
-                type="text"
-                value={formData.city}
-                onChange={(e) => handleInputChange('city', e.target.value)}
-                className="w-full text-sm text-[#0D0E09] bg-transparent border-none outline-none placeholder-[#999999]"
-                placeholder="Masukkan kota"
-              />
-              <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
-            </div>
-
-            {/* Provinsi Field */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm text-[#999999]">Provinsi</label>
-              </div>
-              <input
-                type="text"
-                value={formData.province}
-                onChange={(e) => handleInputChange('province', e.target.value)}
-                className="w-full text-sm text-[#0D0E09] bg-transparent border-none outline-none placeholder-[#999999]"
-                placeholder="Masukkan provinsi"
-              />
-              <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
-            </div>
+            <RajaOngkirLocationFields
+              value={{
+                province: formData.province,
+                city: formData.city,
+                cityId: formData.cityId,
+              }}
+              onChange={(field, nextValue) => handleInputChange(field, nextValue)}
+            />
 
             {/* Negara Field */}
             <div className="space-y-2">

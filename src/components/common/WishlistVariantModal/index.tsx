@@ -21,7 +21,7 @@ const WishlistVariantModal: React.FC<WishlistVariantModalProps> = ({
 
   if (!isOpen || !product) return null;
 
-  const handleAddToWishlist = (e: React.MouseEvent) => {
+  const handleAddToWishlist = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (selectedVariant) {
       // Find the selected variant
@@ -45,7 +45,7 @@ const WishlistVariantModal: React.FC<WishlistVariantModalProps> = ({
           discount: selectedVariantData.discount || 0
         };
         
-        addToWishlist(wishlistItem);
+        await addToWishlist(wishlistItem);
         onClose();
         setSelectedVariant(null);
       }
@@ -153,7 +153,7 @@ const WishlistVariantModal: React.FC<WishlistVariantModalProps> = ({
             Batal
           </button>
           <button
-            onClick={handleAddToWishlist}
+            onClick={(event) => void handleAddToWishlist(event)}
             disabled={!selectedVariant}
             className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >

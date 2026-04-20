@@ -1,6 +1,7 @@
 export interface WishlistItem {
   id: string;
-  productId: string;
+  productId?: string;
+  wishlistId?: number;
   name: string;
   variant: string;
   quantity: number;

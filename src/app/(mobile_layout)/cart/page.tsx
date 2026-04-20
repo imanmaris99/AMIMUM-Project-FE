@@ -30,7 +30,7 @@ export default function CartPage() {
   };
 
   const confirmClearAll = () => {
-    clearAll();
+    void clearAll();
     setShowConfirmDialog(false);
     toast.success("Semua item telah dihapus dari keranjang");
   };

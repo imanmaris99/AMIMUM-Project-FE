@@ -190,13 +190,15 @@ export interface CartItemType {
   variant_name: string;
   image: string;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
+  is_active?: boolean;
 }
 
 export interface CartTotalPricesType {
   subtotal: number;
   shipping_cost: number;
   total: number;
+  promo_total?: number;
 }
 
 export interface CartResponseType {

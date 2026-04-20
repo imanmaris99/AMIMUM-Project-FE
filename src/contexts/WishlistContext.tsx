@@ -1,17 +1,24 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { WishlistItem } from '@/types/wishlist';
 import { validateWishlistItemData } from '@/utils/dataValidation';
 import { ErrorHandler } from '@/lib/errorHandler';
+import {
+  addWishlistProduct,
+  deleteWishlistProduct,
+  getMyWishlistProducts,
+} from '@/services/api/wishlist';
 
 interface WishlistContextType {
   wishlistItems: WishlistItem[];
-  addToWishlist: (product: WishlistItem) => void;
-  removeFromWishlist: (productId: string) => void;
-  clearAll: () => void;
+  isLoading: boolean;
+  addToWishlist: (product: WishlistItem) => Promise<void>;
+  removeFromWishlist: (wishlistIdOrProductId: string) => Promise<void>;
+  clearAll: () => Promise<void>;
   isInWishlist: (productId: string) => boolean;
-  toggleWishlist: (product: WishlistItem) => void;
+  toggleWishlist: (product: WishlistItem) => Promise<void>;
+  refreshWishlist: () => Promise<void>;
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
@@ -30,131 +37,167 @@ interface WishlistProviderProps {
 
 export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) => {
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const PRODUCT_ID_CACHE_KEY = 'wishlist_product_id_map';
 
-  // Load wishlist from localStorage on mount
-  useEffect(() => {
-    const savedWishlist = localStorage.getItem('wishlist');
-    if (savedWishlist) {
-      try {
-        const parsedWishlist = JSON.parse(savedWishlist);
-        if (Array.isArray(parsedWishlist)) {
-          // Validate each wishlist item before loading
-          const validWishlistItems = parsedWishlist.filter(item => validateWishlistItemData(item));
-          if (validWishlistItems.length !== parsedWishlist.length) {
-            ErrorHandler.handleError(new Error('Some wishlist items are invalid and were removed'), 'WishlistLoad');
-          }
-          setWishlistItems(validWishlistItems);
-        }
-      } catch (error) {
-        ErrorHandler.handleError(error, 'WishlistLoad');
-        // Clear corrupted wishlist data
-        localStorage.removeItem('wishlist');
-      }
+  const getProductIdCache = useCallback((): Record<string, string> => {
+    try {
+      const stored = localStorage.getItem(PRODUCT_ID_CACHE_KEY);
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
     }
   }, []);
 
-  // Save wishlist to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
-  }, [wishlistItems]);
+  const saveProductIdCache = useCallback((cache: Record<string, string>) => {
+    localStorage.setItem(PRODUCT_ID_CACHE_KEY, JSON.stringify(cache));
+  }, []);
 
-  const addToWishlist = (product: WishlistItem) => {
+  const mapApiWishlistToItem = useCallback((
+    item: Awaited<ReturnType<typeof getMyWishlistProducts>>["data"][number]
+  ): WishlistItem => {
+    const primaryVariant = item.product_variant?.[0];
+    const productIdCache = getProductIdCache();
+    return {
+      id: item.id.toString(),
+      wishlistId: item.id,
+      productId: productIdCache[item.id.toString()],
+      name: item.product_name,
+      variant: primaryVariant?.variant || 'Varian tidak tersedia',
+      quantity: 1,
+      price: primaryVariant?.discounted_price || 0,
+      image: primaryVariant?.img || "/default-image.jpg",
+      addedAt: item.created_at,
+      originalPrice: primaryVariant?.discount && primaryVariant.discount > 0
+        ? Math.round(primaryVariant.discounted_price / (1 - primaryVariant.discount / 100))
+        : primaryVariant?.discounted_price || 0,
+      discount: primaryVariant?.discount || 0,
+    };
+  }, [getProductIdCache]);
+
+  const refreshWishlist = useCallback(async () => {
     try {
-      // Comprehensive data validation
-      if (!product) {
-        ErrorHandler.handleError(new Error('Product is required'), 'WishlistAdd');
+      const response = await getMyWishlistProducts();
+      const mappedItems = response.data.map(mapApiWishlistToItem);
+      setWishlistItems(mappedItems.filter((item) => validateWishlistItemData(item)));
+    } catch (error) {
+      ErrorHandler.handleError(error, 'WishlistLoad');
+      setWishlistItems([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [mapApiWishlistToItem]);
+
+  useEffect(() => {
+    void refreshWishlist();
+  }, [refreshWishlist]);
+
+  const addToWishlist = async (product: WishlistItem) => {
+    try {
+      if (!product || !product.productId) {
+        ErrorHandler.handleError(new Error('Product ID is required'), 'WishlistAdd');
         return;
       }
 
-      // Validate wishlist item data structure
       if (!validateWishlistItemData(product)) {
         ErrorHandler.handleError(new Error('Invalid wishlist item data structure'), 'WishlistAdd');
         return;
       }
 
-      // Validate required fields
-      if (!product.id || !product.name) {
-        ErrorHandler.handleError(new Error('Product ID or name is missing'), 'WishlistAdd');
-        return;
+      const response = await addWishlistProduct(product.productId);
+      const wishlistId = response.data.id;
+
+      if (wishlistId !== undefined) {
+        const cache = getProductIdCache();
+        cache[wishlistId.toString()] = product.productId;
+        saveProductIdCache(cache);
       }
 
-      // Create unique ID for the wishlist item
-      const uniqueId = `wish-${product.id}-${Date.now()}`;
-      
-      const wishlistItem: WishlistItem = {
-        id: uniqueId,
-        productId: product.productId,
-        name: product.name,
-        price: product.price,
-        image: product.image,
-        variant: product.variant,
-        quantity: product.quantity,
-        addedAt: new Date().toISOString(),
-        brand: product.brand,
-        originalPrice: product.originalPrice,
-        discount: product.discount
-      };
-
-      setWishlistItems(prev => {
-        // Check if this specific variant already exists
-        const exists = prev.some(item => item.id === wishlistItem.id);
-        if (exists) {
-          return prev;
-        }
-        
-        return [...prev, wishlistItem];
-      });
+      await refreshWishlist();
     } catch (error) {
       ErrorHandler.handleError(error, 'WishlistAdd');
+      throw error;
     }
   };
 
-  const removeFromWishlist = (productId: string) => {
-    // Validate product ID
-    if (!productId || typeof productId !== 'string') {
-      ErrorHandler.handleError(new Error('Invalid product ID'), 'WishlistRemove');
+  const removeFromWishlist = async (wishlistIdOrProductId: string) => {
+    if (!wishlistIdOrProductId || typeof wishlistIdOrProductId !== 'string') {
+      ErrorHandler.handleError(new Error('Invalid wishlist identifier'), 'WishlistRemove');
       return;
     }
-    
-    setWishlistItems(prev => prev.filter(item => item.productId !== productId));
+
+    try {
+      const targetItem = wishlistItems.find(
+        (item) =>
+          item.id === wishlistIdOrProductId ||
+          item.productId === wishlistIdOrProductId
+      );
+
+      if (!targetItem?.wishlistId) {
+        throw new Error(
+          'Wishlist ID tidak tersedia dari backend. Item ini tidak dapat dihapus dengan aman.'
+        );
+      }
+
+      await deleteWishlistProduct(targetItem.wishlistId);
+      const cache = getProductIdCache();
+      delete cache[targetItem.wishlistId.toString()];
+      saveProductIdCache(cache);
+      await refreshWishlist();
+    } catch (error) {
+      ErrorHandler.handleError(error, 'WishlistRemove');
+      throw error;
+    }
   };
 
-  const clearAll = () => {
-    setWishlistItems([]);
+  const clearAll = async () => {
+    for (const item of wishlistItems) {
+      if (item.wishlistId) {
+        await deleteWishlistProduct(item.wishlistId);
+      }
+    }
+
+    saveProductIdCache({});
+    await refreshWishlist();
   };
 
   const isInWishlist = (productId: string, variantId?: number) => {
+    if (!productId) {
+      return false;
+    }
+
     if (variantId) {
-      // Check specific variant
-      return wishlistItems.some(item => 
-        item.productId === productId && item.id.includes(`-${variantId}`)
+      return wishlistItems.some(
+        (item) =>
+          item.productId === productId && item.id.includes(`-${variantId}`)
       );
     }
-    // Check if any variant of the product exists
-    return wishlistItems.some(item => item.productId === productId);
+
+    return wishlistItems.some((item) => item.productId === productId);
   };
 
-  const toggleWishlist = (product: WishlistItem) => {
-    // Validate product before toggle
+  const toggleWishlist = async (product: WishlistItem) => {
     if (!product || !product.productId) {
       ErrorHandler.handleError(new Error('Invalid product for wishlist toggle'), 'WishlistToggle');
       return;
     }
     
     if (isInWishlist(product.productId)) {
-      removeFromWishlist(product.productId);
+      await removeFromWishlist(product.productId);
     } else {
-      addToWishlist(product);
+      await addToWishlist(product);
     }
   };
 
   const value: WishlistContextType = {
     wishlistItems,
+    isLoading,
     addToWishlist,
     removeFromWishlist,
     clearAll,
     isInWishlist,
-    toggleWishlist
+    toggleWishlist,
+    refreshWishlist
   };
 
   return (

@@ -1,15 +1,31 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
-import { Transaction, TransactionItem, TransactionStatus } from "@/types/transaction";
+import {
+  Transaction,
+  TransactionItem,
+  TransactionPaymentMethod,
+  TransactionShipmentAddress,
+  TransactionStatus
+} from "@/types/transaction";
 import { CartItemType } from "@/types/apiTypes";
 import { useNotification } from "./NotificationContext";
 import { validateCartItemData } from "@/utils/dataValidation";
 import { ErrorHandler } from "@/lib/errorHandler";
+import { getInitialTransactionStatus } from "@/lib/paymentMethods";
+
+interface CheckoutOrderData {
+  delivery_type: "delivery" | "pickup";
+  payment_method: TransactionPaymentMethod;
+  notes?: string;
+  shipment_id?: string;
+  shipping_cost?: number;
+  shipment_address?: TransactionShipmentAddress;
+}
 
 interface TransactionContextType {
   transactions: Transaction[];
-  addTransaction: (orderData: { delivery_type: "delivery" | "pickup"; notes?: string; shipment_id?: string; shipment_address?: { address: string }; courier_service?: string }, cartItems: CartItemType[]) => Transaction | null;
+  addTransaction: (orderData: CheckoutOrderData, cartItems: CartItemType[]) => Transaction | null;
   updateTransactionStatus: (transactionId: string, status: string) => void;
   getTransactionById: (transactionId: string) => Transaction | undefined;
   clearTransactions: () => void;
@@ -68,7 +84,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
   }, [transactions]);
 
   // Add new transaction
-  const addTransaction = useCallback((orderData: { delivery_type: "delivery" | "pickup"; notes?: string; shipment_id?: string; shipment_address?: { address: string }; courier_service?: string }, cartItems: CartItemType[]) => {
+  const addTransaction = useCallback((orderData: CheckoutOrderData, cartItems: CartItemType[]) => {
     try {
       
       // Validate input data
@@ -106,20 +122,23 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         id: `item-${Date.now()}-${item.id}`,
         productId: item.product_id,
         name: item.product_name,
+        variantName: item.variant_name,
         quantity: item.quantity,
         price: item.price,
         image: item.image || "/default-image.jpg"
       }));
 
-      // Calculate total amount using valid cart items
-      const totalAmount = validCartItems.reduce((total, item) => {
+      const subtotal = validCartItems.reduce((total, item) => {
         const itemPrice = item.price;
         return total + (itemPrice * item.quantity);
       }, 0);
 
-      // Add shipping cost if delivery
-      const shippingCost = orderData.delivery_type === 'delivery' ? 15000 : 0;
-      const finalAmount = totalAmount + shippingCost;
+      const shippingCost =
+        orderData.delivery_type === "delivery" ? orderData.shipping_cost || 0 : 0;
+      const finalAmount = subtotal + shippingCost;
+      const initialStatus: TransactionStatus = getInitialTransactionStatus(
+        orderData.payment_method
+      );
 
       const newTransaction: Transaction = {
         id: `trans-${Date.now()}`,
@@ -132,20 +151,23 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
           minute: '2-digit',
           hour12: true
         }),
-        status: 'pending',
+        status: initialStatus,
         amount: finalAmount,
         total: finalAmount, // Total amount for display
         items: transactionItems,
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
+        subtotal,
+        shippingCost,
         // Additional order data
         deliveryType: orderData.delivery_type,
+        paymentMethod: orderData.payment_method,
         notes: orderData.notes,
         shipmentId: orderData.shipment_id,
-        shipmentAddress: orderData.delivery_type === 'delivery' ? {
-          address: orderData.shipment_address?.address || 'Alamat tidak tersedia',
-          courier: orderData.courier_service || 'Kurir tidak tersedia'
-        } : undefined
+        shipmentAddress:
+          orderData.delivery_type === "delivery"
+            ? orderData.shipment_address
+            : undefined,
       };
 
 
@@ -197,14 +219,18 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
   }, []);
 
   // Get transaction by ID
-  const getTransactionById = useCallback((transactionId: string) => {
+  const getTransactionById = useCallback((transactionIdentifier: string) => {
     // Validate transaction ID
-    if (!transactionId || typeof transactionId !== 'string') {
+    if (!transactionIdentifier || typeof transactionIdentifier !== 'string') {
       ErrorHandler.handleError(new Error('Invalid transaction ID'), 'TransactionGet');
       return undefined;
     }
     
-    return transactions.find(transaction => transaction.transactionId === transactionId);
+    return transactions.find(
+      (transaction) =>
+        transaction.id === transactionIdentifier ||
+        transaction.transactionId === transactionIdentifier
+    );
   }, [transactions]);
 
   // Clear all transactions

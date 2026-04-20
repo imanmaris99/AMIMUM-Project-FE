@@ -9,7 +9,7 @@ export default function CartSummary() {
 
   // Calculate totals
   const subtotal = totalPrices.subtotal;
-  const totalDiscount = 0; // Simplified since we don't have discount calculation in new structure
+  const totalDiscount = totalPrices.promo_total || 0;
   const total = totalPrices.total;
 
   return (

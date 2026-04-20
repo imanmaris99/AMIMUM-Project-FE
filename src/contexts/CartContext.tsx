@@ -1,35 +1,125 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useMemo } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  ReactNode,
+} from "react";
+import { toast } from "react-hot-toast";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 import { CartItemType, CartTotalPricesType } from "@/types/apiTypes";
-import { debounce } from "@/lib/performance";
-import { ErrorHandler } from "@/lib/errorHandler";
-import { validateDetailProductData, validateVariantData, validateCartItemData } from "@/utils/dataValidation";
-
-// Cart Response Type sesuai dengan backend DTO
-export interface CartResponseType {
-  status_code: number;
-  message: string;
-  data: CartItemType[];
-  total_prices: CartTotalPricesType;
-}
+import {
+  addCartProduct,
+  deleteCartProduct,
+  extractVariantInfo,
+  getCartTotalItems,
+  getMyCartProducts,
+  updateAllCartActivation,
+  updateCartActivation,
+  updateCartQuantity as updateCartQuantityApi,
+} from "@/services/api/cart";
 
 interface CartContextType {
   cartItems: CartItemType[];
   totalItems: number;
   totalPrices: CartTotalPricesType;
-  addToCart: (product: DetailProductType, variant: VariantProductType) => void;
-  removeFromCart: (cartId: string) => void;
-  updateQuantity: (cartId: string, quantity: number) => void;
-  updateActiveStatus: (cartId: string, isActive: boolean) => void;
-  clearCart: () => void;
-  clearAll: () => void; // Alias for clearCart
-  removeActiveItems: () => void;
+  isLoading: boolean;
+  addToCart: (product: DetailProductType, variant: VariantProductType) => Promise<void>;
+  removeFromCart: (cartId: string) => Promise<void>;
+  updateQuantity: (cartId: string, quantity: number) => Promise<void>;
+  updateActiveStatus: (cartId: string, isActive: boolean) => Promise<void>;
+  updateAllActiveStatus: (isActive: boolean) => Promise<void>;
+  clearCart: () => Promise<void>;
+  clearAll: () => Promise<void>;
+  removeActiveItems: () => Promise<void>;
   isInCart: (productId: string, variantId: number) => boolean;
+  refreshCart: () => Promise<void>;
 }
 
+interface CartProviderProps {
+  children: ReactNode;
+}
+
+const CART_METADATA_STORAGE_KEY = "cart_product_metadata_map";
+
 const CartContext = createContext<CartContextType | undefined>(undefined);
+
+type CartMetadataMap = Record<
+  string,
+  {
+    productId: string;
+    variantId: number;
+  }
+>;
+
+const readCartMetadata = (): CartMetadataMap => {
+  if (typeof window === "undefined") {
+    return {};
+  }
+
+  try {
+    const rawMap = localStorage.getItem(CART_METADATA_STORAGE_KEY);
+    if (!rawMap) {
+      return {};
+    }
+
+    const parsedMap = JSON.parse(rawMap);
+    return parsedMap && typeof parsedMap === "object" ? parsedMap : {};
+  } catch {
+    return {};
+  }
+};
+
+const writeCartMetadata = (metadataMap: CartMetadataMap) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  localStorage.setItem(CART_METADATA_STORAGE_KEY, JSON.stringify(metadataMap));
+};
+
+const createCartMetadataKey = (productName: string, variantId: number) =>
+  `${productName}::${variantId}`;
+
+const normalizeCartItem = (
+  item: {
+    id: number;
+    product_name: string;
+    product_price: number;
+    variant_info: Record<string, unknown>;
+    quantity: number;
+    is_active: boolean;
+    created_at: string;
+  },
+  metadataMap: CartMetadataMap
+): CartItemType => {
+  const variantInfo = extractVariantInfo(item.variant_info);
+  const variantId =
+    typeof variantInfo.id === "number" ? variantInfo.id : 0;
+  const metadata =
+    metadataMap[createCartMetadataKey(item.product_name, variantId)];
+
+  return {
+    id: item.id.toString(),
+    product_id: metadata?.productId || "",
+    variant_id: metadata?.variantId || variantId,
+    quantity: item.quantity,
+    price:
+      typeof variantInfo.discounted_price === "number"
+        ? variantInfo.discounted_price
+        : item.product_price,
+    product_name: item.product_name,
+    variant_name: variantInfo.variant || "",
+    image: variantInfo.img || "/default-image.jpg",
+    created_at: item.created_at,
+    updated_at: variantInfo.updated_at || item.created_at,
+    is_active: item.is_active,
+  };
+};
 
 export const useCart = () => {
   const context = useContext(CartContext);
@@ -39,222 +129,183 @@ export const useCart = () => {
   return context;
 };
 
-interface CartProviderProps {
-  children: ReactNode;
-}
-
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItemType[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPrices, setTotalPrices] = useState<CartTotalPricesType>({
+    subtotal: 0,
+    shipping_cost: 0,
+    total: 0,
+    promo_total: 0,
+  });
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      try {
-        const parsedCart = JSON.parse(savedCart);
-        if (Array.isArray(parsedCart)) {
-          const validCartItems = parsedCart.filter(item => validateCartItemData(item));
-          if (validCartItems.length !== parsedCart.length) {
-            ErrorHandler.handleError(new Error('Some cart items are invalid and were removed'), 'CartLoad');
-          }
-          setCartItems(validCartItems);
-        }
-      } catch (error) {
-        ErrorHandler.handleError(error, 'CartLoad');
-        localStorage.removeItem('cart');
-      }
-    }
-  }, []);
+  const refreshCart = useCallback(async () => {
+    setIsLoading(true);
 
-  // Debounced save to localStorage to prevent excessive writes
-  const debouncedSave = useMemo(
-    () => debounce((...args: unknown[]) => {
-      const items = args[0] as CartItemType[];
-      try {
-        localStorage.setItem('cart', JSON.stringify(items));
-      } catch (error) {
-        ErrorHandler.handleError(error, 'CartSave');
-      }
-    }, 300),
-    []
-  );
+    try {
+      const [cartResponse, totalResponse] = await Promise.all([
+        getMyCartProducts(),
+        getCartTotalItems(),
+      ]);
 
-  useEffect(() => {
-    debouncedSave(cartItems);
-  }, [cartItems, debouncedSave]);
-
-  // Generate unique cart ID
-  const generateCartId = useCallback(() => {
-    return Date.now() + Math.floor(Math.random() * 1000);
-  }, []);
-
-  // Calculate total prices
-  const calculateTotalPrices = useCallback((items: CartItemType[]): CartTotalPricesType => {
-    const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
-    const shipping_cost = 15000;
-    const total = subtotal + shipping_cost;
-
-    return {
-      subtotal,
-      shipping_cost,
-      total
-    };
-  }, []);
-
-  // Add to cart
-  const addToCart = useCallback((product: DetailProductType, variant: VariantProductType) => {
-    // Comprehensive data validation
-    if (!product || !variant) {
-      ErrorHandler.handleError(new Error('Product or variant is required'), 'CartAdd');
-      return;
-    }
-
-    // Validate product data structure
-    if (!validateDetailProductData(product)) {
-      ErrorHandler.handleError(new Error('Invalid product data structure'), 'CartAdd');
-      return;
-    }
-
-    // Validate variant data structure
-    if (!validateVariantData(variant)) {
-      ErrorHandler.handleError(new Error('Invalid variant data structure'), 'CartAdd');
-      return;
-    }
-
-    // Validate required fields
-    if (!product.id || !variant.id) {
-      ErrorHandler.handleError(new Error('Product ID or variant ID is missing'), 'CartAdd');
-      return;
-    }
-
-    setCartItems(prevItems => {
-
-      const existingItemIndex = prevItems.findIndex(
-        item => item.product_id === product.id && item.variant_id === variant.id
+      const metadataMap = readCartMetadata();
+      const normalizedItems = cartResponse.data.map((item) =>
+        normalizeCartItem(item, metadataMap)
       );
 
-
-      if (existingItemIndex > -1) {
-        // Update quantity if item already exists
-        const updatedItems = [...prevItems];
-        updatedItems[existingItemIndex].quantity += 1;
-        return updatedItems;
-      } else {
-        // Add new item
-        const productPrice = product.price || 0;
-        const discount = variant.discount || 0;
-        const discountedPrice = variant.discounted_price || 
-          (discount > 0 ? Math.round(productPrice * (1 - discount / 100)) : productPrice);
-        
-        const newCartItem: CartItemType = {
-          id: generateCartId().toString(),
-          product_id: product.id,
-          variant_id: variant.id,
-          quantity: 1,
-          price: discountedPrice,
-          product_name: product.name,
-          variant_name: variant.variant || "",
-          image: variant.img || "",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-
-
-        const updatedItems = [...prevItems, newCartItem];
-        return updatedItems;
-      }
-    });
-  }, [generateCartId]);
-
-  // Remove from cart
-  const removeFromCart = useCallback((cartId: string) => {
-    setCartItems(prevItems => {
-      const updatedItems = prevItems.filter(item => item.id !== cartId);
-      // Immediately save to localStorage when removing items
-      try {
-        localStorage.setItem('cart', JSON.stringify(updatedItems));
-      } catch (error) {
-        ErrorHandler.handleError(error, 'CartRemove');
-      }
-      return updatedItems;
-    });
-  }, []);
-
-  const updateQuantity = useCallback((cartId: string, quantity: number) => {
-    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 999) {
-      ErrorHandler.handleError(new Error('Invalid quantity: must be between 1 and 999'), 'CartUpdate');
-      return;
-    }
-    
-    setCartItems(prevItems => {
-      const updatedItems = prevItems.map(item =>
-        item.id === cartId ? { ...item, quantity } : item
+      setCartItems(normalizedItems);
+      setTotalItems(totalResponse.data.total_items);
+      setTotalPrices({
+        subtotal: cartResponse.total_prices.all_item_active_prices,
+        shipping_cost: 0,
+        total: cartResponse.total_prices.total_all_active_prices,
+        promo_total: cartResponse.total_prices.all_promo_active_prices,
+      });
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Gagal mengambil keranjang."
       );
-      return updatedItems;
-    });
-  }, []);
-
-  const updateActiveStatus = useCallback(() => {
-  }, []);
-
-  const clearCart = useCallback(() => {
-    setCartItems([]);
-    try {
-      localStorage.removeItem('cart');
-    } catch (error) {
-      ErrorHandler.handleError(error, 'CartClear');
+      setCartItems([]);
+      setTotalItems(0);
+      setTotalPrices({
+        subtotal: 0,
+        shipping_cost: 0,
+        total: 0,
+        promo_total: 0,
+      });
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
-  const clearAll = useCallback(() => {
-    setCartItems([]);
-    try {
-      localStorage.removeItem('cart');
-    } catch (error) {
-      ErrorHandler.handleError(error, 'CartClearAll');
-    }
-  }, []);
+  useEffect(() => {
+    void refreshCart();
+  }, [refreshCart]);
 
-  const removeActiveItems = useCallback(() => {
-    setCartItems([]);
-  }, []);
+  const addToCart = useCallback(
+    async (product: DetailProductType, variant: VariantProductType) => {
+      if (!product?.id || !variant?.id) {
+        throw new Error("Produk atau varian tidak valid.");
+      }
 
-  const isInCart = useCallback((productId: string, variantId: number) => {
-    return cartItems.some(item => item.product_id === productId && item.variant_id === variantId);
-  }, [cartItems]);
+      await addCartProduct({
+        productId: product.id,
+        variantId: variant.id,
+      });
 
-  const totalItems = useMemo(() => cartItems.length, [cartItems.length]);
-  const totalPrices = useMemo(() => calculateTotalPrices(cartItems), [cartItems, calculateTotalPrices]);
+      const metadataMap = readCartMetadata();
+      metadataMap[createCartMetadataKey(product.name, variant.id)] = {
+        productId: product.id,
+        variantId: variant.id,
+      };
+      writeCartMetadata(metadataMap);
 
-  // Memoized context value to prevent unnecessary re-renders
-  const value: CartContextType = useMemo(() => ({
-    cartItems,
-    totalItems,
-    totalPrices,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    updateActiveStatus,
-    clearCart,
-    clearAll,
-    removeActiveItems,
-    isInCart,
-  }), [
-    cartItems,
-    totalItems,
-    totalPrices,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    updateActiveStatus,
-    clearCart,
-    clearAll,
-    removeActiveItems,
-    isInCart,
-  ]);
-
-  return (
-    <CartContext.Provider value={value}>
-      {children}
-    </CartContext.Provider>
+      await refreshCart();
+    },
+    [refreshCart]
   );
+
+  const removeFromCart = useCallback(
+    async (cartId: string) => {
+      await deleteCartProduct(cartId);
+      await refreshCart();
+    },
+    [refreshCart]
+  );
+
+  const updateQuantity = useCallback(
+    async (cartId: string, quantity: number) => {
+      if (!Number.isInteger(quantity) || quantity < 1) {
+        throw new Error("Jumlah produk tidak valid.");
+      }
+
+      await updateCartQuantityApi({
+        cartId,
+        quantity,
+      });
+      await refreshCart();
+    },
+    [refreshCart]
+  );
+
+  const updateActiveStatus = useCallback(
+    async (cartId: string, isActive: boolean) => {
+      await updateCartActivation({
+        cartId,
+        isActive,
+      });
+      await refreshCart();
+    },
+    [refreshCart]
+  );
+
+  const updateAllActiveStatus = useCallback(
+    async (isActive: boolean) => {
+      await updateAllCartActivation(isActive);
+      await refreshCart();
+    },
+    [refreshCart]
+  );
+
+  const clearCart = useCallback(async () => {
+    await Promise.all(cartItems.map((item) => deleteCartProduct(item.id)));
+    await refreshCart();
+  }, [cartItems, refreshCart]);
+
+  const clearAll = useCallback(async () => {
+    await clearCart();
+  }, [clearCart]);
+
+  const removeActiveItems = useCallback(async () => {
+    const activeItems = cartItems.filter((item) => item.is_active !== false);
+
+    await Promise.all(activeItems.map((item) => deleteCartProduct(item.id)));
+    await refreshCart();
+  }, [cartItems, refreshCart]);
+
+  const isInCart = useCallback(
+    (productId: string, variantId: number) =>
+      cartItems.some(
+        (item) => item.product_id === productId && item.variant_id === variantId
+      ),
+    [cartItems]
+  );
+
+  const value: CartContextType = useMemo(
+    () => ({
+      cartItems,
+      totalItems,
+      totalPrices,
+      isLoading,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      updateActiveStatus,
+      updateAllActiveStatus,
+      clearCart,
+      clearAll,
+      removeActiveItems,
+      isInCart,
+      refreshCart,
+    }),
+    [
+      cartItems,
+      totalItems,
+      totalPrices,
+      isLoading,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      updateActiveStatus,
+      updateAllActiveStatus,
+      clearCart,
+      clearAll,
+      removeActiveItems,
+      isInCart,
+      refreshCart,
+    ]
+  );
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };

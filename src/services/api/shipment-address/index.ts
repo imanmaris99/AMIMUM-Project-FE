@@ -22,6 +22,12 @@ export interface ShipmentAddressListResponse {
   data: ShipmentAddress[];
 }
 
+export interface ShipmentAddressSingleResponse {
+  status_code: number;
+  message: string;
+  data: ShipmentAddress;
+}
+
 interface ShipmentAddressErrorResponse {
   status_code?: number;
   error?: string;
@@ -76,6 +82,71 @@ export const getMyShipmentAddresses =
 
         throw new Error(
           errorData.message || "Gagal mengambil alamat pengiriman."
+        );
+      }
+
+      if (error instanceof Error) {
+        throw error;
+      }
+
+      throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    }
+  };
+
+export const getOwnerShipmentAddress =
+  async (): Promise<ShipmentAddressSingleResponse> => {
+    try {
+      const session = SessionManager.getSession();
+      const token = session?.token?.token;
+
+      const response = await axiosInstance.get<ShipmentAddressSingleResponse>(
+        API_ENDPOINTS.SHIPMENT_ADDRESS_OWNER,
+        token && isJwtToken(token)
+          ? {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          : undefined
+      );
+
+      if (
+        (response.data?.status_code === 200 || response.data?.status_code === 201) &&
+        response.data.data
+      ) {
+        return response.data;
+      }
+
+      throw new Error(
+        response.data?.message || "Gagal mengambil alamat pemilik toko."
+      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response) {
+        const status = error.response.status;
+        const errorData = error.response.data as ShipmentAddressErrorResponse;
+
+        if (status === 403) {
+          throw new Error(
+            errorData.message ||
+              "Pengguna tidak diizinkan untuk mengakses informasi ini."
+          );
+        }
+
+        if (status === 404) {
+          throw new Error(
+            errorData.message || "Alamat pemilik toko tidak ditemukan."
+          );
+        }
+
+        if (status === 500) {
+          throw new Error(
+            errorData.message ||
+              "Terjadi kesalahan tak terduga saat mengambil data alamat."
+          );
+        }
+
+        throw new Error(
+          errorData.message || "Gagal mengambil alamat pemilik toko."
         );
       }
 

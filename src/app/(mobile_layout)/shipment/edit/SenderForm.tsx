@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { LuContact, LuPhone, LuMapPin } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { SenderFormData } from "@/types/shipment";
-import { dummyStoreAddress } from "@/data/shipmentDummyData";
+import { getOwnerShipmentAddress } from "@/services/api/shipment-address";
+import { toast } from "react-hot-toast";
 
 interface SenderFormProps {
   onSubmit: (data: SenderFormData) => void;
@@ -22,24 +23,42 @@ const SenderForm: React.FC<SenderFormProps> = ({ onSubmit, initialData }) => {
   });
   const [errors, setErrors] = useState<Partial<SenderFormData>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
-  // Load data dummy atau initial data
   useEffect(() => {
-    if (initialData) {
-      setFormData(initialData);
-    } else {
-      // Load data dummy toko
-      setFormData({
-        senderName: dummyStoreAddress.name,
-        phoneNumber: dummyStoreAddress.phone,
-        country: dummyStoreAddress.country,
-        province: dummyStoreAddress.state,
-        city: dummyStoreAddress.city,
-        cityId: dummyStoreAddress.cityId.toString(),
-        postalCode: dummyStoreAddress.zipCode,
-        fullAddress: dummyStoreAddress.address
-      });
-    }
+    const loadOwnerAddress = async () => {
+      if (initialData) {
+        setFormData(initialData);
+        return;
+      }
+
+      setIsFetching(true);
+      try {
+        const response = await getOwnerShipmentAddress();
+        const ownerAddress = response.data;
+
+        setFormData({
+          senderName: ownerAddress.name || "",
+          phoneNumber: ownerAddress.phone || "",
+          country: ownerAddress.country || "",
+          province: ownerAddress.state || "",
+          city: ownerAddress.city || "",
+          cityId: ownerAddress.city_id?.toString() || "",
+          postalCode: ownerAddress.zip_code?.toString() || "",
+          fullAddress: ownerAddress.address || "",
+        });
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Gagal mengambil alamat pemilik toko."
+        );
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
+    loadOwnerAddress();
   }, [initialData]);
 
   const validateForm = (): boolean => {
@@ -271,10 +290,10 @@ const SenderForm: React.FC<SenderFormProps> = ({ onSubmit, initialData }) => {
       <div className="flex justify-center items-center mt-auto mb-10">
         <Button 
           type="submit" 
-          disabled={isLoading}
+          disabled={isLoading || isFetching}
           className="bg-primary text-white px-4 py-2 rounded-lg w-96 mt-10 h-14 text-lg disabled:opacity-50"
         >
-          {isLoading ? "Memproses..." : "Selanjutnya"}
+          {isLoading || isFetching ? "Memproses..." : "Selanjutnya"}
         </Button>
       </div>
     </form>

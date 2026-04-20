@@ -28,6 +28,22 @@ const CourierSelector: React.FC<CourierSelectorProps> = ({
   const selectedCompanyData = courierCompanies.find(company => company.id === selectedCompany);
   const selectedServiceData = selectedCompanyData?.services.find(service => service.id === selectedService);
 
+  const getCompanyStatusLabel = (companyId: string, serviceCount: number) => {
+    if (selectedCompany === companyId && isLoading) {
+      return 'Memuat layanan...';
+    }
+
+    if (selectedCompany !== companyId && serviceCount === 0) {
+      return 'Pilih ekspedisi untuk memuat layanan';
+    }
+
+    if (serviceCount === 0) {
+      return 'Layanan tidak tersedia';
+    }
+
+    return `${serviceCount} layanan tersedia`;
+  };
+
   const handleCompanySelect = (companyId: string) => {
     onCompanySelect(companyId);
     onServiceSelect(''); // Reset service selection when company changes
@@ -81,7 +97,7 @@ const CourierSelector: React.FC<CourierSelectorProps> = ({
                   <div className="text-left">
                     <p className="font-medium text-gray-900">{company.name}</p>
                     <p className="text-sm text-gray-500">
-                      {company.services.length} layanan tersedia
+                      {getCompanyStatusLabel(company.id, company.services.length)}
                     </p>
                   </div>
                 </div>
@@ -129,34 +145,42 @@ const CourierSelector: React.FC<CourierSelectorProps> = ({
           {/* Service Dropdown Options */}
           {isServiceDropdownOpen && (
             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-              {selectedCompanyData.services.map((service) => (
-                <button
-                  key={service.id}
-                  type="button"
-                  onClick={() => handleServiceSelect(service.id)}
-                  className="w-full p-4 hover:bg-gray-50 transition-colors first:rounded-t-lg last:rounded-b-lg"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 text-left">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="font-medium text-gray-900">{service.serviceType}</p>
-                        <p className="text-lg font-semibold text-primary">
-                          {rupiahFormater(service.cost)}
+              {selectedCompanyData.services.length === 0 ? (
+                <div className="p-4 text-sm text-gray-500">
+                  {isLoading
+                    ? 'Sedang memuat layanan pengiriman...'
+                    : 'Belum ada layanan yang dapat dipilih untuk ekspedisi ini.'}
+                </div>
+              ) : (
+                selectedCompanyData.services.map((service) => (
+                  <button
+                    key={service.id}
+                    type="button"
+                    onClick={() => handleServiceSelect(service.id)}
+                    className="w-full p-4 hover:bg-gray-50 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 text-left">
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="font-medium text-gray-900">{service.serviceType}</p>
+                          <p className="text-lg font-semibold text-primary">
+                            {rupiahFormater(service.cost)}
+                          </p>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-1">
+                          {service.estimatedDelivery}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {service.description}
                         </p>
                       </div>
-                      <p className="text-sm text-gray-600 mb-1">
-                        {service.estimatedDelivery}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {service.description}
-                      </p>
+                      {selectedService === service.id && (
+                        <GoCheck className="w-5 h-5 text-primary ml-3 flex-shrink-0" />
+                      )}
                     </div>
-                    {selectedService === service.id && (
-                      <GoCheck className="w-5 h-5 text-primary ml-3 flex-shrink-0" />
-                    )}
-                  </div>
-                </button>
-              ))}
+                  </button>
+                ))
+              )}
             </div>
           )}
         </div>

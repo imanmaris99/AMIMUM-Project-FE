@@ -18,14 +18,7 @@ const WishlistList: React.FC<WishlistListProps> = ({ items, onRemoveItem }) => {
     setRemovingItems(prev => new Set(prev).add(id));
     
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // Remove from context using productId
-      const item = items.find(item => item.id === id);
-      if (item) {
-        removeFromWishlist(item.productId);
-      }
-      // Also call the passed onRemoveItem for backward compatibility
+      await removeFromWishlist(id);
       onRemoveItem(id);
     } catch {
       // Ignore wishlist removal errors

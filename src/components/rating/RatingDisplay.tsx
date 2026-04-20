@@ -1,8 +1,22 @@
 import React from 'react';
-import { ProductRatingSummary } from '@/data/dummyData';
+
+export interface RatingDisplayReview {
+  id: number | string;
+  rate: number;
+  review: string;
+  rater_name?: string;
+  created_at: string;
+}
+
+export interface RatingDisplaySummary {
+  avg_rating: number;
+  total_rater: number;
+  rating_distribution: Record<1 | 2 | 3 | 4 | 5, number>;
+  recent_reviews: RatingDisplayReview[];
+}
 
 interface RatingDisplayProps {
-  ratingData: ProductRatingSummary;
+  ratingData: RatingDisplaySummary;
   showDistribution?: boolean;
   showReviews?: boolean;
   className?: string;

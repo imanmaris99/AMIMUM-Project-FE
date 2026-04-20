@@ -111,7 +111,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     ?.services.find(service => service.id === selectedCourierService);
 
   // Use direct checkout item or cart items
-  const currentItems = isDirectCheckout && directCheckoutItem ? [directCheckoutItem] : cartItems;
+  const currentItems =
+    isDirectCheckout && directCheckoutItem
+      ? [directCheckoutItem]
+      : cartItems.filter((item) => item.is_active !== false);
   
   
   
@@ -199,6 +202,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       // Create order data based on backend DTOs
       const orderData = {
         delivery_type: deliveryMethod,
+        payment_method: 'bca_va' as const,
         notes: additionalNotes || (deliveryMethod === 'pickup' ? 'Ambil di toko' : undefined),
         shipment_id: deliveryMethod === 'delivery' ? selectedCourierService : undefined,
         items: currentItems.map((item: CartItemType) => ({
@@ -219,7 +223,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       
       // Remove only active items from cart after successful payment
       if (!isDirectCheckout) {
-        removeActiveItems();
+        await removeActiveItems();
       } else {
         // Clear direct checkout item from localStorage
         localStorage.removeItem('directCheckoutItem');

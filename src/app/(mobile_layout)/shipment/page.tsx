@@ -8,8 +8,14 @@ import { FiEdit } from "react-icons/fi";
 import { RiCheckboxBlankCircleLine } from "react-icons/ri";
 import { RiCheckboxCircleLine } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
-import { dummyShipments } from "@/data/shipmentDummyData";
 import { ShipmentData } from "@/types/shipment";
+import {
+  activateShipment,
+  deleteShipment,
+  getMyShipments,
+  ShipmentListItem,
+} from "@/services/api/shipment";
+import { toast } from "react-hot-toast";
 
 const ShipmentSkeleton = () => (
   <div className="flex flex-col justify-between min-h-screen animate-pulse">
@@ -52,30 +58,56 @@ const Shipment = () => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Simulasi loading data
+  const mapShipmentToViewModel = (shipment: ShipmentListItem): ShipmentData => ({
+    id: shipment.id,
+    address: {
+      id: shipment.my_address.id,
+      name: shipment.my_address.name,
+      phone: shipment.my_address.phone,
+      address: shipment.my_address.address,
+      city: shipment.my_address.city,
+      city_id: shipment.my_address.city_id,
+      state: shipment.my_address.state,
+      country: shipment.my_address.country,
+      zip_code: shipment.my_address.zip_code,
+      created_at: shipment.my_address.created_at || shipment.created_at,
+    },
+    courier: {
+      id: shipment.my_courier.id,
+      courier_name: shipment.my_courier.courier_name,
+      weight: shipment.my_courier.weight,
+      service_type: shipment.my_courier.service_type,
+      cost: shipment.my_courier.cost,
+      estimated_delivery: shipment.my_courier.estimated_delivery,
+      is_active: shipment.is_active,
+      created_at: shipment.my_courier.created_at || shipment.created_at,
+    },
+    is_active: shipment.is_active,
+    created_at: shipment.created_at,
+  });
+
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      // Simulasi delay API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setShipments(dummyShipments);
-      
-      // Memastikan hanya 1 alamat yang aktif
-      const activeStates = dummyShipments.map(shipment => shipment.is_active);
-      const activeCount = activeStates.filter(state => state).length;
-      
-      // Jika lebih dari 1 yang aktif, reset ke hanya yang pertama
-      if (activeCount > 1) {
-        const resetStates = new Array(activeStates.length).fill(false);
-        resetStates[0] = true; // Set hanya yang pertama sebagai aktif
-        setActiveStates(resetStates);
-      } else {
-        setActiveStates(activeStates);
+      try {
+        const response = await getMyShipments();
+        const mappedShipments = response.data.map(mapShipmentToViewModel);
+
+        setShipments(mappedShipments);
+        setActiveStates(mappedShipments.map((shipment) => shipment.is_active));
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Gagal mengambil data pengiriman."
+        );
+        setShipments([]);
+        setActiveStates([]);
+      } finally {
+        setLoading(false);
       }
-      
-      setLoading(false);
     };
-    
+
     loadData();
   }, []);
 
@@ -104,38 +136,41 @@ const Shipment = () => {
   }, [searchParams, router]);
 
   const handleIconClick = async (index: number) => {
-    // Jika sudah aktif, tidak perlu melakukan apa-apa
     if (activeStates[index]) return;
-    
-    setActiveStates((prevStates) => {
-      // Reset semua ke false, lalu set yang dipilih ke true
-      const newStates = new Array(prevStates.length).fill(false);
-      newStates[index] = true;
-      return newStates;
-    });
-    
-    // Set loading state untuk alamat yang sedang disimpan
+
     setSavingIndex(index);
-    
-    // Simulasi save preferensi alamat otomatis
     const selectedShipment = shipments[index];
-    if (selectedShipment) {
-      
-      // Simulasi API call untuk menyimpan preferensi
-      try {
-        // Simulasi delay API call
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // Update data shipment untuk mencerminkan perubahan
-        setShipments(prev => prev.map((shipment, idx) => ({
+
+    if (!selectedShipment) {
+      setSavingIndex(null);
+      return;
+    }
+
+    try {
+      await activateShipment(selectedShipment.id, true);
+
+      setShipments((prev) =>
+        prev.map((shipment, currentIndex) => ({
           ...shipment,
-          isActive: idx === index
-        })));
-        
-      } catch {
-      } finally {
-        setSavingIndex(null);
-      }
+          is_active: currentIndex === index,
+          courier: {
+            ...shipment.courier,
+            is_active: currentIndex === index,
+          },
+        }))
+      );
+      setActiveStates(
+        shipments.map((_, currentIndex) => currentIndex === index)
+      );
+      toast.success("Alamat utama pengiriman berhasil diperbarui.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Gagal memperbarui status pengiriman."
+      );
+    } finally {
+      setSavingIndex(null);
     }
   };
 
@@ -143,25 +178,31 @@ const Shipment = () => {
     router.push(`/shipment/edit?shipmentId=${shipmentId}`);
   };
 
-  const handleDelete = (shipmentId: string) => {
+  const handleDelete = async (shipmentId: string) => {
     if (confirm("Apakah Anda yakin ingin menghapus alamat pengiriman ini?")) {
-      const deletedIndex = shipments.findIndex(s => s.id === shipmentId);
-      const wasActive = activeStates[deletedIndex];
-      
-      setShipments(prev => prev.filter(shipment => shipment.id !== shipmentId));
-      setActiveStates(prev => {
-        const newStates = prev.filter((_, index) => index !== deletedIndex);
-        
-        // Jika yang dihapus adalah alamat aktif, set alamat pertama sebagai aktif
-        if (wasActive && newStates.length > 0) {
-          const hasActive = newStates.some(state => state);
-          if (!hasActive) {
-            newStates[0] = true;
+      try {
+        await deleteShipment(shipmentId);
+
+        const deletedIndex = shipments.findIndex((shipment) => shipment.id === shipmentId);
+        const wasActive = activeStates[deletedIndex];
+
+        setShipments((prev) => prev.filter((shipment) => shipment.id !== shipmentId));
+        setActiveStates((prev) => {
+          const nextStates = prev.filter((_, index) => index !== deletedIndex);
+
+          if (wasActive && nextStates.length > 0 && !nextStates.some(Boolean)) {
+            nextStates[0] = true;
           }
-        }
-        
-        return newStates;
-      });
+
+          return nextStates;
+        });
+
+        toast.success("Data pengiriman berhasil dihapus.");
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Gagal menghapus pengiriman."
+        );
+      }
     }
   };
 

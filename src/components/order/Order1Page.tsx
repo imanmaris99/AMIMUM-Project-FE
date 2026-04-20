@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { GoChevronLeft, GoLocation, GoPackage, GoCreditCard, GoPlus } from 'react-icons/go';
+import { GoChevronLeft, GoLocation, GoPackage, GoPlus } from 'react-icons/go';
 import { IoCheckmarkCircle, IoWarning } from 'react-icons/io5';
 import { toast } from 'react-hot-toast';
 import rupiahFormater from '@/utils/rupiahFormater';
@@ -13,7 +13,23 @@ import { CartItemType } from '@/types/apiTypes';
 import { useTransaction } from '@/contexts/TransactionContext';
 import CourierSelector from './CourierSelector';
 import AddressSelector from './AddressSelector';
-import { courierCompanies, dummyShipments } from '@/data/shipmentDummyData';
+import { CourierCompany } from '@/types/shipment';
+import { TransactionPaymentMethod } from '@/types/transaction';
+import {
+  getPaymentMethodGroups,
+  requiresPendingPayment,
+  PaymentMethodGroup,
+} from '@/lib/paymentMethods';
+import {
+  getMyShipmentAddresses,
+  getOwnerShipmentAddress,
+} from '@/services/api/shipment-address';
+import {
+  getRajaOngkirShippingCost,
+  getRajaOngkirCities,
+  getRajaOngkirProvinces,
+  SUPPORTED_COURIERS,
+} from '@/services/api/rajaongkir';
 
 interface Order1PageProps {
   onBack?: () => void;
@@ -27,9 +43,49 @@ interface AddressInfo {
   phone: string;
   address: string;
   city: string;
+  state?: string;
+  city_id?: number;
   postal_code: string;
   isDefault?: boolean;
 }
+
+interface StoreAddressInfo {
+  name: string;
+  phone: string;
+  address: string;
+  cityId?: number;
+}
+
+const normalizeAreaName = (value: string) =>
+  value
+    .toUpperCase()
+    .replace(/^KOTA\s+/g, '')
+    .replace(/^KABUPATEN\s+/g, '')
+    .replace(/\s*\(.*?\)\s*/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const resolveCityIdFromRajaOngkir = async (
+  provinceName: string,
+  cityName: string
+): Promise<number | undefined> => {
+  const provinces = await getRajaOngkirProvinces();
+  const matchedProvince = provinces.find(
+    (province) =>
+      normalizeAreaName(province.province) === normalizeAreaName(provinceName)
+  );
+
+  if (!matchedProvince) {
+    return undefined;
+  }
+
+  const cities = await getRajaOngkirCities(matchedProvince.province_id);
+  const matchedCity = cities.find(
+    (city) => normalizeAreaName(city.city_name) === normalizeAreaName(cityName)
+  );
+
+  return matchedCity?.city_id;
+};
 
 const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const router = useRouter();
@@ -42,6 +98,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   
   // State management
   const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<TransactionPaymentMethod | null>(null);
   // Courier state - using hierarchical selection
   const [selectedCourierCompany, setSelectedCourierCompany] = useState<string>('');
   const [selectedCourierService, setSelectedCourierService] = useState<string>('');
@@ -53,32 +111,162 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   
   const [addresses, setAddresses] = useState<AddressInfo[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo | null>(null);
+  const [storeAddress, setStoreAddress] = useState<StoreAddressInfo | null>(null);
+  const [courierCompanies, setCourierCompanies] = useState<CourierCompany[]>([]);
+  const [isReferenceLoading, setIsReferenceLoading] = useState(true);
+  const [isCourierLoading, setIsCourierLoading] = useState(false);
+  const [expandedPaymentGroups, setExpandedPaymentGroups] = useState<
+    Record<string, boolean>
+  >({});
+
+  const paymentMethodGroups = getPaymentMethodGroups(deliveryMethod);
 
   useEffect(() => {
-    const loadAddresses = () => {
-      const shipmentAddresses: AddressInfo[] = dummyShipments.map(shipment => ({
-        id: shipment.address.id.toString(),
-        name: shipment.address.name,
-        phone: shipment.address.phone,
-        address: shipment.address.address || '',
-        city: shipment.address.city || '',
-        postal_code: shipment.address.zip_code?.toString() || '',
-        isDefault: shipment.is_active
-      }));
-      
-      setAddresses(shipmentAddresses);
-      
-      // Set default address (first active one)
-      const defaultAddress = shipmentAddresses.find(addr => addr.isDefault);
-      if (defaultAddress) {
-        setSelectedAddress(defaultAddress);
-      } else if (shipmentAddresses.length > 0) {
-        setSelectedAddress(shipmentAddresses[0]);
+    const loadReferences = async () => {
+      setIsReferenceLoading(true);
+
+      try {
+        const [addressResponse, ownerResponse] = await Promise.all([
+          getMyShipmentAddresses(),
+          getOwnerShipmentAddress(),
+        ]);
+
+        const shipmentAddresses: AddressInfo[] = await Promise.all(
+          addressResponse.data.map(async (address) => ({
+            id: address.id.toString(),
+            name: address.name,
+            phone: address.phone,
+            address: address.address || '',
+            city: address.city || '',
+            state: address.state || '',
+            city_id:
+              address.city_id ||
+              (address.state && address.city
+                ? await resolveCityIdFromRajaOngkir(address.state, address.city)
+                : undefined),
+            postal_code: address.zip_code?.toString() || '',
+            isDefault: false,
+          }))
+        );
+
+        setAddresses(shipmentAddresses);
+        setSelectedAddress(shipmentAddresses[0] || null);
+        setStoreAddress({
+          name: ownerResponse.data.name,
+          phone: ownerResponse.data.phone,
+          cityId: ownerResponse.data.city_id,
+          address: [
+            ownerResponse.data.address,
+            ownerResponse.data.city,
+            ownerResponse.data.state,
+            ownerResponse.data.zip_code,
+            ownerResponse.data.country,
+          ]
+            .filter(Boolean)
+            .join(', '),
+        });
+        setCourierCompanies(
+          SUPPORTED_COURIERS.map((courier) => ({
+            id: courier.id,
+            name: courier.name,
+            services: [],
+          }))
+        );
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : 'Gagal mengambil data checkout.'
+        );
+      } finally {
+        setIsReferenceLoading(false);
       }
     };
 
-    loadAddresses();
+    loadReferences();
   }, []);
+
+  useEffect(() => {
+    const loadCourierServices = async () => {
+      if (
+        deliveryMethod !== 'delivery' ||
+        !selectedCourierCompany ||
+        !selectedAddress?.city_id ||
+        !storeAddress?.cityId
+      ) {
+        return;
+      }
+
+      setIsCourierLoading(true);
+
+      try {
+        const response = await getRajaOngkirShippingCost({
+          origin: storeAddress.cityId,
+          destination: selectedAddress.city_id,
+          weight: 1000,
+          courier: selectedCourierCompany,
+        });
+
+        setCourierCompanies((prevCompanies) =>
+          prevCompanies.map((company) =>
+            company.id === selectedCourierCompany
+              ? {
+                  ...company,
+                  services: response.details.map((detail) => ({
+                    id: `${selectedCourierCompany}-${detail.service}`,
+                    serviceType: detail.service,
+                    cost: detail.cost,
+                    estimatedDelivery: detail.etd,
+                    description: detail.description,
+                    weight: 1000,
+                  })),
+                }
+              : company
+          )
+        );
+      } catch (error) {
+        setCourierCompanies((prevCompanies) =>
+          prevCompanies.map((company) =>
+            company.id === selectedCourierCompany
+              ? {
+                  ...company,
+                  services: [],
+                }
+              : company
+          )
+        );
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : 'Gagal mengambil layanan kurir.'
+        );
+      } finally {
+        setIsCourierLoading(false);
+      }
+    };
+
+    loadCourierServices();
+  }, [deliveryMethod, selectedCourierCompany, selectedAddress, storeAddress]);
+
+  useEffect(() => {
+    const availableMethods = paymentMethodGroups
+      .flatMap((group) => group.methods)
+      .filter((method) => method.isAvailable)
+      .map((option) => option.id);
+
+    if (selectedPaymentMethod && !availableMethods.includes(selectedPaymentMethod)) {
+      setSelectedPaymentMethod(null);
+    }
+  }, [deliveryMethod, paymentMethodGroups, selectedPaymentMethod]);
+
+  useEffect(() => {
+    setExpandedPaymentGroups(
+      paymentMethodGroups.reduce<Record<string, boolean>>((accumulator, group) => {
+        accumulator[group.id] = false;
+        return accumulator;
+      }, {})
+    );
+  }, [paymentMethodGroups]);
 
   // Handle direct checkout
   useEffect(() => {
@@ -111,7 +299,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     ?.services.find(service => service.id === selectedCourierService);
 
   // Use direct checkout item or cart items
-  const currentItems = isDirectCheckout && directCheckoutItem ? [directCheckoutItem] : cartItems;
+  const currentItems =
+    isDirectCheckout && directCheckoutItem
+      ? [directCheckoutItem]
+      : cartItems.filter((item) => item.is_active !== false);
   
   
   
@@ -153,12 +344,19 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     }
     
     // Only require courier for delivery method
-    if (deliveryMethod === 'delivery' && (!selectedCourierCompany || !selectedCourierService)) {
+    if (
+      deliveryMethod === 'delivery' &&
+      (!selectedCourierCompany || !selectedCourierService)
+    ) {
       newErrors.courier = 'Ekspedisi dan layanan pengiriman harus dipilih';
     }
     
     if (currentItems.length === 0) {
       newErrors.cart = 'Keranjang kosong';
+    }
+
+    if (!selectedPaymentMethod) {
+      newErrors.payment = 'Metode pembayaran harus dipilih';
     }
     
     setErrors(newErrors);
@@ -199,13 +397,23 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       // Create order data based on backend DTOs
       const orderData = {
         delivery_type: deliveryMethod,
+        payment_method: selectedPaymentMethod as TransactionPaymentMethod,
         notes: additionalNotes || (deliveryMethod === 'pickup' ? 'Ambil di toko' : undefined),
         shipment_id: deliveryMethod === 'delivery' ? selectedCourierService : undefined,
-        items: currentItems.map((item: CartItemType) => ({
-          product_id: item.product_id,
-          variant_id: item.variant_id,
-          quantity: item.quantity
-        }))
+        shipping_cost: deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0,
+        shipment_address:
+          deliveryMethod === 'delivery' && selectedAddress && selectedCourierData
+            ? {
+                recipientName: selectedAddress.name,
+                phone: selectedAddress.phone,
+                address: selectedAddress.address,
+                city: selectedAddress.city,
+                postalCode: selectedAddress.postal_code,
+                courier: selectedCourierCompany.toUpperCase(),
+                service: selectedCourierData.serviceType,
+                estimatedDelivery: selectedCourierData.estimatedDelivery,
+              }
+            : undefined,
       };
       
       
@@ -219,14 +427,18 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       
       // Remove only active items from cart after successful payment
       if (!isDirectCheckout) {
-        removeActiveItems();
+        await removeActiveItems();
       } else {
         // Clear direct checkout item from localStorage
         localStorage.removeItem('directCheckoutItem');
       }
       
       // Show success message and navigate immediately
-      toast.success('Pesanan berhasil dibuat!');
+      toast.success(
+        requiresPendingPayment(selectedPaymentMethod || undefined)
+          ? 'Pesanan berhasil dibuat. Menunggu pembayaran.'
+          : 'Pesanan berhasil dibuat!'
+      );
       
       // Navigate after a short delay to ensure toast is visible
       setTimeout(() => {
@@ -240,7 +452,6 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   };
 
   const handleAddAddress = () => {
-    // Buka address selector untuk memilih dari alamat yang ada
     setShowAddressSelector(true);
   };
 
@@ -251,10 +462,28 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   };
 
   const handleAddNewAddress = () => {
-    // Redirect ke page shipment untuk menambah alamat baru
     setShowAddressSelector(false);
     router.push('/shipment/create');
   };
+
+  const togglePaymentGroup = (groupId: string) => {
+    setExpandedPaymentGroups((previous) => ({
+      ...previous,
+      [groupId]: !previous[groupId],
+    }));
+  };
+
+  const renderPaymentBadge = (badge: string, isAvailable: boolean) => (
+    <div
+      className={`flex h-10 w-10 items-center justify-center rounded-xl text-[10px] font-semibold ${
+        isAvailable
+          ? 'bg-[#F4F0E8] text-[#6B4E2E]'
+          : 'bg-gray-100 text-gray-400'
+      }`}
+    >
+      {badge}
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -402,10 +631,12 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
               <div className="flex items-start space-x-3">
                 <GoLocation className="w-5 h-5 text-gray-400 mt-1 flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900">Amimum Herbal Store</p>
-                  <p className="text-sm text-gray-600">+62 812-3456-7890</p>
+                  <p className="font-medium text-gray-900">
+                    {storeAddress?.name || 'Alamat toko belum tersedia'}
+                  </p>
+                  <p className="text-sm text-gray-600">{storeAddress?.phone || '-'}</p>
                   <p className="text-sm text-gray-600 mt-1">
-                    Jl. Silugonggo No. 15, Kelurahan Pati Wetan, Kecamatan Pati, Kota Pati, Kode Pos 59185, Jawa Tengah, Indonesia
+                    {storeAddress?.address || 'Alamat toko belum tersedia'}
                   </p>
                 </div>
               </div>
@@ -443,7 +674,9 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                   className="w-full text-center py-4 text-gray-500 hover:text-primary transition-colors"
                 >
                   <GoPlus className="w-6 h-6 mx-auto mb-2" />
-                  <p className="text-sm">Pilih alamat pengiriman</p>
+                  <p className="text-sm">
+                    {isReferenceLoading ? 'Memuat alamat...' : 'Pilih alamat pengiriman'}
+                  </p>
                 </button>
               )}
             </div>
@@ -459,12 +692,14 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Informasi Pengambilan</h2>
             <div className="p-4 bg-blue-50 rounded-lg">
               <div className="flex items-start space-x-3">
-                <GoLocation className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">Amimum Herbal Store</p>
-                  <p className="text-sm text-gray-600">+62 812-3456-7890</p>
+                  <GoLocation className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
+                  <div className="flex-1">
+                  <p className="font-medium text-gray-900">
+                    {storeAddress?.name || 'Alamat toko belum tersedia'}
+                  </p>
+                  <p className="text-sm text-gray-600">{storeAddress?.phone || '-'}</p>
                   <p className="text-sm text-gray-600 mt-1">
-                    Jl. Silugonggo No. 15, Kelurahan Pati Wetan, Kecamatan Pati, Kota Pati, Kode Pos 59185, Jawa Tengah, Indonesia
+                    {storeAddress?.address || 'Alamat toko belum tersedia'}
                   </p>
                   <p className="text-sm text-blue-600 font-medium mt-2">
                     Jam operasional: 08:00 - 17:00 WIB
@@ -491,7 +726,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                 setSelectedCourierService(serviceId);
                 clearError('courier');
               }}
-              isLoading={isLoading}
+              isLoading={isLoading || isReferenceLoading || isCourierLoading}
             />
             {errors.courier && (
               <p className="text-red-500 text-xs mt-2">{errors.courier}</p>
@@ -580,20 +815,77 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
         {/* Payment Method */}
         <div className="px-4 py-4 border-b border-gray-200">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-gray-900">Metode Pembayaran</h2>
-            <button className="text-primary text-sm font-medium hover:underline">
-              Ubah
-            </button>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Metode Pembayaran</h2>
+          <div className="space-y-4">
+            {paymentMethodGroups.map((group: PaymentMethodGroup) => (
+              <div key={group.id} className="overflow-hidden rounded-2xl border border-gray-200">
+                <button
+                  type="button"
+                  onClick={() => togglePaymentGroup(group.id)}
+                  className="flex w-full items-center justify-between bg-[#FAF7F2] px-4 py-3 text-left"
+                >
+                  <span className="text-base font-semibold text-[#0D0E09]">
+                    {group.title}
+                  </span>
+                  <span className="text-lg text-gray-500">
+                    {expandedPaymentGroups[group.id] ? '−' : '+'}
+                  </span>
+                </button>
+                {expandedPaymentGroups[group.id] && (
+                  <div className="divide-y divide-gray-100 bg-white">
+                    {group.methods.map((method) => {
+                      const isSelected = selectedPaymentMethod === method.id;
+
+                      return (
+                        <label
+                          key={method.id}
+                          className={`flex items-center gap-3 px-4 py-4 transition-all ${
+                            method.isAvailable
+                              ? 'cursor-pointer hover:bg-gray-50'
+                              : 'cursor-not-allowed opacity-60'
+                          } ${isSelected ? 'bg-primary/5' : ''}`}
+                        >
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value={method.id}
+                            checked={isSelected}
+                            disabled={!method.isAvailable}
+                            onChange={(event) => {
+                              setSelectedPaymentMethod(
+                                event.target.value as TransactionPaymentMethod
+                              );
+                              clearError('payment');
+                            }}
+                            className="sr-only"
+                          />
+                          {renderPaymentBadge(method.badge, method.isAvailable)}
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-gray-900">{method.name}</p>
+                            <p className="text-sm text-gray-500">{method.description}</p>
+                          </div>
+                          <div
+                            className={`h-6 w-6 rounded-full border-2 ${
+                              isSelected
+                                ? 'border-primary bg-primary'
+                                : 'border-gray-300 bg-white'
+                            }`}
+                          >
+                            {isSelected && (
+                              <IoCheckmarkCircle className="h-5 w-5 text-white" />
+                            )}
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-          <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-            <GoCreditCard className="w-5 h-5 text-gray-400" />
-            <div className="flex-1">
-              <p className="font-medium text-gray-900">Credit Card</p>
-              <p className="text-sm text-gray-600">**** **** **** 1234</p>
-            </div>
-            <IoCheckmarkCircle className="w-5 h-5 text-green-500" />
-          </div>
+          {errors.payment && (
+            <p className="text-red-500 text-xs mt-2">{errors.payment}</p>
+          )}
         </div>
 
         {/* Payment Button */}
@@ -610,7 +902,11 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             {isLoading ? (
               <ButtonSpinner size="md" color="white" text="Memproses..." />
             ) : (
-              `Bayar ${rupiahFormater(totals.total)}`
+              `${
+                requiresPendingPayment(selectedPaymentMethod || undefined)
+                  ? 'Buat Pesanan'
+                  : 'Konfirmasi Pesanan'
+              } ${rupiahFormater(totals.total)}`
             )}
           </button>
           

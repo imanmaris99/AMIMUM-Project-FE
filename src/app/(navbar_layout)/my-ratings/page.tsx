@@ -1,24 +1,34 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { getUserRatingData } from '@/data/dataUtils';
-import { RatingDummyType } from '@/data/dummyData';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'react-hot-toast';
+import {
+  deleteProductRating,
+  getMyProductRatings,
+  ProductRatingItem,
+  updateProductRating,
+} from '@/services/api/rating';
 
 export default function MyRatingsPage() {
-  const [ratings, setRatings] = useState<RatingDummyType[]>([]);
+  const [ratings, setRatings] = useState<ProductRatingItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedRating, setSelectedRating] = useState<RatingDummyType | null>(null);
+  const [selectedRating, setSelectedRating] = useState<ProductRatingItem | null>(null);
+  const [editableRate, setEditableRate] = useState(0);
+  const [editableReview, setEditableReview] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    // Simulate loading user ratings
-    const loadRatings = () => {
+    const loadRatings = async () => {
       try {
-        // In real app, this would be the actual user ID from auth
-        const userId = "user-001"; // Dummy user ID
-        const userRatings = getUserRatingData(userId);
-        setRatings(userRatings);
-      } catch {
+        const response = await getMyProductRatings();
+        setRatings(response.data);
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Gagal mengambil rating Anda."
+        );
       } finally {
         setIsLoading(false);
       }
@@ -27,14 +37,64 @@ export default function MyRatingsPage() {
     loadRatings();
   }, []);
 
-  const handleEditRating = (rating: RatingDummyType) => {
+  const handleEditRating = (rating: ProductRatingItem) => {
     setSelectedRating(rating);
+    setEditableRate(rating.rate);
+    setEditableReview(rating.review || "");
   };
 
-  const handleDeleteRating = (ratingId: number) => {
+  const handleDeleteRating = async (ratingId: number) => {
     if (confirm("Apakah Anda yakin ingin menghapus rating ini?")) {
-      setRatings(prev => prev.filter(r => r.id !== ratingId));
+      try {
+        await deleteProductRating(ratingId);
+        setRatings((prev) => prev.filter((rating) => rating.id !== ratingId));
+        setSelectedRating(null);
+        toast.success("Rating berhasil dihapus.");
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Gagal menghapus rating."
+        );
+      }
+    }
+  };
+
+  const handleSubmitEdit = async () => {
+    if (!selectedRating) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await updateProductRating({
+        ratingId: selectedRating.id,
+        rate: editableRate,
+        review: editableReview,
+      });
+
+      setRatings((prev) =>
+        prev.map((rating) =>
+          rating.id === selectedRating.id
+            ? {
+                ...rating,
+                rate: editableRate,
+                review: editableReview,
+              }
+            : rating
+        )
+      );
       setSelectedRating(null);
+      toast.success("Rating berhasil diperbarui.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Gagal memperbarui rating."
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -130,10 +190,10 @@ export default function MyRatingsPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleDeleteRating(rating.id)}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    Hapus
+                      onClick={() => void handleDeleteRating(rating.id)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      Hapus
                   </Button>
                 </div>
               </div>
@@ -154,32 +214,42 @@ export default function MyRatingsPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Rating Saat Ini: {selectedRating.rate} bintang
+                    Pilih Rating
                   </label>
                   <div className="flex items-center">
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <svg
+                      <button
                         key={star}
-                        className={`w-6 h-6 ${
-                          star <= selectedRating.rate
+                        type="button"
+                        onClick={() => setEditableRate(star)}
+                        className={`${
+                          star <= editableRate
                             ? "text-yellow-400"
                             : "text-gray-300"
                         }`}
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
                       >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
+                        <svg
+                          className="w-6 h-6"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      </button>
                     ))}
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Ulasan Saat Ini:
+                    Ulasan
                   </label>
-                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded">
-                    {selectedRating.review || "Tidak ada ulasan"}
-                  </p>
+                  <textarea
+                    value={editableReview}
+                    onChange={(event) => setEditableReview(event.target.value)}
+                    rows={4}
+                    className="w-full rounded border border-gray-300 p-3 text-sm text-gray-700"
+                    placeholder="Bagikan pengalaman Anda terhadap produk ini"
+                  />
                 </div>
                 <div className="flex gap-3 pt-4">
                   <Button
@@ -190,13 +260,11 @@ export default function MyRatingsPage() {
                     Tutup
                   </Button>
                   <Button
-                    onClick={() => {
-                      // In real app, this would call the API
-                      setSelectedRating(null);
-                    }}
+                    onClick={() => void handleSubmitEdit()}
+                    disabled={isSubmitting || editableRate < 1}
                     className="flex-1 bg-primary hover:bg-primary/90 text-white"
                   >
-                    Simpan Perubahan
+                    {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
                   </Button>
                 </div>
               </div>
