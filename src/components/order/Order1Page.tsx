@@ -1,24 +1,33 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { GoChevronLeft, GoLocation, GoPackage, GoPlus } from 'react-icons/go';
-import { IoCheckmarkCircle, IoWarning } from 'react-icons/io5';
+import { GoChevronLeft, GoLocation, GoPackage } from 'react-icons/go';
+import { IoWarning } from 'react-icons/io5';
 import { toast } from 'react-hot-toast';
-import rupiahFormater from '@/utils/rupiahFormater';
-import ButtonSpinner from '@/components/ui/ButtonSpinner';
 import { useCart } from '@/contexts/CartContext';
 import { CartItemType } from '@/types/apiTypes';
 import { useTransaction } from '@/contexts/TransactionContext';
-import CourierSelector from './CourierSelector';
 import AddressSelector from './AddressSelector';
+import OrderAdditionalNotesSection from './OrderAdditionalNotesSection';
+import OrderAddressSection from './OrderAddressSection';
+import OrderCourierSection from './OrderCourierSection';
+import OrderItemsSection from './OrderItemsSection';
+import OrderPaymentSummarySection from './OrderPaymentSummarySection';
+import OrderSubmitSection from './OrderSubmitSection';
+import PaymentMethodSection from './PaymentMethodSection';
+import {
+  buildCheckoutOrderData,
+  calculateCheckoutTotals,
+  CheckoutAddressInfo,
+  normalizeAreaName,
+  validateCheckoutForm,
+} from './orderPageUtils';
 import { CourierCompany } from '@/types/shipment';
 import { TransactionPaymentMethod } from '@/types/transaction';
 import {
   getPaymentMethodGroups,
   requiresPendingPayment,
-  PaymentMethodGroup,
 } from '@/lib/paymentMethods';
 import {
   getMyShipmentAddresses,
@@ -35,35 +44,12 @@ interface Order1PageProps {
   onBack?: () => void;
 }
 
-// Using CartItemType from CartContext
-
-interface AddressInfo {
-  id: string;
-  name: string;
-  phone: string;
-  address: string;
-  city: string;
-  state?: string;
-  city_id?: number;
-  postal_code: string;
-  isDefault?: boolean;
-}
-
 interface StoreAddressInfo {
   name: string;
   phone: string;
   address: string;
   cityId?: number;
 }
-
-const normalizeAreaName = (value: string) =>
-  value
-    .toUpperCase()
-    .replace(/^KOTA\s+/g, '')
-    .replace(/^KABUPATEN\s+/g, '')
-    .replace(/\s*\(.*?\)\s*/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
 
 const resolveCityIdFromRajaOngkir = async (
   provinceName: string,
@@ -109,8 +95,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   
   const [additionalNotes, setAdditionalNotes] = useState<string>('');
   
-  const [addresses, setAddresses] = useState<AddressInfo[]>([]);
-  const [selectedAddress, setSelectedAddress] = useState<AddressInfo | null>(null);
+  const [addresses, setAddresses] = useState<CheckoutAddressInfo[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<CheckoutAddressInfo | null>(null);
   const [storeAddress, setStoreAddress] = useState<StoreAddressInfo | null>(null);
   const [courierCompanies, setCourierCompanies] = useState<CourierCompany[]>([]);
   const [isReferenceLoading, setIsReferenceLoading] = useState(true);
@@ -131,7 +117,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
           getOwnerShipmentAddress(),
         ]);
 
-        const shipmentAddresses: AddressInfo[] = await Promise.all(
+        const shipmentAddresses: CheckoutAddressInfo[] = await Promise.all(
           addressResponse.data.map(async (address) => ({
             id: address.id.toString(),
             name: address.name,
@@ -307,58 +293,25 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   
   
   // Calculate totals for direct checkout or cart
-  const calculateTotals = () => {
-    if (isDirectCheckout && directCheckoutItem) {
-      const itemPrice = directCheckoutItem.price;
-      const subtotal = itemPrice * directCheckoutItem.quantity;
-      const discount = 0; // No discount for direct checkout
-      const shippingCost = deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0;
-      return {
-        subtotal,
-        discount,
-        shipping: shippingCost,
-        total: subtotal + shippingCost
-      };
-    } else {
-      const subtotal = totalPrices.subtotal || 0;
-      const discount = 0; // Simplified since we don't have discount calculation in new structure
-      const shippingCost = deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0;
-      return {
-        subtotal,
-        discount,
-        shipping: shippingCost,
-        total: totalPrices.total + shippingCost
-      };
-    }
-  };
-
-  const totals = calculateTotals();
+  const totals = calculateCheckoutTotals({
+    isDirectCheckout,
+    directCheckoutItem,
+    totalPrices,
+    deliveryMethod,
+    selectedCourierCost: selectedCourierData?.cost,
+  });
 
   // Validation
   const validateForm = () => {
-    const newErrors: {[key: string]: string} = {};
-    
-    // Only require address for delivery method
-    if (deliveryMethod === 'delivery' && !selectedAddress) {
-      newErrors.address = 'Alamat pengiriman harus dipilih';
-    }
-    
-    // Only require courier for delivery method
-    if (
-      deliveryMethod === 'delivery' &&
-      (!selectedCourierCompany || !selectedCourierService)
-    ) {
-      newErrors.courier = 'Ekspedisi dan layanan pengiriman harus dipilih';
-    }
-    
-    if (currentItems.length === 0) {
-      newErrors.cart = 'Keranjang kosong';
-    }
+    const newErrors = validateCheckoutForm({
+      deliveryMethod,
+      selectedAddress,
+      selectedCourierCompany,
+      selectedCourierService,
+      itemCount: currentItems.length,
+      selectedPaymentMethod,
+    });
 
-    if (!selectedPaymentMethod) {
-      newErrors.payment = 'Metode pembayaran harus dipilih';
-    }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -395,26 +348,15 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Create order data based on backend DTOs
-      const orderData = {
-        delivery_type: deliveryMethod,
-        payment_method: selectedPaymentMethod as TransactionPaymentMethod,
-        notes: additionalNotes || (deliveryMethod === 'pickup' ? 'Ambil di toko' : undefined),
-        shipment_id: deliveryMethod === 'delivery' ? selectedCourierService : undefined,
-        shipping_cost: deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0,
-        shipment_address:
-          deliveryMethod === 'delivery' && selectedAddress && selectedCourierData
-            ? {
-                recipientName: selectedAddress.name,
-                phone: selectedAddress.phone,
-                address: selectedAddress.address,
-                city: selectedAddress.city,
-                postalCode: selectedAddress.postal_code,
-                courier: selectedCourierCompany.toUpperCase(),
-                service: selectedCourierData.serviceType,
-                estimatedDelivery: selectedCourierData.estimatedDelivery,
-              }
-            : undefined,
-      };
+      const orderData = buildCheckoutOrderData({
+        deliveryMethod,
+        selectedPaymentMethod: selectedPaymentMethod as TransactionPaymentMethod,
+        additionalNotes,
+        selectedCourierCompany,
+        selectedCourierService,
+        selectedCourierData,
+        selectedAddress,
+      });
       
       
       // Add transaction to context
@@ -455,7 +397,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     setShowAddressSelector(true);
   };
 
-  const handleAddressSelect = (address: AddressInfo) => {
+  const handleAddressSelect = (address: CheckoutAddressInfo) => {
     setSelectedAddress(address);
     setShowAddressSelector(false);
     clearError('address');
@@ -472,18 +414,6 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       [groupId]: !previous[groupId],
     }));
   };
-
-  const renderPaymentBadge = (badge: string, isAvailable: boolean) => (
-    <div
-      className={`flex h-10 w-10 items-center justify-center rounded-xl text-[10px] font-semibold ${
-        isAvailable
-          ? 'bg-[#F4F0E8] text-[#6B4E2E]'
-          : 'bg-gray-100 text-gray-400'
-      }`}
-    >
-      {badge}
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -562,360 +492,84 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         </div>
 
         {/* Cart Items */}
-        <div className="px-4 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            {isDirectCheckout ? 'Produk yang Dibeli' : 'Produk Pesanan'}
-          </h2>
-          {currentItems.length === 0 ? (
-            <div className="text-center py-8">
-              <GoPackage className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500">Keranjang kosong</p>
-              <button
-                onClick={() => router.push('/')}
-                className="mt-2 text-primary font-medium text-sm hover:underline"
-              >
-                Mulai belanja
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {currentItems.map((item: CartItemType) => (
-                <div key={item.id} className="flex items-center space-x-3">
-                  <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0">
-                    <Image 
-                      src={item.image || "/default-image.jpg"} 
-                      alt={item.product_name} 
-                      width={64}
-                      height={64}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900 text-sm">{item.product_name}</h3>
-                    <p className="text-xs text-gray-600">{item.variant_name}</p>
-                    <div className="flex items-center space-x-2 mt-1">
-                      <span className="text-sm font-medium text-gray-900">
-                        {rupiahFormater(item.price)}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-600">Qty: {item.quantity}</p>
-                    <p className="font-medium text-gray-900 text-sm">
-                      {rupiahFormater(item.price * item.quantity)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <OrderItemsSection
+          items={currentItems}
+          title={isDirectCheckout ? 'Produk yang Dibeli' : 'Produk Pesanan'}
+          onStartShopping={() => router.push('/')}
+        />
 
-        {/* Address Section */}
+        <OrderAddressSection
+          deliveryMethod={deliveryMethod}
+          storeAddress={storeAddress}
+          selectedAddress={selectedAddress}
+          isReferenceLoading={isReferenceLoading}
+          addressError={errors.address}
+          onAddAddress={handleAddAddress}
+          onChangeAddress={() => {
+            handleAddAddress();
+            clearError('address');
+          }}
+        />
+
         {deliveryMethod === 'delivery' && (
-          <div className="px-4 py-4 border-b border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">Alamat Pengiriman</h2>
-              <button
-                onClick={handleAddAddress}
-                className="text-primary text-sm font-medium hover:underline flex items-center"
-              >
-                <GoPlus className="w-4 h-4 mr-1" />
-                Tambah Alamat
-              </button>
-            </div>
-            
-            {/* Store Address */}
-            <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-800 font-medium mb-2">Alamat pengirim</p>
-              <div className="flex items-start space-x-3">
-                <GoLocation className="w-5 h-5 text-gray-400 mt-1 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">
-                    {storeAddress?.name || 'Alamat toko belum tersedia'}
-                  </p>
-                  <p className="text-sm text-gray-600">{storeAddress?.phone || '-'}</p>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {storeAddress?.address || 'Alamat toko belum tersedia'}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Delivery Address */}
-            <div className="p-3 border-2 border-dashed border-gray-200 rounded-lg">
-              <p className="text-sm text-gray-800 font-medium mb-2">Alamat tujuan</p>
-              {selectedAddress ? (
-                <div className="flex items-start space-x-3">
-                  <GoLocation className="w-5 h-5 text-gray-400 mt-1 flex-shrink-0" />
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900">{selectedAddress.name}</p>
-                    <p className="text-sm text-gray-600">{selectedAddress.phone}</p>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {selectedAddress.address}, {selectedAddress.city} {selectedAddress.postal_code}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      handleAddAddress();
-                      clearError('address');
-                    }}
-                    className="text-primary text-xs font-medium hover:underline"
-                  >
-                    Ubah
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => {
-                    handleAddAddress();
-                    clearError('address');
-                  }}
-                  className="w-full text-center py-4 text-gray-500 hover:text-primary transition-colors"
-                >
-                  <GoPlus className="w-6 h-6 mx-auto mb-2" />
-                  <p className="text-sm">
-                    {isReferenceLoading ? 'Memuat alamat...' : 'Pilih alamat pengiriman'}
-                  </p>
-                </button>
-              )}
-            </div>
-            {errors.address && (
-              <p className="text-red-500 text-xs mt-1">{errors.address}</p>
-            )}
-          </div>
+          <OrderCourierSection
+            courierCompanies={courierCompanies}
+            selectedCourierCompany={selectedCourierCompany}
+            selectedCourierService={selectedCourierService}
+            isLoading={isLoading || isReferenceLoading || isCourierLoading}
+            courierError={errors.courier}
+            onCompanySelect={(companyId) => {
+              setSelectedCourierCompany(companyId);
+              clearError('courier');
+            }}
+            onServiceSelect={(serviceId) => {
+              setSelectedCourierService(serviceId);
+              clearError('courier');
+            }}
+          />
         )}
 
-        {/* Pickup Information */}
-        {deliveryMethod === 'pickup' && (
-          <div className="px-4 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Informasi Pengambilan</h2>
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <div className="flex items-start space-x-3">
-                  <GoLocation className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
-                  <div className="flex-1">
-                  <p className="font-medium text-gray-900">
-                    {storeAddress?.name || 'Alamat toko belum tersedia'}
-                  </p>
-                  <p className="text-sm text-gray-600">{storeAddress?.phone || '-'}</p>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {storeAddress?.address || 'Alamat toko belum tersedia'}
-                  </p>
-                  <p className="text-sm text-blue-600 font-medium mt-2">
-                    Jam operasional: 08:00 - 17:00 WIB
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Courier Selection */}
-        {deliveryMethod === 'delivery' && (
-          <div className="px-4 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Pilih Kurir</h2>
-            <CourierSelector
-              courierCompanies={courierCompanies}
-              selectedCompany={selectedCourierCompany}
-              selectedService={selectedCourierService}
-              onCompanySelect={(companyId) => {
-                setSelectedCourierCompany(companyId);
-                clearError('courier');
-              }}
-              onServiceSelect={(serviceId) => {
-                setSelectedCourierService(serviceId);
-                clearError('courier');
-              }}
-              isLoading={isLoading || isReferenceLoading || isCourierLoading}
-            />
-            {errors.courier && (
-              <p className="text-red-500 text-xs mt-2">{errors.courier}</p>
-            )}
-          </div>
-        )}
-
-        {/* Additional Notes Section */}
-        <div className="px-4 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Catatan Tambahan</h2>
-          <div className="space-y-3">
-            <div>
-              <label htmlFor="additionalNotes" className="block text-sm font-medium text-gray-700 mb-2">
-                Pesan untuk penjual (opsional)
-              </label>
-              <textarea
-                id="additionalNotes"
-                value={additionalNotes}
-                onChange={(e) => {
-                  setAdditionalNotes(e.target.value);
-                  clearError('notes');
-                }}
-                placeholder="Contoh: Ambil jam 3 sore, tolong bungkus rapi, dll."
-                className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none transition-colors"
-                rows={3}
-                maxLength={500}
-              />
-              <div className="flex justify-between items-center mt-2">
-                <p className="text-xs text-gray-500">
-                  Maksimal 500 karakter
-                </p>
-                <span className="text-xs text-gray-400">
-                  {additionalNotes.length}/500
-                </span>
-              </div>
-            </div>
-            
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-sm text-blue-800 font-medium mb-2">
-                💡 Contoh catatan yang berguna:
-              </p>
-              <ul className="text-xs text-blue-700 space-y-1">
-                <li>• &ldquo;Ambil jam 3 sore&rdquo;</li>
-                <li>• &ldquo;Tolong bungkus rapi&rdquo;</li>
-                <li>• &ldquo;Kirim ke alamat kantor&rdquo;</li>
-                <li>• &ldquo;Hubungi sebelum kirim&rdquo;</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <OrderAdditionalNotesSection
+          additionalNotes={additionalNotes}
+          onNotesChange={(value) => {
+            setAdditionalNotes(value);
+            clearError('notes');
+          }}
+        />
 
         {/* Payment Summary */}
-        <div className="px-4 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Ringkasan Pembayaran</h2>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Subtotal ({currentItems.length} item)</span>
-              <span className="font-medium">{rupiahFormater(totals.subtotal)}</span>
-            </div>
-            {totals.discount > 0 && (
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Diskon</span>
-                <span className="font-medium text-red-500">-{rupiahFormater(totals.discount)}</span>
-              </div>
-            )}
-            {deliveryMethod === 'delivery' && totals.shipping > 0 && (
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Ongkir</span>
-                <span className="font-medium">{rupiahFormater(totals.shipping)}</span>
-              </div>
-            )}
-            {deliveryMethod === 'pickup' && (
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Pengambilan</span>
-                <span className="font-medium text-green-600">Gratis</span>
-              </div>
-            )}
-            <div className="border-t border-gray-200 pt-3">
-              <div className="flex justify-between items-center text-lg font-semibold">
-                <span>Total</span>
-                <span className="text-primary">{rupiahFormater(totals.total)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <OrderPaymentSummarySection
+          itemCount={currentItems.length}
+          deliveryMethod={deliveryMethod}
+          totals={totals}
+        />
 
         {/* Payment Method */}
-        <div className="px-4 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Metode Pembayaran</h2>
-          <div className="space-y-4">
-            {paymentMethodGroups.map((group: PaymentMethodGroup) => (
-              <div key={group.id} className="overflow-hidden rounded-2xl border border-gray-200">
-                <button
-                  type="button"
-                  onClick={() => togglePaymentGroup(group.id)}
-                  className="flex w-full items-center justify-between bg-[#FAF7F2] px-4 py-3 text-left"
-                >
-                  <span className="text-base font-semibold text-[#0D0E09]">
-                    {group.title}
-                  </span>
-                  <span className="text-lg text-gray-500">
-                    {expandedPaymentGroups[group.id] ? '−' : '+'}
-                  </span>
-                </button>
-                {expandedPaymentGroups[group.id] && (
-                  <div className="divide-y divide-gray-100 bg-white">
-                    {group.methods.map((method) => {
-                      const isSelected = selectedPaymentMethod === method.id;
-
-                      return (
-                        <label
-                          key={method.id}
-                          className={`flex items-center gap-3 px-4 py-4 transition-all ${
-                            method.isAvailable
-                              ? 'cursor-pointer hover:bg-gray-50'
-                              : 'cursor-not-allowed opacity-60'
-                          } ${isSelected ? 'bg-primary/5' : ''}`}
-                        >
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            value={method.id}
-                            checked={isSelected}
-                            disabled={!method.isAvailable}
-                            onChange={(event) => {
-                              setSelectedPaymentMethod(
-                                event.target.value as TransactionPaymentMethod
-                              );
-                              clearError('payment');
-                            }}
-                            className="sr-only"
-                          />
-                          {renderPaymentBadge(method.badge, method.isAvailable)}
-                          <div className="min-w-0 flex-1">
-                            <p className="font-medium text-gray-900">{method.name}</p>
-                            <p className="text-sm text-gray-500">{method.description}</p>
-                          </div>
-                          <div
-                            className={`h-6 w-6 rounded-full border-2 ${
-                              isSelected
-                                ? 'border-primary bg-primary'
-                                : 'border-gray-300 bg-white'
-                            }`}
-                          >
-                            {isSelected && (
-                              <IoCheckmarkCircle className="h-5 w-5 text-white" />
-                            )}
-                          </div>
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-          {errors.payment && (
-            <p className="text-red-500 text-xs mt-2">{errors.payment}</p>
-          )}
-        </div>
+        <PaymentMethodSection
+          paymentMethodGroups={paymentMethodGroups}
+          expandedPaymentGroups={expandedPaymentGroups}
+          selectedPaymentMethod={selectedPaymentMethod}
+          paymentError={errors.payment}
+          onToggleGroup={togglePaymentGroup}
+          onSelectPaymentMethod={(method) => {
+            setSelectedPaymentMethod(method);
+            clearError('payment');
+          }}
+        />
 
         {/* Payment Button */}
-        <div className="px-4 py-6 bg-white sticky bottom-0">
-          <button
-            onClick={handlePayment}
-            disabled={isLoading || currentItems.length === 0}
-            className={`w-full py-4 rounded-lg font-semibold text-lg transition-all ${
-              isLoading || currentItems.length === 0
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-primary text-white hover:bg-primary/90 active:scale-95'
-            }`}
-          >
-            {isLoading ? (
-              <ButtonSpinner size="md" color="white" text="Memproses..." />
-            ) : (
-              `${
-                requiresPendingPayment(selectedPaymentMethod || undefined)
-                  ? 'Buat Pesanan'
-                  : 'Konfirmasi Pesanan'
-              } ${rupiahFormater(totals.total)}`
-            )}
-          </button>
-          
-          {currentItems.length === 0 && (
-            <p className="text-center text-sm text-gray-500 mt-2">
-              Keranjang kosong, tidak dapat melanjutkan pembayaran
-            </p>
-          )}
-        </div>
+        <OrderSubmitSection
+          isLoading={isLoading}
+          isDisabled={isLoading || currentItems.length === 0}
+          totalAmount={totals.total}
+          submitLabel={
+            requiresPendingPayment(selectedPaymentMethod || undefined)
+              ? 'Buat Pesanan'
+              : 'Konfirmasi Pesanan'
+          }
+          onSubmit={handlePayment}
+        />
+
       </div>
 
       {/* Address Selector Modal */}
@@ -932,3 +586,4 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 };
 
 export default Order1Page;
+

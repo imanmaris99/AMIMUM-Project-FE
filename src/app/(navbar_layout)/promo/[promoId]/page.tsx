@@ -1,5 +1,5 @@
-import ProductListWithPagination from "@/components/DetailBrand/ProductListWithPagination";
-import DetailBrand from "@/components/DetailBrand";
+import ProductListWithPagination from "@/components/detail-brand/ProductListWithPagination";
+import DetailBrand from "@/components/detail-brand";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 import { GetBrandDetailByIDServer } from "@/services/api/brand";

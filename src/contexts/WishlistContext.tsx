@@ -158,7 +158,9 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       const cache = getProductIdCache();
       delete cache[targetItem.wishlistId.toString()];
       saveProductIdCache(cache);
-      await refreshWishlist();
+      setWishlistItems((previous) =>
+        previous.filter((item) => item.wishlistId !== targetItem.wishlistId)
+      );
     } catch (error) {
       ErrorHandler.handleError(error, 'WishlistRemove');
       throw error;
@@ -172,14 +174,14 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       return;
     }
 
-    for (const item of wishlistItems) {
-      if (item.wishlistId) {
-        await deleteWishlistProduct(item.wishlistId);
-      }
-    }
+    await Promise.all(
+      wishlistItems
+        .filter((item) => item.wishlistId)
+        .map((item) => deleteWishlistProduct(item.wishlistId as number))
+    );
 
     saveProductIdCache({});
-    await refreshWishlist();
+    setWishlistItems([]);
   };
 
   const isInWishlist = (productId: string, variantId?: number) => {

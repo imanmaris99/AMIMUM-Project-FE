@@ -17,7 +17,6 @@ import {
   addCartProduct,
   deleteCartProduct,
   extractVariantInfo,
-  getCartTotalItems,
   getMyCartProducts,
   updateAllCartActivation,
   updateCartActivation,
@@ -158,10 +157,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
 
     try {
-      const [cartResponse, totalResponse] = await Promise.all([
-        getMyCartProducts(),
-        getCartTotalItems(),
-      ]);
+      const cartResponse = await getMyCartProducts();
 
       const metadataMap = readCartMetadata();
       const normalizedItems = cartResponse.data.map((item) =>
@@ -169,7 +165,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       );
 
       setCartItems(normalizedItems);
-      setTotalItems(totalResponse.data.total_items);
+      setTotalItems(normalizedItems.length);
       setTotalPrices({
         subtotal: cartResponse.total_prices.all_item_active_prices,
         shipping_cost: 0,

@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import ProductImage from "@/components/detailproduct/ProductImage";
-import TitleProduct from "@/components/detailproduct/TitleProduct";
-import ProductVariants from "@/components/detailproduct/ProductVariants";
-import ProductInformation from "@/components/detailproduct/ProductInformation";
-import ProductDescription from "@/components/detailproduct/ProductDescription";
-import ProductPrice from "@/components/detailproduct/ProductPrice";
+import ProductImage from "@/components/detail-product/ProductImage";
+import TitleProduct from "@/components/detail-product/TitleProduct";
+import ProductVariants from "@/components/detail-product/ProductVariants";
+import ProductInformation from "@/components/detail-product/ProductInformation";
+import ProductDescription from "@/components/detail-product/ProductDescription";
+import ProductPrice from "@/components/detail-product/ProductPrice";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 import { validateDetailProductData } from "@/utils/dataValidation";
 import UnifiedHeader from "@/components/common/UnifiedHeader";

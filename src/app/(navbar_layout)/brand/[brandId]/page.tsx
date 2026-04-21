@@ -1,6 +1,6 @@
-import DetailBrand from "@/components/DetailBrand";
-import ProductListWithPagination from "@/components/DetailBrand/ProductListWithPagination";
-import SearchProductByBrand from "@/components/DetailBrand/SearchProductByBrand";
+import DetailBrand from "@/components/detail-brand";
+import ProductListWithPagination from "@/components/detail-brand/ProductListWithPagination";
+import SearchProductByBrand from "@/components/detail-brand/SearchProductByBrand";
 import { BrandDetailType } from "@/types/detailProduct";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 import UnifiedHeader from "@/components/common/UnifiedHeader";

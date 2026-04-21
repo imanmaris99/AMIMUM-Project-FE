@@ -4,24 +4,14 @@ import React, { createContext, useContext, useState, useEffect, useCallback, Rea
 import {
   Transaction,
   TransactionItem,
-  TransactionPaymentMethod,
-  TransactionShipmentAddress,
   TransactionStatus
 } from "@/types/transaction";
 import { CartItemType } from "@/types/apiTypes";
+import { CheckoutOrderData } from "@/types/checkout";
 import { useNotification } from "./NotificationContext";
 import { validateCartItemData } from "@/utils/dataValidation";
 import { ErrorHandler } from "@/lib/errorHandler";
 import { getInitialTransactionStatus } from "@/lib/paymentMethods";
-
-interface CheckoutOrderData {
-  delivery_type: "delivery" | "pickup";
-  payment_method: TransactionPaymentMethod;
-  notes?: string;
-  shipment_id?: string;
-  shipping_cost?: number;
-  shipment_address?: TransactionShipmentAddress;
-}
 
 interface TransactionContextType {
   transactions: Transaction[];

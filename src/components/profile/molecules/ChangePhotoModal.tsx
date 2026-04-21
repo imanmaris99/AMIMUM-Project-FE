@@ -149,10 +149,13 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({ isOpen, onClose, on
               {/* Preview Image */}
               {previewUrl && (
                 <div className="flex justify-center">
-                  <img
+                  <Image
                     src={previewUrl}
                     alt="Preview"
+                    width={100}
+                    height={100}
                     className="h-[100px] w-[100px] rounded-lg object-cover"
+                    unoptimized
                   />
                 </div>
               )}

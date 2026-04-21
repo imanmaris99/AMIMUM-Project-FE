@@ -186,11 +186,13 @@ const ProfileInfo: React.FC = () => {
         <div className="relative mb-6">
           <div className="w-20 h-20 bg-[#E6F2F0] rounded-full flex items-center justify-center">
             {profile?.photo_url ? (
-              // Use native img to avoid remote image configuration issues.
-              <img
+              <Image
                 src={profile.photo_url}
                 alt={displayName}
+                width={80}
+                height={80}
                 className="h-20 w-20 rounded-full object-cover"
+                unoptimized
               />
             ) : (
               <Image
