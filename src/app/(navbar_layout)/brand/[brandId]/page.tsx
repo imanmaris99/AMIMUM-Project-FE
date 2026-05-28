@@ -78,6 +78,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
         brandDetail={brandData} 
         errorMessage={errorMessage}
         promoProductCount={brandData?.total_product_with_promo}
+        totalProductCount={products.length}
       />
       <SearchProductByBrand 
         brandId={productionId} 
