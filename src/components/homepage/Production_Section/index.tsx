@@ -9,7 +9,7 @@ interface ProductionSectionProps {
   errorMessage?: string | null;
 }
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 12;
 
 const Production = ({ productions, errorMessage }: ProductionSectionProps) => {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
