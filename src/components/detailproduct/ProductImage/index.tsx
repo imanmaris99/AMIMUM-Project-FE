@@ -5,11 +5,12 @@ import { useMemo, useState } from "react";
 
 interface ProductImageProps {
   detailProduct?: DetailProductType | null;
+  selectedVariantImg?: string;
 }
 
-const ProductImage = ({ detailProduct }: ProductImageProps) => {
+const ProductImage = ({ detailProduct, selectedVariantImg }: ProductImageProps) => {
   const [imageError, setImageError] = useState(false);
-  const imageUrl = detailProduct?.variants_list?.[0]?.img || "/default-image.jpg";
+  const imageUrl = selectedVariantImg || detailProduct?.variants_list?.[0]?.img || "/default-image.jpg";
 
   const handleImageError = () => {
     setImageError(true);
