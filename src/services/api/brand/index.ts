@@ -159,46 +159,49 @@ export async function GetAllPromoServer(): Promise<PromoProps[]> {
  */
 export async function GetAllBrandServer(): Promise<ProductionProps[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.BRAND_ALL}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      next: { revalidate: 60 },
-    });
+    const allBrands: ProductionProps[] = [];
+    const pageSize = 50;
+    let skip = 0;
+    let hasMore = true;
 
-    // Handle different status codes according to API documentation
-    if (res.status === 409) {
-      // Conflict error
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'Konflik terjadi saat mencoba mengambil data perusahaan produksi.';
-      throw new Error(errorMessage);
+    while (hasMore) {
+      const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.BRAND_LOADER}?skip=${skip}&limit=${pageSize}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        next: { revalidate: 60 },
+      });
+
+      if (res.status === 409) {
+        const errorData = await res.json().catch(() => ({}));
+        const errorMessage = errorData.message || 'Konflik terjadi saat mencoba mengambil data perusahaan produksi.';
+        throw new Error(errorMessage);
+      }
+
+      if (res.status === 500) {
+        const errorData = await res.json().catch(() => ({}));
+        const errorMessage = errorData.message || 'Kesalahan tak terduga saat mengambil data perusahaan produksi.';
+        throw new Error(errorMessage);
+      }
+
+      if (!res.ok) {
+        throw new Error(`Gagal mengambil data brand: ${res.status}`);
+      }
+
+      const payload = await res.json();
+      const pageData = Array.isArray(payload?.data) ? payload.data as ProductionProps[] : [];
+
+      allBrands.push(...pageData);
+
+      hasMore = Boolean(payload?.has_more) && pageData.length > 0;
+      skip += pageData.length;
+
+      if (pageData.length === 0) break;
     }
 
-    if (res.status === 500) {
-      // Internal Server Error
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'Kesalahan tak terduga saat mengambil data perusahaan produksi.';
-      throw new Error(errorMessage);
-    }
-
-    if (!res.ok) {
-      // Other errors
-      throw new Error(`Gagal mengambil data brand: ${res.status}`);
-    }
-
-    // Parse response
-    const data: BrandsResponseType = await res.json();
-    
-    // Validate response structure
-    if (!data || !data.data || !Array.isArray(data.data)) {
-      throw new Error('Invalid response format: data is not an array');
-    }
-
-    // Return the brands/productions array from response.data
-    return data.data;
+    return allBrands;
   } catch (error) {
-    // Re-throw with more context if needed
     if (error instanceof Error) {
       throw error;
     }

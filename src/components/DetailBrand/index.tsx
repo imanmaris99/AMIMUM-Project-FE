@@ -8,10 +8,11 @@ import { useMemo, useState } from "react";
 interface DetailBrandProps {
   brandDetail: BrandDetailType | null;
   errorMessage?: string | null;
-  promoProductCount?: number; // Add promo product count
+  promoProductCount?: number;
+  totalProductCount?: number;
 }
 
-const DetailBrand = ({ brandDetail, errorMessage, promoProductCount }: DetailBrandProps) => {
+const DetailBrand = ({ brandDetail, errorMessage, promoProductCount, totalProductCount }: DetailBrandProps) => {
   const [imageError, setImageError] = useState(false);
 
   const handleImageError = () => {
@@ -43,8 +44,8 @@ const DetailBrand = ({ brandDetail, errorMessage, promoProductCount }: DetailBra
   }
   // Gunakan description_list sesuai dengan backend DTO
   const descriptionArr = brandDetail.description_list || [];
-  // Use promo product count if available, otherwise fall back to total_product
-  const productCount = promoProductCount ?? brandDetail.total_product ?? 0;
+  // Prioritas: total produk real dari hasil list -> promo count -> total_product backend
+  const productCount = totalProductCount ?? promoProductCount ?? brandDetail.total_product ?? 0;
   return (
     <div className="mt-4 mx-6">
       <div>

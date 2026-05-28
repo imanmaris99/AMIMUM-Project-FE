@@ -4,7 +4,7 @@ import SearchProductByBrand from "@/components/DetailBrand/SearchProductByBrand"
 import { BrandDetailType } from "@/types/detailProduct";
 import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
-import { validateProductData } from "@/utils/dataValidation";
+
 import { GetBrandDetailByIDServer } from "@/services/api/brand";
 import { GetProductsByProductionIdServer } from "@/services/api/product";
 
@@ -45,8 +45,24 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
     
   try {
     const allProducts = await GetProductsByProductionIdServer(productionId);
-    const validProducts = allProducts.filter(validateProductData);
-    products = validProducts;
+
+    products = allProducts.map((product) => {
+      const variants = Array.isArray(product.all_variants) && product.all_variants.length > 0
+        ? product.all_variants
+        : [{
+            id: 0,
+            variant: "default",
+            img: "/default-image.jpg",
+            discount: 0,
+            discounted_price: Number(product.price || 0),
+            updated_at: product.created_at || new Date().toISOString(),
+          }];
+
+      return {
+        ...product,
+        all_variants: variants,
+      };
+    });
   } catch {
     products = [];
   }
@@ -62,6 +78,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
         brandDetail={brandData} 
         errorMessage={errorMessage}
         promoProductCount={brandData?.total_product_with_promo}
+        totalProductCount={products.length}
       />
       <SearchProductByBrand 
         brandId={productionId} 
