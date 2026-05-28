@@ -9,7 +9,7 @@ interface ProductImageProps {
 
 const ProductImage = ({ detailProduct }: ProductImageProps) => {
   const [imageError, setImageError] = useState(false);
-  const imageUrl = detailProduct?.variants_list?.[0]?.img || "/buyungupik_agr-1.svg";
+  const imageUrl = detailProduct?.variants_list?.[0]?.img || "";
 
   const handleImageError = () => {
     setImageError(true);
@@ -29,8 +29,7 @@ const ProductImage = ({ detailProduct }: ProductImageProps) => {
 
   return (
     <div className="w-full h-48 relative bg-gray-50 rounded-lg overflow-hidden shadow-sm">
-      {!isExternalUrl ? (
-        // Use Next.js Image ONLY for local images (no server-side fetch issues)
+      {!imageUrl ? null : !isExternalUrl ? (
         <Image 
           src={imageUrl} 
           alt={detailProduct?.name || "Product Image"} 
@@ -38,14 +37,9 @@ const ProductImage = ({ detailProduct }: ProductImageProps) => {
           style={{ objectFit: "contain" }}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           priority={false}
-          onError={(e) => {
-            e.currentTarget.src = "/buyungupik_agr-1.svg";
-          }}
           unoptimized
         />
       ) : (
-        // Use regular img tag for ALL external images (http/https) to prevent Next.js Image optimizer retry loops
-        // This completely avoids server-side fetch attempts that cause infinite retry loops
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={imageUrl}
