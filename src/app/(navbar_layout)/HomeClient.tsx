@@ -64,10 +64,21 @@ export default function HomeClient({
       })?.name
     : null;
     
+  const normalize = (value: string) => value.toLowerCase().trim().replace(/\s+/g, ' ');
+
   const filteredProductions = selectedCategory && selectedCategoryName
     ? productionsData.filter((prod: unknown) => {
         const production = prod as { category: string };
-        return production && typeof production.category === 'string' && production.category === selectedCategoryName;
+        if (!production || typeof production.category !== 'string') return false;
+
+        const selected = normalize(selectedCategoryName);
+        const current = normalize(production.category);
+
+        // exact match first
+        if (current === selected) return true;
+
+        // fallback: tolerate minor label differences between category master and production payload
+        return current.includes(selected) || selected.includes(current);
       })
     : productionsData;
     
