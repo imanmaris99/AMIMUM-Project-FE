@@ -168,6 +168,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                     <div className="relative">
                       <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center overflow-hidden">
                         {userPhotoUrl ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
                           <img
                             src={userPhotoUrl}
                             alt={userDisplayName || userEmail || "User"}
