@@ -80,7 +80,10 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
       {/* Content - Optimized layout with proper spacing */}
       <div className="px-4 py-6 pb-56">
         <div className="max-w-sm mx-auto space-y-4">
-          <ProductImage detailProduct={detailProduct || undefined} />
+          <ProductImage 
+            detailProduct={detailProduct || undefined}
+            selectedVariantImg={selectedVariant?.img}
+          />
           <TitleProduct isLoading={false} isError={isError} data={detailProduct || undefined} />
           
           {/* Variants Selection */}

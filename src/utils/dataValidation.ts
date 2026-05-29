@@ -85,7 +85,7 @@ export function validateProductionData(production: unknown): production is Produ
   return !!(
     typeof p.id === 'number' &&
     typeof p.name === 'string' &&
-    typeof p.photo_url === 'string' &&
+    (typeof p.photo_url === 'string' || p.photo_url === null || p.photo_url === undefined) &&
     Array.isArray(p.description_list) &&
     typeof p.category === 'string' &&
     typeof p.created_at === 'string'

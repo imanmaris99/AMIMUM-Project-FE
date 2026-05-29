@@ -187,6 +187,7 @@ const ProfileInfo: React.FC = () => {
           <div className="w-20 h-20 bg-[#E6F2F0] rounded-full flex items-center justify-center">
             {profile?.photo_url ? (
               // Use native img to avoid remote image configuration issues.
+              /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={profile.photo_url}
                 alt={displayName}
