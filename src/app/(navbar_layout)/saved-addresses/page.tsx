@@ -101,7 +101,23 @@ const SavedAddressesPage: React.FC = () => {
       );
     }
 
-    if (normalizedPostalCode && !/^\d+$/.test(normalizedPostalCode)) {
+    if (!addressData.address.trim()) {
+      throw new Error("Alamat wajib diisi.");
+    }
+
+    if (!addressData.province.trim() || !addressData.city.trim()) {
+      throw new Error("Provinsi dan Kota/Kabupaten wajib dipilih.");
+    }
+
+    if (!addressData.country.trim()) {
+      throw new Error("Negara wajib diisi.");
+    }
+
+    if (!normalizedPostalCode) {
+      throw new Error("Kode pos wajib diisi.");
+    }
+
+    if (!/^\d+$/.test(normalizedPostalCode)) {
       throw new Error("Kode pos harus berupa angka.");
     }
 
@@ -209,7 +225,23 @@ const SavedAddressesPage: React.FC = () => {
       );
     }
 
-    if (normalizedPostalCode && !/^\d+$/.test(normalizedPostalCode)) {
+    if (!addressData.address.trim()) {
+      throw new Error("Alamat wajib diisi.");
+    }
+
+    if (!addressData.province.trim() || !addressData.city.trim()) {
+      throw new Error("Provinsi dan Kota/Kabupaten wajib dipilih.");
+    }
+
+    if (!addressData.country.trim()) {
+      throw new Error("Negara wajib diisi.");
+    }
+
+    if (!normalizedPostalCode) {
+      throw new Error("Kode pos wajib diisi.");
+    }
+
+    if (!/^\d+$/.test(normalizedPostalCode)) {
       throw new Error("Kode pos harus berupa angka.");
     }
 

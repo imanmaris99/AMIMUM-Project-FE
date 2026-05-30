@@ -33,8 +33,11 @@ interface ShipmentAddressErrorResponse {
   error?: string;
   message?: string;
   detail?: Array<{
-    msg: string;
-  }>;
+    msg?: string;
+    message?: string;
+  }> | {
+    message?: string;
+  };
 }
 
 export const getMyShipmentAddresses =
@@ -246,12 +249,13 @@ export const createShipmentAddress = async (
       }
 
       if (status === 422) {
-        const errorMessages = (errorData.detail || [])
-          .map((item) => item.msg)
-          .join(", ");
+        const detail = errorData.detail;
+        const errorMessages = Array.isArray(detail)
+          ? detail.map((item) => item.msg || item.message).filter(Boolean).join(', ')
+          : detail?.message;
 
         throw new Error(
-          errorMessages || "Data alamat tidak lolos validasi."
+          errorMessages || errorData.message || "Data alamat tidak lolos validasi."
         );
       }
 
@@ -345,12 +349,13 @@ export const updateShipmentAddress = async (
       }
 
       if (status === 422) {
-        const errorMessages = (errorData.detail || [])
-          .map((item) => item.msg)
-          .join(", ");
+        const detail = errorData.detail;
+        const errorMessages = Array.isArray(detail)
+          ? detail.map((item) => item.msg || item.message).filter(Boolean).join(', ')
+          : detail?.message;
 
         throw new Error(
-          errorMessages || "Data alamat tidak lolos validasi."
+          errorMessages || errorData.message || "Data alamat tidak lolos validasi."
         );
       }
 
