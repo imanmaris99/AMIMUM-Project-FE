@@ -198,7 +198,7 @@ const ProductPrice = ({
               ) : (
                 <div>
                   <p className={`font-bold text-gray-900 ${isSticky ? 'text-lg' : 'text-xl'} ${isSticky ? 'text-center' : ''}`}>
-                    Rp {data?.price?.toLocaleString()}
+                    Rp {discountedPrice?.toLocaleString()}
                   </p>
                 </div>
               )
