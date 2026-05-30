@@ -32,7 +32,14 @@ export interface DetailProductType {
     variants_list: VariantProductType[];
     description_list: string[];
     instructions_list: string[];
-    price: number;  
+    price: number;
+    primary_image_url?: string | null;
+    gallery_images?: Array<{
+        id: number;
+        url: string;
+        is_primary: boolean;
+        sort_order: number;
+    }>;
     is_active: boolean;
     company: string;
     avg_rating: number;
