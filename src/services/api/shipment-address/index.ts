@@ -434,12 +434,13 @@ export const deleteShipmentAddress = async (
       }
 
       if (status === 422) {
-        const errorMessages = (errorData.detail || [])
-          .map((item) => item.msg)
-          .join(", ");
+        const detail = errorData.detail;
+        const errorMessages = Array.isArray(detail)
+          ? detail.map((item) => item.msg || item.message).filter(Boolean).join(', ')
+          : detail?.message;
 
         throw new Error(
-          errorMessages || "Permintaan hapus alamat tidak lolos validasi."
+          errorMessages || errorData.message || "Permintaan hapus alamat tidak lolos validasi."
         );
       }
 
