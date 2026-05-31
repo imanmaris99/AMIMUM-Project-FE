@@ -1,4 +1,7 @@
 import DetailBrand from "@/components/DetailBrand";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 import ProductListWithPagination from "@/components/DetailBrand/ProductListWithPagination";
 import SearchProductByBrand from "@/components/DetailBrand/SearchProductByBrand";
 import { BrandDetailType } from "@/types/detailProduct";
