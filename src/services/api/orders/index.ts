@@ -22,6 +22,10 @@ export interface OrderListItemDto {
     price_per_item: number;
     total_price: number;
     created_at: string;
+    img?: string;
+    image?: string;
+    product_image?: string;
+    variant_image?: string;
   }>;
 }
 
@@ -114,7 +118,7 @@ const mapOrderItems = (
     variantName: item.variant_product,
     quantity: item.quantity,
     price: item.price_per_item,
-    image: "/default-image.jpg",
+    image: item.img || item.image || item.variant_image || item.product_image || "/default-image.jpg",
   }));
 
 export const mapOrderSummaryToTransaction = (

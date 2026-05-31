@@ -323,7 +323,11 @@ const TransactionDetailPage: React.FC = () => {
                       width={48}
                       height={48}
                       className="w-full h-full object-cover"
-                      unoptimized
+                      unoptimized={false}
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        if (!target.src.endsWith('/default-image.jpg')) target.src = '/default-image.jpg';
+                      }}
                     />
                   </div>
                   <div className="flex-1 min-w-0">
