@@ -126,45 +126,55 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       setIsReferenceLoading(true);
 
       try {
-        const [addressResponse, ownerResponse] = await Promise.all([
+        const [addressResult, ownerResult] = await Promise.allSettled([
           getMyShipmentAddresses(),
           getOwnerShipmentAddress(),
         ]);
 
-        const shipmentAddresses: AddressInfo[] = await Promise.all(
-          addressResponse.data.map(async (address) => ({
-            id: address.id.toString(),
-            name: address.name,
-            phone: address.phone,
-            address: address.address || '',
-            city: address.city || '',
-            state: address.state || '',
-            city_id:
-              address.city_id ||
-              (address.state && address.city
-                ? await resolveCityIdFromRajaOngkir(address.state, address.city)
-                : undefined),
-            postal_code: address.zip_code?.toString() || '',
-            isDefault: false,
-          }))
-        );
+        if (addressResult.status === 'fulfilled') {
+          const shipmentAddresses: AddressInfo[] = await Promise.all(
+            addressResult.value.data.map(async (address) => ({
+              id: address.id.toString(),
+              name: address.name,
+              phone: address.phone,
+              address: address.address || '',
+              city: address.city || '',
+              state: address.state || '',
+              city_id:
+                address.city_id ||
+                (address.state && address.city
+                  ? await resolveCityIdFromRajaOngkir(address.state, address.city)
+                  : undefined),
+              postal_code: address.zip_code?.toString() || '',
+              isDefault: false,
+            }))
+          );
 
-        setAddresses(shipmentAddresses);
-        setSelectedAddress(shipmentAddresses[0] || null);
-        setStoreAddress({
-          name: ownerResponse.data.name,
-          phone: ownerResponse.data.phone,
-          cityId: ownerResponse.data.city_id,
-          address: [
-            ownerResponse.data.address,
-            ownerResponse.data.city,
-            ownerResponse.data.state,
-            ownerResponse.data.zip_code,
-            ownerResponse.data.country,
-          ]
-            .filter(Boolean)
-            .join(', '),
-        });
+          setAddresses(shipmentAddresses);
+          setSelectedAddress(shipmentAddresses[0] || null);
+        }
+
+        if (ownerResult.status === 'fulfilled') {
+          const owner = ownerResult.value.data;
+          const ownerCityId = owner.city_id || (
+            owner.state && owner.city
+              ? await resolveCityIdFromRajaOngkir(owner.state, owner.city)
+              : undefined
+          );
+
+          setStoreAddress({
+            name: owner.name,
+            phone: owner.phone,
+            cityId: ownerCityId,
+            address: [owner.address, owner.city, owner.state, owner.zip_code, owner.country]
+              .filter(Boolean)
+              .join(', '),
+          });
+        } else {
+          throw ownerResult.reason instanceof Error
+            ? ownerResult.reason
+            : new Error('Alamat pemilik toko tidak ditemukan.');
+        }
         setCourierCompanies(
           SUPPORTED_COURIERS.map((courier) => ({
             id: courier.id,
@@ -581,13 +591,20 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             <div className="space-y-4">
               {currentItems.map((item: CartItemType) => (
                 <div key={item.id} className="flex items-center space-x-3">
-                  <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0">
-                    <Image 
-                      src={item.image || "/default-image.jpg"} 
-                      alt={item.product_name} 
+                  <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                    <Image
+                      src={item.image || "/default-image.jpg"}
+                      alt={item.product_name}
                       width={64}
                       height={64}
                       className="w-full h-full object-cover rounded-lg"
+                      unoptimized={false}
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        if (!target.src.endsWith('/default-image.jpg')) {
+                          target.src = '/default-image.jpg';
+                        }
+                      }}
                     />
                   </div>
                   <div className="flex-1">

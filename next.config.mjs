@@ -11,6 +11,10 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'qopjphumrfywzveemvko.supabase.co',
             },
+            {
+                protocol: 'https',
+                hostname: 'res.cloudinary.com',
+            },
             // Note: Brand websites are NOT included here because:
             // 1. They use regular <img> tags (not Next.js Image) to prevent retry loops
             // 2. Some domains (www.hpaihalalnetwork.com, lestarijayabangsa.com) are unreliable
