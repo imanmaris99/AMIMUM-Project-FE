@@ -70,6 +70,33 @@ interface OrderErrorResponse {
   message?: string;
 }
 
+export interface CheckoutItemPayload {
+  product_id: string;
+  variant_id: number;
+  quantity: number;
+}
+
+export interface CheckoutPayload {
+  delivery_type: "delivery" | "pickup";
+  notes?: string;
+  shipment_id?: string;
+  items: CheckoutItemPayload[];
+}
+
+export interface CheckoutResponse {
+  status_code: number;
+  message: string;
+  data: {
+    id: string;
+    status: string;
+    total_price: number;
+    shipment_id?: string;
+    delivery_type: string;
+    notes?: string;
+    created_at?: string;
+  };
+}
+
 const normalizeTransactionStatus = (status: string): TransactionStatus => {
   const normalizedStatus = status.toLowerCase();
 
@@ -168,6 +195,34 @@ export const mapOrderDetailToTransaction = (
           }
         : undefined,
   };
+};
+
+export const createCheckoutOrder = async (
+  payload: CheckoutPayload
+): Promise<CheckoutResponse> => {
+  try {
+    const response = await apiClient.post<CheckoutResponse>(
+      API_ENDPOINTS.ORDERS_CHECKOUT,
+      payload
+    );
+
+    if (response?.status_code === 200 && response.data?.id) {
+      return response;
+    }
+
+    throw new Error(response?.message || "Gagal membuat pesanan.");
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response) {
+      const errorData = error.response.data as OrderErrorResponse;
+      throw new Error(errorData.message || "Gagal membuat pesanan.");
+    }
+
+    if (error instanceof Error) {
+      throw error;
+    }
+
+    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+  }
 };
 
 export const getMyOrders = async (): Promise<OrdersListResponse> => {

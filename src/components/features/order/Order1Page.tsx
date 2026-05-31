@@ -10,7 +10,7 @@ import rupiahFormater from '@/utils/rupiahFormater';
 import ButtonSpinner from '@/components/ui/ButtonSpinner';
 import { useCart } from '@/contexts/CartContext';
 import { CartItemType } from '@/types/apiTypes';
-import { useTransaction } from '@/contexts/TransactionContext';
+import { createCheckoutOrder } from '@/services/api/orders';
 import CourierSelector from './CourierSelector';
 import AddressSelector from './AddressSelector';
 import { courierCompanies, dummyShipments } from '@/data/shipmentDummyData';
@@ -34,7 +34,6 @@ interface AddressInfo {
 const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const router = useRouter();
   const { cartItems, totalPrices, removeActiveItems } = useCart();
-  const { addTransaction } = useTransaction();
   
   // Direct checkout state
   const [isDirectCheckout, setIsDirectCheckout] = useState(false);
@@ -196,47 +195,36 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     setIsLoading(true);
     
     try {
-      // Simulate API call - reduced time for better UX
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Create order data based on backend DTOs
-      const orderData = {
+      const checkoutPayload = {
         delivery_type: deliveryMethod,
-        payment_method: 'bca_va' as const,
         notes: additionalNotes || (deliveryMethod === 'pickup' ? 'Ambil di toko' : undefined),
         shipment_id: deliveryMethod === 'delivery' ? selectedCourierService : undefined,
         items: currentItems.map((item: CartItemType) => ({
           product_id: item.product_id,
-          variant_id: item.variant_id,
+          variant_id: Number(item.variant_id),
           quantity: item.quantity
         }))
       };
-      
-      
-      // Add transaction to context
-      const newTransaction = addTransaction(orderData, currentItems);
-      
-      if (!newTransaction) {
-        throw new Error('Failed to create transaction');
+
+      const checkoutResponse = await createCheckoutOrder(checkoutPayload);
+      const createdOrderId = checkoutResponse.data.id;
+
+      if (!createdOrderId) {
+        throw new Error('Order ID tidak ditemukan dari response backend');
       }
-      
-      
-      // Remove only active items from cart after successful payment
+
       if (!isDirectCheckout) {
         await removeActiveItems();
       } else {
-        // Clear direct checkout item from localStorage
         localStorage.removeItem('directCheckoutItem');
       }
-      
-      // Show success message and navigate immediately
+
       toast.success('Pesanan berhasil dibuat!');
-      
-      // Navigate after a short delay to ensure toast is visible
+
       setTimeout(() => {
-        router.push('/order-confirmation');
+        router.push(`/transaction/${createdOrderId}`);
       }, 500);
-      
+
     } catch (error) {
       toast.error(`Terjadi kesalahan saat memproses pesanan: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setIsLoading(false);
