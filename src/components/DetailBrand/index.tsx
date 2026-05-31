@@ -44,12 +44,23 @@ const DetailBrand = ({ brandDetail, errorMessage, promoProductCount, totalProduc
   }
   // Gunakan description_list sesuai dengan backend DTO
   const descriptionArr = brandDetail.description_list || [];
-  // Prioritas: total produk real dari hasil list -> promo count -> total_product backend
-  const productCount = Math.max(
-    Number(totalProductCount ?? 0),
-    Number(brandDetail.total_product ?? 0),
-    Number(promoProductCount ?? 0)
-  );
+
+  // Source of truth count: products.length dari server page.
+  // Fallback hanya jika prop tidak dikirim.
+  const normalizedTotalFromList = Number.isFinite(Number(totalProductCount))
+    ? Number(totalProductCount)
+    : undefined;
+  const normalizedBrandTotal = Number.isFinite(Number(brandDetail.total_product))
+    ? Number(brandDetail.total_product)
+    : 0;
+  const normalizedPromoTotal = Number.isFinite(Number(promoProductCount))
+    ? Number(promoProductCount)
+    : 0;
+
+  const productCount =
+    normalizedTotalFromList !== undefined
+      ? normalizedTotalFromList
+      : Math.max(normalizedBrandTotal, normalizedPromoTotal);
   return (
     <div className="mt-4 mx-6">
       <div>
