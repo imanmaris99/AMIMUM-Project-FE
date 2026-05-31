@@ -3,6 +3,7 @@ import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 import Spinner from "@/components/ui/Spinner";
 import ButtonSpinner from "@/components/ui/ButtonSpinner";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import RatingDisplay from "@/components/rating/RatingDisplay";
 import { useCart } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
@@ -50,8 +51,12 @@ const ProductPrice = ({
       setShowFeedback(true);
       setTimeout(() => setShowFeedback(false), 3000);
       
-    } catch {
-      // Ignore add to cart errors
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : "Gagal menambahkan item ke keranjang.";
+      toast.error(message);
     } finally {
       setIsAdding(false);
     }
@@ -103,6 +108,7 @@ const ProductPrice = ({
 
   // Check if item is already in cart
   const isItemInCart = data && datavariant ? isInCart(data.id, datavariant.id) : false;
+  const isOutOfStock = (datavariant?.stock ?? 0) <= 0;
 
   if (isLoading) {
     return (
@@ -217,7 +223,7 @@ const ProductPrice = ({
                 <Button 
                   variant="default" 
                   onClick={handleAddToCart}
-                  disabled={isAdding}
+                  disabled={isAdding || isOutOfStock}
                   className={`${
                     isItemInCart 
                       ? "bg-green-600 hover:bg-green-700" 
@@ -251,7 +257,7 @@ const ProductPrice = ({
               <Button 
                 variant="default" 
                 onClick={handleAddToCart}
-                disabled={isAdding || !datavariant}
+                disabled={isAdding || !datavariant || isOutOfStock}
                 className={`${
                   isItemInCart 
                     ? "bg-green-600 hover:bg-green-700" 
