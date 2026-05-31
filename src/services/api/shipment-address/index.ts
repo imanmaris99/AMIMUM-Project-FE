@@ -55,7 +55,7 @@ const extractApiErrorMessage = (
       .filter(Boolean)
       .join(', ');
     if (msg) return msg;
-  } else if (detail?.message) {
+  } else if (detail && typeof detail === 'object' && 'message' in detail && detail.message) {
     return detail.message;
   }
 
