@@ -37,8 +37,30 @@ interface ShipmentAddressErrorResponse {
     message?: string;
   }> | {
     message?: string;
-  };
+  } | string;
 }
+
+const extractApiErrorMessage = (
+  errorData: ShipmentAddressErrorResponse,
+  fallback: string
+): string => {
+  if (errorData?.message) return errorData.message;
+
+  const detail = errorData?.detail;
+  if (typeof detail === 'string' && detail.trim()) return detail;
+
+  if (Array.isArray(detail)) {
+    const msg = detail
+      .map((item) => item?.msg || item?.message)
+      .filter(Boolean)
+      .join(', ');
+    if (msg) return msg;
+  } else if (detail?.message) {
+    return detail.message;
+  }
+
+  return fallback;
+};
 
 export const getMyShipmentAddresses =
   async (): Promise<ShipmentAddressListResponse> => {
@@ -236,15 +258,13 @@ export const createShipmentAddress = async (
 
       if (status === 400) {
         throw new Error(
-          errorData.message ||
-            "Data yang dikirimkan tidak sesuai dengan format yang diharapkan."
+          extractApiErrorMessage(errorData, "Data yang dikirimkan tidak sesuai dengan format yang diharapkan.")
         );
       }
 
       if (status === 401) {
         throw new Error(
-          errorData.message ||
-            "Token autentikasi tidak valid atau tidak ditemukan."
+          extractApiErrorMessage(errorData, "Token autentikasi tidak valid atau tidak ditemukan.")
         );
       }
 
@@ -252,22 +272,23 @@ export const createShipmentAddress = async (
         const detail = errorData.detail;
         const errorMessages = Array.isArray(detail)
           ? detail.map((item) => item.msg || item.message).filter(Boolean).join(', ')
-          : detail?.message;
+          : typeof detail === 'string'
+            ? detail
+            : detail?.message;
 
         throw new Error(
-          errorMessages || errorData.message || "Data alamat tidak lolos validasi."
+          errorMessages || extractApiErrorMessage(errorData, "Data alamat tidak lolos validasi.")
         );
       }
 
       if (status === 500) {
         throw new Error(
-          errorData.message ||
-            "Terjadi kesalahan tak terduga saat memproses permintaan."
+          extractApiErrorMessage(errorData, "Terjadi kesalahan tak terduga saat memproses permintaan.")
         );
       }
 
       throw new Error(
-        errorData.message || "Gagal menyimpan alamat pengiriman."
+        extractApiErrorMessage(errorData, "Gagal menyimpan alamat pengiriman.")
       );
     }
 
