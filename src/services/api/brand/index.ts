@@ -224,7 +224,8 @@ export async function GetAllBrandServer(): Promise<ProductionProps[]> {
  */
 export async function GetBrandDetailByIDServer(productionId: number): Promise<BrandDetailType> {
   try {
-    const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.BRAND_DETAIL(productionId)}`, {
+    const cacheBuster = Date.now();
+    const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.BRAND_DETAIL(productionId)}?_t=${cacheBuster}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

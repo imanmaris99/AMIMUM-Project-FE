@@ -301,7 +301,8 @@ export async function GetProductDiscountByBrandIdServer(productionId: number): P
  */
 export async function GetProductsByProductionIdServer(productionId: number): Promise<AllProductInfoType[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.PRODUCT_BY_BRAND(productionId)}`, {
+    const cacheBuster = Date.now();
+    const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.PRODUCT_BY_BRAND(productionId)}?_t=${cacheBuster}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
