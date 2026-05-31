@@ -10,13 +10,9 @@ interface DetailBrandProps {
   errorMessage?: string | null;
   promoProductCount?: number;
   totalProductCount?: number;
-  debugInfo?: {
-    productsLength?: number;
-    buildRef?: string;
-  };
 }
 
-const DetailBrand = ({ brandDetail, errorMessage, promoProductCount, totalProductCount, debugInfo }: DetailBrandProps) => {
+const DetailBrand = ({ brandDetail, errorMessage, promoProductCount, totalProductCount }: DetailBrandProps) => {
   const [imageError, setImageError] = useState(false);
 
   const handleImageError = () => {
@@ -117,15 +113,6 @@ const DetailBrand = ({ brandDetail, errorMessage, promoProductCount, totalProduc
           <p className="text-gray-500">Jumlah Produk</p>
           <p>{productCount} Produk</p>
         </div>
-        {debugInfo && (
-          <div className="text-[10px] text-gray-400 break-all leading-4">
-            <p>debug.productsLength: {String(debugInfo?.productsLength ?? "n/a")}</p>
-            <p>debug.totalProductCountProp: {String(totalProductCount ?? "n/a")}</p>
-            <p>debug.brandDetail.total_product: {String(brandDetail.total_product ?? "n/a")}</p>
-            <p>debug.promoProductCount: {String(promoProductCount ?? "n/a")}</p>
-            <p>debug.buildRef: {debugInfo?.buildRef || "n/a"}</p>
-          </div>
-        )}
       </div>
     </div>
   );

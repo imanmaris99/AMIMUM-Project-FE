@@ -82,10 +82,6 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
         errorMessage={errorMessage}
         promoProductCount={brandData?.total_product_with_promo}
         totalProductCount={products.length}
-        debugInfo={{
-          productsLength: products.length,
-          buildRef: process.env.VERCEL_GIT_COMMIT_SHA || process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || "local",
-        }}
       />
       <SearchProductByBrand 
         brandId={productionId} 
