@@ -373,7 +373,11 @@ export const updateShipmentAddress = async (
         const detail = errorData.detail;
         const errorMessages = Array.isArray(detail)
           ? detail.map((item) => item.msg || item.message).filter(Boolean).join(', ')
-          : detail?.message;
+          : typeof detail === 'string'
+            ? detail
+            : detail && typeof detail === 'object' && 'message' in detail
+              ? detail.message
+              : undefined;
 
         throw new Error(
           errorMessages || errorData.message || "Data alamat tidak lolos validasi."
