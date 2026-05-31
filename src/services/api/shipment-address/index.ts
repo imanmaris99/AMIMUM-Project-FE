@@ -462,7 +462,11 @@ export const deleteShipmentAddress = async (
         const detail = errorData.detail;
         const errorMessages = Array.isArray(detail)
           ? detail.map((item) => item.msg || item.message).filter(Boolean).join(', ')
-          : detail?.message;
+          : typeof detail === 'string'
+            ? detail
+            : detail && typeof detail === 'object' && 'message' in detail
+              ? detail.message
+              : undefined;
 
         throw new Error(
           errorMessages || errorData.message || "Permintaan hapus alamat tidak lolos validasi."
