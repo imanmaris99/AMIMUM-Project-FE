@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { GoChevronLeft, GoLocation, GoPackage, GoPlus } from 'react-icons/go';
 import { IoCheckmarkCircle, IoWarning } from 'react-icons/io5';
@@ -591,14 +592,15 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
               {currentItems.map((item: CartItemType) => (
                 <div key={item.id} className="flex items-center space-x-3">
                   <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
-                    <img
+                    <Image
                       src={item.image || "/default-image.jpg"}
                       alt={item.product_name}
+                      width={64}
+                      height={64}
                       className="w-full h-full object-cover rounded-lg"
-                      loading="lazy"
-                      referrerPolicy="no-referrer"
+                      unoptimized={false}
                       onError={(e) => {
-                        const target = e.currentTarget;
+                        const target = e.currentTarget as HTMLImageElement;
                         if (!target.src.endsWith('/default-image.jpg')) {
                           target.src = '/default-image.jpg';
                         }
