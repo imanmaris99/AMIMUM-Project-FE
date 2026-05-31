@@ -72,8 +72,13 @@ axiosClient.interceptors.response.use(
     ) && 
     !urlPath.includes('/product/detail/') &&
     !urlPath.includes('/product/discount/');
-    
+
+    const isOrderDetailEndpoint = /^\/orders\/detail\//.test(urlPath);
+
     if (error.response) {
+      if (isOrderDetailEndpoint) {
+        return Promise.reject(error);
+      }
       switch (status) {
         case 401:
           // Unauthorized - clear session and redirect

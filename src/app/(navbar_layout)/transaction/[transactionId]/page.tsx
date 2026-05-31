@@ -39,6 +39,15 @@ const TransactionDetailPage: React.FC = () => {
         return;
       }
 
+      if (transactionId.startsWith("trans-")) {
+        setTransaction(null);
+        setErrorMessage(
+          "Ini transaksi lama (lokal) dari versi sebelumnya. Silakan buat transaksi baru agar tersimpan ke database dan bisa dibuka ulang setelah refresh."
+        );
+        setIsLoading(false);
+        return;
+      }
+
       setIsLoading(true);
       setErrorMessage(null);
 
