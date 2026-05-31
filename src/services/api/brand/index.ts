@@ -229,7 +229,7 @@ export async function GetBrandDetailByIDServer(productionId: number): Promise<Br
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: 60 },
+      cache: "no-store",
     });
 
     // Handle different status codes according to API documentation
