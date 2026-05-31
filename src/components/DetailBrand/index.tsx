@@ -45,7 +45,11 @@ const DetailBrand = ({ brandDetail, errorMessage, promoProductCount, totalProduc
   // Gunakan description_list sesuai dengan backend DTO
   const descriptionArr = brandDetail.description_list || [];
   // Prioritas: total produk real dari hasil list -> promo count -> total_product backend
-  const productCount = totalProductCount ?? promoProductCount ?? brandDetail.total_product ?? 0;
+  const productCount = Math.max(
+    Number(totalProductCount ?? 0),
+    Number(brandDetail.total_product ?? 0),
+    Number(promoProductCount ?? 0)
+  );
   return (
     <div className="mt-4 mx-6">
       <div>
