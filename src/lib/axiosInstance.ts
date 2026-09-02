@@ -6,7 +6,9 @@ const axiosInstance = axios.create({
     headers: {
         "Content-Type": 'application/json'
     },
-    timeout: 10000,
+    // Email flows can take >10s when the backend waits for SMTP/provider response.
+    // Keep this above backend SMTP timeout so users receive the real API error/success.
+    timeout: 30000,
 })
 
 export default axiosInstance

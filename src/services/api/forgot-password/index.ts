@@ -15,15 +15,27 @@ export interface ForgotPasswordResponse {
 }
 
 export interface ForgotPasswordErrorResponse {
-  status_code: number;
+  status_code?: number;
   error?: string;
-  message: string;
-  detail?: Array<{
-    loc: (string | number)[];
-    msg: string;
-    type: string;
-  }>;
+  message?: string;
+  detail?:
+    | {
+        status_code?: number;
+        error?: string;
+        message?: string;
+      }
+    | Array<{
+        loc: (string | number)[];
+        msg: string;
+        type: string;
+      }>;
 }
+
+const getErrorMessage = (errorData: ForgotPasswordErrorResponse): string | undefined => {
+  if (errorData.message) return errorData.message;
+  if (errorData.detail && !Array.isArray(errorData.detail)) return errorData.detail.message;
+  return undefined;
+};
 
 export const postForgotPassword = async (data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> => {
   try {
@@ -53,24 +65,24 @@ export const postForgotPassword = async (data: ForgotPasswordRequest): Promise<F
       const errorData = error.response.data as ForgotPasswordErrorResponse;
 
       if (status === 400) {
-        throw new Error(errorData.message || "Email domain tidak didukung. Gunakan email dari gmail.com, yahoo.com, atau outlook.com.");
+        throw new Error(getErrorMessage(errorData) || "Email domain tidak didukung. Gunakan email dari gmail.com, yahoo.com, atau outlook.com.");
       }
 
       if (status === 404) {
-        throw new Error(errorData.message || "Email tidak ditemukan.");
+        throw new Error(getErrorMessage(errorData) || "Email tidak ditemukan.");
       }
 
       if (status === 422) {
-        const validationErrors = errorData.detail || [];
+        const validationErrors = Array.isArray(errorData.detail) ? errorData.detail : [];
         const errorMessages = validationErrors.map((err) => err.msg).join(", ");
-        throw new Error(errorMessages || "Kesalahan validasi. Silakan periksa email yang Anda masukkan.");
+        throw new Error(errorMessages || getErrorMessage(errorData) || "Kesalahan validasi. Silakan periksa email yang Anda masukkan.");
       }
 
       if (status === 500) {
-        throw new Error(errorData.message || "Gagal mengirim email reset password. Silakan coba lagi nanti.");
+        throw new Error(getErrorMessage(errorData) || "Gagal mengirim email reset password. Silakan coba lagi nanti.");
       }
 
-      throw new Error(errorData.message || "Gagal mengirim email reset password. Silakan coba lagi.");
+      throw new Error(getErrorMessage(errorData) || "Gagal mengirim email reset password. Silakan coba lagi.");
     }
 
     if (error instanceof Error) {
