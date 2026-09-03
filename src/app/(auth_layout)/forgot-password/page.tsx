@@ -5,7 +5,7 @@ import Image from "next/image";
 
 const ForgotPassword = () => {
   return (
-    <div className="mx-auto min-h-screen w-full min-w-[360px] max-w-[440px] relative flex flex-col overflow-hidden bg-[#EEF9F4]">
+    <div className="mx-auto min-h-screen w-full min-w-[360px] max-w-[440px] relative flex flex-col overflow-x-hidden bg-[#EEF9F4]">
       <HeaderLogin />
       
       {/* Konten utama */}

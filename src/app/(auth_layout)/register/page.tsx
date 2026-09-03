@@ -156,9 +156,9 @@ const Register = () => {
   // Show success message if registration was successful
   if (isSuccess) {
     return (
-      <div className="mx-auto min-h-screen w-full min-w-[360px] max-w-[440px] relative flex flex-col overflow-hidden bg-[#EEF9F4]">
+      <div className="mx-auto min-h-screen w-full min-w-[360px] max-w-[440px] relative flex flex-col overflow-x-hidden bg-[#EEF9F4]">
         <HeaderRegister />
-        <main className="px-6 pb-8 pt-6 flex-1 overflow-y-auto relative z-10">
+        <main className="px-6 pb-8 pt-6 flex-1 relative z-10">
           <div className="w-full max-w-sm mx-auto">
             <div className="text-center">
               <h1 className="text-3xl font-bold text-primary mb-6">Registrasi Berhasil!</h1>
@@ -186,9 +186,9 @@ const Register = () => {
   }
 
   return (
-    <div className="mx-auto min-h-screen w-full min-w-[360px] max-w-[440px] relative flex flex-col overflow-hidden bg-[#EEF9F4]">
+    <div className="mx-auto min-h-screen w-full min-w-[360px] max-w-[440px] relative flex flex-col overflow-x-hidden bg-[#EEF9F4]">
       <HeaderRegister />
-      <main className="px-6 pb-8 pt-6 flex-1 overflow-y-auto relative z-10">
+      <main className="px-6 pb-8 pt-6 flex-1 relative z-10">
         <div className="w-full max-w-sm mx-auto">
           <h1 className="text-3xl font-bold text-primary text-center mb-6">
             Registrasi
