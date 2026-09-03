@@ -68,7 +68,59 @@ interface OrderErrorResponse {
   status_code?: number;
   error?: string;
   message?: string;
+  detail?:
+    | string
+    | {
+        status_code?: number;
+        error?: string;
+        message?: string;
+      }
+    | Array<{
+        msg?: string;
+        message?: string;
+      }>;
 }
+
+export interface CheckoutOrderRequest {
+  notes?: string;
+  payment_method?: string;
+  subtotal?: number;
+  discount_total?: number;
+  final_total?: number;
+}
+
+export interface CheckoutOrderResponse {
+  status_code: number;
+  message: string;
+  data: {
+    id: string;
+    status: string;
+    total_price: number;
+    shipment_id?: string | null;
+    delivery_type: string;
+    notes?: string | null;
+    created_at: string;
+  };
+}
+
+const getOrderErrorMessage = (
+  errorData: OrderErrorResponse,
+  fallbackMessage: string
+) => {
+  if (errorData.message) return errorData.message;
+  if (typeof errorData.detail === "string") return errorData.detail;
+  if (errorData.detail && !Array.isArray(errorData.detail)) {
+    return errorData.detail.message || fallbackMessage;
+  }
+  if (Array.isArray(errorData.detail)) {
+    const messages = errorData.detail
+      .map((item) => item.msg || item.message)
+      .filter(Boolean)
+      .join(", ");
+    if (messages) return messages;
+  }
+  return fallbackMessage;
+};
 
 const normalizeTransactionStatus = (status: string): TransactionStatus => {
   const normalizedStatus = status.toLowerCase();
@@ -168,6 +220,39 @@ export const mapOrderDetailToTransaction = (
           }
         : undefined,
   };
+};
+
+export const checkoutOrder = async (
+  payload: CheckoutOrderRequest
+): Promise<CheckoutOrderResponse> => {
+  try {
+    const response = await apiClient.post<CheckoutOrderResponse>(
+      API_ENDPOINTS.ORDERS_CHECKOUT,
+      payload
+    );
+
+    if (
+      (response?.status_code === 200 || response?.status_code === 201) &&
+      response.data?.id
+    ) {
+      return response;
+    }
+
+    throw new Error(response?.message || "Gagal membuat pesanan.");
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response) {
+      const errorData = error.response.data as OrderErrorResponse;
+      throw new Error(
+        getOrderErrorMessage(errorData, "Gagal membuat pesanan.")
+      );
+    }
+
+    if (error instanceof Error) {
+      throw error;
+    }
+
+    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+  }
 };
 
 export const getMyOrders = async (): Promise<OrdersListResponse> => {

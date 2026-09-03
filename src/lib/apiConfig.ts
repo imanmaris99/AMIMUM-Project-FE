@@ -99,9 +99,13 @@ export const API_ENDPOINTS = {
   SHIPMENT_DELETE: (shipmentId: string) => `/shipment/delete/${shipmentId}`,
 
   // Orders
+  ORDERS_CHECKOUT: '/orders/checkout',
   ORDERS_MY_ORDERS: '/orders/my-orders',
   ORDERS_DETAIL: (orderId: string) => `/orders/detail/${orderId}`,
   ORDERS_COMPLETE_DETAILS: (orderId: string) => `/orders/complete-details/${orderId}`,
+
+  // Payments
+  PAYMENTS_CREATE: '/payments/create',
 
   // RajaOngkir
   RAJAONGKIR_PROVINCES: '/rajaongkir/provinces',
