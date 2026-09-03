@@ -3,6 +3,7 @@ import { LuContact, LuPhone, LuMapPin } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { ReceiverFormData } from "@/types/shipment";
 import { getMyShipmentAddresses } from "@/services/api/shipment-address";
+import RajaOngkirLocationFields from "@/components/profile/molecules/RajaOngkirLocationFields";
 import { toast } from "react-hot-toast";
 
 interface ReceiverFormProps {
@@ -105,20 +106,23 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+  const handleFieldChange = (field: keyof ReceiverFormData, value: string) => {
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [field]: value
     }));
     
-    // Clear error when user starts typing
-    if (errors[name as keyof ReceiverFormData]) {
+    if (errors[field]) {
       setErrors(prev => ({
         ...prev,
-        [name]: undefined
+        [field]: undefined
       }));
     }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    handleFieldChange(name as keyof ReceiverFormData, value);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -196,62 +200,20 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
         )}
       </div>
 
-      <div className="flex flex-col gap-2 relative">
-        <label htmlFor="province" className="text-[14px] font-semibold">Provinsi</label>
-        <LuMapPin className="text-xl absolute left-2 top-9 stroke-1" />
-        <input 
-          type="text" 
-          id="province" 
-          name="province" 
-          value={formData.province}
-          onChange={handleInputChange}
-          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
-            errors.province ? 'border-red-500' : 'border-gray-300'
-          }`}
-          placeholder="Jawa Tengah"
-        />
-        {errors.province && (
-          <p className="text-red-500 text-xs mt-1">{errors.province}</p>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-2 relative">
-        <label htmlFor="city" className="text-[14px] font-semibold">Kota/Kabupaten</label>
-        <LuMapPin className="text-xl absolute left-2 top-9 stroke-1" />
-        <input 
-          type="text" 
-          id="city" 
-          name="city" 
-          value={formData.city}
-          onChange={handleInputChange}
-          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
-            errors.city ? 'border-red-500' : 'border-gray-300'
-          }`}
-          placeholder="Wonogiri"
-        />
-        {errors.city && (
-          <p className="text-red-500 text-xs mt-1">{errors.city}</p>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-2 relative">
-        <label htmlFor="cityId" className="text-[14px] font-semibold">ID.Kota/Kabupaten</label>
-        <LuMapPin className="text-xl absolute left-2 top-9 stroke-1" />
-        <input 
-          type="text" 
-          id="cityId" 
-          name="cityId" 
-          value={formData.cityId}
-          onChange={handleInputChange}
-          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
-            errors.cityId ? 'border-red-500' : 'border-gray-300'
-          }`}
-          placeholder="123"
-        />
-        {errors.cityId && (
-          <p className="text-red-500 text-xs mt-1">{errors.cityId}</p>
-        )}
-      </div>
+      <RajaOngkirLocationFields
+        value={{
+          province: formData.province,
+          city: formData.city,
+          cityId: formData.cityId,
+          postalCode: formData.postalCode,
+        }}
+        onChange={(field, nextValue) => handleFieldChange(field, nextValue)}
+      />
+      {(errors.province || errors.city || errors.cityId) && (
+        <p className="text-red-500 text-xs mt-1">
+          {errors.province || errors.city || errors.cityId}
+        </p>
+      )}
 
       <div className="flex flex-col gap-2 relative">
         <label htmlFor="postalCode" className="text-[14px] font-semibold">Kode Pos</label>
@@ -261,11 +223,11 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
           id="postalCode" 
           name="postalCode" 
           value={formData.postalCode}
-          onChange={handleInputChange}
+          readOnly
           className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
             errors.postalCode ? 'border-red-500' : 'border-gray-300'
           }`}
-          placeholder="59191"
+          placeholder="Terisi otomatis setelah kota dipilih"
         />
         {errors.postalCode && (
           <p className="text-red-500 text-xs mt-1">{errors.postalCode}</p>

@@ -12,11 +12,12 @@ interface RajaOngkirLocationValue {
   province: string;
   city: string;
   cityId?: string;
+  postalCode?: string;
 }
 
 interface RajaOngkirLocationFieldsProps {
   value: RajaOngkirLocationValue;
-  onChange: (field: "province" | "city" | "cityId", nextValue: string) => void;
+  onChange: (field: "province" | "city" | "cityId" | "postalCode", nextValue: string) => void;
 }
 
 const normalizeAreaName = (value: string) =>
@@ -171,6 +172,7 @@ const RajaOngkirLocationFields: React.FC<RajaOngkirLocationFieldsProps> = ({
     onChange("province", matchedProvince?.province || "");
     onChange("city", "");
     onChange("cityId", "");
+    onChange("postalCode", "");
   };
 
   const handleCitySelect = (cityId: string) => {
@@ -178,6 +180,7 @@ const RajaOngkirLocationFields: React.FC<RajaOngkirLocationFieldsProps> = ({
 
     onChange("cityId", cityId);
     onChange("city", matchedCity?.city_name || "");
+    onChange("postalCode", matchedCity?.postal_code ? String(matchedCity.postal_code) : "");
   };
 
   return (
