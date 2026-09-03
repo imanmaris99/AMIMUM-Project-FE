@@ -518,6 +518,17 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       });
 
       const backendOrder = checkoutResponse.data;
+
+      if (isOnlinePayment) {
+        const paymentResponse = await createPayment({ order_id: backendOrder.id });
+        if (paymentResponse.data.redirect_url) {
+          await refreshCart();
+          toast.success('Pesanan dibuat. Mengalihkan ke halaman pembayaran.');
+          window.location.href = paymentResponse.data.redirect_url;
+          return;
+        }
+      }
+
       const newTransaction = addTransaction(
         {
           ...orderData,
@@ -531,15 +542,6 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
       if (!newTransaction) {
         throw new Error('Failed to create transaction');
-      }
-
-      if (isOnlinePayment) {
-        const paymentResponse = await createPayment({ order_id: backendOrder.id });
-        if (paymentResponse.data.redirect_url) {
-          toast.success('Pesanan dibuat. Mengalihkan ke halaman pembayaran.');
-          window.location.href = paymentResponse.data.redirect_url;
-          return;
-        }
       }
 
       await refreshCart();

@@ -34,14 +34,38 @@ interface PaymentErrorResponse {
       }>;
 }
 
+const PAYMENT_SERVICE_ERROR_MESSAGE =
+  "Layanan pembayaran online sementara belum tersedia. Silakan pilih metode COD/bayar di toko atau coba beberapa saat lagi.";
+
+const sanitizePaymentError = (message?: string): string | undefined => {
+  if (!message) return undefined;
+
+  const technicalMarkers = [
+    "Midtrans",
+    "snap",
+    "Konfigurasi",
+    "Bad Gateway",
+    "Internal Server Error",
+    "Unexpected error",
+    "502",
+    "503",
+  ];
+
+  if (technicalMarkers.some((marker) => message.includes(marker))) {
+    return PAYMENT_SERVICE_ERROR_MESSAGE;
+  }
+
+  return message;
+};
+
 const getPaymentErrorMessage = (
   errorData: PaymentErrorResponse,
   fallbackMessage: string
 ) => {
-  if (errorData.message) return errorData.message;
-  if (typeof errorData.detail === "string") return errorData.detail;
+  if (errorData.message) return sanitizePaymentError(errorData.message);
+  if (typeof errorData.detail === "string") return sanitizePaymentError(errorData.detail);
   if (errorData.detail && !Array.isArray(errorData.detail)) {
-    return errorData.detail.message || fallbackMessage;
+    return sanitizePaymentError(errorData.detail.message) || fallbackMessage;
   }
   if (Array.isArray(errorData.detail)) {
     const messages = errorData.detail
