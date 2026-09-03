@@ -356,10 +356,10 @@ const Login = () => {
   // Show success message if login was successful
   if (isSuccess) {
     return (
-      <div className="mx-auto max-w-[440px] min-w-[360px] h-screen relative flex flex-col overflow-hidden">
+      <div className="mx-auto min-h-screen w-full min-w-[360px] max-w-[440px] relative flex flex-col overflow-hidden bg-[#EEF9F4]">
         <HeaderLogin />
-        <div className="px-6 py-4 h-full flex flex-col relative z-10">
-          <div className="w-full max-w-sm mx-auto mt-20">
+        <main className="px-6 pb-8 pt-6 flex-1 overflow-y-auto relative z-10">
+          <div className="w-full max-w-sm mx-auto">
             <div className="text-center">
               <h1 className="text-3xl font-bold text-primary mb-6">Login Berhasil!</h1>
             </div>
@@ -380,18 +380,18 @@ const Login = () => {
               </p>
             </div>
           </div>
-        </div>
+        </main>
 
-        {/* Logo brand di bagian bawah */}
-        <div className="absolute bottom-0 right-0 w-[220px] h-[242px] transform rotate-[20deg] opacity-25 z-0">
+        {/* Logo brand dekoratif */}
+        <div className="pointer-events-none absolute bottom-8 right-[-18px] w-[180px] h-[198px] rotate-[20deg] opacity-15 z-0">
           <div className="relative w-full h-full">
-            <div className="absolute top-[49px] left-[1.75px] w-[200px] h-[200px] bg-[#B0D5C7] bg-opacity-25 rounded-full"></div>
-            <div className="relative z-10 w-[175px] h-[200px] mx-auto mt-[-4px]">
+            <div className="absolute top-[40px] left-[1px] w-[164px] h-[164px] bg-[#B0D5C7] bg-opacity-25 rounded-full"></div>
+            <div className="relative z-10 w-[144px] h-[164px] mx-auto mt-[-4px]">
               <Image
                 src="/logo_toko.svg"
                 alt="Logo Toko"
-                width={175}
-                height={200}
+                width={144}
+                height={164}
                 className="object-contain"
               />
             </div>
@@ -402,10 +402,10 @@ const Login = () => {
   }
 
   return (
-    <div className="mx-auto max-w-[440px] min-w-[360px] h-screen relative flex flex-col overflow-hidden">
+    <div className="mx-auto min-h-screen w-full min-w-[360px] max-w-[440px] relative flex flex-col overflow-hidden bg-[#EEF9F4]">
       <HeaderLogin />
-      <div className="px-6 py-4 h-full flex flex-col relative z-10">
-        <div className="w-full max-w-sm mx-auto mt-20">
+      <main className="px-6 pb-8 pt-6 flex-1 overflow-y-auto relative z-10">
+        <div className="w-full max-w-sm mx-auto">
           <h1 className="text-3xl font-bold text-primary text-center mb-6">
             Login
           </h1>
@@ -528,7 +528,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={isSubmitting || isLocked}
-              className="w-full bg-primary text-white py-3 rounded font-medium hover:bg-primary/90 transition-colors mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-sm"
             >
               {isSubmitting ? (
                 <>
@@ -545,9 +545,9 @@ const Login = () => {
           </form>
 
           {/* Divider */}
-          <div className="flex items-center gap-4 my-4 mt-10">
+          <div className="flex items-center gap-3 my-5">
             <div className="flex-1 h-px bg-gray-300"></div>
-            <span className="text-slate-500 text-sm">atau Log In menggunakan</span>
+            <span className="text-slate-500 text-sm whitespace-nowrap">atau login dengan</span>
             <div className="flex-1 h-px bg-gray-300"></div>
           </div>
 
@@ -555,7 +555,7 @@ const Login = () => {
           <button
             onClick={handleGoogleLoginClick}
             disabled={isGoogleLoading}
-            className="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded font-medium hover:bg-gray-50 transition-colors mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
             <div className="flex items-center justify-center gap-2">
               {isGoogleLoading ? (
@@ -590,18 +590,18 @@ const Login = () => {
             </p>
           </div>
         </div>
-      </div>
+      </main>
 
-      {/* Logo brand di bagian bawah */}
-      <div className="absolute bottom-0 right-0 w-[220px] h-[242px] transform rotate-[20deg] opacity-25 z-0">
+      {/* Logo brand dekoratif */}
+      <div className="pointer-events-none absolute bottom-8 right-[-18px] w-[180px] h-[198px] rotate-[20deg] opacity-15 z-0">
         <div className="relative w-full h-full">
-          <div className="absolute top-[49px] left-[1.75px] w-[200px] h-[200px] bg-[#B0D5C7] bg-opacity-25 rounded-full"></div>
-          <div className="relative z-10 w-[175px] h-[200px] mx-auto mt-[-4px]">
+          <div className="absolute top-[40px] left-[1px] w-[164px] h-[164px] bg-[#B0D5C7] bg-opacity-25 rounded-full"></div>
+          <div className="relative z-10 w-[144px] h-[164px] mx-auto mt-[-4px]">
             <Image
               src="/logo_toko.svg"
               alt="Logo Toko"
-              width={175}
-              height={200}
+              width={144}
+              height={164}
               className="object-contain"
             />
           </div>
