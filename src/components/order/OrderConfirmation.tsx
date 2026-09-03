@@ -70,6 +70,50 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
     }
   };
 
+  if (!latestTransaction && !orderId) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-10">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={handleBackToHome}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label="Kembali ke beranda"
+            >
+              <GoHome className="w-6 h-6 text-gray-600" />
+            </button>
+            <h1 className="text-lg font-semibold text-gray-900">Konfirmasi Pesanan</h1>
+            <div className="w-10" />
+          </div>
+        </div>
+
+        <div className="max-w-sm mx-auto bg-white min-h-screen px-4 py-10 text-center">
+          <div className="w-20 h-20 bg-yellow-50 rounded-full mx-auto flex items-center justify-center mb-5">
+            <GoPackage className="w-10 h-10 text-yellow-600" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">
+            Belum Ada Pesanan Baru
+          </h2>
+          <p className="text-sm text-gray-600 mb-6">
+            Halaman ini akan menampilkan detail setelah checkout berhasil.
+          </p>
+          <button
+            onClick={() => router.push('/cart')}
+            className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-[#005A3C] transition-colors mb-3"
+          >
+            Lihat Keranjang
+          </button>
+          <button
+            onClick={handleBackToHome}
+            className="w-full text-primary py-3 px-4 rounded-lg font-medium hover:bg-primary/5 transition-colors"
+          >
+            Kembali ke Beranda
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
