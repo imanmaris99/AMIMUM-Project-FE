@@ -245,7 +245,7 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
     }));
   }, [initialData]);
 
-  const validateForm = (): boolean => {
+  const getPackageInputErrors = (): {[key: string]: string} => {
     const newErrors: {[key: string]: string} = {};
 
     if (!formData.courier.trim()) {
@@ -268,6 +268,30 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
       newErrors.height = "Tinggi paket harus diisi dan lebih dari 0";
     }
 
+    return newErrors;
+  };
+
+  const validatePackageInputs = (): boolean => {
+    const newErrors = getPackageInputErrors();
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors = getPackageInputErrors();
+
+    if (!formData.serviceType.trim() || !selectedService) {
+      newErrors.serviceType = "Pilih layanan pengiriman setelah kalkulasi ongkir";
+    }
+
+    if (!formData.cost || formData.cost <= 0) {
+      newErrors.cost = "Biaya kirim belum valid. Kalkulasi ongkir terlebih dahulu";
+    }
+
+    if (!formData.estimatedDelivery.trim()) {
+      newErrors.estimatedDelivery = "Estimasi pengiriman belum tersedia";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -280,6 +304,17 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
         ? Number(value) || 0 
         : value
     }));
+
+    if (name === 'courier' || name === 'weight' || name === 'length' || name === 'width' || name === 'height') {
+      setSelectedService("");
+      setAvailableServices([]);
+      setFormData(prev => ({
+        ...prev,
+        serviceType: "",
+        cost: 0,
+        estimatedDelivery: "",
+      }));
+    }
     
     // Clear error when user starts typing
     if (errors[name]) {
@@ -310,7 +345,7 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
   };
 
   const handleCalculate = async () => {
-    if (!validateForm()) {
+    if (!validatePackageInputs()) {
       return;
     }
 
@@ -330,6 +365,18 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
       });
 
       setAvailableServices(response.details);
+
+      if (response.details.length === 0) {
+        toast.error("Layanan pengiriman tidak tersedia untuk rute ini.");
+        setSelectedService("");
+        setFormData((prev) => ({
+          ...prev,
+          serviceType: "",
+          cost: 0,
+          estimatedDelivery: "",
+        }));
+        return;
+      }
 
       const firstService = response.details[0];
       setFormData((prev) => ({
@@ -402,6 +449,11 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
           estimatedDelivery={formData.estimatedDelivery}
           serviceType={formData.serviceType}
         />
+        {(errors.serviceType || errors.cost || errors.estimatedDelivery) && (
+          <p className="text-red-500 text-xs">
+            {errors.serviceType || errors.cost || errors.estimatedDelivery}
+          </p>
+        )}
       </div>
       <div className="flex justify-center items-center gap-2">
         <Button 
@@ -413,7 +465,7 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
         </Button>
         <Button 
           type="submit" 
-          disabled={isLoading}
+          disabled={isLoading || isCalculating || !selectedService || formData.cost <= 0}
           className="bg-primary text-white px-4 py-2 rounded-lg w-48 mt-10 h-14 text-lg disabled:opacity-50"
         >
           {isLoading ? "Menyimpan..." : "Simpan"}

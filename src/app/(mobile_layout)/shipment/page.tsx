@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GoChevronLeft } from "react-icons/go";
 import { BsTrash } from "react-icons/bs";
@@ -16,6 +16,34 @@ import {
   ShipmentListItem,
 } from "@/services/api/shipment";
 import { toast } from "react-hot-toast";
+
+const mapShipmentToViewModel = (shipment: ShipmentListItem): ShipmentData => ({
+  id: shipment.id,
+  address: {
+    id: shipment.my_address.id,
+    name: shipment.my_address.name,
+    phone: shipment.my_address.phone,
+    address: shipment.my_address.address,
+    city: shipment.my_address.city,
+    city_id: shipment.my_address.city_id,
+    state: shipment.my_address.state,
+    country: shipment.my_address.country,
+    zip_code: shipment.my_address.zip_code,
+    created_at: shipment.my_address.created_at || shipment.created_at,
+  },
+  courier: {
+    id: shipment.my_courier.id,
+    courier_name: shipment.my_courier.courier_name,
+    weight: shipment.my_courier.weight,
+    service_type: shipment.my_courier.service_type,
+    cost: shipment.my_courier.cost,
+    estimated_delivery: shipment.my_courier.estimated_delivery,
+    is_active: shipment.is_active,
+    created_at: shipment.my_courier.created_at || shipment.created_at,
+  },
+  is_active: shipment.is_active,
+  created_at: shipment.created_at,
+});
 
 const ShipmentSkeleton = () => (
   <div className="flex flex-col justify-between min-h-screen animate-pulse">
@@ -58,43 +86,19 @@ const Shipment = () => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  const mapShipmentToViewModel = (shipment: ShipmentListItem): ShipmentData => ({
-    id: shipment.id,
-    address: {
-      id: shipment.my_address.id,
-      name: shipment.my_address.name,
-      phone: shipment.my_address.phone,
-      address: shipment.my_address.address,
-      city: shipment.my_address.city,
-      city_id: shipment.my_address.city_id,
-      state: shipment.my_address.state,
-      country: shipment.my_address.country,
-      zip_code: shipment.my_address.zip_code,
-      created_at: shipment.my_address.created_at || shipment.created_at,
-    },
-    courier: {
-      id: shipment.my_courier.id,
-      courier_name: shipment.my_courier.courier_name,
-      weight: shipment.my_courier.weight,
-      service_type: shipment.my_courier.service_type,
-      cost: shipment.my_courier.cost,
-      estimated_delivery: shipment.my_courier.estimated_delivery,
-      is_active: shipment.is_active,
-      created_at: shipment.my_courier.created_at || shipment.created_at,
-    },
-    is_active: shipment.is_active,
-    created_at: shipment.created_at,
-  });
+  const refreshShipments = useCallback(async () => {
+    const response = await getMyShipments();
+    const mappedShipments = response.data.map(mapShipmentToViewModel);
+
+    setShipments(mappedShipments);
+    setActiveStates(mappedShipments.map((shipment) => shipment.is_active));
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const response = await getMyShipments();
-        const mappedShipments = response.data.map(mapShipmentToViewModel);
-
-        setShipments(mappedShipments);
-        setActiveStates(mappedShipments.map((shipment) => shipment.is_active));
+        await refreshShipments();
       } catch (error) {
         toast.error(
           error instanceof Error
@@ -109,7 +113,7 @@ const Shipment = () => {
     };
 
     loadData();
-  }, []);
+  }, [refreshShipments]);
 
   // Handle success message dari create/edit page
   useEffect(() => {
@@ -186,16 +190,13 @@ const Shipment = () => {
         const deletedIndex = shipments.findIndex((shipment) => shipment.id === shipmentId);
         const wasActive = activeStates[deletedIndex];
 
-        setShipments((prev) => prev.filter((shipment) => shipment.id !== shipmentId));
-        setActiveStates((prev) => {
-          const nextStates = prev.filter((_, index) => index !== deletedIndex);
+        const remainingShipments = shipments.filter((shipment) => shipment.id !== shipmentId);
 
-          if (wasActive && nextStates.length > 0 && !nextStates.some(Boolean)) {
-            nextStates[0] = true;
-          }
+        if (wasActive && remainingShipments.length > 0) {
+          await activateShipment(remainingShipments[0].id, true);
+        }
 
-          return nextStates;
-        });
+        await refreshShipments();
 
         toast.success("Data pengiriman berhasil dihapus.");
       } catch (error) {
@@ -237,8 +238,8 @@ const Shipment = () => {
           <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
         </div>
         <div className="text-center">
-          <h1 className="text-[16px] font-semibold">Alamat Pengirimanku</h1>
-          <p className="text-xs text-gray-500 mt-1">Pilih 1 alamat sebagai alamat utama</p>
+          <h1 className="text-[16px] font-semibold">Alamat Pengiriman</h1>
+          <p className="text-xs text-gray-500 mt-1">Pilih 1 alamat aktif untuk checkout delivery</p>
         </div>
       </div>
 
