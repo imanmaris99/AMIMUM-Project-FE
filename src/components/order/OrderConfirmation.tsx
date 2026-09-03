@@ -151,7 +151,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
           
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
             <p className="text-sm text-green-800 font-medium">
-              ID Pesanan: {latestTransaction?.transactionId || orderId || "ORD-2024-001"}
+              ID Pesanan: {latestTransaction?.transactionId || orderId}
             </p>
             <p className="text-xs text-green-600 mt-1">
               Simpan ID ini untuk melacak pesanan Anda
