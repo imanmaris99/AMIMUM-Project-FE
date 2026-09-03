@@ -88,7 +88,7 @@ const StatusOrder: React.FC<StatusOrderProps> = ({ currentStatus = 0, deliveryTy
       <div className="space-y-6">
         {/* Title */}
         <h3 className="text-lg font-semibold text-[#0D0E09]">
-          Status Order
+          Status Pesanan
         </h3>
         
         {/* Status List */}

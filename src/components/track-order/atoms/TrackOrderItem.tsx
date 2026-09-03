@@ -41,7 +41,7 @@ const TrackOrderItem: React.FC<TrackOrderItemProps> = ({
           </span>
           <span className="text-xs text-[#C4C4C4] mx-2">•</span>
           <span className="text-xs text-[#C4C4C4]">
-            Size: {item.size}
+            Pengiriman: {item.size}
           </span>
           <span className="text-xs text-[#C4C4C4] mx-2">•</span>
           <span className="text-xs text-[#C4C4C4]">

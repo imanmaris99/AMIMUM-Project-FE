@@ -133,11 +133,12 @@ const TrackOrderPage: React.FC = () => {
     switch (status) {
       case "pending":
         return {
-          text: "Menunggu Pembayaran",
+          text: "Menunggu Bayar",
           color: "text-yellow-600",
           bgColor: "bg-yellow-100",
         };
       case "processing":
+      case "capture":
         return {
           text: "Diproses",
           color: "text-blue-600",
@@ -157,8 +158,12 @@ const TrackOrderPage: React.FC = () => {
           bgColor: "bg-green-100",
         };
       case "cancelled":
+      case "failed":
+      case "expire":
+      case "cancel":
+      case "deny":
         return {
-          text: "Batal",
+          text: "Pembayaran Gagal",
           color: "text-red-600",
           bgColor: "bg-red-100",
         };
@@ -182,6 +187,7 @@ const TrackOrderPage: React.FC = () => {
       case "pending":
         return -1;
       case "processing":
+      case "capture":
         return 0;
       case "shipped":
         return deliveryType === "pickup" ? 1 : 2;
@@ -189,10 +195,14 @@ const TrackOrderPage: React.FC = () => {
       case "completed":
         return deliveryType === "pickup" ? 2 : 3;
       case "cancelled":
+      case "failed":
+      case "expire":
+      case "cancel":
+      case "deny":
       case "refund":
         return -1;
       default:
-        return 0;
+        return -1;
     }
   };
 
@@ -201,7 +211,7 @@ const TrackOrderPage: React.FC = () => {
       <div className="min-h-screen bg-gray-100">
         <UnifiedHeader
           type="secondary"
-          title="Track Order"
+          title="Lacak Pesanan"
           subtitle="Lacak status pesanan Anda"
           showBackButton={true}
           onBack={handleBack}

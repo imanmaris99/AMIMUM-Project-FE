@@ -60,7 +60,7 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
           {/* No. Resi */}
           <div className="flex justify-between items-center">
             <span className="text-sm text-[#A2A2A2]">
-              No. Resi
+              ID Pengiriman
             </span>
             <span className="text-sm font-medium text-[#0D0E09]">
               {trackingNumber}
