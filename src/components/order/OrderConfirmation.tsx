@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { GoCheckCircle, GoHome, GoPackage, GoCreditCard, GoLocation } from 'react-icons/go';
 import { IoCheckmarkCircle } from 'react-icons/io5';
 import { useTransaction } from '@/contexts/TransactionContext';
@@ -20,33 +20,56 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
   onBack 
 }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { transactions } = useTransaction();
   const [latestTransaction, setLatestTransaction] = useState<Transaction | null>(null);
+  const confirmationTransactionId = searchParams?.get('transactionId') || orderId;
 
-  // Get the latest transaction
+  // Show only a confirmed checkout context; avoid displaying a success state for direct visits.
   useEffect(() => {
+    if (confirmationTransactionId) {
+      const matchedTransaction = transactions.find(
+        (transaction) =>
+          transaction.id === confirmationTransactionId ||
+          transaction.transactionId === confirmationTransactionId
+      );
+
+      setLatestTransaction(matchedTransaction || null);
+      return;
+    }
+
     if (transactions.length > 0) {
       setLatestTransaction(transactions[0]); // First transaction is the latest
+      return;
     }
-  }, [transactions]);
+
+    setLatestTransaction(null);
+  }, [confirmationTransactionId, transactions]);
 
   const getStatusLabel = (status?: string) => {
     switch (status) {
       case 'pending':
-        return 'Menunggu Pembayaran';
+        return 'Menunggu Bayar';
       case 'processing':
+      case 'capture':
         return 'Pesanan Diproses';
       case 'shipped':
         return 'Dalam pengiriman';
       case 'delivered':
       case 'completed':
+      case 'settlement':
+      case 'paid':
         return 'Selesai';
       case 'cancelled':
-        return 'Batal';
+      case 'failed':
+      case 'expire':
+      case 'cancel':
+      case 'deny':
+        return 'Pembayaran Gagal';
       case 'refund':
         return 'Refund';
       default:
-        return 'Menunggu Pembayaran';
+        return 'Status belum tersedia';
     }
   };
 
@@ -70,7 +93,12 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
     }
   };
 
-  if (!latestTransaction && !orderId) {
+  const isPendingPayment = latestTransaction?.status === 'pending';
+  const isFailedPayment = ['cancelled', 'failed', 'expire', 'cancel', 'deny'].includes(
+    latestTransaction?.status || ''
+  );
+
+  if (!latestTransaction) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-10">
@@ -95,7 +123,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
             Belum Ada Pesanan Baru
           </h2>
           <p className="text-sm text-gray-600 mb-6">
-            Halaman ini akan menampilkan detail setelah checkout berhasil.
+            Halaman ini hanya menampilkan detail jika checkout berhasil dan data pesanan tersedia.
           </p>
           <button
             onClick={() => router.push('/cart')}
@@ -143,7 +171,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
           </div>
           
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Pesanan Berhasil!
+            {isPendingPayment ? 'Pesanan Dibuat' : 'Pesanan Berhasil Dicatat'}
           </h2>
           <p className="text-gray-600 mb-4">
             Terima kasih telah berbelanja di Amimum Herbal Store
@@ -218,19 +246,23 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
               </div>
               <div>
                 <p className="font-medium text-gray-900">
-                  {latestTransaction?.status === 'pending'
+                  {isPendingPayment
                     ? 'Menunggu Pembayaran'
-                    : 'Pembayaran Tersimulasi'}
+                    : isFailedPayment
+                      ? 'Pembayaran Perlu Diulang'
+                      : 'Pesanan Sudah Masuk Sistem'}
                 </p>
                 <p className="text-sm text-gray-600">
-                  {latestTransaction?.status === 'pending'
-                    ? `Silakan selesaikan pembayaran ${getPaymentMethodLabel(latestTransaction?.paymentMethod).toLowerCase()} untuk melanjutkan pesanan`
-                    : 'Pesanan sudah tercatat menggunakan data checkout terbaru tanpa pembayaran real'}
+                  {isPendingPayment
+                    ? `Silakan selesaikan pembayaran ${getPaymentMethodLabel(latestTransaction?.paymentMethod).toLowerCase()} untuk melanjutkan pesanan.`
+                    : isFailedPayment
+                      ? 'Silakan cek riwayat transaksi untuk mencoba pembayaran ulang jika tersedia.'
+                      : 'Pesanan sudah tercatat dan bisa dipantau dari halaman transaksi.'}
                 </p>
               </div>
             </div>
             
-            {latestTransaction?.status === 'pending' && (
+            {isPendingPayment && (
               <div className="flex items-start space-x-3">
                 <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <GoPackage className="w-4 h-4 text-orange-600" />
@@ -244,7 +276,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
               </div>
             )}
 
-            {latestTransaction?.status !== 'pending' && latestTransaction?.deliveryType === 'delivery' && (
+            {!isPendingPayment && !isFailedPayment && latestTransaction?.deliveryType === 'delivery' && (
               <div className="flex items-start space-x-3">
                 <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <GoPackage className="w-4 h-4 text-orange-600" />
@@ -260,7 +292,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
               </div>
             )}
 
-            {latestTransaction?.status !== 'pending' && latestTransaction?.deliveryType === 'pickup' && (
+            {!isPendingPayment && !isFailedPayment && latestTransaction?.deliveryType === 'pickup' && (
               <div className="flex items-start space-x-3">
                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <GoLocation className="w-4 h-4 text-green-600" />

@@ -469,7 +469,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         localStorage.removeItem('directCheckoutItem');
         toast.success('Pesanan berhasil dibuat!');
         setTimeout(() => {
-          router.push('/order-confirmation');
+          router.push(`/order-confirmation?transactionId=${newTransaction.id}`);
         }, 500);
         return;
       }
@@ -552,7 +552,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       );
 
       setTimeout(() => {
-        router.push('/order-confirmation');
+        router.push(`/order-confirmation?transactionId=${newTransaction.id}`);
       }, 500);
       
     } catch (error) {
