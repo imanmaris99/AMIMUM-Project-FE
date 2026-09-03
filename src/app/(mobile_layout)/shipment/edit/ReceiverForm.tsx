@@ -223,7 +223,7 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
           id="postalCode" 
           name="postalCode" 
           value={formData.postalCode}
-          readOnly
+          onChange={handleInputChange}
           className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
             errors.postalCode ? 'border-red-500' : 'border-gray-300'
           }`}
