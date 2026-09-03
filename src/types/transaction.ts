@@ -4,6 +4,7 @@ export type TransactionStatus =
   | 'shipped'
   | 'delivered'
   | 'completed'
+  | 'failed'
   | 'cancelled'
   | 'refund';
 

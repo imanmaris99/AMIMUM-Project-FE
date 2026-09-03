@@ -106,6 +106,7 @@ export const API_ENDPOINTS = {
 
   // Payments
   PAYMENTS_CREATE: '/payments/create',
+  PAYMENTS_NOTIFICATIONS: '/payments/notifications',
 
   // RajaOngkir
   RAJAONGKIR_PROVINCES: '/rajaongkir/provinces',

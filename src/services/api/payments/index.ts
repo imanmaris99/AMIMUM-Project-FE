@@ -17,6 +17,20 @@ export interface CreatePaymentResponse {
   };
 }
 
+export interface SyncPaymentStatusRequest {
+  order_id: string;
+}
+
+export interface SyncPaymentStatusResponse {
+  status_code: number;
+  message: string;
+  data: {
+    order_id: string;
+    transaction_status: string;
+    fraud_status?: string | null;
+  };
+}
+
 interface PaymentErrorResponse {
   status_code?: number;
   error?: string;
@@ -99,6 +113,36 @@ export const createPayment = async (
       const errorData = error.response.data as PaymentErrorResponse;
       throw new Error(
         getPaymentErrorMessage(errorData, "Gagal membuat pembayaran.")
+      );
+    }
+
+    if (error instanceof Error) {
+      throw error;
+    }
+
+    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+  }
+};
+
+export const syncPaymentStatus = async (
+  payload: SyncPaymentStatusRequest
+): Promise<SyncPaymentStatusResponse> => {
+  try {
+    const response = await apiClient.post<SyncPaymentStatusResponse>(
+      API_ENDPOINTS.PAYMENTS_NOTIFICATIONS,
+      payload
+    );
+
+    if (response?.status_code === 200 && response.data?.order_id) {
+      return response;
+    }
+
+    throw new Error(response?.message || "Gagal menyinkronkan status pembayaran.");
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response) {
+      const errorData = error.response.data as PaymentErrorResponse;
+      throw new Error(
+        getPaymentErrorMessage(errorData, "Gagal menyinkronkan status pembayaran.")
       );
     }
 

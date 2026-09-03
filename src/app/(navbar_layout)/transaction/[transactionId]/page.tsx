@@ -13,6 +13,7 @@ import {
   getOrderDetail,
   mapOrderDetailToTransaction,
 } from "@/services/api/orders";
+import { createPayment, syncPaymentStatus } from "@/services/api/payments";
 import { useTransaction } from "@/contexts/TransactionContext";
 
 const TransactionDetailPage: React.FC = () => {
@@ -23,6 +24,7 @@ const TransactionDetailPage: React.FC = () => {
 
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPaymentActionLoading, setIsPaymentActionLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -137,11 +139,75 @@ const TransactionDetailPage: React.FC = () => {
     toast.success("Pembayaran berhasil disimulasikan.");
   };
 
+  const isLocalSimulatedTransaction = Boolean(
+    transaction?.id.startsWith("trans-") || transaction?.id.startsWith("ORD-")
+  );
+
+  const refreshOrderDetail = async () => {
+    if (!transaction || isLocalSimulatedTransaction) {
+      return;
+    }
+
+    const response = await getOrderDetail(transaction.id);
+    setTransaction(mapOrderDetailToTransaction(response.data));
+  };
+
+  const handlePayNow = async () => {
+    if (!transaction) {
+      return;
+    }
+
+    if (isLocalSimulatedTransaction) {
+      handleSimulatePayment();
+      return;
+    }
+
+    setIsPaymentActionLoading(true);
+    try {
+      const paymentResponse = await createPayment({ order_id: transaction.id });
+      if (paymentResponse.data.redirect_url) {
+        window.location.href = paymentResponse.data.redirect_url;
+        return;
+      }
+      toast.success("Pembayaran dibuat. Silakan cek status pesanan.");
+      await refreshOrderDetail();
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Gagal membuka pembayaran. Silakan coba lagi."
+      );
+    } finally {
+      setIsPaymentActionLoading(false);
+    }
+  };
+
+  const handleSyncPaymentStatus = async () => {
+    if (!transaction || isLocalSimulatedTransaction) {
+      return;
+    }
+
+    setIsPaymentActionLoading(true);
+    try {
+      await syncPaymentStatus({ order_id: transaction.id });
+      await refreshOrderDetail();
+      toast.success("Status pembayaran diperbarui.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Gagal memperbarui status pembayaran."
+      );
+    } finally {
+      setIsPaymentActionLoading(false);
+    }
+  };
+
   const getStatusConfig = (status: string) => {
     switch (status) {
       case "pending":
         return {
-          text: "Menunggu Pembayaran",
+          text: "Menunggu Bayar",
           bgColor: "bg-yellow-100",
           textColor: "text-yellow-700",
           borderColor: "border-yellow-200",
@@ -169,8 +235,9 @@ const TransactionDetailPage: React.FC = () => {
           borderColor: "border-green-200",
         };
       case "cancelled":
+      case "failed":
         return {
-          text: "Batal",
+          text: "Pembayaran Gagal",
           bgColor: "bg-red-100",
           textColor: "text-red-600",
           borderColor: "border-red-200",
@@ -240,6 +307,13 @@ const TransactionDetailPage: React.FC = () => {
   }
 
   const statusConfig = getStatusConfig(transaction.status);
+  const isPendingPayment = transaction.status === "pending";
+  const canRetryPayment = ["cancelled", "failed"].includes(transaction.status);
+  const isOfflinePayment = ["cod", "pay_at_store"].includes(
+    transaction.paymentMethod || ""
+  );
+  const shouldShowPaymentActions =
+    !isLocalSimulatedTransaction && !isOfflinePayment && (isPendingPayment || canRetryPayment);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -416,13 +490,32 @@ const TransactionDetailPage: React.FC = () => {
 
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <div className="space-y-3">
-              {transaction.status === "pending" && transaction.id.startsWith("trans-") && (
+              {isLocalSimulatedTransaction && isPendingPayment && (
                 <button
-                  onClick={handleSimulatePayment}
-                  className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                  onClick={handlePayNow}
+                  disabled={isPaymentActionLoading}
+                  className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   Simulasikan Pembayaran Berhasil
                 </button>
+              )}
+              {shouldShowPaymentActions && (
+                <>
+                  <button
+                    onClick={handlePayNow}
+                    disabled={isPaymentActionLoading}
+                    className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {canRetryPayment ? "Coba Bayar Lagi" : "Bayar Sekarang"}
+                  </button>
+                  <button
+                    onClick={handleSyncPaymentStatus}
+                    disabled={isPaymentActionLoading}
+                    className="w-full border border-primary text-primary py-3 px-4 rounded-lg font-medium hover:bg-primary/5 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Perbarui Status Pembayaran
+                  </button>
+                </>
               )}
               {transaction.deliveryType === "delivery" && (
                 <button

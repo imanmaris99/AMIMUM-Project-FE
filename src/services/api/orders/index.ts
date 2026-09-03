@@ -1,7 +1,7 @@
 import axios from "axios";
 import { apiClient } from "@/lib/axiosClient";
 import { API_ENDPOINTS } from "@/lib/apiConfig";
-import { Transaction, TransactionItem, TransactionStatus } from "@/types/transaction";
+import { Transaction, TransactionItem, TransactionPaymentMethod, TransactionStatus } from "@/types/transaction";
 
 export interface OrderListItemDto {
   id: string;
@@ -130,6 +130,7 @@ const normalizeTransactionStatus = (status: string): TransactionStatus => {
       return "pending";
     case "processing":
     case "process":
+    case "capture":
       return "processing";
     case "shipped":
     case "shipping":
@@ -142,6 +143,11 @@ const normalizeTransactionStatus = (status: string): TransactionStatus => {
       return "completed";
     case "cancelled":
     case "canceled":
+    case "cancel":
+    case "expire":
+    case "expired":
+    case "deny":
+    case "failed":
       return "cancelled";
     case "refund":
       return "refund";
@@ -159,6 +165,36 @@ const formatOrderDate = (value: string) =>
     minute: "2-digit",
     hour12: true,
   });
+
+const extractPaymentMethodFromNotes = (
+  notes?: string | null
+): TransactionPaymentMethod | undefined => {
+  const match = notes?.match(/\[PAYMENT:\s*([^\]]+)\]/i);
+  const paymentMethod = match?.[1]?.trim().toLowerCase();
+
+  if (!paymentMethod) return undefined;
+
+  const aliases: Record<string, TransactionPaymentMethod> = {
+    qris: "qris",
+    cod: "cod",
+    cash: "cod",
+    pay_at_store: "pay_at_store",
+    "pay at store": "pay_at_store",
+    bca_va: "bca_va",
+    mandiri_va: "mandiri_va",
+    bni_va: "bni_va",
+    bri_va: "bri_va",
+    bsi_va: "bsi_va",
+    permata_va: "permata_va",
+    gopay: "gopay",
+    ovo: "ovo",
+    dana: "dana",
+    alfamart: "alfamart",
+    indomaret: "indomaret",
+  };
+
+  return aliases[paymentMethod];
+};
 
 const mapOrderItems = (
   items: OrderListItemDto["order_item_lists"]
@@ -194,6 +230,7 @@ export const mapOrderSummaryToTransaction = (
     subtotal,
     shippingCost: order.shipping_cost || 0,
     deliveryType: order.delivery_type,
+    paymentMethod: extractPaymentMethodFromNotes(order.notes),
     notes: order.notes,
     shipmentId: order.shipment_id,
   };

@@ -203,7 +203,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
       return;
     }
 
-    const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+    const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'completed', 'failed', 'cancelled', 'refund'];
     if (!validStatuses.includes(status)) {
       ErrorHandler.handleError(new Error('Invalid status value'), 'TransactionUpdate');
       return;

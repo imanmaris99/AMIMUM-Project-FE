@@ -44,8 +44,9 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
           borderColor: 'border-green-200'
         };
       case 'cancelled':
+      case 'failed':
         return {
-          text: 'Batal',
+          text: 'Gagal',
           bgColor: 'bg-red-100',
           textColor: 'text-red-600',
           borderColor: 'border-red-200'
