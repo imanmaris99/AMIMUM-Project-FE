@@ -40,7 +40,7 @@ export const postVerifyAccount = async (
       data
     );
 
-    if (response.data.status_code === 0) {
+    if (response.data.status_code === 200 || response.data.status_code === 0) {
       toast.success(response.data.message || "Verifikasi berhasil! Akun Anda telah terverifikasi dan dapat digunakan untuk login!");
       
       setTimeout(() => {

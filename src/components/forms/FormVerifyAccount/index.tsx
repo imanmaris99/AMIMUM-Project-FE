@@ -41,11 +41,16 @@ const FormVerifyAccount = () => {
     [searchParams]
   );
 
+  const initialCode = React.useMemo(
+    () => searchParams?.get("code")?.trim() ?? "",
+    [searchParams]
+  );
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: initialEmail,
-      code: "",
+      code: initialCode,
     },
   });
 
@@ -53,7 +58,10 @@ const FormVerifyAccount = () => {
     if (initialEmail && form.getValues("email") !== initialEmail) {
       form.setValue("email", initialEmail, { shouldValidate: true });
     }
-  }, [form, initialEmail]);
+    if (initialCode && form.getValues("code") !== initialCode) {
+      form.setValue("code", initialCode, { shouldValidate: true });
+    }
+  }, [form, initialEmail, initialCode]);
 
   React.useEffect(() => {
     let interval: NodeJS.Timeout;
