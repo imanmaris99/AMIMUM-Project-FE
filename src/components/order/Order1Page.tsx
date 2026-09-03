@@ -311,11 +311,30 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     .find(company => company.id === selectedCourierCompany)
     ?.services.find(service => service.id === selectedCourierService);
 
+  const hasValidDeliverySelection =
+    deliveryMethod !== 'delivery' ||
+    Boolean(
+      selectedAddress?.city_id &&
+        storeAddress?.cityId &&
+        selectedCourierCompany &&
+        selectedCourierService &&
+        selectedCourierData &&
+        selectedCourierData.cost > 0
+    );
+
   // Use direct checkout item or cart items
   const currentItems =
     isDirectCheckout && directCheckoutItem
       ? [directCheckoutItem]
       : cartItems.filter((item) => item.is_active !== false);
+
+  const canSubmitOrder =
+    !isLoading &&
+    !isReferenceLoading &&
+    !isCourierLoading &&
+    currentItems.length > 0 &&
+    hasValidDeliverySelection &&
+    Boolean(selectedPaymentMethod);
   
   
   
@@ -379,17 +398,31 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
     
-    // Only require address for delivery method
     if (deliveryMethod === 'delivery' && !selectedAddress) {
       newErrors.address = 'Alamat pengiriman harus dipilih';
     }
+
+    if (deliveryMethod === 'delivery' && selectedAddress && !selectedAddress.city_id) {
+      newErrors.address = 'Kota alamat harus dipilih dari data RajaOngkir agar ongkir bisa dihitung';
+    }
+
+    if (deliveryMethod === 'delivery' && !storeAddress?.cityId) {
+      newErrors.address = 'Alamat toko belum memiliki kota RajaOngkir yang valid';
+    }
     
-    // Only require courier for delivery method
     if (
       deliveryMethod === 'delivery' &&
       (!selectedCourierCompany || !selectedCourierService)
     ) {
       newErrors.courier = 'Ekspedisi dan layanan pengiriman harus dipilih';
+    }
+
+    if (deliveryMethod === 'delivery' && selectedCourierService && !selectedCourierData) {
+      newErrors.courier = 'Layanan pengiriman belum valid. Pilih ulang layanan ongkir';
+    }
+
+    if (deliveryMethod === 'delivery' && selectedCourierData && selectedCourierData.cost <= 0) {
+      newErrors.courier = 'Biaya ongkir belum valid. Pilih layanan pengiriman lain';
     }
     
     if (currentItems.length === 0) {
@@ -479,7 +512,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
           throw new Error('Alamat dan layanan kurir belum lengkap.');
         }
 
-        await createShipment({
+        const shipmentResponse = await createShipment({
           address: {
             name: selectedAddress.name,
             phone: selectedAddress.phone,
@@ -501,6 +534,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             estimated_delivery: selectedCourierData.estimatedDelivery,
           },
         });
+
+        if (shipmentResponse.data?.shipment_id) {
+          await activateShipment(shipmentResponse.data.shipment_id, true);
+        }
       } else {
         const shipmentResponse = await getMyShipments();
         const activeShipments = shipmentResponse.data.filter((shipment) => shipment.is_active);
@@ -567,8 +604,11 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
   const handleAddressSelect = (address: AddressInfo) => {
     setSelectedAddress(address);
+    setSelectedCourierCompany('');
+    setSelectedCourierService('');
     setShowAddressSelector(false);
     clearError('address');
+    clearError('courier');
   };
 
   const handleAddNewAddress = () => {
@@ -837,6 +877,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
               selectedService={selectedCourierService}
               onCompanySelect={(companyId) => {
                 setSelectedCourierCompany(companyId);
+                setSelectedCourierService('');
                 clearError('courier');
               }}
               onServiceSelect={(serviceId) => {
@@ -1009,9 +1050,9 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         <div className="px-4 py-6 bg-white sticky bottom-0">
           <button
             onClick={handlePayment}
-            disabled={isLoading || currentItems.length === 0}
+            disabled={!canSubmitOrder}
             className={`w-full py-4 rounded-lg font-semibold text-lg transition-all ${
-              isLoading || currentItems.length === 0
+              !canSubmitOrder
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-primary text-white hover:bg-primary/90 active:scale-95'
             }`}
@@ -1030,6 +1071,16 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
           {currentItems.length === 0 && (
             <p className="text-center text-sm text-gray-500 mt-2">
               Keranjang kosong, tidak dapat melanjutkan pembayaran
+            </p>
+          )}
+          {deliveryMethod === 'delivery' && currentItems.length > 0 && !hasValidDeliverySelection && (
+            <p className="text-center text-sm text-gray-500 mt-2">
+              Pilih alamat RajaOngkir dan layanan ongkir terlebih dahulu.
+            </p>
+          )}
+          {currentItems.length > 0 && hasValidDeliverySelection && !selectedPaymentMethod && (
+            <p className="text-center text-sm text-gray-500 mt-2">
+              Pilih metode pembayaran terlebih dahulu.
             </p>
           )}
         </div>
