@@ -43,11 +43,6 @@ const FormForgotPassword = () => {
       if (response.status_code === 200) {
         setIsSuccess(true);
         toast.success(response.message || "Email reset password telah dikirim. Silakan cek email Anda.");
-        
-        // Auto redirect after 3 seconds
-        setTimeout(() => {
-          router.push("/login");
-        }, 3000);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Gagal mengirim email reset password. Silakan coba lagi.";
@@ -83,7 +78,7 @@ const FormForgotPassword = () => {
               Silakan periksa inbox dan ikuti instruksi yang diberikan.
             </p>
             <p className="text-green-600 text-xs mt-3">
-              Anda akan diarahkan ke halaman login dalam beberapa detik...
+              Klik tombol atau link reset password dari email agar kode otomatis terisi.
             </p>
           </CardContent>
         </Card>

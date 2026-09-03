@@ -49,11 +49,6 @@ const FormForgotPassword = () => {
           AUTH_FLOW_STORAGE_KEYS.resetEmail,
           normalizedEmail
         );
-        setTimeout(() => {
-          router.push(
-            `/reset-password?email=${encodeURIComponent(normalizedEmail)}`
-          );
-        }, 3000);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Gagal mengirim email reset password. Silakan coba lagi.";
@@ -89,7 +84,7 @@ const FormForgotPassword = () => {
               Buka link pada email untuk melanjutkan reset password.
             </p>
             <p className="text-green-600 text-xs mt-3">
-              Anda akan diarahkan otomatis dalam beberapa detik...
+              Klik tombol atau link reset password dari email agar kode otomatis terisi.
             </p>
           </CardContent>
         </Card>
