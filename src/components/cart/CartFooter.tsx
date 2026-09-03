@@ -13,11 +13,16 @@ interface CartFooterProps {
 
 export default function CartFooter({ onCheckout }: CartFooterProps) {
   const router = useRouter();
-  const { cartItems, totalPrices, updateAllActiveStatus } = useCart();
+  const { cartItems, totalPrices, updateAllActiveStatus, isLoading } = useCart();
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  // Calculate totals
+  // Calculate totals from active/selected items only.
   const total = totalPrices.total;
+  const activeItems = cartItems.filter((item) => item.is_active !== false);
+  const selectedItemCount = activeItems.reduce((sum, item) => sum + item.quantity, 0);
+  const hasSelectedItems = activeItems.length > 0;
+  const hasValidTotal = total > 0;
+  const canCheckout = !isLoading && hasSelectedItems && hasValidTotal;
   const allItemsSelected =
     cartItems.length > 0 && cartItems.every((item) => item.is_active !== false);
 
@@ -31,6 +36,18 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
   }, [cartItems.length, allItemsSelected, updateAllActiveStatus]);
 
   const handleCheckout = () => {
+    if (isLoading) {
+      return;
+    }
+
+    if (!hasSelectedItems) {
+      return;
+    }
+
+    if (!hasValidTotal) {
+      return;
+    }
+
     // Check if user is logged in using SessionManager
     const isLoggedIn = SessionManager.isAuthenticated();
     
@@ -56,7 +73,10 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
           <div className="flex items-center space-x-2">
             <button
               onClick={handleSelectAll}
-              className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all duration-200 ${
+              disabled={isLoading || cartItems.length === 0}
+              aria-pressed={allItemsSelected}
+              aria-label="Pilih semua produk"
+              className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${
                 allItemsSelected
                   ? 'border-primary bg-primary'
                   : 'border-gray-300 bg-white'
@@ -68,16 +88,23 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
                 </svg>
               )}
             </button>
-            <span className="text-gray-600 text-sm">All Item</span>
+            <span className="text-gray-600 text-sm">
+              {selectedItemCount > 0 ? `${selectedItemCount} dipilih` : 'Pilih item'}
+            </span>
           </div>
 
           {/* Checkout Button */}
           <button
             onClick={handleCheckout}
-            disabled={cartItems.length === 0 || total === 0}
+            disabled={!canCheckout}
+            aria-disabled={!canCheckout}
             className="bg-primary text-white px-6 py-3 rounded-full font-medium text-sm disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
-            Checkout ({rupiahFormater(total)})
+            {isLoading
+              ? 'Memuat...'
+              : hasSelectedItems
+                ? `Checkout (${rupiahFormater(total)})`
+                : 'Pilih item dulu'}
           </button>
         </div>
       </div>
