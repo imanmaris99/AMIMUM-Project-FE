@@ -19,6 +19,7 @@ export interface ForgotPasswordErrorResponse {
   error?: string;
   message?: string;
   detail?:
+    | string
     | {
         status_code?: number;
         error?: string;
@@ -31,9 +32,38 @@ export interface ForgotPasswordErrorResponse {
       }>;
 }
 
+const EMAIL_SERVICE_ERROR_MESSAGE =
+  "Layanan email sementara belum tersedia. Silakan coba beberapa saat lagi.";
+
+const sanitizeForgotPasswordError = (message?: string): string | undefined => {
+  if (!message) return undefined;
+
+  const technicalMarkers = [
+    "Brevo",
+    "unrecognised IP",
+    "unauthorized",
+    "Bad Gateway",
+    "Internal Server Error",
+    "Unexpected error occurred",
+    "SMTP",
+    "502",
+  ];
+
+  if (technicalMarkers.some((marker) => message.includes(marker))) {
+    return EMAIL_SERVICE_ERROR_MESSAGE;
+  }
+
+  return message;
+};
+
 const getErrorMessage = (errorData: ForgotPasswordErrorResponse): string | undefined => {
-  if (errorData.message) return errorData.message;
-  if (errorData.detail && !Array.isArray(errorData.detail)) return errorData.detail.message;
+  if (errorData.message) return sanitizeForgotPasswordError(errorData.message);
+  if (typeof errorData.detail === "string") {
+    return sanitizeForgotPasswordError(errorData.detail);
+  }
+  if (errorData.detail && !Array.isArray(errorData.detail)) {
+    return sanitizeForgotPasswordError(errorData.detail.message);
+  }
   return undefined;
 };
 
