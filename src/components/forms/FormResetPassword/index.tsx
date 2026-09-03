@@ -58,12 +58,16 @@ const FormResetPassword = () => {
       ),
     [searchParams]
   );
+  const initialCode = React.useMemo(
+    () => searchParams?.get("code")?.trim() ?? "",
+    [searchParams]
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: initialEmail,
-      code: "",
+      code: initialCode,
       new_password: "",
       confirm_password: "",
     },
@@ -73,7 +77,10 @@ const FormResetPassword = () => {
     if (initialEmail && form.getValues("email") !== initialEmail) {
       form.setValue("email", initialEmail, { shouldValidate: true });
     }
-  }, [form, initialEmail]);
+    if (initialCode && form.getValues("code") !== initialCode) {
+      form.setValue("code", initialCode, { shouldValidate: true });
+    }
+  }, [form, initialEmail, initialCode]);
 
   React.useEffect(() => {
     if (!isSuccess) {

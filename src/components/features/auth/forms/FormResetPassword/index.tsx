@@ -6,7 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Spinner from "@/components/ui/Spinner";
 import React from "react";
 import { postResetPassword } from "@/services/api/reset-password";
@@ -38,22 +38,40 @@ const formSchema = z
 
 const FormResetPassword = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
   const [apiError, setApiError] = React.useState<string | null>(null);
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const { login: handleGoogleLogin, isLoading: isGoogleLoading } = useGoogleLogin();
+  const initialEmail = React.useMemo(
+    () => searchParams?.get("email")?.trim().toLowerCase() ?? "",
+    [searchParams]
+  );
+  const initialCode = React.useMemo(
+    () => searchParams?.get("code")?.trim() ?? "",
+    [searchParams]
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      code: "",
+      email: initialEmail,
+      code: initialCode,
       new_password: "",
       confirm_password: "",
     },
   });
+
+  React.useEffect(() => {
+    if (initialEmail && form.getValues("email") !== initialEmail) {
+      form.setValue("email", initialEmail, { shouldValidate: true });
+    }
+    if (initialCode && form.getValues("code") !== initialCode) {
+      form.setValue("code", initialCode, { shouldValidate: true });
+    }
+  }, [form, initialEmail, initialCode]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
