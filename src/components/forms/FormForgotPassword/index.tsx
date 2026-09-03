@@ -70,25 +70,26 @@ const FormForgotPassword = () => {
 
   if (isSuccess) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-5 pt-2">
         <div className="text-center">
-          <h1 className="text-[#00764F] text-[38px] font-bold">Email Terkirim!</h1>
+          <h1 className="text-[#00764F] text-3xl font-bold leading-tight">Email Terkirim</h1>
+          <p className="mt-2 text-sm text-slate-500">Cek inbox atau folder spam email Anda.</p>
         </div>
         
-        <Card className="bg-green-50 border-green-200 rounded-[5px]">
-          <CardContent className="p-6 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <Card className="bg-green-50/90 border border-green-200 rounded-xl shadow-sm">
+          <CardContent className="px-5 py-6 text-center">
+            <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-green-800 mb-2">Permintaan Berhasil Dikirim</h3>
-            <p className="text-green-700 text-sm">
+            <h3 className="text-base font-semibold text-green-800 mb-2">Permintaan berhasil dikirim</h3>
+            <p className="text-green-700 text-sm leading-relaxed">
               Kami telah mengirimkan kode reset password ke email Anda.
-              Silakan periksa inbox lalu lanjutkan ke form reset password.
+              Buka link pada email untuk melanjutkan reset password.
             </p>
             <p className="text-green-600 text-xs mt-3">
-              Anda akan diarahkan ke halaman reset password dalam beberapa detik...
+              Anda akan diarahkan otomatis dalam beberapa detik...
             </p>
           </CardContent>
         </Card>
@@ -97,22 +98,23 @@ const FormForgotPassword = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 pt-2">
       <div className="text-center">
-        <h1 className="text-[#00764F] text-[38px] font-bold">Lupa Password</h1>
+        <h1 className="text-[#00764F] text-3xl font-bold leading-tight">Lupa Password</h1>
+        <p className="mt-2 text-sm text-slate-500">Masukkan email terdaftar untuk menerima link reset.</p>
       </div>
 
-      <Card className="bg-white bg-opacity-25 rounded-[5px] border-none">
-        <CardContent className="p-5">
-          <p className="text-[#828282] text-center text-sm leading-tight">
-            Kirim permintaan ganti passwordmu melalui email yang sudah terdaftar disini !!
+      <Card className="bg-white/70 rounded-xl border border-white/60 shadow-sm">
+        <CardContent className="px-5 py-4">
+          <p className="text-[#6B7280] text-center text-sm leading-relaxed">
+            Kami akan mengirimkan kode dan link reset password ke email Anda.
           </p>
         </CardContent>
       </Card>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-4 mt-20">
+          <div className="space-y-4 pt-3">
             {apiError && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
                 <p className="text-red-600 text-sm">{apiError}</p>
@@ -145,7 +147,7 @@ const FormForgotPassword = () => {
 
             <Button 
               type="submit" 
-              className="w-full h-10 bg-[#00764F] hover:bg-[#00764F]/90 text-white rounded-[4px] font-normal"
+              className="w-full h-11 bg-[#00764F] hover:bg-[#00764F]/90 text-white rounded-lg font-medium shadow-sm"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -161,16 +163,16 @@ const FormForgotPassword = () => {
         </form>
       </Form>
 
-      <div className="flex items-center gap-4 my-4 mt-6">
+      <div className="flex items-center gap-3 my-5">
         <div className="flex-1 h-px bg-gray-300"></div>
-        <span className="text-slate-500 text-sm">atau Log In menggunakan</span>
+        <span className="text-slate-500 text-sm whitespace-nowrap">atau login dengan</span>
         <div className="flex-1 h-px bg-gray-300"></div>
       </div>
 
       <button
         onClick={handleGoogleLogin}
         disabled={isGoogleLoading}
-        className="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded font-medium hover:bg-gray-50 transition-colors mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
       >
         <div className="flex items-center justify-center gap-2">
           {isGoogleLoading ? (
