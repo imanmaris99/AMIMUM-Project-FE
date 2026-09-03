@@ -21,6 +21,9 @@ interface CheckoutOrderData {
   shipment_id?: string;
   shipping_cost?: number;
   shipment_address?: TransactionShipmentAddress;
+  backend_order_id?: string;
+  backend_order_status?: TransactionStatus;
+  backend_created_at?: string;
 }
 
 interface TransactionContextType {
@@ -114,8 +117,10 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         return null;
       }
 
-      const transactionId = `ORD-${Date.now()}`;
-      const now = new Date();
+      const transactionId = orderData.backend_order_id || `ORD-${Date.now()}`;
+      const now = orderData.backend_created_at
+        ? new Date(orderData.backend_created_at)
+        : new Date();
       
       // Convert valid cart items to transaction items
       const transactionItems: TransactionItem[] = validCartItems.map((item: CartItemType) => ({
@@ -136,12 +141,12 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
       const shippingCost =
         orderData.delivery_type === "delivery" ? orderData.shipping_cost || 0 : 0;
       const finalAmount = subtotal + shippingCost;
-      const initialStatus: TransactionStatus = getInitialTransactionStatus(
-        orderData.payment_method
-      );
+      const initialStatus: TransactionStatus =
+        orderData.backend_order_status ||
+        getInitialTransactionStatus(orderData.payment_method);
 
       const newTransaction: Transaction = {
-        id: `trans-${Date.now()}`,
+        id: transactionId,
         transactionId: transactionId,
         date: now.toLocaleString('id-ID', {
           year: 'numeric',

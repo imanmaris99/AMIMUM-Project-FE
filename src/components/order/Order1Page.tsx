@@ -11,10 +11,13 @@ import ButtonSpinner from '@/components/ui/ButtonSpinner';
 import { useCart } from '@/contexts/CartContext';
 import { CartItemType } from '@/types/apiTypes';
 import { useTransaction } from '@/contexts/TransactionContext';
+import { checkoutOrder } from '@/services/api/orders';
+import { createPayment } from '@/services/api/payments';
+import { createShipment, activateShipment, getMyShipments } from '@/services/api/shipment';
 import CourierSelector from './CourierSelector';
 import AddressSelector from './AddressSelector';
 import { CourierCompany } from '@/types/shipment';
-import { TransactionPaymentMethod } from '@/types/transaction';
+import { TransactionPaymentMethod, TransactionStatus } from '@/types/transaction';
 import {
   getPaymentMethodGroups,
   requiresPendingPayment,
@@ -89,7 +92,7 @@ const resolveCityIdFromRajaOngkir = async (
 
 const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const router = useRouter();
-  const { cartItems, totalPrices, removeActiveItems } = useCart();
+  const { cartItems, totalPrices, refreshCart } = useCart();
   const { addTransaction } = useTransaction();
   
   // Direct checkout state
@@ -344,6 +347,34 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
   const totals = calculateTotals();
 
+  const normalizeBackendOrderStatus = (status?: string): TransactionStatus => {
+    switch ((status || '').toLowerCase()) {
+      case 'pending':
+        return 'pending';
+      case 'processing':
+      case 'process':
+        return 'processing';
+      case 'shipped':
+      case 'shipping':
+        return 'shipped';
+      case 'delivered':
+        return 'delivered';
+      case 'completed':
+      case 'settlement':
+      case 'paid':
+        return 'completed';
+      case 'cancelled':
+      case 'canceled':
+        return 'cancelled';
+      case 'refund':
+        return 'refund';
+      default:
+        return requiresPendingPayment(selectedPaymentMethod || undefined)
+          ? 'pending'
+          : 'processing';
+    }
+  };
+
   // Validation
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
@@ -401,13 +432,13 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     setIsLoading(true);
     
     try {
-      // Simulate API call - reduced time for better UX
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Create order data based on backend DTOs
+      const selectedPayment = selectedPaymentMethod as TransactionPaymentMethod;
+      const isOnlinePayment = requiresPendingPayment(selectedPayment);
+
+      // Create order data for local confirmation state.
       const orderData = {
         delivery_type: deliveryMethod,
-        payment_method: selectedPaymentMethod as TransactionPaymentMethod,
+        payment_method: selectedPayment,
         notes: additionalNotes || (deliveryMethod === 'pickup' ? 'Ambil di toko' : undefined),
         shipment_id: deliveryMethod === 'delivery' ? selectedCourierService : undefined,
         shipping_cost: deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0,
@@ -425,32 +456,99 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
               }
             : undefined,
       };
-      
-      
-      // Add transaction to context
-      const newTransaction = addTransaction(orderData, currentItems);
-      
+
+      // Direct checkout data is not guaranteed to exist as an active backend cart row.
+      // Keep it local until direct-checkout backend contract is added.
+      if (isDirectCheckout) {
+        const newTransaction = addTransaction(orderData, currentItems);
+
+        if (!newTransaction) {
+          throw new Error('Failed to create transaction');
+        }
+
+        localStorage.removeItem('directCheckoutItem');
+        toast.success('Pesanan berhasil dibuat!');
+        setTimeout(() => {
+          router.push('/order-confirmation');
+        }, 500);
+        return;
+      }
+
+      if (deliveryMethod === 'delivery') {
+        if (!selectedAddress?.city_id || !selectedCourierData) {
+          throw new Error('Alamat dan layanan kurir belum lengkap.');
+        }
+
+        await createShipment({
+          address: {
+            name: selectedAddress.name,
+            phone: selectedAddress.phone,
+            address: selectedAddress.address,
+            city: selectedAddress.city,
+            city_id: selectedAddress.city_id,
+            state: selectedAddress.state || '',
+            country: 'Indonesia',
+            zip_code: Number(selectedAddress.postal_code || 0),
+          },
+          courier: {
+            courier_name: selectedCourierCompany as 'jne' | 'pos' | 'tiki',
+            weight: selectedCourierData.weight || 1000,
+            length: 1,
+            width: 1,
+            height: 1,
+            service_type: selectedCourierData.serviceType,
+            cost: selectedCourierData.cost,
+            estimated_delivery: selectedCourierData.estimatedDelivery,
+          },
+        });
+      } else {
+        const shipmentResponse = await getMyShipments();
+        const activeShipments = shipmentResponse.data.filter((shipment) => shipment.is_active);
+        await Promise.all(
+          activeShipments.map((shipment) => activateShipment(shipment.id, false))
+        );
+      }
+
+      const checkoutResponse = await checkoutOrder({
+        notes: orderData.notes,
+        payment_method: selectedPayment,
+        subtotal: totals.subtotal,
+        discount_total: totals.discount,
+        final_total: totals.total,
+      });
+
+      const backendOrder = checkoutResponse.data;
+      const newTransaction = addTransaction(
+        {
+          ...orderData,
+          shipment_id: backendOrder.shipment_id || orderData.shipment_id,
+          backend_order_id: backendOrder.id,
+          backend_order_status: normalizeBackendOrderStatus(backendOrder.status),
+          backend_created_at: backendOrder.created_at,
+        },
+        currentItems
+      );
+
       if (!newTransaction) {
         throw new Error('Failed to create transaction');
       }
-      
-      
-      // Remove only active items from cart after successful payment
-      if (!isDirectCheckout) {
-        await removeActiveItems();
-      } else {
-        // Clear direct checkout item from localStorage
-        localStorage.removeItem('directCheckoutItem');
+
+      if (isOnlinePayment) {
+        const paymentResponse = await createPayment({ order_id: backendOrder.id });
+        if (paymentResponse.data.redirect_url) {
+          toast.success('Pesanan dibuat. Mengalihkan ke halaman pembayaran.');
+          window.location.href = paymentResponse.data.redirect_url;
+          return;
+        }
       }
-      
-      // Show success message and navigate immediately
+
+      await refreshCart();
       toast.success(
-        requiresPendingPayment(selectedPaymentMethod || undefined)
+        isOnlinePayment
           ? 'Pesanan berhasil dibuat. Menunggu pembayaran.'
           : 'Pesanan berhasil dibuat!'
       );
-      
-      // Navigate after a short delay to ensure toast is visible
+
       setTimeout(() => {
         router.push('/order-confirmation');
       }, 500);
