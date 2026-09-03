@@ -5,26 +5,26 @@ import Image from "next/image";
 
 const VerifyAccount = () => {
   return (
-    <div className="mx-auto max-w-[440px] min-w-[360px] h-screen relative flex flex-col overflow-hidden">
+    <div className="mx-auto min-h-screen w-full min-w-[360px] max-w-[440px] relative flex flex-col overflow-x-hidden bg-[#EEF9F4]">
       <HeaderLogin />
       
       {/* Konten utama */}
-      <div className="px-6 py-4 h-full flex flex-col">
-        <div className="w-full max-w-sm mx-auto mt-8">
+      <main className="px-6 pb-8 pt-6 flex-1 relative z-10">
+        <div className="w-full max-w-sm mx-auto">
           <FormVerifyAccount />
         </div>
-      </div>
+      </main>
 
-      {/* Logo brand di bagian bawah */}
-      <div className="absolute bottom-0 right-0 w-[220px] h-[242px] transform rotate-[20deg] opacity-25">
+      {/* Logo brand dekoratif */}
+      <div className="pointer-events-none absolute bottom-8 right-[-18px] w-[180px] h-[198px] rotate-[20deg] opacity-15 z-0">
         <div className="relative w-full h-full">
-          <div className="absolute top-[49px] left-[1.75px] w-[200px] h-[200px] bg-[#B0D5C7] bg-opacity-25 rounded-full"></div>
-          <div className="relative z-10 w-[175px] h-[200px] mx-auto mt-[-4px]">
+          <div className="absolute top-[40px] left-[1px] w-[164px] h-[164px] bg-[#B0D5C7] bg-opacity-25 rounded-full"></div>
+          <div className="relative z-10 w-[144px] h-[164px] mx-auto mt-[-4px]">
             <Image
               src="/logo_toko.svg"
               alt="Logo Toko"
-              width={175}
-              height={200}
+              width={144}
+              height={164}
               className="object-contain"
             />
           </div>

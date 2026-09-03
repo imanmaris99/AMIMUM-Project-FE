@@ -135,23 +135,20 @@ const FormVerifyAccount = () => {
   }, [form]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 pt-2">
       {/* Judul Verifikasi Akun */}
       <div className="text-center">
-        <h1 className="text-[#00764F] text-[38px] font-bold">Verifikasi Akun</h1>
+        <h1 className="text-[#00764F] text-3xl font-bold leading-tight">Verifikasi Akun</h1>
+        <p className="mt-2 text-sm text-slate-500">Masukkan kode yang dikirim ke email Anda.</p>
       </div>
 
       {/* Card informasi */}
-      <Card className="bg-white bg-opacity-25 rounded-[5px] border-none">
-        <CardContent className="p-5">
+      <Card className="bg-white/70 rounded-xl border border-white/60 shadow-sm">
+        <CardContent className="px-5 py-4">
           <div className="space-y-1">
-            <p className="text-[#828282] text-center text-sm leading-tight">
-              Melakukan Verifikasi Akun, dengan melengkapi dua isian dibawah :
+            <p className="text-[#6B7280] text-center text-sm leading-relaxed">
+              Lengkapi email dan kode verifikasi untuk mengaktifkan akun.
             </p>
-            <div className="pt-2 space-y-1">
-              <p className="text-[#828282] text-sm">• Email yang sudah didaftarkan</p>
-              <p className="text-[#828282] text-sm">• Kode verifikasi yang sudah terkirim ke email terdaftar</p>
-            </div>
           </div>
         </CardContent>
       </Card>
@@ -225,7 +222,7 @@ const FormVerifyAccount = () => {
             {/* Submit Button */}
             <Button 
               type="submit" 
-              className="w-full h-10 bg-[#00764F] hover:bg-[#00764F]/90 text-white rounded-[4px] font-normal"
+              className="w-full h-11 bg-[#00764F] hover:bg-[#00764F]/90 text-white rounded-lg font-medium shadow-sm"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -242,9 +239,9 @@ const FormVerifyAccount = () => {
       </Form>
 
       {/* Divider */}
-      <div className="flex items-center gap-4 my-4 mt-6">
+      <div className="flex items-center gap-3 my-5">
         <div className="flex-1 h-px bg-gray-300"></div>
-        <span className="text-slate-500 text-sm">atau Log In menggunakan</span>
+        <span className="text-slate-500 text-sm whitespace-nowrap">atau login dengan</span>
         <div className="flex-1 h-px bg-gray-300"></div>
       </div>
 
@@ -252,7 +249,7 @@ const FormVerifyAccount = () => {
       <button
         onClick={handleGoogleLogin}
         disabled={isGoogleLoading}
-        className="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded font-medium hover:bg-gray-50 transition-colors mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
       >
         <div className="flex items-center justify-center gap-2">
           {isGoogleLoading ? (

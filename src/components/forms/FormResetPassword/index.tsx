@@ -137,14 +137,15 @@ const FormResetPassword = () => {
   // Show success message if request was successful
   if (isSuccess) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-5 pt-2">
         <div className="text-center">
-          <h1 className="text-[#00764F] text-[38px] font-bold">Password Berhasil Direset!</h1>
+          <h1 className="text-[#00764F] text-3xl font-bold leading-tight">Password Berhasil</h1>
+          <p className="mt-2 text-sm text-slate-500">Silakan login dengan password baru Anda.</p>
         </div>
 
-        <Card className="bg-green-50 border-green-200 rounded-[5px]">
-          <CardContent className="p-6 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <Card className="bg-green-50/90 border border-green-200 rounded-xl shadow-sm">
+          <CardContent className="px-5 py-6 text-center">
+            <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="w-8 h-8 text-green-600"
                 fill="none"
@@ -173,19 +174,20 @@ const FormResetPassword = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 pt-2">
       {/* Judul Reset Password */}
       <div className="text-center">
-        <h1 className="text-[#00764F] text-[38px] font-bold">Reset Password</h1>
+        <h1 className="text-[#00764F] text-3xl font-bold leading-tight">Reset Password</h1>
+        <p className="mt-2 text-sm text-slate-500">Masukkan kode dari email dan password baru.</p>
       </div>
 
       {/* Card informasi */}
-      <Card className="bg-white bg-opacity-25 rounded-[5px] border-none">
-        <CardContent className="p-5">
-          <p className="text-[#828282] text-center text-sm leading-tight mb-3">
-            Masukkan email, kode verifikasi dari email, dan password baru Anda.
+      <Card className="bg-white/70 rounded-xl border border-white/60 shadow-sm">
+        <CardContent className="px-5 py-4">
+          <p className="text-[#6B7280] text-center text-sm leading-relaxed mb-3">
+            Pastikan password baru mudah diingat dan tetap aman.
           </p>
-          <div className="bg-blue-50 border border-blue-200 rounded p-3">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-blue-800 text-xs font-medium mb-1">Kriteria Password:</p>
             <ul className="text-blue-700 text-xs space-y-1">
               <li>• Minimal 8 karakter</li>
@@ -335,7 +337,7 @@ const FormResetPassword = () => {
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full h-10 bg-[#00764F] hover:bg-[#00764F]/90 text-white rounded-[4px] font-normal"
+              className="w-full h-11 bg-[#00764F] hover:bg-[#00764F]/90 text-white rounded-lg font-medium shadow-sm"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -356,9 +358,9 @@ const FormResetPassword = () => {
       </Form>
 
       {/* Divider */}
-      <div className="flex items-center gap-4 my-4 mt-6">
+      <div className="flex items-center gap-3 my-5">
         <div className="flex-1 h-px bg-gray-300"></div>
-        <span className="text-slate-500 text-sm">atau Log In menggunakan</span>
+        <span className="text-slate-500 text-sm whitespace-nowrap">atau login dengan</span>
         <div className="flex-1 h-px bg-gray-300"></div>
       </div>
 
@@ -366,7 +368,7 @@ const FormResetPassword = () => {
       <button
         onClick={handleGoogleLogin}
         disabled={isGoogleLoading}
-        className="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded font-medium hover:bg-gray-50 transition-colors mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
       >
         <div className="flex items-center justify-center gap-2">
           {isGoogleLoading ? (
