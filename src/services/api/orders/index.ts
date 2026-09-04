@@ -243,6 +243,7 @@ export const mapOrderDetailToTransaction = (
 
   return {
     ...baseTransaction,
+    shipmentId: baseTransaction.shipmentId || order.my_shipping?.id,
     shipmentAddress:
       order.delivery_type === "delivery" && order.my_shipping
         ? {
