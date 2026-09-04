@@ -467,6 +467,12 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     try {
       const selectedPayment = selectedPaymentMethod as TransactionPaymentMethod;
       const isOnlinePayment = requiresPendingPayment(selectedPayment);
+      const backendCheckoutNotes = [
+        `[PAYMENT: ${selectedPayment}]`,
+        additionalNotes || (deliveryMethod === 'pickup' ? 'Ambil di toko' : undefined),
+      ]
+        .filter(Boolean)
+        .join(' | ');
 
       // Create order data for local confirmation state.
       const orderData = {
@@ -547,7 +553,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       }
 
       const checkoutResponse = await checkoutOrder({
-        notes: orderData.notes,
+        notes: backendCheckoutNotes,
         payment_method: selectedPayment,
         subtotal: totals.subtotal,
         discount_total: totals.discount,
