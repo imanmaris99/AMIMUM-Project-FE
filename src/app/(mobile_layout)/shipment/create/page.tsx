@@ -10,6 +10,7 @@ import { GoLocation } from "react-icons/go";
 import { ReceiverFormData, PackageFormData } from "@/types/shipment";
 import { createShipment } from "@/services/api/shipment";
 import { getOwnerShipmentAddress } from "@/services/api/shipment-address";
+import LoginProtection from "@/components/common/LoginProtection";
 
 interface StoreAddressInfo {
   name: string;
@@ -147,6 +148,7 @@ const CreateShipment = () => {
   };
 
   return (
+    <LoginProtection useModal={true} feature="general">
     <div>
       <div className="flex justify-center items-center relative mt-16 px-6">
         <div className="absolute left-10">
@@ -240,6 +242,7 @@ const CreateShipment = () => {
         </div>
       )}
     </div>
+    </LoginProtection>
   );
 };
 
