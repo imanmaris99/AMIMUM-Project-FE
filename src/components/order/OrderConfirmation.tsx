@@ -7,6 +7,11 @@ import { IoCheckmarkCircle } from 'react-icons/io5';
 import { useTransaction } from '@/contexts/TransactionContext';
 import { Transaction } from '@/types/transaction';
 import { getPaymentMethodLabel } from '@/lib/paymentMethods';
+import {
+  getCustomerStatusConfig,
+  isFailedPaymentStatus,
+  isPendingPaymentStatus,
+} from '@/lib/transactionStatus';
 import { SessionManager } from '@/lib/auth';
 import {
   getOrderDetail,
@@ -79,32 +84,6 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
     void loadConfirmationTransaction();
   }, [confirmationTransactionId, transactions]);
 
-  const getStatusLabel = (status?: string) => {
-    switch (status) {
-      case 'pending':
-        return 'Menunggu Bayar';
-      case 'processing':
-      case 'capture':
-        return 'Pesanan Diproses';
-      case 'shipped':
-        return 'Dalam pengiriman';
-      case 'delivered':
-      case 'completed':
-      case 'settlement':
-      case 'paid':
-        return 'Selesai';
-      case 'cancelled':
-      case 'failed':
-      case 'expire':
-      case 'cancel':
-      case 'deny':
-        return 'Pembayaran Gagal';
-      case 'refund':
-        return 'Refund';
-      default:
-        return 'Status belum tersedia';
-    }
-  };
 
   const handleBackToHome = () => {
     if (onBack) {
@@ -126,10 +105,12 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
     }
   };
 
-  const isPendingPayment = latestTransaction?.status === 'pending';
-  const isFailedPayment = ['cancelled', 'failed', 'expire', 'cancel', 'deny'].includes(
-    latestTransaction?.status || ''
+  const statusConfig = getCustomerStatusConfig(
+    latestTransaction?.status || '',
+    latestTransaction?.paymentMethod
   );
+  const isPendingPayment = isPendingPaymentStatus(latestTransaction?.status);
+  const isFailedPayment = isFailedPaymentStatus(latestTransaction?.status);
 
   if (isResolvingTransaction) {
     return (
@@ -237,8 +218,8 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Status</span>
-              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                {getStatusLabel(latestTransaction?.status)}
+              <span className={`${statusConfig.bgColor} ${statusConfig.textColor} px-2 py-1 rounded-full text-xs font-medium text-right`}>
+                {statusConfig.text}
               </span>
             </div>
             <div className="flex justify-between items-center">

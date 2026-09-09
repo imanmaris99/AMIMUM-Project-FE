@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Transaction } from "@/types/transaction";
+import { getCustomerStatusConfig } from "@/lib/transactionStatus";
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -12,63 +13,10 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
   transaction, 
   onViewDetails 
 }) => {
-  const getStatusConfig = (status: string) => {
-    switch (status) {
-      case 'processing':
-        return {
-          text: 'Diproses',
-          bgColor: 'bg-blue-100',
-          textColor: 'text-blue-600',
-          borderColor: 'border-blue-200'
-        };
-      case 'pending':
-        return {
-          text: 'Menunggu Bayar',
-          bgColor: 'bg-yellow-100',
-          textColor: 'text-yellow-700',
-          borderColor: 'border-yellow-200'
-        };
-      case 'shipped':
-        return {
-          text: 'Dikirim',
-          bgColor: 'bg-indigo-100',
-          textColor: 'text-indigo-600',
-          borderColor: 'border-indigo-200'
-        };
-      case 'delivered':
-      case 'completed':
-        return {
-          text: status === 'delivered' ? 'Selesai' : 'Lunas',
-          bgColor: 'bg-green-100',
-          textColor: 'text-green-600',
-          borderColor: 'border-green-200'
-        };
-      case 'cancelled':
-      case 'failed':
-        return {
-          text: 'Gagal',
-          bgColor: 'bg-red-100',
-          textColor: 'text-red-600',
-          borderColor: 'border-red-200'
-        };
-      case 'refund':
-        return {
-          text: 'Refund',
-          bgColor: 'bg-purple-100',
-          textColor: 'text-purple-600',
-          borderColor: 'border-purple-200'
-        };
-      default:
-        return {
-          text: 'Unknown',
-          bgColor: 'bg-gray-100',
-          textColor: 'text-gray-600',
-          borderColor: 'border-gray-200'
-        };
-    }
-  };
-
-  const statusConfig = getStatusConfig(transaction.status);
+  const statusConfig = getCustomerStatusConfig(
+    transaction.status,
+    transaction.paymentMethod
+  );
 
   return (
     <div 
@@ -121,8 +69,8 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
 
         {/* Status Badge */}
         <div className="flex-shrink-0">
-          <div className={`px-4 py-2 rounded-lg ${statusConfig.bgColor} ${statusConfig.borderColor} border w-[75px] flex items-center justify-center`}>
-            <span className={`text-xs font-medium ${statusConfig.textColor} whitespace-nowrap`}>
+          <div className={`px-3 py-2 rounded-lg ${statusConfig.bgColor} ${statusConfig.borderColor} border min-w-[92px] max-w-[128px] flex items-center justify-center text-center`}>
+            <span className={`text-[11px] leading-tight font-medium ${statusConfig.textColor}`}>
               {statusConfig.text}
             </span>
           </div>

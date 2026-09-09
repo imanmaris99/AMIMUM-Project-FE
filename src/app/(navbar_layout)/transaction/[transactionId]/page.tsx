@@ -15,6 +15,12 @@ import {
 } from "@/services/api/orders";
 import { createPayment, syncPaymentStatus } from "@/services/api/payments";
 import { useTransaction } from "@/contexts/TransactionContext";
+import {
+  getCustomerStatusConfig,
+  isFailedPaymentStatus,
+  isOfflinePaymentMethod,
+  isPendingPaymentStatus,
+} from "@/lib/transactionStatus";
 
 const TransactionDetailPage: React.FC = () => {
   const params = useParams();
@@ -203,61 +209,6 @@ const TransactionDetailPage: React.FC = () => {
     }
   };
 
-  const getStatusConfig = (status: string) => {
-    switch (status) {
-      case "pending":
-        return {
-          text: "Menunggu Bayar",
-          bgColor: "bg-yellow-100",
-          textColor: "text-yellow-700",
-          borderColor: "border-yellow-200",
-        };
-      case "processing":
-        return {
-          text: "Diproses",
-          bgColor: "bg-blue-100",
-          textColor: "text-blue-600",
-          borderColor: "border-blue-200",
-        };
-      case "shipped":
-        return {
-          text: "Dikirim",
-          bgColor: "bg-indigo-100",
-          textColor: "text-indigo-600",
-          borderColor: "border-indigo-200",
-        };
-      case "delivered":
-      case "completed":
-        return {
-          text: status === "delivered" ? "Selesai" : "Lunas",
-          bgColor: "bg-green-100",
-          textColor: "text-green-600",
-          borderColor: "border-green-200",
-        };
-      case "cancelled":
-      case "failed":
-        return {
-          text: "Pembayaran Gagal",
-          bgColor: "bg-red-100",
-          textColor: "text-red-600",
-          borderColor: "border-red-200",
-        };
-      case "refund":
-        return {
-          text: "Refund",
-          bgColor: "bg-purple-100",
-          textColor: "text-purple-600",
-          borderColor: "border-purple-200",
-        };
-      default:
-        return {
-          text: "Unknown",
-          bgColor: "bg-gray-100",
-          textColor: "text-gray-600",
-          borderColor: "border-gray-200",
-        };
-    }
-  };
 
   if (isLoading) {
     return (
@@ -306,12 +257,13 @@ const TransactionDetailPage: React.FC = () => {
     );
   }
 
-  const statusConfig = getStatusConfig(transaction.status);
-  const isPendingPayment = transaction.status === "pending";
-  const canRetryPayment = ["cancelled", "failed"].includes(transaction.status);
-  const isOfflinePayment = ["cod", "pay_at_store"].includes(
-    transaction.paymentMethod || ""
+  const statusConfig = getCustomerStatusConfig(
+    transaction.status,
+    transaction.paymentMethod
   );
+  const isPendingPayment = isPendingPaymentStatus(transaction.status);
+  const canRetryPayment = isFailedPaymentStatus(transaction.status);
+  const isOfflinePayment = isOfflinePaymentMethod(transaction.paymentMethod);
   const shouldShowPaymentActions =
     !isLocalSimulatedTransaction && !isOfflinePayment && (isPendingPayment || canRetryPayment);
 

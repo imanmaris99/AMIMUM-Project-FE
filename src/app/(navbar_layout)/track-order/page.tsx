@@ -12,6 +12,7 @@ import { Transaction } from "@/types/transaction";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 import LoginProtection from "@/components/common/LoginProtection";
 import { SessionManager } from "@/lib/auth";
+import { getCustomerStatusConfig } from "@/lib/transactionStatus";
 import {
   getMyOrders,
   getOrderDetail,
@@ -130,56 +131,16 @@ const TrackOrderPage: React.FC = () => {
   }, [currentTransaction, orders, transactionId]);
 
   const getStatusConfig = (status: string) => {
-    switch (status) {
-      case "pending":
-        return {
-          text: "Menunggu Bayar",
-          color: "text-yellow-600",
-          bgColor: "bg-yellow-100",
-        };
-      case "processing":
-      case "capture":
-        return {
-          text: "Diproses",
-          color: "text-blue-600",
-          bgColor: "bg-blue-100",
-        };
-      case "shipped":
-        return {
-          text: "Dikirim",
-          color: "text-indigo-600",
-          bgColor: "bg-indigo-100",
-        };
-      case "delivered":
-      case "completed":
-        return {
-          text: status === "delivered" ? "Selesai" : "Lunas",
-          color: "text-green-600",
-          bgColor: "bg-green-100",
-        };
-      case "cancelled":
-      case "failed":
-      case "expire":
-      case "cancel":
-      case "deny":
-        return {
-          text: "Pembayaran Gagal",
-          color: "text-red-600",
-          bgColor: "bg-red-100",
-        };
-      case "refund":
-        return {
-          text: "Refund",
-          color: "text-purple-600",
-          bgColor: "bg-purple-100",
-        };
-      default:
-        return {
-          text: "Unknown",
-          color: "text-gray-600",
-          bgColor: "bg-gray-100",
-        };
-    }
+    const config = getCustomerStatusConfig(
+      status,
+      currentTransaction?.paymentMethod
+    );
+
+    return {
+      text: config.text,
+      color: config.textColor,
+      bgColor: config.bgColor,
+    };
   };
 
   const getCurrentStatusIndex = (status: string, deliveryType: string) => {
