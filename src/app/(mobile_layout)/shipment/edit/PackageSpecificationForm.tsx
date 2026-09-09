@@ -18,6 +18,13 @@ interface PackageSpecificationFormProps {
   destinationCityId?: string;
 }
 
+const DEFAULT_PACKAGE = {
+  weight: 500,
+  length: 10,
+  width: 10,
+  height: 10,
+};
+
 const CourierSelection = ({ 
   value, 
   onChange, 
@@ -142,8 +149,40 @@ const ShippingCostCalculation = ({
       className="w-full font-semibold rounded-lg disabled:opacity-50" 
       variant="outline"
     >
-      {isLoading ? "Mencari layanan tersedia..." : "Kalkulasi Biaya Pengiriman"}
+      {isLoading ? "Mencari layanan tersedia..." : "Hitung Ongkir"}
     </Button>
+  </div>
+);
+
+const PackageSummary = ({
+  values,
+  onToggleAdvanced,
+  showAdvanced,
+}: {
+  values: { weight: number; length: number; width: number; height: number };
+  onToggleAdvanced: () => void;
+  showAdvanced: boolean;
+}) => (
+  <div className="rounded-xl border border-primary/10 bg-primary/5 p-4 text-sm text-gray-700">
+    <div className="flex items-start gap-3">
+      <PiPackageThin className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
+      <div className="flex-1">
+        <p className="font-semibold text-gray-900">Estimasi Paket Otomatis</p>
+        <p className="mt-1 text-xs leading-relaxed text-gray-600">
+          Sistem memakai estimasi paket herbal kecil agar customer cukup pilih kurir dan layanan ongkir.
+        </p>
+        <p className="mt-2 text-xs font-medium text-gray-800">
+          {values.weight} gram • {values.length}×{values.width}×{values.height} cm
+        </p>
+        <button
+          type="button"
+          onClick={onToggleAdvanced}
+          className="mt-3 text-xs font-semibold text-primary underline-offset-2 hover:underline"
+        >
+          {showAdvanced ? "Sembunyikan detail paket" : "Ubah detail paket jika perlu"}
+        </button>
+      </div>
+    </div>
   </div>
 );
 
@@ -213,10 +252,10 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
 }) => {
   const [formData, setFormData] = useState<PackageFormData>({
     courier: "",
-    weight: 0,
-    length: 0,
-    width: 0,
-    height: 0,
+    weight: DEFAULT_PACKAGE.weight,
+    length: DEFAULT_PACKAGE.length,
+    width: DEFAULT_PACKAGE.width,
+    height: DEFAULT_PACKAGE.height,
     serviceType: "",
     cost: 0,
     estimatedDelivery: ""
@@ -227,10 +266,17 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
   const [selectedService, setSelectedService] = useState("");
   const [availableServices, setAvailableServices] = useState<RajaOngkirShippingDetail[]>([]);
   const [shippingNotice, setShippingNotice] = useState("");
+  const [showAdvancedPackage, setShowAdvancedPackage] = useState(false);
 
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setFormData({
+        ...initialData,
+        weight: initialData.weight || DEFAULT_PACKAGE.weight,
+        length: initialData.length || DEFAULT_PACKAGE.length,
+        width: initialData.width || DEFAULT_PACKAGE.width,
+        height: initialData.height || DEFAULT_PACKAGE.height,
+      });
       setSelectedService(initialData.serviceType);
       setAvailableServices([
         {
@@ -246,6 +292,10 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
     setFormData((prev) => ({
       ...prev,
       courier: prev.courier || SUPPORTED_COURIERS[0].id,
+      weight: prev.weight || DEFAULT_PACKAGE.weight,
+      length: prev.length || DEFAULT_PACKAGE.length,
+      width: prev.width || DEFAULT_PACKAGE.width,
+      height: prev.height || DEFAULT_PACKAGE.height,
     }));
   }, [initialData]);
 
@@ -463,24 +513,43 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
           onChange={handleInputChange}
           error={errors.courier}
         />
-        <WeightInput 
-          value={formData.weight}
-          onChange={handleInputChange}
-          error={errors.weight}
-        />
-        <DimensionInputs 
+        <PackageSummary
           values={{
+            weight: formData.weight,
             length: formData.length,
             width: formData.width,
-            height: formData.height
+            height: formData.height,
           }}
-          onChange={handleInputChange}
-          errors={{
-            length: errors.length,
-            width: errors.width,
-            height: errors.height
-          }}
+          showAdvanced={showAdvancedPackage}
+          onToggleAdvanced={() => setShowAdvancedPackage((value) => !value)}
         />
+        {showAdvancedPackage && (
+          <div className="rounded-xl border border-gray-200 bg-white p-4">
+            <p className="mb-3 text-xs font-medium text-gray-600">
+              Ubah hanya jika paket pesanan berbeda dari estimasi otomatis.
+            </p>
+            <div className="flex flex-col gap-4">
+              <WeightInput
+                value={formData.weight}
+                onChange={handleInputChange}
+                error={errors.weight}
+              />
+              <DimensionInputs
+                values={{
+                  length: formData.length,
+                  width: formData.width,
+                  height: formData.height
+                }}
+                onChange={handleInputChange}
+                errors={{
+                  length: errors.length,
+                  width: errors.width,
+                  height: errors.height
+                }}
+              />
+            </div>
+          </div>
+        )}
         <ShippingCostCalculation 
           onCalculate={handleCalculate}
           isLoading={isCalculating}
