@@ -196,6 +196,17 @@ const extractPaymentMethodFromNotes = (
   return aliases[paymentMethod];
 };
 
+const sanitizeCustomerNotes = (notes?: string | null): string | undefined => {
+  const sanitized = notes
+    ?.replace(/\[(?:PAYMENT|POS_SUBTOTAL|POS_DISCOUNT|POS_TOTAL):[^\]]*\]/gi, "")
+    .split("|")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(" | ");
+
+  return sanitized || undefined;
+};
+
 const mapOrderItems = (
   items: OrderListItemDto["order_item_lists"]
 ): TransactionItem[] =>
@@ -231,7 +242,7 @@ export const mapOrderSummaryToTransaction = (
     shippingCost: order.shipping_cost || 0,
     deliveryType: order.delivery_type,
     paymentMethod: extractPaymentMethodFromNotes(order.notes),
-    notes: order.notes,
+    notes: sanitizeCustomerNotes(order.notes),
     shipmentId: order.shipment_id,
   };
 };
