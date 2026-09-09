@@ -36,6 +36,13 @@ interface TransactionContextType {
 
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
 
+const BACKEND_ORDER_ID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const isBackendBackedTransaction = (transaction: Transaction) =>
+  BACKEND_ORDER_ID_PATTERN.test(transaction.id) &&
+  BACKEND_ORDER_ID_PATTERN.test(transaction.transactionId);
+
 export const useTransaction = () => {
   const context = useContext(TransactionContext);
   if (context === undefined) {
@@ -60,11 +67,12 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         const parsedTransactions = JSON.parse(savedTransactions);
         if (Array.isArray(parsedTransactions)) {
           // Validate transaction data structure
-          const validTransactions = parsedTransactions.filter(transaction => 
-            transaction && 
+          const validTransactions = parsedTransactions.filter(transaction =>
+            transaction &&
             typeof transaction.id === 'string' &&
             typeof transaction.transactionId === 'string' &&
-            Array.isArray(transaction.items)
+            Array.isArray(transaction.items) &&
+            isBackendBackedTransaction(transaction)
           );
           if (validTransactions.length !== parsedTransactions.length) {
             ErrorHandler.handleError(new Error('Some transactions are invalid and were removed'), 'TransactionLoad');
@@ -83,6 +91,8 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
   useEffect(() => {
     if (transactions.length > 0) {
       localStorage.setItem('transactions', JSON.stringify(transactions));
+    } else {
+      localStorage.removeItem('transactions');
     }
   }, [transactions]);
 
@@ -117,7 +127,15 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         return null;
       }
 
-      const transactionId = orderData.backend_order_id || `ORD-${Date.now()}`;
+      if (!orderData.backend_order_id || !BACKEND_ORDER_ID_PATTERN.test(orderData.backend_order_id)) {
+        ErrorHandler.handleError(
+          new Error('Backend order ID is required to create customer transaction state'),
+          'TransactionAdd'
+        );
+        return null;
+      }
+
+      const transactionId = orderData.backend_order_id;
       const now = orderData.backend_created_at
         ? new Date(orderData.backend_created_at)
         : new Date();

@@ -7,6 +7,11 @@ import { IoCheckmarkCircle } from 'react-icons/io5';
 import { useTransaction } from '@/contexts/TransactionContext';
 import { Transaction } from '@/types/transaction';
 import { getPaymentMethodLabel } from '@/lib/paymentMethods';
+import { SessionManager } from '@/lib/auth';
+import {
+  getOrderDetail,
+  mapOrderDetailToTransaction,
+} from '@/services/api/orders';
 
 interface OrderConfirmationProps {
   orderId?: string;
@@ -27,23 +32,42 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
 
   // Show only a confirmed checkout context; avoid displaying a success state for direct visits.
   useEffect(() => {
-    if (confirmationTransactionId) {
+    const loadConfirmationTransaction = async () => {
+      if (!confirmationTransactionId) {
+        if (transactions.length > 0) {
+          setLatestTransaction(transactions[0]); // First transaction is the latest
+          return;
+        }
+
+        setLatestTransaction(null);
+        return;
+      }
+
       const matchedTransaction = transactions.find(
         (transaction) =>
           transaction.id === confirmationTransactionId ||
           transaction.transactionId === confirmationTransactionId
       );
 
-      setLatestTransaction(matchedTransaction || null);
-      return;
-    }
+      if (matchedTransaction) {
+        setLatestTransaction(matchedTransaction);
+        return;
+      }
 
-    if (transactions.length > 0) {
-      setLatestTransaction(transactions[0]); // First transaction is the latest
-      return;
-    }
+      if (!SessionManager.isAuthenticated()) {
+        setLatestTransaction(null);
+        return;
+      }
 
-    setLatestTransaction(null);
+      try {
+        const response = await getOrderDetail(confirmationTransactionId);
+        setLatestTransaction(mapOrderDetailToTransaction(response.data));
+      } catch {
+        setLatestTransaction(null);
+      }
+    };
+
+    void loadConfirmationTransaction();
   }, [confirmationTransactionId, transactions]);
 
   const getStatusLabel = (status?: string) => {

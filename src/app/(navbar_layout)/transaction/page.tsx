@@ -50,7 +50,15 @@ const TransactionPage = () => {
     void loadOrders();
   }, []);
 
-  const transactions = [...localTransactions, ...apiTransactions];
+  const transactions = [
+    ...apiTransactions,
+    ...localTransactions.filter(
+      (localTransaction) =>
+        !apiTransactions.some(
+          (apiTransaction) => apiTransaction.id === localTransaction.id
+        )
+    ),
+  ];
 
   const handleViewDetails = (transactionId: string) => {
     router.push(`/transaction/${transactionId}`);
