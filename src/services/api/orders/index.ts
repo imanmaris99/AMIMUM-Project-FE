@@ -107,10 +107,18 @@ const getOrderErrorMessage = (
   errorData: OrderErrorResponse,
   fallbackMessage: string
 ) => {
-  if (errorData.message) return errorData.message;
-  if (typeof errorData.detail === "string") return errorData.detail;
+  const normalizeMessage = (message?: string) => {
+    if (!message) return undefined;
+    if (message.includes("Active cart items")) {
+      return "Keranjang aktif tidak ditemukan. Jika pesanan baru saja dibuat, cek halaman transaksi dan lanjutkan pembayaran dari sana.";
+    }
+    return message;
+  };
+
+  if (errorData.message) return normalizeMessage(errorData.message);
+  if (typeof errorData.detail === "string") return normalizeMessage(errorData.detail);
   if (errorData.detail && !Array.isArray(errorData.detail)) {
-    return errorData.detail.message || fallbackMessage;
+    return normalizeMessage(errorData.detail.message) || fallbackMessage;
   }
   if (Array.isArray(errorData.detail)) {
     const messages = errorData.detail

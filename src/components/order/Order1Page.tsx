@@ -106,6 +106,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const [selectedCourierCompany, setSelectedCourierCompany] = useState<string>('');
   const [selectedCourierService, setSelectedCourierService] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const isSubmittingRef = React.useRef(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [showAddressSelector, setShowAddressSelector] = useState(false);
   
@@ -433,11 +434,17 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   };
 
   const handlePayment = async () => {
+    if (isSubmittingRef.current) {
+      toast.error('Pesanan sedang diproses. Mohon tunggu sebentar.');
+      return;
+    }
+
     if (!validateForm()) {
       toast.error('Mohon lengkapi semua field yang diperlukan');
       return;
     }
 
+    isSubmittingRef.current = true;
     setIsLoading(true);
     
     try {
@@ -528,15 +535,6 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         await refreshCart();
       }
 
-      if (isOnlinePayment) {
-        const paymentResponse = await createPayment({ order_id: backendOrder.id });
-        if (paymentResponse.data.redirect_url) {
-          toast.success('Pesanan dibuat. Mengalihkan ke halaman pembayaran.');
-          window.location.href = paymentResponse.data.redirect_url;
-          return;
-        }
-      }
-
       const newTransaction = addTransaction(
         {
           ...orderData,
@@ -549,7 +547,27 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       );
 
       if (!newTransaction) {
-        throw new Error('Failed to create transaction');
+        throw new Error('Gagal menyimpan data transaksi. Silakan cek riwayat pesanan.');
+      }
+
+      if (isOnlinePayment) {
+        try {
+          const paymentResponse = await createPayment({ order_id: backendOrder.id });
+          if (paymentResponse.data.redirect_url) {
+            toast.success('Pesanan dibuat. Mengalihkan ke halaman pembayaran.');
+            window.location.href = paymentResponse.data.redirect_url;
+            return;
+          }
+        } catch (paymentError) {
+          await refreshCart();
+          toast.error(
+            paymentError instanceof Error
+              ? `Pesanan sudah dibuat, tetapi halaman pembayaran belum terbuka: ${paymentError.message}`
+              : 'Pesanan sudah dibuat, tetapi halaman pembayaran belum terbuka.'
+          );
+          router.push(`/transaction/${newTransaction.id}`);
+          return;
+        }
       }
 
       await refreshCart();
@@ -564,7 +582,12 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       }, 500);
       
     } catch (error) {
-      toast.error(`Terjadi kesalahan saat memproses pesanan: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      const rawMessage = error instanceof Error ? error.message : 'Unknown error';
+      const customerMessage = rawMessage.includes('Active cart items')
+        ? 'Keranjang aktif tidak ditemukan. Jika pesanan baru saja dibuat, cek halaman transaksi dan lanjutkan pembayaran dari sana.'
+        : rawMessage;
+      toast.error(`Terjadi kesalahan saat memproses pesanan: ${customerMessage}`);
+      isSubmittingRef.current = false;
       setIsLoading(false);
     }
   };
