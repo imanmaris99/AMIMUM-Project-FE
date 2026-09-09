@@ -458,14 +458,14 @@ const TransactionDetailPage: React.FC = () => {
                     disabled={isPaymentActionLoading}
                     className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {canRetryPayment ? "Coba Bayar Lagi" : "Bayar Sekarang"}
+                    {canRetryPayment ? "Coba Bayar Lagi" : "Lanjutkan Pembayaran"}
                   </button>
                   <button
                     onClick={handleSyncPaymentStatus}
                     disabled={isPaymentActionLoading}
                     className="w-full border border-primary text-primary py-3 px-4 rounded-lg font-medium hover:bg-primary/5 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    Perbarui Status Pembayaran
+                    Saya Sudah Bayar, Perbarui Status
                   </button>
                 </>
               )}

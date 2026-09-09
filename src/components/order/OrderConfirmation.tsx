@@ -97,6 +97,14 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
     router.push('/transaction');
   };
 
+  const handleContinuePayment = () => {
+    if (latestTransaction?.id) {
+      router.push(`/transaction/${latestTransaction.id}`);
+    } else {
+      router.push('/transaction');
+    }
+  };
+
   const handleTrackOrder = () => {
     if (latestTransaction?.id) {
       router.push(`/track-order?transactionId=${latestTransaction.id}`);
@@ -335,9 +343,17 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
 
         {/* Action Buttons */}
         <div className="px-4 py-6 space-y-3">
+          {isPendingPayment && !isFailedPayment && (
+            <button
+              onClick={handleContinuePayment}
+              className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-[#005A3C] transition-colors"
+            >
+              Lanjutkan Pembayaran
+            </button>
+          )}
           <button
             onClick={handleViewOrders}
-            className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-[#005A3C] transition-colors"
+            className={`${isPendingPayment ? 'w-full bg-gray-100 text-gray-700 hover:bg-gray-200' : 'w-full bg-primary text-white hover:bg-[#005A3C]'} py-3 px-4 rounded-lg font-medium transition-colors`}
           >
             Lihat Pesanan Saya
           </button>
