@@ -92,7 +92,7 @@ const resolveCityIdFromRajaOngkir = async (
 
 const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const router = useRouter();
-  const { cartItems, totalPrices, refreshCart } = useCart();
+  const { cartItems, totalPrices, refreshCart, removeActiveItems } = useCart();
   const { addTransaction } = useTransaction();
   
   // Direct checkout state
@@ -562,10 +562,16 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
       const backendOrder = checkoutResponse.data;
 
+      try {
+        await removeActiveItems();
+      } catch (cartCleanupError) {
+        console.warn('Failed to clean checked-out cart items', cartCleanupError);
+        await refreshCart();
+      }
+
       if (isOnlinePayment) {
         const paymentResponse = await createPayment({ order_id: backendOrder.id });
         if (paymentResponse.data.redirect_url) {
-          await refreshCart();
           toast.success('Pesanan dibuat. Mengalihkan ke halaman pembayaran.');
           window.location.href = paymentResponse.data.redirect_url;
           return;
