@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { GoChevronLeft } from "react-icons/go";
 import { toast } from "react-hot-toast";
+import LoginProtection from "@/components/common/LoginProtection";
 import EditAddressModal from "../../../components/profile/molecules/EditAddressModal";
 import DeleteAddressModal from "../../../components/profile/molecules/DeleteAddressModal";
 import AddAddressModal, {
@@ -278,7 +279,8 @@ const SavedAddressesPage: React.FC = () => {
   }, [addresses, selectedAddress]);
 
   return (
-    <div className="flex flex-col justify-between min-h-screen bg-gray-100">
+    <LoginProtection useModal={true} feature="general">
+      <div className="flex flex-col justify-between min-h-screen bg-gray-100">
       {/* Header - Same style as track order with white background */}
       <div className="bg-white border-b border-gray-200">
         <div className="flex justify-center items-center relative mt-16 py-4">
@@ -461,6 +463,7 @@ const SavedAddressesPage: React.FC = () => {
                 }}
               />
             </div>
+          </LoginProtection>
           );
         };
 
