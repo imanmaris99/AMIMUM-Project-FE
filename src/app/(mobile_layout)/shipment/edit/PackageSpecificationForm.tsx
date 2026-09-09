@@ -142,10 +142,13 @@ const ShippingCostCalculation = ({
       className="w-full font-semibold rounded-lg disabled:opacity-50" 
       variant="outline"
     >
-      {isLoading ? "Menghitung..." : "Kalkulasi Biaya Pengiriman"}
+      {isLoading ? "Mencari layanan tersedia..." : "Kalkulasi Biaya Pengiriman"}
     </Button>
   </div>
 );
+
+const getCourierName = (courierId: string) =>
+  SUPPORTED_COURIERS.find((courier) => courier.id === courierId)?.name || courierId.toUpperCase();
 
 const ShippingCostDetails = ({ 
   couriers,
@@ -223,6 +226,7 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
   const [isCalculating, setIsCalculating] = useState(false);
   const [selectedService, setSelectedService] = useState("");
   const [availableServices, setAvailableServices] = useState<RajaOngkirShippingDetail[]>([]);
+  const [shippingNotice, setShippingNotice] = useState("");
 
   useEffect(() => {
     if (initialData) {
@@ -308,6 +312,7 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
     if (name === 'courier' || name === 'weight' || name === 'length' || name === 'width' || name === 'height') {
       setSelectedService("");
       setAvailableServices([]);
+      setShippingNotice("");
       setFormData(prev => ({
         ...prev,
         serviceType: "",
@@ -355,20 +360,49 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
     }
 
     setIsCalculating(true);
+    setShippingNotice("");
+    setAvailableServices([]);
+    setSelectedService("");
 
     try {
-      const response = await getRajaOngkirShippingCost({
-        origin: Number(originCityId),
-        destination: Number(destinationCityId),
-        weight: formData.weight,
-        courier: formData.courier,
-      });
+      const selectedCourier = formData.courier;
+      const fallbackCouriers = SUPPORTED_COURIERS
+        .map((courier) => courier.id)
+        .filter((courierId) => courierId !== selectedCourier);
+      const courierQueue = [selectedCourier, ...fallbackCouriers];
+      let response: Awaited<ReturnType<typeof getRajaOngkirShippingCost>> | null = null;
+      let successfulCourier = selectedCourier;
+      let lastError: unknown = null;
 
-      setAvailableServices(response.details);
+      for (const courier of courierQueue) {
+        try {
+          const nextResponse = await getRajaOngkirShippingCost({
+            origin: Number(originCityId),
+            destination: Number(destinationCityId),
+            weight: formData.weight,
+            courier,
+          });
 
-      if (response.details.length === 0) {
-        toast.error("Layanan pengiriman tidak tersedia untuk rute ini.");
-        setSelectedService("");
+          if (nextResponse.details.length > 0) {
+            response = nextResponse;
+            successfulCourier = courier;
+            break;
+          }
+        } catch (error) {
+          lastError = error;
+        }
+      }
+
+      if (!response) {
+        const message =
+          lastError instanceof Error
+            ? lastError.message
+            : "Tidak ada layanan pengiriman yang tersedia untuk rute ini.";
+
+        setShippingNotice(
+          "Belum ada layanan ongkir untuk kombinasi alamat dan kurir yang dipilih. Coba cek ulang kota tujuan, berat paket, atau pilih alamat lain."
+        );
+        toast.error(message);
         setFormData((prev) => ({
           ...prev,
           serviceType: "",
@@ -378,15 +412,25 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
         return;
       }
 
+      setAvailableServices(response.details);
+
       const firstService = response.details[0];
       setFormData((prev) => ({
         ...prev,
+        courier: successfulCourier,
         serviceType: firstService?.service || prev.serviceType,
         cost: firstService?.cost || prev.cost,
         estimatedDelivery: firstService?.etd || prev.estimatedDelivery,
       }));
       setSelectedService(firstService?.service || "");
-      toast.success("Biaya pengiriman berhasil dihitung.");
+
+      if (successfulCourier !== selectedCourier) {
+        const notice = `${getCourierName(selectedCourier)} belum tersedia untuk rute ini. Sistem memilih ${getCourierName(successfulCourier)} yang tersedia.`;
+        setShippingNotice(notice);
+        toast.success(notice);
+      } else {
+        toast.success("Biaya pengiriman berhasil dihitung.");
+      }
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -441,6 +485,11 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
           onCalculate={handleCalculate}
           isLoading={isCalculating}
         />
+        {shippingNotice && (
+          <div className="rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
+            {shippingNotice}
+          </div>
+        )}
         <ShippingCostDetails 
           couriers={availableServices}
           selectedService={selectedService}
@@ -475,4 +524,4 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
   );
 };
 
-export default PackageSpecificationForm; 
+export default PackageSpecificationForm;

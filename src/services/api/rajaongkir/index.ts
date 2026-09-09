@@ -45,9 +45,34 @@ interface RajaOngkirErrorResponse {
   status_code?: number;
   error?: string;
   message?: string;
-  detail?: Array<{
-    msg: string;
-  }>;
+  detail?:
+    | Array<{
+        msg?: string;
+        message?: string;
+      }>
+    | {
+        message?: string;
+        error?: string;
+      };
+}
+
+function getRajaOngkirErrorMessage(errorData: RajaOngkirErrorResponse): string | undefined {
+  if (errorData.message) {
+    return errorData.message;
+  }
+
+  if (Array.isArray(errorData.detail)) {
+    return errorData.detail
+      .map((item) => item.message || item.msg)
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  if (errorData.detail && typeof errorData.detail === "object") {
+    return errorData.detail.message || errorData.detail.error;
+  }
+
+  return undefined;
 }
 
 export async function getRajaOngkirProvinces(): Promise<RajaOngkirProvince[]> {
@@ -120,35 +145,35 @@ export async function getRajaOngkirShippingCost(
     if (axios.isAxiosError(error) && error.response) {
       const status = error.response.status;
       const errorData = error.response.data as RajaOngkirErrorResponse;
+      const errorMessage = getRajaOngkirErrorMessage(errorData);
 
       if (status === 400) {
         throw new Error(
-          errorData.message ||
+          errorMessage ||
             "Parameter yang diberikan tidak valid, periksa ulang nilai origin, destination, weight, atau courier."
         );
       }
 
       if (status === 404) {
         throw new Error(
-          errorData.message ||
-            "Data biaya pengiriman tidak ditemukan untuk parameter yang diberikan."
+          errorMessage ||
+            "Layanan kurir ini belum tersedia untuk alamat tujuan tersebut. Silakan pilih kurir lain."
         );
       }
 
       if (status === 422) {
-        const messages = (errorData.detail || []).map((item) => item.msg).join(", ");
-        throw new Error(messages || "Permintaan ongkir tidak lolos validasi.");
+        throw new Error(errorMessage || "Permintaan ongkir tidak lolos validasi.");
       }
 
       if (status === 500) {
         throw new Error(
-          errorData.message ||
+          errorMessage ||
             "Kesalahan tak terduga saat memproses permintaan."
         );
       }
 
       throw new Error(
-        errorData.message || "Gagal mengambil estimasi ongkos kirim."
+        errorMessage || "Gagal mengambil estimasi ongkos kirim."
       );
     }
 
