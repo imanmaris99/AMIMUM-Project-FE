@@ -52,6 +52,9 @@ interface AddressInfo {
   isDefault?: boolean;
 }
 
+const hasValidRajaOngkirCityId = (cityId?: number) =>
+  Boolean(cityId && Number(cityId) > 0);
+
 interface StoreAddressInfo {
   name: string;
   phone: string;
@@ -139,18 +142,20 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
               address: address.address || '',
               city: address.city || '',
               state: address.state || '',
-              city_id:
-                address.city_id ||
-                (address.state && address.city
-                  ? await resolveCityIdFromRajaOngkir(address.state, address.city)
-                  : undefined),
+              city_id: hasValidRajaOngkirCityId(address.city_id)
+                ? address.city_id
+                : undefined,
               postal_code: address.zip_code?.toString() || '',
               isDefault: false,
             }))
           );
 
           setAddresses(shipmentAddresses);
-          setSelectedAddress(shipmentAddresses[0] || null);
+          setSelectedAddress(
+            shipmentAddresses.find((address) =>
+              hasValidRajaOngkirCityId(address.city_id)
+            ) || null
+          );
         }
 
         if (ownerResult.status === 'fulfilled') {
@@ -297,7 +302,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const hasValidDeliverySelection =
     deliveryMethod !== 'delivery' ||
     Boolean(
-      selectedAddress?.city_id &&
+      hasValidRajaOngkirCityId(selectedAddress?.city_id) &&
         storeAddress?.cityId &&
         selectedCourierCompany &&
         selectedCourierService &&
@@ -369,7 +374,11 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       newErrors.address = 'Alamat pengiriman harus dipilih';
     }
 
-    if (deliveryMethod === 'delivery' && selectedAddress && !selectedAddress.city_id) {
+    if (
+      deliveryMethod === 'delivery' &&
+      selectedAddress &&
+      !hasValidRajaOngkirCityId(selectedAddress.city_id)
+    ) {
       newErrors.address = 'Kota alamat harus dipilih dari data RajaOngkir agar ongkir bisa dihitung';
     }
 
@@ -565,6 +574,15 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   };
 
   const handleAddressSelect = (address: AddressInfo) => {
+    if (!hasValidRajaOngkirCityId(address.city_id)) {
+      toast.error('Alamat ini belum punya kota RajaOngkir. Update alamat dulu sebelum checkout.');
+      setErrors((prev) => ({
+        ...prev,
+        address: 'Alamat ini belum punya kota RajaOngkir. Update alamat dulu sebelum checkout.',
+      }));
+      return;
+    }
+
     setSelectedAddress(address);
     setSelectedCourierCompany('');
     setSelectedCourierService('');

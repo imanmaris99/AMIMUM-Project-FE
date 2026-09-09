@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { GoLocation, GoCheck, GoPlus, GoX } from 'react-icons/go';
+import { IoWarning } from 'react-icons/io5';
 
 interface AddressInfo {
   id: string;
@@ -9,6 +10,7 @@ interface AddressInfo {
   phone: string;
   address: string;
   city: string;
+  city_id?: number;
   postal_code: string;
   isDefault?: boolean;
 }
@@ -82,14 +84,25 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
             </div>
           ) : (
             <div className="space-y-3">
-              {filteredAddresses.map((address) => (
+              {filteredAddresses.map((address) => {
+                const hasValidRajaOngkirCity = Boolean(
+                  address.city_id && Number(address.city_id) > 0
+                );
+
+                return (
                 <div
                   key={address.id}
-                  onClick={() => onAddressSelect(address)}
+                  onClick={() => {
+                    if (hasValidRajaOngkirCity) {
+                      onAddressSelect(address);
+                    }
+                  }}
                   className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
                     selectedAddress?.id === address.id
                       ? 'border-primary bg-primary/5'
-                      : 'border-gray-200 hover:border-primary/50'
+                      : hasValidRajaOngkirCity
+                        ? 'border-gray-200 hover:border-primary/50'
+                        : 'border-yellow-200 bg-yellow-50 cursor-not-allowed opacity-80'
                   }`}
                 >
                   <div className="flex items-start space-x-3">
@@ -107,13 +120,22 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
                       <p className="text-sm text-gray-600 mt-1">
                         {address.address}, {address.city} {address.postal_code}
                       </p>
+                      {!hasValidRajaOngkirCity && (
+                        <div className="mt-2 flex items-start gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-medium text-yellow-800">
+                          <IoWarning className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                          <span>
+                            Belum bisa dipilih untuk checkout. Update kota RajaOngkir di halaman alamat tersimpan dulu.
+                          </span>
+                        </div>
+                      )}
                     </div>
-                    {selectedAddress?.id === address.id && (
+                    {selectedAddress?.id === address.id && hasValidRajaOngkirCity && (
                       <GoCheck className="w-5 h-5 text-primary flex-shrink-0" />
                     )}
                   </div>
                 </div>
-              ))}
+              );
+              })}
             </div>
           )}
         </div>
