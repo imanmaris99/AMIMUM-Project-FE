@@ -95,10 +95,6 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const { cartItems, totalPrices, refreshCart, removeActiveItems } = useCart();
   const { addTransaction } = useTransaction();
   
-  // Direct checkout state
-  const [isDirectCheckout, setIsDirectCheckout] = useState(false);
-  const [directCheckoutItem, setDirectCheckoutItem] = useState<CartItemType | null>(null);
-  
   // State management
   const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
@@ -288,8 +284,6 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
     if (isDirect) {
       localStorage.removeItem('directCheckoutItem');
-      setIsDirectCheckout(false);
-      setDirectCheckoutItem(null);
       toast.error('Beli langsung diperbarui. Silakan pilih produk dari keranjang untuk checkout.');
       router.replace('/cart');
     }
@@ -311,11 +305,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         selectedCourierData.cost > 0
     );
 
-  // Use direct checkout item or cart items
-  const currentItems =
-    isDirectCheckout && directCheckoutItem
-      ? [directCheckoutItem]
-      : cartItems.filter((item) => item.is_active !== false);
+  const currentItems = cartItems.filter((item) => item.is_active !== false);
 
   const canSubmitOrder =
     !isLoading &&
@@ -327,30 +317,18 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   
   
   
-  // Calculate totals for direct checkout or cart
+  // Calculate totals from active cart rows; buy-now also routes through cart first.
   const calculateTotals = () => {
-    if (isDirectCheckout && directCheckoutItem) {
-      const itemPrice = directCheckoutItem.price;
-      const subtotal = itemPrice * directCheckoutItem.quantity;
-      const discount = 0; // No discount for direct checkout
-      const shippingCost = deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0;
-      return {
-        subtotal,
-        discount,
-        shipping: shippingCost,
-        total: subtotal + shippingCost
-      };
-    } else {
-      const subtotal = totalPrices.subtotal || 0;
-      const discount = 0; // Simplified since we don't have discount calculation in new structure
-      const shippingCost = deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0;
-      return {
-        subtotal,
-        discount,
-        shipping: shippingCost,
-        total: totalPrices.total + shippingCost
-      };
-    }
+    const subtotal = totalPrices.subtotal || 0;
+    const discount = 0;
+    const shippingCost = deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0;
+
+    return {
+      subtotal,
+      discount,
+      shipping: shippingCost,
+      total: totalPrices.total + shippingCost,
+    };
   };
 
   const totals = calculateTotals();
@@ -484,23 +462,6 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
               }
             : undefined,
       };
-
-      // Direct checkout data is not guaranteed to exist as an active backend cart row.
-      // Keep it local until direct-checkout backend contract is added.
-      if (isDirectCheckout) {
-        const newTransaction = addTransaction(orderData, currentItems);
-
-        if (!newTransaction) {
-          throw new Error('Failed to create transaction');
-        }
-
-        localStorage.removeItem('directCheckoutItem');
-        toast.success('Pesanan berhasil dibuat!');
-        setTimeout(() => {
-          router.push(`/order-confirmation?transactionId=${newTransaction.id}`);
-        }, 500);
-        return;
-      }
 
       if (deliveryMethod === 'delivery') {
         if (!selectedAddress?.city_id || !selectedCourierData) {
@@ -715,7 +676,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         {/* Cart Items */}
         <div className="px-4 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            {isDirectCheckout ? 'Produk yang Dibeli' : 'Produk Pesanan'}
+            Produk Pesanan
           </h2>
           {currentItems.length === 0 ? (
             <div className="text-center py-8">

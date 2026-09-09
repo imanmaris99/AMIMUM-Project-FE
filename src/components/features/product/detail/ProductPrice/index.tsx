@@ -30,7 +30,7 @@ const ProductPrice = ({
   const [isAdding, setIsAdding] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const { addToCart, isInCart } = useCart();
+  const { addToCart, isInCart, updateAllActiveStatus } = useCart();
   const router = useRouter();
 
 
@@ -76,28 +76,20 @@ const ProductPrice = ({
     setIsBuying(true);
     
     try {
-      // Create temporary cart item for direct checkout
-      const tempCartItem = {
-        id: Date.now().toString(),
-        product_id: data.id,
-        variant_id: datavariant.id,
-        quantity: 1,
-        price: datavariant.discounted_price || data.price,
-        product_name: data.name,
-        variant_name: datavariant.variant,
-        image: datavariant.img || "/default-image.jpg",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      
-      // Store temporary item in localStorage for direct checkout
-      localStorage.setItem('directCheckoutItem', JSON.stringify(tempCartItem));
-      
-      // Navigate to checkout page
-      router.push('/order-1?direct=true');
+      // Buy Now must use the same backend cart-based checkout contract as /cart.
+      // Deactivate existing cart rows first so only this item proceeds to checkout.
+      try {
+        await updateAllActiveStatus(false);
+      } catch {
+        // Empty cart can return a not-found style response; continue by adding this item.
+      }
+
+      localStorage.removeItem('directCheckoutItem');
+      await addToCart(data, datavariant);
+      router.push('/order-1');
       
     } catch {
-      // Ignore add to cart errors
+      setShowFeedback(false);
     } finally {
       setIsBuying(false);
     }
