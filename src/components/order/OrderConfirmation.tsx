@@ -28,18 +28,23 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
   const searchParams = useSearchParams();
   const { transactions } = useTransaction();
   const [latestTransaction, setLatestTransaction] = useState<Transaction | null>(null);
+  const [isResolvingTransaction, setIsResolvingTransaction] = useState(true);
   const confirmationTransactionId = searchParams?.get('transactionId') || orderId;
 
   // Show only a confirmed checkout context; avoid displaying a success state for direct visits.
   useEffect(() => {
     const loadConfirmationTransaction = async () => {
+      setIsResolvingTransaction(true);
+
       if (!confirmationTransactionId) {
         if (transactions.length > 0) {
           setLatestTransaction(transactions[0]); // First transaction is the latest
+          setIsResolvingTransaction(false);
           return;
         }
 
         setLatestTransaction(null);
+        setIsResolvingTransaction(false);
         return;
       }
 
@@ -51,11 +56,13 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
 
       if (matchedTransaction) {
         setLatestTransaction(matchedTransaction);
+        setIsResolvingTransaction(false);
         return;
       }
 
       if (!SessionManager.isAuthenticated()) {
         setLatestTransaction(null);
+        setIsResolvingTransaction(false);
         return;
       }
 
@@ -64,6 +71,8 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
         setLatestTransaction(mapOrderDetailToTransaction(response.data));
       } catch {
         setLatestTransaction(null);
+      } finally {
+        setIsResolvingTransaction(false);
       }
     };
 
@@ -121,6 +130,17 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
   const isFailedPayment = ['cancelled', 'failed', 'expire', 'cancel', 'deny'].includes(
     latestTransaction?.status || ''
   );
+
+  if (isResolvingTransaction) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-sm text-gray-600">Memuat detail pesanan...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!latestTransaction) {
     return (
