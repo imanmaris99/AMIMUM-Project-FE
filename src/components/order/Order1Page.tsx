@@ -281,30 +281,19 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     );
   }, [paymentMethodGroups]);
 
-  // Handle direct checkout
+  // Guard old direct-checkout links/localStorage so they cannot create local-only orders.
   useEffect(() => {
-    const checkDirectCheckout = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const isDirect = urlParams.get('direct') === 'true';
-      
-      
-      if (isDirect) {
-        const directItem = localStorage.getItem('directCheckoutItem');
-        
-        if (directItem) {
-          try {
-            const parsedItem = JSON.parse(directItem);
-            setDirectCheckoutItem(parsedItem);
-            setIsDirectCheckout(true);
-          } catch {
-            // Ignore parsing errors
-          }
-        }
-      }
-    };
+    const urlParams = new URLSearchParams(window.location.search);
+    const isDirect = urlParams.get('direct') === 'true';
 
-    checkDirectCheckout();
-  }, []);
+    if (isDirect) {
+      localStorage.removeItem('directCheckoutItem');
+      setIsDirectCheckout(false);
+      setDirectCheckoutItem(null);
+      toast.error('Beli langsung diperbarui. Silakan pilih produk dari keranjang untuk checkout.');
+      router.replace('/cart');
+    }
+  }, [router]);
 
   // Get selected courier service data for calculations
   const selectedCourierData = courierCompanies
