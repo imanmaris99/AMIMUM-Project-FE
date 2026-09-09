@@ -1,32 +1,87 @@
 "use client";
 
 import HorizontalLinearAlternativeLabelStepper from "../edit/Stepper";
-import SenderForm from "../edit/SenderForm";
 import ReceiverForm from "../edit/ReceiverForm";
 import PackageSpecificationForm from "../edit/PackageSpecificationForm";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
-import { SenderFormData, ReceiverFormData, PackageFormData } from "@/types/shipment";
+import { GoLocation } from "react-icons/go";
+import { ReceiverFormData, PackageFormData } from "@/types/shipment";
 import { createShipment } from "@/services/api/shipment";
+import { getOwnerShipmentAddress } from "@/services/api/shipment-address";
+
+interface StoreAddressInfo {
+  name: string;
+  phone: string;
+  address: string;
+  cityId?: string;
+}
+
+const customerShipmentSteps = ["Alamat Tujuan", "Paket & Ongkir"];
+
+const getSafeReturnPath = (value: string | null) => {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) {
+    return "/shipment";
+  }
+
+  return value;
+};
 
 const CreateShipment = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = useMemo(
+    () => getSafeReturnPath(searchParams?.get("returnTo") ?? null),
+    [searchParams]
+  );
   
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [senderData, setSenderData] = useState<SenderFormData | null>(null);
+  const [isStoreAddressLoading, setIsStoreAddressLoading] = useState(true);
+  const [storeAddress, setStoreAddress] = useState<StoreAddressInfo | null>(null);
   const [receiverData, setReceiverData] = useState<ReceiverFormData | null>(null);
   const [packageData, setPackageData] = useState<PackageFormData | null>(null);
 
-  const handleSenderSubmit = (data: SenderFormData) => {
-    setSenderData(data);
-    setCurrentStep(1);
-  };
+  useEffect(() => {
+    const loadStoreAddress = async () => {
+      setIsStoreAddressLoading(true);
+      try {
+        const response = await getOwnerShipmentAddress();
+        const ownerAddress = response.data;
+
+        setStoreAddress({
+          name: ownerAddress.name || "Alamat toko",
+          phone: ownerAddress.phone || "-",
+          cityId: ownerAddress.city_id?.toString(),
+          address: [
+            ownerAddress.address,
+            ownerAddress.city,
+            ownerAddress.state,
+            ownerAddress.zip_code,
+            ownerAddress.country,
+          ]
+            .filter(Boolean)
+            .join(", "),
+        });
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Gagal mengambil alamat toko."
+        );
+        setStoreAddress(null);
+      } finally {
+        setIsStoreAddressLoading(false);
+      }
+    };
+
+    loadStoreAddress();
+  }, []);
 
   const handleReceiverSubmit = (data: ReceiverFormData) => {
     setReceiverData(data);
-    setCurrentStep(2);
+    setCurrentStep(1);
   };
 
   const handlePackageSubmit = async (data: PackageFormData) => {
@@ -36,6 +91,10 @@ const CreateShipment = () => {
     try {
       if (!receiverData) {
         throw new Error("Data penerima belum lengkap.");
+      }
+
+      if (!storeAddress?.cityId) {
+        throw new Error("Alamat toko belum memiliki kota RajaOngkir yang valid. Hubungi admin toko.");
       }
 
       await createShipment({
@@ -61,8 +120,8 @@ const CreateShipment = () => {
         },
       });
 
-      toast.success("Alamat pengiriman berhasil dibuat.");
-      router.push("/shipment?created=true");
+      toast.success("Alamat tujuan dan ongkir berhasil disimpan.");
+      router.push(returnTo === "/shipment" ? "/shipment?created=true" : returnTo);
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -75,65 +134,108 @@ const CreateShipment = () => {
   };
 
   const handlePreviousStep = () => {
-    setCurrentStep((prevStep) => prevStep - 1);
+    setCurrentStep((prevStep) => Math.max(prevStep - 1, 0));
   };
 
   const handleBack = () => {
+    if (currentStep > 0) {
+      handlePreviousStep();
+      return;
+    }
+
     router.back();
   };
 
   return (
     <div>
-      <div className="flex justify-center items-center relative mt-16">
+      <div className="flex justify-center items-center relative mt-16 px-6">
         <div className="absolute left-10">
           <button 
             onClick={handleBack}
             className="text-3xl cursor-pointer hover:text-primary transition-colors"
+            aria-label="Kembali"
           >
             ←
           </button>
         </div>
-        <div className="text-center">
-          <h1 className="text-[16px] font-semibold">Tambah Alamat Pengiriman</h1>
-          <p className="text-xs text-gray-500 mt-1">Buat alamat pengiriman baru</p>
+        <div className="text-center max-w-[280px]">
+          <h1 className="text-[16px] font-semibold">Tambah Alamat Tujuan</h1>
+          <p className="text-xs text-gray-500 mt-1">
+            Customer hanya mengisi alamat penerima. Alamat toko dikelola admin.
+          </p>
         </div>
       </div>
 
-      <div className="flex justify-center items-center mt-10 pb-4">
-        <HorizontalLinearAlternativeLabelStepper currentStep={currentStep} />
+      <div className="mx-auto mt-6 w-full max-w-[420px] px-6">
+        <div className="rounded-2xl border border-primary/10 bg-primary/5 p-4">
+          <div className="flex items-start gap-3">
+            <GoLocation className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-semibold text-gray-900">Alamat toko</p>
+                <span className="rounded-full bg-white px-2 py-1 text-[10px] font-semibold text-primary">
+                  Info pengirim
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-gray-600">
+                Alamat ini dipakai sebagai asal pengiriman dan hanya dapat diedit oleh admin toko.
+              </p>
+              <div className="mt-3 rounded-xl bg-white p-3 text-xs text-gray-700">
+                {isStoreAddressLoading ? (
+                  <p>Memuat alamat toko...</p>
+                ) : storeAddress ? (
+                  <>
+                    <p className="font-semibold text-gray-900">{storeAddress.name}</p>
+                    <p>{storeAddress.phone}</p>
+                    <p className="mt-1 leading-relaxed">{storeAddress.address || "Alamat toko belum lengkap"}</p>
+                    {!storeAddress.cityId && (
+                      <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 font-medium text-yellow-700">
+                        Kota RajaOngkir alamat toko belum valid. Customer belum bisa menghitung ongkir.
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <p className="font-medium text-red-600">
+                    Alamat toko belum tersedia. Hubungi admin toko.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-center items-center mt-6 pb-4">
+        <HorizontalLinearAlternativeLabelStepper
+          currentStep={currentStep}
+          steps={customerShipmentSteps}
+        />
       </div>
 
       <div className="flex justify-center items-center">
         {currentStep === 0 && (
-          <SenderForm 
-            onSubmit={handleSenderSubmit}
-            initialData={senderData || undefined}
-          />
-        )}
-        {currentStep === 1 && (
           <ReceiverForm 
             onSubmit={handleReceiverSubmit}
-            onBack={handlePreviousStep}
+            onBack={handleBack}
             initialData={receiverData || undefined}
           />
         )}
-        {currentStep === 2 && (
+        {currentStep === 1 && (
           <PackageSpecificationForm 
             onSubmit={handlePackageSubmit}
             onBack={handlePreviousStep}
             initialData={packageData || undefined}
-            originCityId={senderData?.cityId}
+            originCityId={storeAddress?.cityId}
             destinationCityId={receiverData?.cityId}
           />
         )}
       </div>
 
-      {/* Loading Overlay */}
       {isLoading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 flex flex-col items-center gap-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <p className="text-sm text-gray-600">Menyimpan alamat pengiriman...</p>
+            <p className="text-sm text-gray-600">Menyimpan alamat tujuan...</p>
           </div>
         </div>
       )}

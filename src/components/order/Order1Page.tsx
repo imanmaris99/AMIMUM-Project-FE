@@ -593,7 +593,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
   const handleAddNewAddress = () => {
     setShowAddressSelector(false);
-    router.push('/shipment/create');
+    router.push('/shipment/create?returnTo=/order-1');
   };
 
   const togglePaymentGroup = (groupId: string) => {

@@ -4,7 +4,7 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 
-const steps = [
+const defaultSteps = [
   'Alamat Toko',
   'Alamat Tujuan',
   'Spesifikasi Paket',
@@ -12,9 +12,13 @@ const steps = [
 
 interface StepperProps {
   currentStep: number;
+  steps?: string[];
 }
 
-const HorizontalLinearAlternativeLabelStepper: React.FC<StepperProps> = ({ currentStep }) => {
+const HorizontalLinearAlternativeLabelStepper: React.FC<StepperProps> = ({
+  currentStep,
+  steps = defaultSteps,
+}) => {
   return (
     <Box sx={{ width: '100%' }} className="bg-customGreen5 p-4 w-96">
       <Stepper 
