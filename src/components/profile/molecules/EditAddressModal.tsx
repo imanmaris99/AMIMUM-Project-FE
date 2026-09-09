@@ -34,6 +34,8 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const hasRajaOngkirCity = Boolean(formData.cityId.trim());
+
   const handleSave = async () => {
     if (isSaving) {
       return;
@@ -129,6 +131,12 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
               onChange={(field, nextValue) => handleInputChange(field, nextValue)}
             />
 
+            {!hasRajaOngkirCity && (
+              <p className="rounded-lg bg-yellow-50 px-3 py-2 text-xs text-yellow-700">
+                Pilih ulang kota/kabupaten dari RajaOngkir agar alamat ini siap dipakai checkout.
+              </p>
+            )}
+
             {/* Negara Field */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -173,7 +181,7 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
             </button>
             <button
               onClick={handleSave}
-              disabled={isSaving}
+              disabled={isSaving || !hasRajaOngkirCity}
               className="flex-1 py-4 px-6 rounded-2xl text-lg font-medium bg-[#006A47] text-white hover:bg-[#005A3C] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSaving ? "Menyimpan..." : "Save"}

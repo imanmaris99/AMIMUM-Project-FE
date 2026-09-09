@@ -106,7 +106,7 @@ const SavedAddressesPage: React.FC = () => {
     }
 
     if (!addressData.province.trim() || !addressData.city.trim()) {
-      throw new Error("Provinsi dan Kota/Kabupaten wajib dipilih.");
+      throw new Error("Provinsi dan Kota/Kabupaten wajib dipilih dari data RajaOngkir.");
     }
 
     if (!addressData.country.trim()) {
@@ -121,7 +121,9 @@ const SavedAddressesPage: React.FC = () => {
       throw new Error("Kode pos harus berupa angka.");
     }
 
-    if (!addressData.cityId.trim()) {
+    const normalizedCityId = Number(addressData.cityId);
+
+    if (!addressData.cityId.trim() || !Number.isFinite(normalizedCityId) || normalizedCityId <= 0) {
       throw new Error("Kota/Kabupaten harus dipilih dari data RajaOngkir.");
     }
 
@@ -133,7 +135,7 @@ const SavedAddressesPage: React.FC = () => {
       city: addressData.city.trim(),
       state: addressData.province.trim(),
       country: addressData.country.trim(),
-      city_id: Number(addressData.cityId),
+      city_id: normalizedCityId,
       zip_code: normalizedPostalCode
         ? Number(normalizedPostalCode)
         : undefined,
@@ -230,7 +232,7 @@ const SavedAddressesPage: React.FC = () => {
     }
 
     if (!addressData.province.trim() || !addressData.city.trim()) {
-      throw new Error("Provinsi dan Kota/Kabupaten wajib dipilih.");
+      throw new Error("Provinsi dan Kota/Kabupaten wajib dipilih dari data RajaOngkir.");
     }
 
     if (!addressData.country.trim()) {
@@ -245,7 +247,9 @@ const SavedAddressesPage: React.FC = () => {
       throw new Error("Kode pos harus berupa angka.");
     }
 
-    if (!addressData.cityId.trim()) {
+    const normalizedCityId = Number(addressData.cityId);
+
+    if (!addressData.cityId.trim() || !Number.isFinite(normalizedCityId) || normalizedCityId <= 0) {
       throw new Error("Kota/Kabupaten harus dipilih dari data RajaOngkir.");
     }
 
@@ -256,7 +260,7 @@ const SavedAddressesPage: React.FC = () => {
       city: addressData.city.trim(),
       state: addressData.province.trim(),
       country: addressData.country.trim(),
-      city_id: Number(addressData.cityId),
+      city_id: normalizedCityId,
       zip_code: normalizedPostalCode
         ? Number(normalizedPostalCode)
         : undefined,
@@ -311,6 +315,7 @@ const SavedAddressesPage: React.FC = () => {
             addresses.map((item) => {
               const addressId = item.id.toString();
               const isSelected = selectedAddress === addressId;
+              const hasValidRajaOngkirCity = Boolean(item.city_id && Number(item.city_id) > 0);
               const addressSummary = [
                 item.address,
                 item.city,
@@ -363,6 +368,11 @@ const SavedAddressesPage: React.FC = () => {
                       <p className="text-sm text-[#A2A2A2] leading-relaxed">
                         {addressSummary}
                       </p>
+                      {!hasValidRajaOngkirCity && (
+                        <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-700">
+                          Perlu update lokasi RajaOngkir sebelum dipakai checkout.
+                        </p>
+                      )}
                     </div>
 
                     <button
