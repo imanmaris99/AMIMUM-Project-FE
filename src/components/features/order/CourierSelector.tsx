@@ -27,6 +27,8 @@ const CourierSelector: React.FC<CourierSelectorProps> = ({
 
   const selectedCompanyData = courierCompanies.find(company => company.id === selectedCompany);
   const selectedServiceData = selectedCompanyData?.services.find(service => service.id === selectedService);
+  const sortedServices = [...(selectedCompanyData?.services || [])].sort((a, b) => a.cost - b.cost);
+  const cheapestServiceId = sortedServices[0]?.id;
 
   const handleCompanySelect = (companyId: string) => {
     onCompanySelect(companyId);
@@ -129,26 +131,39 @@ const CourierSelector: React.FC<CourierSelectorProps> = ({
           {/* Service Dropdown Options */}
           {isServiceDropdownOpen && (
             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-              {selectedCompanyData.services.map((service) => (
+              {sortedServices.map((service) => {
+                const isCheapest = service.id === cheapestServiceId;
+                return (
                 <button
                   key={service.id}
                   type="button"
                   onClick={() => handleServiceSelect(service.id)}
-                  className="w-full p-4 hover:bg-gray-50 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                  className={`w-full p-4 transition-colors first:rounded-t-lg last:rounded-b-lg ${
+                    selectedService === service.id
+                      ? 'bg-primary/5'
+                      : 'hover:bg-gray-50'
+                  }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 text-left">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="font-medium text-gray-900">{service.serviceType}</p>
+                      <div className="flex items-start justify-between gap-3 mb-1">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="font-medium text-gray-900">{service.serviceType}</p>
+                            {isCheapest && (
+                              <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">
+                                Termurah • Rekomendasi
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500">{service.description}</p>
+                        </div>
                         <p className="text-lg font-semibold text-primary">
                           {rupiahFormater(service.cost)}
                         </p>
                       </div>
-                      <p className="text-sm text-gray-600 mb-1">
-                        {service.estimatedDelivery}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {service.description}
+                      <p className="text-sm font-medium text-orange-700">
+                        Estimasi: {service.estimatedDelivery || 'Belum tersedia'}
                       </p>
                     </div>
                     {selectedService === service.id && (
@@ -156,7 +171,8 @@ const CourierSelector: React.FC<CourierSelectorProps> = ({
                     )}
                   </div>
                 </button>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

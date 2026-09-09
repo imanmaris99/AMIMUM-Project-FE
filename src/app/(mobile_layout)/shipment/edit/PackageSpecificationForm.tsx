@@ -189,59 +189,97 @@ const PackageSummary = ({
 const getCourierName = (courierId: string) =>
   SUPPORTED_COURIERS.find((courier) => courier.id === courierId)?.name || courierId.toUpperCase();
 
-const ShippingCostDetails = ({ 
+const ShippingCostDetails = ({
   couriers,
-  selectedService, 
-  onServiceChange, 
-  cost, 
-  estimatedDelivery, 
-  serviceType 
-}: { 
+  selectedService,
+  onServiceChange,
+  cost,
+  estimatedDelivery,
+  serviceType
+}: {
   couriers: RajaOngkirShippingDetail[];
   selectedService: string;
-  onServiceChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onServiceChange: (service: string) => void;
   cost: number;
   estimatedDelivery: string;
   serviceType: string;
-}) => (
-  <div className="bg-white rounded-lg p-4 flex flex-col gap-4">
-    <div className="flex flex-col justify-center items-center">
-      <h6 className="font-semibold">Detail Biaya Pengiriman</h6>
-      <p className="text-sm text-gray-500">Pilih Layanan</p>
-    </div>
-    <div>
-      <select 
-        name="select-service" 
-        id="select-service" 
-        value={selectedService}
-        onChange={onServiceChange}
-        className="w-full border border-gray-300 rounded-md outline-none px-2 py-1 bg-gray-200"
-      >
-        <option value="">Pilih Layanan</option>
-        {couriers.map((courier) => (
-          <option key={courier.service} value={courier.service}>
-            {courier.service} - {courier.description}
-          </option>
-        ))}
-      </select>
-    </div>
-    {selectedService && (
-      <div className="mt-6">
-        <div className="flex flex-col gap-3">
-          <div className="bg-blue-50 rounded-md px-2 py-2">
-            <p className="text-sm font-semibold text-blue-800">Tipe Layanan: {serviceType}</p>
-          </div>
-          <div className="bg-green-50 rounded-md px-2 py-2">
-            <p className="text-sm font-semibold text-green-800">Biaya Kirim: Rp {cost.toLocaleString()}</p>
-          </div>
-          <div className="bg-orange-50 rounded-md px-2 py-2">
-            <p className="text-sm font-semibold text-orange-800">Estimasi Pengiriman: {estimatedDelivery}</p>
-          </div>
-        </div>
+}) => {
+  const sortedCouriers = [...couriers].sort((a, b) => (a.cost || 0) - (b.cost || 0));
+  const cheapestService = sortedCouriers[0]?.service;
+
+  return (
+    <div className="bg-white rounded-lg p-4 flex flex-col gap-4">
+      <div className="flex flex-col justify-center items-center text-center">
+        <h6 className="font-semibold">Pilih Ongkir</h6>
+        <p className="text-sm text-gray-500">
+          Pilih layanan sesuai estimasi dan biaya yang paling cocok.
+        </p>
       </div>
-    )}
-  </div>
-);
+
+      {sortedCouriers.length === 0 ? (
+        <div className="rounded-lg bg-gray-50 px-3 py-4 text-center text-sm text-gray-500">
+          Klik Hitung Ongkir untuk melihat layanan pengiriman tersedia.
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {sortedCouriers.map((courier) => {
+            const isSelected = selectedService === courier.service;
+            const isCheapest = courier.service === cheapestService;
+
+            return (
+              <button
+                key={courier.service}
+                type="button"
+                onClick={() => onServiceChange(courier.service)}
+                className={`w-full rounded-xl border p-4 text-left transition-all ${
+                  isSelected
+                    ? "border-primary bg-primary/5 ring-2 ring-primary/10"
+                    : "border-gray-200 bg-white hover:border-primary/40 hover:bg-gray-50"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-semibold text-gray-900">{courier.service}</p>
+                      {isCheapest && (
+                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">
+                          Termurah • Rekomendasi
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-1 text-xs text-gray-500">{courier.description}</p>
+                    <p className="mt-2 text-xs font-medium text-orange-700">
+                      Estimasi: {courier.etd || "Belum tersedia"}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-base font-bold text-primary">
+                      Rp {(courier.cost || 0).toLocaleString()}
+                    </p>
+                    {isSelected && (
+                      <span className="mt-1 inline-block text-xs font-semibold text-primary">
+                        Dipilih
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {selectedService && (
+        <div className="rounded-lg bg-primary/5 px-3 py-3">
+          <p className="text-sm font-semibold text-primary">Ongkir dipilih</p>
+          <p className="mt-1 text-sm text-gray-700">
+            {serviceType} • Rp {cost.toLocaleString()} • Estimasi {estimatedDelivery || "-"}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
   onSubmit,
@@ -381,10 +419,9 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
     }
   };
 
-  const handleServiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
+  const handleServiceChange = (value: string) => {
     setSelectedService(value);
-    
+
     if (value) {
       const courier = availableServices.find((item) => item.service === value);
       
