@@ -132,7 +132,9 @@ export const createPayment = async (
     }
 
     if (error instanceof Error) {
-      throw error;
+      throw new Error(
+        sanitizePaymentError(error.message) || "Gagal membuat pembayaran."
+      );
     }
 
     throw new Error("Terjadi kesalahan yang tidak diketahui.");
@@ -162,7 +164,9 @@ export const syncPaymentStatus = async (
     }
 
     if (error instanceof Error) {
-      throw error;
+      throw new Error(
+        sanitizePaymentError(error.message) || "Gagal menyinkronkan status pembayaran."
+      );
     }
 
     throw new Error("Terjadi kesalahan yang tidak diketahui.");

@@ -80,6 +80,7 @@ axiosClient.interceptors.response.use(
     ];
     const isExpectedHandledEndpoint =
       expectedHandledEndpoints.includes(urlPath) ||
+      /^\/orders\/(my-orders|detail|complete-details)(?:\/|$)/.test(urlPath) ||
       /^\/cart\/(product|update-quantity|update-activate|delete)(?:\/|$)/.test(urlPath) ||
       urlPath === API_ENDPOINTS.CART_UPDATE_ACTIVATE_ALL;
     

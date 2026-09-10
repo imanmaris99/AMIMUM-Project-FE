@@ -103,12 +103,17 @@ export interface CheckoutOrderResponse {
   };
 }
 
+const ORDER_REQUEST_TIMEOUT_MS = 60000;
+
 const getOrderErrorMessage = (
   errorData: OrderErrorResponse,
   fallbackMessage: string
 ) => {
   const normalizeMessage = (message?: string) => {
     if (!message) return undefined;
+    if (message.includes("timeout") || message.includes("ECONNABORTED")) {
+      return "Server membutuhkan waktu lebih lama dari biasanya. Silakan coba lagi beberapa saat lagi.";
+    }
     if (message.includes("Order tidak ditemukan")) {
       return "Transaksi tidak ditemukan di server. Silakan cek halaman transaksi terbaru atau ulangi checkout dari keranjang.";
     }
@@ -288,7 +293,8 @@ export const checkoutOrder = async (
   try {
     const response = await apiClient.post<CheckoutOrderResponse>(
       API_ENDPOINTS.ORDERS_CHECKOUT,
-      payload
+      payload,
+      { timeout: ORDER_REQUEST_TIMEOUT_MS }
     );
 
     if (
@@ -308,7 +314,9 @@ export const checkoutOrder = async (
     }
 
     if (error instanceof Error) {
-      throw error;
+      throw new Error(
+        getOrderErrorMessage({ message: error.message }, "Gagal membuat pesanan.")
+      );
     }
 
     throw new Error("Terjadi kesalahan yang tidak diketahui.");
@@ -318,7 +326,8 @@ export const checkoutOrder = async (
 export const getMyOrders = async (): Promise<OrdersListResponse> => {
   try {
     const response = await apiClient.get<OrdersListResponse>(
-      API_ENDPOINTS.ORDERS_MY_ORDERS
+      API_ENDPOINTS.ORDERS_MY_ORDERS,
+      { timeout: ORDER_REQUEST_TIMEOUT_MS }
     );
 
     if (response?.status_code === 200 && Array.isArray(response.data)) {
@@ -343,7 +352,9 @@ export const getMyOrders = async (): Promise<OrdersListResponse> => {
     }
 
     if (error instanceof Error) {
-      throw error;
+      throw new Error(
+        getOrderErrorMessage({ message: error.message }, "Gagal mengambil daftar pesanan.")
+      );
     }
 
     throw new Error("Terjadi kesalahan yang tidak diketahui.");
@@ -355,7 +366,8 @@ export const getOrderDetail = async (
 ): Promise<OrderDetailResponse> => {
   try {
     const response = await apiClient.get<OrderDetailResponse>(
-      API_ENDPOINTS.ORDERS_DETAIL(orderId)
+      API_ENDPOINTS.ORDERS_DETAIL(orderId),
+      { timeout: ORDER_REQUEST_TIMEOUT_MS }
     );
 
     if (
@@ -376,7 +388,9 @@ export const getOrderDetail = async (
     }
 
     if (error instanceof Error) {
-      throw error;
+      throw new Error(
+        getOrderErrorMessage({ message: error.message }, "Gagal mengambil detail pesanan.")
+      );
     }
 
     throw new Error("Terjadi kesalahan yang tidak diketahui.");
