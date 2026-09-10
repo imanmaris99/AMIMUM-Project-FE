@@ -22,6 +22,7 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
   const selectedItemCount = activeItems.reduce((sum, item) => sum + item.quantity, 0);
   const hasSelectedItems = activeItems.length > 0;
   const hasValidTotal = total > 0;
+  const hasSyncMismatch = hasSelectedItems && !hasValidTotal && !isLoading;
   const canCheckout = !isLoading && hasSelectedItems && hasValidTotal;
   const allItemsSelected =
     cartItems.length > 0 && cartItems.every((item) => item.is_active !== false);
@@ -107,6 +108,11 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
                 : 'Pilih item dulu'}
           </button>
         </div>
+        {hasSyncMismatch && (
+          <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
+            Data keranjang sedang disinkronkan. Coba pilih ulang produk atau refresh halaman.
+          </p>
+        )}
       </div>
 
       {/* Home Indicator */}

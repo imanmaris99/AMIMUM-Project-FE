@@ -8,19 +8,19 @@ import { useCart } from "@/contexts/CartContext";
 
 const CartList: React.FC = () => {
   const router = useRouter();
-  const { cartItems, updateQuantity, updateActiveStatus, removeFromCart } = useCart();
+  const { cartItems, updateQuantity, updateActiveStatus, removeFromCart, isLoading } = useCart();
 
 
-  const handleQuantityChange = (cartId: string, quantity: number) => {
-    updateQuantity(cartId, quantity);
+  const handleQuantityChange = async (cartId: string, quantity: number) => {
+    await updateQuantity(cartId, quantity);
   };
 
-  const handleCheckChange = (cartId: string, checked: boolean) => {
-    updateActiveStatus(cartId, checked);
+  const handleCheckChange = async (cartId: string, checked: boolean) => {
+    await updateActiveStatus(cartId, checked);
   };
 
-  const handleDelete = (cartId: string) => {
-    removeFromCart(cartId);
+  const handleDelete = async (cartId: string) => {
+    await removeFromCart(cartId);
   };
 
   const handleStartShopping = () => {
@@ -50,6 +50,7 @@ const CartList: React.FC = () => {
           <CartItem
             key={item.id}
             item={item}
+            disabled={isLoading}
             onQuantityChange={handleQuantityChange}
             onCheckChange={handleCheckChange}
             onDelete={handleDelete}

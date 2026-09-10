@@ -3,17 +3,20 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 import { CartItemType } from "@/types/apiTypes";
 
 interface CartItemProps {
   item: CartItemType;
-  onQuantityChange?: (cartId: string, quantity: number) => void;
-  onCheckChange?: (cartId: string, checked: boolean) => void;
-  onDelete?: (cartId: string) => void;
+  disabled?: boolean;
+  onQuantityChange?: (cartId: string, quantity: number) => Promise<void> | void;
+  onCheckChange?: (cartId: string, checked: boolean) => Promise<void> | void;
+  onDelete?: (cartId: string) => Promise<void> | void;
 }
 
 const CartItem: React.FC<CartItemProps> = ({
   item,
+  disabled = false,
   onQuantityChange,
   onCheckChange,
   onDelete,
@@ -21,6 +24,8 @@ const CartItem: React.FC<CartItemProps> = ({
   const router = useRouter();
   const [quantity, setQuantity] = useState(item.quantity);
   const [isChecked, setIsChecked] = useState(item.is_active !== false);
+  const [isMutating, setIsMutating] = useState(false);
+  const isControlDisabled = disabled || isMutating;
 
   // Sync local state with context when item changes
   useEffect(() => {
@@ -28,32 +33,80 @@ const CartItem: React.FC<CartItemProps> = ({
     setIsChecked(item.is_active !== false);
   }, [item.id, item.quantity, item.is_active]);
 
-  const handleMinus = () => {
+  const handleMinus = async () => {
+    if (isControlDisabled) return;
     const newQuantity = Math.max(1, quantity - 1);
+    if (newQuantity === quantity) return;
+    const previousQuantity = quantity;
     setQuantity(newQuantity);
-    onQuantityChange?.(item.id, newQuantity);
+    setIsMutating(true);
+    try {
+      await onQuantityChange?.(item.id, newQuantity);
+    } catch (error) {
+      setQuantity(previousQuantity);
+      toast.error(error instanceof Error ? error.message : 'Gagal mengubah jumlah produk.');
+    } finally {
+      setIsMutating(false);
+    }
   };
 
-  const handlePlus = () => {
+  const handlePlus = async () => {
+    if (isControlDisabled) return;
     const newQuantity = Math.max(1, quantity + 1);
+    const previousQuantity = quantity;
     setQuantity(newQuantity);
-    onQuantityChange?.(item.id, newQuantity);
+    setIsMutating(true);
+    try {
+      await onQuantityChange?.(item.id, newQuantity);
+    } catch (error) {
+      setQuantity(previousQuantity);
+      toast.error(error instanceof Error ? error.message : 'Gagal mengubah jumlah produk.');
+    } finally {
+      setIsMutating(false);
+    }
   };
 
-  const handleQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleQuantityInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isControlDisabled) return;
     const newQuantity = Math.max(1, parseInt(e.target.value) || 1);
+    const previousQuantity = quantity;
     setQuantity(newQuantity);
-    onQuantityChange?.(item.id, newQuantity);
+    setIsMutating(true);
+    try {
+      await onQuantityChange?.(item.id, newQuantity);
+    } catch (error) {
+      setQuantity(previousQuantity);
+      toast.error(error instanceof Error ? error.message : 'Gagal mengubah jumlah produk.');
+    } finally {
+      setIsMutating(false);
+    }
   };
 
-  const handleCheckChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCheckChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isControlDisabled) return;
     const checked = e.target.checked;
+    const previousChecked = isChecked;
     setIsChecked(checked);
-    onCheckChange?.(item.id, checked);
+    setIsMutating(true);
+    try {
+      await onCheckChange?.(item.id, checked);
+    } catch (error) {
+      setIsChecked(previousChecked);
+      toast.error(error instanceof Error ? error.message : 'Gagal memilih produk. Coba lagi sebentar.');
+    } finally {
+      setIsMutating(false);
+    }
   };
 
-  const handleDelete = () => {
-    onDelete?.(item.id);
+  const handleDelete = async () => {
+    if (isControlDisabled) return;
+    setIsMutating(true);
+    try {
+      await onDelete?.(item.id);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Gagal menghapus produk.');
+      setIsMutating(false);
+    }
   };
 
   const handleItemClick = () => {
@@ -86,7 +139,7 @@ const CartItem: React.FC<CartItemProps> = ({
   }, [imageUrl, imageError]);
 
   return (
-    <article className="flex items-center gap-3 p-4 border border-gray-200 rounded-xl max-w-full mx-auto will-change-auto">
+    <article className={`flex items-center gap-3 p-4 border border-gray-200 rounded-xl max-w-full mx-auto will-change-auto ${isControlDisabled ? 'opacity-75' : ''}`}>
       {/* Checkbox */}
       <label className={`w-7 h-7 border-2 rounded-lg grid place-items-center cursor-pointer flex-shrink-0 transition-all duration-150 will-change-transform ${
         isChecked 
@@ -96,6 +149,7 @@ const CartItem: React.FC<CartItemProps> = ({
         <input 
           type="checkbox" 
           checked={isChecked}
+          disabled={isControlDisabled}
           onChange={handleCheckChange}
           className="appearance-none m-0 w-0 h-0 absolute"
         />
@@ -172,6 +226,7 @@ const CartItem: React.FC<CartItemProps> = ({
           className="w-6 h-6 border-none bg-transparent cursor-pointer opacity-80 hover:opacity-100 p-1" 
           title="Hapus" 
           onClick={handleDelete}
+          disabled={isControlDisabled}
         >
           <Image src="/Trush_Icon_UIA.svg" alt="Hapus" width={16} height={16} />
         </button>
@@ -182,6 +237,7 @@ const CartItem: React.FC<CartItemProps> = ({
             className="w-7 h-7 border-0 bg-gray-100 cursor-pointer text-sm hover:bg-gray-200" 
             aria-label="Kurangi" 
             onClick={handleMinus}
+            disabled={isControlDisabled || quantity <= 1}
           >
             −
           </button>
@@ -193,12 +249,14 @@ const CartItem: React.FC<CartItemProps> = ({
             inputMode="numeric" 
             aria-label="Jumlah"
             onChange={handleQuantityInput}
+            disabled={isControlDisabled}
           />
           <button 
             type="button" 
             className="w-7 h-7 border-0 bg-gray-100 cursor-pointer text-sm hover:bg-gray-200" 
-            aria-label="Tambah" 
+            aria-label="Tambah"
             onClick={handlePlus}
+            disabled={isControlDisabled}
           >
             +
           </button>

@@ -78,7 +78,10 @@ axiosClient.interceptors.response.use(
       API_ENDPOINTS.CART_MY_CART,
       API_ENDPOINTS.CART_TOTAL_ITEMS,
     ];
-    const isExpectedHandledEndpoint = expectedHandledEndpoints.includes(urlPath);
+    const isExpectedHandledEndpoint =
+      expectedHandledEndpoints.includes(urlPath) ||
+      /^\/cart\/(product|update-quantity|update-activate|delete)(?:\/|$)/.test(urlPath) ||
+      urlPath === API_ENDPOINTS.CART_UPDATE_ACTIVATE_ALL;
     
     if (error.response) {
       switch (status) {
