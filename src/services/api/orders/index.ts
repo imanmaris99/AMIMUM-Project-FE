@@ -212,6 +212,18 @@ const extractPaymentMethodFromNotes = (
   return aliases[paymentMethod];
 };
 
+const inferPaymentMethod = (order: Pick<OrderListItemDto, "notes" | "status">) => {
+  const fromNotes = extractPaymentMethodFromNotes(order.notes);
+  if (fromNotes) return fromNotes;
+
+  const status = order.status.toLowerCase();
+  if (["pending", "capture", "settlement", "paid"].includes(status)) {
+    return "qris" satisfies TransactionPaymentMethod;
+  }
+
+  return undefined;
+};
+
 const sanitizeCustomerNotes = (notes?: string | null): string | undefined => {
   const sanitized = notes
     ?.replace(/\[(?:PAYMENT|POS_SUBTOTAL|POS_DISCOUNT|POS_TOTAL):[^\]]*\]/gi, "")
@@ -257,7 +269,7 @@ export const mapOrderSummaryToTransaction = (
     subtotal,
     shippingCost: order.shipping_cost || 0,
     deliveryType: order.delivery_type,
-    paymentMethod: extractPaymentMethodFromNotes(order.notes),
+    paymentMethod: inferPaymentMethod(order),
     notes: sanitizeCustomerNotes(order.notes),
     shipmentId: order.shipment_id,
   };
