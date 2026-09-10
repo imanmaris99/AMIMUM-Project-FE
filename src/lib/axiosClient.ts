@@ -156,12 +156,14 @@ axiosClient.interceptors.response.use(
           }
       }
     } else if (error.request) {
-      await ErrorHandler.handleError(
-        new Error('Network error - no response received'),
-        'API_NETWORK',
-        true,
-        () => axiosClient(originalRequest)
-      );
+      if (!isExpectedHandledEndpoint) {
+        await ErrorHandler.handleError(
+          new Error('Network error - no response received'),
+          'API_NETWORK',
+          true,
+          () => axiosClient(originalRequest)
+        );
+      }
     } else {
       await ErrorHandler.handleError(
         new Error(errorMessage || 'Request setup error'),

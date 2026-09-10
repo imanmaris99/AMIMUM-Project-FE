@@ -246,6 +246,11 @@ export async function withRetry<T>(
   let lastError: unknown;
 
   const shouldRetry = (error: unknown) => {
+    const maybeCode = (error as { code?: string })?.code;
+    if (maybeCode === 'ECONNABORTED') {
+      return false;
+    }
+
     const maybeStatus = (error as { response?: { status?: number }; status?: number })?.response?.status ||
       (error as { status?: number })?.status;
 

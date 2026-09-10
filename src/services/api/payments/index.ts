@@ -51,6 +51,8 @@ interface PaymentErrorResponse {
 const PAYMENT_SERVICE_ERROR_MESSAGE =
   "Layanan pembayaran online sementara belum tersedia. Silakan pilih metode COD/bayar di toko atau coba beberapa saat lagi.";
 
+const PAYMENT_REQUEST_TIMEOUT_MS = 60000;
+
 const sanitizePaymentError = (message?: string): string | undefined => {
   if (!message) return undefined;
 
@@ -60,6 +62,10 @@ const sanitizePaymentError = (message?: string): string | undefined => {
 
   if (message.includes("Order tidak valid untuk pembayaran")) {
     return "Pesanan ini tidak bisa dibayar lagi. Cek status terbaru di halaman transaksi.";
+  }
+
+  if (message.includes("timeout") || message.includes("ECONNABORTED")) {
+    return "Pembayaran membutuhkan waktu lebih lama dari biasanya. Silakan tekan Lanjutkan Pembayaran lagi beberapa saat lagi.";
   }
 
   const technicalMarkers = [
@@ -105,7 +111,8 @@ export const createPayment = async (
   try {
     const response = await apiClient.post<CreatePaymentResponse>(
       API_ENDPOINTS.PAYMENTS_CREATE,
-      payload
+      payload,
+      { timeout: PAYMENT_REQUEST_TIMEOUT_MS }
     );
 
     if (
