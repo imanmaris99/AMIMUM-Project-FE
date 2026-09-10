@@ -109,6 +109,9 @@ const getOrderErrorMessage = (
 ) => {
   const normalizeMessage = (message?: string) => {
     if (!message) return undefined;
+    if (message.includes("Order tidak ditemukan")) {
+      return "Transaksi tidak ditemukan di server. Silakan cek halaman transaksi terbaru atau ulangi checkout dari keranjang.";
+    }
     if (message.includes("Active cart items")) {
       return "Keranjang aktif tidak ditemukan. Jika pesanan baru saja dibuat, cek halaman transaksi dan lanjutkan pembayaran dari sana.";
     }
@@ -367,7 +370,9 @@ export const getOrderDetail = async (
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response) {
       const errorData = error.response.data as OrderErrorResponse;
-      throw new Error(errorData.message || "Gagal mengambil detail pesanan.");
+      throw new Error(
+        getOrderErrorMessage(errorData, "Gagal mengambil detail pesanan.")
+      );
     }
 
     if (error instanceof Error) {

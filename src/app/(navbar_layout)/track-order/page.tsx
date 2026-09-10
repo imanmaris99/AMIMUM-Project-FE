@@ -21,6 +21,9 @@ import {
 } from "@/services/api/orders";
 import { useTransaction } from "@/contexts/TransactionContext";
 
+const BACKEND_ORDER_ID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const TrackOrderPage: React.FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -49,6 +52,16 @@ const TrackOrderPage: React.FC = () => {
 
       try {
         if (transactionId) {
+          if (BACKEND_ORDER_ID_PATTERN.test(transactionId)) {
+            const detailResponse = await getOrderDetail(transactionId);
+            const mappedTransaction = mapOrderDetailToTransaction(
+              detailResponse.data
+            );
+            setApiOrders([mappedTransaction]);
+            setCurrentTransaction(mappedTransaction);
+            return;
+          }
+
           const localTransaction = localTransactions.find(
             (transaction) => transaction.id === transactionId
           );
@@ -58,14 +71,7 @@ const TrackOrderPage: React.FC = () => {
             setApiOrders([]);
             return;
           }
-
-          const detailResponse = await getOrderDetail(transactionId);
-          const mappedTransaction = mapOrderDetailToTransaction(
-            detailResponse.data
-          );
-          setApiOrders([mappedTransaction]);
-          setCurrentTransaction(mappedTransaction);
-          return;
+          throw new Error("Data tracking belum tersimpan di server. Silakan cek transaksi terbaru.");
         }
 
         const listResponse = await getMyOrders();

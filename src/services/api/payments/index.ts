@@ -54,6 +54,14 @@ const PAYMENT_SERVICE_ERROR_MESSAGE =
 const sanitizePaymentError = (message?: string): string | undefined => {
   if (!message) return undefined;
 
+  if (message.includes("Order tidak ditemukan")) {
+    return "Transaksi tidak ditemukan di server. Silakan cek halaman transaksi terbaru atau ulangi checkout dari keranjang.";
+  }
+
+  if (message.includes("Order tidak valid untuk pembayaran")) {
+    return "Pesanan ini tidak bisa dibayar lagi. Cek status terbaru di halaman transaksi.";
+  }
+
   const technicalMarkers = [
     "Midtrans",
     "snap",

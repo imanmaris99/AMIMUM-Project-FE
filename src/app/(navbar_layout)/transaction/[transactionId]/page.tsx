@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "react-hot-toast";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
+import LoginProtection from "@/components/common/LoginProtection";
 import rupiahFormater from "@/utils/rupiahFormater";
 import { getPaymentMethodLabel } from "@/lib/paymentMethods";
 import { Transaction } from "@/types/transaction";
@@ -21,6 +22,9 @@ import {
   isOfflinePaymentMethod,
   isPendingPaymentStatus,
 } from "@/lib/transactionStatus";
+
+const BACKEND_ORDER_ID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const TransactionDetailPage: React.FC = () => {
   const params = useParams();
@@ -51,14 +55,19 @@ const TransactionDetailPage: React.FC = () => {
       setErrorMessage(null);
 
       try {
+        if (BACKEND_ORDER_ID_PATTERN.test(transactionId)) {
+          const response = await getOrderDetail(transactionId);
+          setTransaction(mapOrderDetailToTransaction(response.data));
+          return;
+        }
+
         const localTransaction = getTransactionById(transactionId);
         if (localTransaction) {
           setTransaction(localTransaction);
           return;
         }
 
-        const response = await getOrderDetail(transactionId);
-        setTransaction(mapOrderDetailToTransaction(response.data));
+        throw new Error("Transaksi belum tersimpan di server. Silakan cek halaman transaksi terbaru atau ulangi checkout dari keranjang.");
       } catch (error) {
         setErrorMessage(
           error instanceof Error
@@ -228,37 +237,53 @@ const TransactionDetailPage: React.FC = () => {
 
   if (!transaction || errorMessage) {
     return (
-      <div className="min-h-screen bg-white">
-        <UnifiedHeader
-          type="secondary"
-          title="Detail Transaksi"
-          showBackButton={true}
-          onBack={handleBack}
-        />
-        <div className="flex flex-col items-center justify-center h-64 px-4">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-            <svg
-              className="w-8 h-8 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
+      <LoginProtection useModal={true} feature="transaction">
+        <div className="min-h-screen bg-white">
+          <UnifiedHeader
+            type="secondary"
+            title="Detail Transaksi"
+            showBackButton={true}
+            onBack={handleBack}
+          />
+          <div className="flex flex-col items-center justify-center min-h-[420px] px-4">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <svg
+                className="w-8 h-8 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Transaksi Tidak Ditemukan
+            </h3>
+            <p className="text-gray-500 text-sm text-center max-w-xs">
+              {errorMessage || `Transaksi dengan ID ${transactionId} tidak ditemukan`}
+            </p>
+            <div className="mt-5 grid w-full max-w-xs gap-3">
+              <button
+                onClick={() => router.push("/transaction")}
+                className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+              >
+                Cek Transaksi Terbaru
+              </button>
+              <button
+                onClick={() => router.push("/cart")}
+                className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+              >
+                Kembali ke Keranjang
+              </button>
+            </div>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Transaksi Tidak Ditemukan
-          </h3>
-          <p className="text-gray-500 text-sm text-center">
-            {errorMessage || `Transaksi dengan ID ${transactionId} tidak ditemukan`}
-          </p>
         </div>
-      </div>
+      </LoginProtection>
     );
   }
 
@@ -280,6 +305,7 @@ const TransactionDetailPage: React.FC = () => {
         : "Pesanan pickup sedang disiapkan toko. Ambil pesanan setelah status siap diambil.";
 
   return (
+    <LoginProtection useModal={true} feature="transaction">
     <div className="min-h-screen bg-gray-50">
       <UnifiedHeader
         type="secondary"
@@ -503,6 +529,7 @@ const TransactionDetailPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </LoginProtection>
   );
 };
 
