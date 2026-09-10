@@ -16,89 +16,14 @@ export interface PaymentMethodGroup {
 
 const DELIVERY_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
   {
-    id: "virtual_account",
-    title: "Virtual Account",
-    methods: [
-      {
-        id: "bca_va",
-        name: "BCA Virtual Account",
-        description: "Dicek otomatis setelah pembayaran berhasil",
-        badge: "BCA",
-        isAvailable: true,
-      },
-      {
-        id: "mandiri_va",
-        name: "Mandiri Virtual Account",
-        description: "Dicek otomatis setelah pembayaran berhasil",
-        badge: "MDR",
-        isAvailable: true,
-      },
-      {
-        id: "bni_va",
-        name: "BNI Virtual Account",
-        description: "Dicek otomatis setelah pembayaran berhasil",
-        badge: "BNI",
-        isAvailable: true,
-      },
-      {
-        id: "bri_va",
-        name: "BRI Virtual Account",
-        description: "Dicek otomatis setelah pembayaran berhasil",
-        badge: "BRI",
-        isAvailable: true,
-      },
-      {
-        id: "bsi_va",
-        name: "BSI Virtual Account",
-        description: "Dicek otomatis setelah pembayaran berhasil",
-        badge: "BSI",
-        isAvailable: true,
-      },
-      {
-        id: "permata_va",
-        name: "Permata Virtual Account",
-        description: "Tersedia untuk transaksi ini",
-        badge: "PMT",
-        isAvailable: true,
-      },
-    ],
-  },
-  {
-    id: "dompet_digital",
-    title: "Dompet Digital",
-    methods: [
-      {
-        id: "gopay",
-        name: "GoPay",
-        description: "Tersedia untuk transaksi ini",
-        badge: "GP",
-        isAvailable: true,
-      },
-      {
-        id: "ovo",
-        name: "OVO",
-        description: "Dalam perbaikan",
-        badge: "OV",
-        isAvailable: false,
-      },
-      {
-        id: "dana",
-        name: "DANA",
-        description: "Dalam perbaikan",
-        badge: "DN",
-        isAvailable: false,
-      },
-    ],
-  },
-  {
-    id: "instan",
-    title: "Pembayaran Instan",
+    id: "online_payment",
+    title: "Pembayaran Online",
     methods: [
       {
         id: "qris",
-        name: "QRIS",
-        description: "Status awal menunggu pembayaran",
-        badge: "QR",
+        name: "Bayar Online via Midtrans",
+        description: "Pilih VA, QRIS, GoPay, atau kartu di halaman Midtrans",
+        badge: "MT",
         isAvailable: true,
       },
     ],
@@ -140,26 +65,14 @@ const DELIVERY_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
 
 const PICKUP_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
   {
-    id: "virtual_account",
-    title: "Virtual Account",
-    methods: DELIVERY_PAYMENT_METHOD_GROUPS[0].methods,
-  },
-  {
-    id: "digital",
-    title: "Dompet Digital",
+    id: "online_payment",
+    title: "Pembayaran Online",
     methods: [
       {
-        id: "gopay",
-        name: "GoPay",
-        description: "Bayar online sebelum ambil di toko",
-        badge: "GP",
-        isAvailable: true,
-      },
-      {
         id: "qris",
-        name: "QRIS",
-        description: "Bayar online sebelum ambil di toko",
-        badge: "QR",
+        name: "Bayar Online via Midtrans",
+        description: "Pilih VA, QRIS, GoPay, atau kartu di halaman Midtrans",
+        badge: "MT",
         isAvailable: true,
       },
     ],

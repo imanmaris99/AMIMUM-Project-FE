@@ -121,6 +121,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const [expandedPaymentGroups, setExpandedPaymentGroups] = useState<
     Record<string, boolean>
   >({});
+  const [isRecoveringCreatedOrder, setIsRecoveringCreatedOrder] = useState(false);
 
   const paymentMethodGroups = getPaymentMethodGroups(deliveryMethod);
 
@@ -277,7 +278,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   useEffect(() => {
     setExpandedPaymentGroups(
       paymentMethodGroups.reduce<Record<string, boolean>>((accumulator, group) => {
-        accumulator[group.id] = false;
+        accumulator[group.id] = group.id === 'online_payment';
         return accumulator;
       }, {})
     );
@@ -583,10 +584,18 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       
     } catch (error) {
       const rawMessage = error instanceof Error ? error.message : 'Unknown error';
-      const customerMessage = rawMessage.includes('Active cart items')
-        ? 'Keranjang aktif tidak ditemukan. Jika pesanan baru saja dibuat, cek halaman transaksi dan lanjutkan pembayaran dari sana.'
+      const isActiveCartError = rawMessage.includes('Active cart items');
+      const customerMessage = isActiveCartError
+        ? 'Pesanan kemungkinan sudah dibuat. Saya arahkan ke halaman transaksi agar pembayaran bisa dilanjutkan dari sana.'
         : rawMessage;
       toast.error(`Terjadi kesalahan saat memproses pesanan: ${customerMessage}`);
+      if (isActiveCartError) {
+        setIsRecoveringCreatedOrder(true);
+        await refreshCart();
+        setTimeout(() => {
+          router.push('/transaction');
+        }, 900);
+      }
       isSubmittingRef.current = false;
       setIsLoading(false);
     }
@@ -977,6 +986,9 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         {/* Payment Method */}
         <div className="px-4 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Metode Pembayaran</h2>
+          <div className="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-3 py-3 text-sm text-blue-800">
+            Untuk pembayaran online, toko akan membuka halaman resmi Midtrans. Customer bisa pilih VA, QRIS, GoPay, atau kartu di sana.
+          </div>
           <div className="space-y-4">
             {paymentMethodGroups.map((group: PaymentMethodGroup) => (
               <div key={group.id} className="overflow-hidden rounded-2xl border border-gray-200">
@@ -1060,7 +1072,9 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                 : 'bg-primary text-white hover:bg-primary/90 active:scale-95'
             }`}
           >
-            {isLoading ? (
+            {isRecoveringCreatedOrder ? (
+              'Mengarahkan ke Transaksi...'
+            ) : isLoading ? (
               <ButtonSpinner size="md" color="white" text="Memproses..." />
             ) : (
               `${
