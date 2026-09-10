@@ -16,9 +16,9 @@ interface DeliveryAddressProps {
 }
 
 const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
-  orderDate = "03 Oktober 2024",
-  paymentStatus = "Lunas",
-  trackingNumber = "11000280330003",
+  orderDate = "-",
+  paymentStatus = "Belum tersedia",
+  trackingNumber,
   recipientName,
   phone,
   address,
@@ -57,15 +57,19 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
             </span>
           </div>
           
-          {/* No. Resi */}
           <div className="flex justify-between items-center">
             <span className="text-sm text-[#A2A2A2]">
-              ID Pengiriman
+              No. Resi
             </span>
-            <span className="text-sm font-medium text-[#0D0E09]">
-              {trackingNumber}
+            <span className="text-sm font-medium text-[#0D0E09] text-right">
+              {trackingNumber || "Belum tersedia"}
             </span>
           </div>
+          {!trackingNumber && (
+            <div className="rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
+              Resi akan muncul setelah admin memproses dan mengirim pesanan.
+            </div>
+          )}
           {recipientName && (
             <div className="flex justify-between items-start gap-4">
               <span className="text-sm text-[#A2A2A2]">

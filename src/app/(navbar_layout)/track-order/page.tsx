@@ -167,6 +167,22 @@ const TrackOrderPage: React.FC = () => {
     }
   };
 
+  const getTrackingHelpText = (transaction: Transaction) => {
+    if (transaction.status === "pending") {
+      return "Pesanan sudah tercatat dan sedang menunggu pembayaran. Selesaikan pembayaran dari halaman transaksi agar pesanan bisa diproses.";
+    }
+
+    if (transaction.deliveryType !== "delivery") {
+      return "Pesanan pickup akan disiapkan toko. Datang ke toko setelah status siap diambil.";
+    }
+
+    if (transaction.status === "shipped") {
+      return "Pesanan sedang dalam pengiriman. Gunakan nomor resi dari admin untuk cek detail di website kurir.";
+    }
+
+    return "Pesanan sedang diproses toko. Nomor resi akan muncul setelah admin mengirim pesanan.";
+  };
+
   return (
     <LoginProtection useModal={true} feature="tracking">
       <div className="min-h-screen bg-gray-100">
@@ -276,6 +292,9 @@ const TrackOrderPage: React.FC = () => {
                       </span>
                     </div>
                   </div>
+                  <div className="mt-4 rounded-lg bg-primary/5 px-3 py-2 text-xs font-medium text-primary">
+                    {getTrackingHelpText(currentTransaction)}
+                  </div>
                 </div>
               )}
 
@@ -293,7 +312,7 @@ const TrackOrderPage: React.FC = () => {
                 <DeliveryAddress
                   orderDate={currentTransaction.date}
                   paymentStatus={getStatusConfig(currentTransaction.status).text}
-                  trackingNumber={currentTransaction.shipmentId || "Belum tersedia"}
+                  trackingNumber={undefined}
                   recipientName={currentTransaction.shipmentAddress?.recipientName}
                   phone={currentTransaction.shipmentAddress?.phone}
                   address={currentTransaction.shipmentAddress?.address}

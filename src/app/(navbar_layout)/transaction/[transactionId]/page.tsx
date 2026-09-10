@@ -91,10 +91,15 @@ const TransactionDetailPage: React.FC = () => {
       return;
     }
 
+    const customerStatus = getCustomerStatusConfig(
+      transaction.status,
+      transaction.paymentMethod
+    ).text;
+
     const invoiceLines = [
       `Invoice ${transaction.transactionId}`,
       `Tanggal: ${transaction.date}`,
-      `Status: ${transaction.status}`,
+      `Status: ${customerStatus}`,
       `Metode Pengiriman: ${
         transaction.deliveryType === "delivery" ? "Kirim ke tujuan" : "Ambil di toko"
       }`,
@@ -266,6 +271,13 @@ const TransactionDetailPage: React.FC = () => {
   const isOfflinePayment = isOfflinePaymentMethod(transaction.paymentMethod);
   const shouldShowPaymentActions =
     !isLocalSimulatedTransaction && !isOfflinePayment && (isPendingPayment || canRetryPayment);
+  const transactionGuidance = isPendingPayment
+    ? "Pesanan sudah tercatat. Selesaikan pembayaran agar pesanan bisa diproses toko."
+    : canRetryPayment
+      ? "Pembayaran belum berhasil. Coba bayar lagi atau hubungi admin jika butuh bantuan."
+      : transaction.deliveryType === "delivery"
+        ? "Pesanan sedang diproses toko. Resi akan tersedia setelah admin mengirim pesanan."
+        : "Pesanan pickup sedang disiapkan toko. Ambil pesanan setelah status siap diambil.";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -329,6 +341,9 @@ const TransactionDetailPage: React.FC = () => {
                   {rupiahFormater(transaction.total)}
                 </span>
               </div>
+            </div>
+            <div className="mt-4 rounded-lg bg-primary/5 px-3 py-2 text-xs font-medium text-primary">
+              {transactionGuidance}
             </div>
           </div>
 

@@ -90,6 +90,11 @@ const StatusOrder: React.FC<StatusOrderProps> = ({ currentStatus = 0, deliveryTy
         <h3 className="text-lg font-semibold text-[#0D0E09]">
           Status Pesanan
         </h3>
+        {currentStatus < 0 && (
+          <div className="rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
+            Pesanan belum masuk proses pengiriman. Jika pembayaran belum selesai, lanjutkan pembayaran dari halaman transaksi.
+          </div>
+        )}
         
         {/* Status List */}
         <div className="space-y-5">
