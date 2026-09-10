@@ -11,7 +11,7 @@ import ButtonSpinner from '@/components/ui/ButtonSpinner';
 import { useCart } from '@/contexts/CartContext';
 import { CartItemType } from '@/types/apiTypes';
 import { useTransaction } from '@/contexts/TransactionContext';
-import { checkoutOrder } from '@/services/api/orders';
+import { checkoutOrder, getMyOrders } from '@/services/api/orders';
 import { createPayment } from '@/services/api/payments';
 import { CartApiItem, extractVariantInfo, getMyCartProducts } from '@/services/api/cart';
 import { createShipment, activateShipment, getMyShipments } from '@/services/api/shipment';
@@ -359,6 +359,51 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     };
   };
 
+  const recoverLatestPendingPayment = async (
+    selectedPayment: TransactionPaymentMethod
+  ) => {
+    const ordersResponse = await getMyOrders();
+    const now = Date.now();
+    const recentPendingOnlineOrder = ordersResponse.data.find((order) => {
+      const createdAt = new Date(order.created_at).getTime();
+      const ageMinutes = Number.isFinite(createdAt)
+        ? (now - createdAt) / 60000
+        : Number.POSITIVE_INFINITY;
+      const paymentToken = order.notes?.match(/\[PAYMENT:\s*([^\]]+)\]/i)?.[1]?.trim().toLowerCase();
+
+      return (
+        order.status?.toLowerCase() === 'pending' &&
+        ageMinutes <= 30 &&
+        paymentToken === selectedPayment
+      );
+    });
+
+    if (!recentPendingOnlineOrder) {
+      return false;
+    }
+
+    try {
+      const paymentResponse = await createPayment({
+        order_id: recentPendingOnlineOrder.id,
+      });
+
+      if (paymentResponse.data.redirect_url) {
+        toast.success('Pesanan ditemukan. Mengalihkan ke halaman pembayaran.');
+        window.location.href = paymentResponse.data.redirect_url;
+        return true;
+      }
+    } catch (paymentError) {
+      toast.error(
+        paymentError instanceof Error
+          ? `Pesanan sudah dibuat, tetapi pembayaran belum terbuka: ${paymentError.message}`
+          : 'Pesanan sudah dibuat, tetapi pembayaran belum terbuka.'
+      );
+    }
+
+    router.push(`/transaction/${recentPendingOnlineOrder.id}`);
+    return true;
+  };
+
   const canSubmitOrder =
     !isLoading &&
     !isReferenceLoading &&
@@ -499,15 +544,16 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       const freshCheckoutCart = await buildCheckoutCartItems();
 
       if (freshCheckoutCart.items.length === 0) {
+        if (isOnlinePayment && await recoverLatestPendingPayment(selectedPayment)) {
+          return;
+        }
+
         setErrors((previous) => ({
           ...previous,
           cart: 'Keranjang aktif tidak ditemukan. Silakan pilih produk dari keranjang dulu.',
         }));
-        toast.error('Keranjang aktif tidak ditemukan. Saya arahkan kembali ke keranjang.');
-        await refreshCart();
-        setTimeout(() => {
-          router.push('/cart');
-        }, 700);
+        toast.error('Keranjang aktif tidak ditemukan. Saya arahkan kembali ke halaman transaksi jika pesanan sudah dibuat.');
+        router.push('/transaction');
         return;
       }
 
@@ -623,7 +669,6 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             return;
           }
         } catch (paymentError) {
-          await refreshCart();
           toast.error(
             paymentError instanceof Error
               ? `Pesanan sudah dibuat, tetapi halaman pembayaran belum terbuka: ${paymentError.message}`
@@ -649,15 +694,21 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       const rawMessage = error instanceof Error ? error.message : 'Unknown error';
       const isActiveCartError = rawMessage.includes('Active cart items') || rawMessage.includes('Keranjang aktif tidak ditemukan');
       const customerMessage = isActiveCartError
-        ? 'Keranjang aktif tidak ditemukan. Jika pesanan baru saja dibuat, cek halaman transaksi. Jika belum, pilih ulang produk dari keranjang.'
+        ? 'Keranjang aktif tidak ditemukan. Jika pesanan baru saja dibuat, saya coba arahkan ke pembayaran atau detail transaksi.'
         : rawMessage;
       toast.error(`Terjadi kesalahan saat memproses pesanan: ${customerMessage}`);
       if (isActiveCartError) {
         setIsRecoveringCreatedOrder(true);
-        await refreshCart();
-        setTimeout(() => {
-          router.push('/cart');
-        }, 900);
+        const selectedPayment = selectedPaymentMethod as TransactionPaymentMethod | null;
+        if (
+          selectedPayment &&
+          requiresPendingPayment(selectedPayment) &&
+          await recoverLatestPendingPayment(selectedPayment)
+        ) {
+          return;
+        }
+
+        router.push('/transaction');
       }
       isSubmittingRef.current = false;
       setIsLoading(false);
