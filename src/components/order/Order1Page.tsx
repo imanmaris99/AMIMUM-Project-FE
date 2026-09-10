@@ -13,6 +13,7 @@ import { CartItemType } from '@/types/apiTypes';
 import { useTransaction } from '@/contexts/TransactionContext';
 import { checkoutOrder } from '@/services/api/orders';
 import { createPayment } from '@/services/api/payments';
+import { CartApiItem, extractVariantInfo, getMyCartProducts } from '@/services/api/cart';
 import { createShipment, activateShipment, getMyShipments } from '@/services/api/shipment';
 import CourierSelector from './CourierSelector';
 import AddressSelector from './AddressSelector';
@@ -314,6 +315,50 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
   const currentItems = cartItems.filter((item) => item.is_active !== false);
 
+  const buildCheckoutCartItems = async () => {
+    const freshCart = await getMyCartProducts();
+    const freshActiveItems = freshCart.data.filter((item: CartApiItem) => item.is_active !== false);
+
+    if (freshActiveItems.length === 0) {
+      return {
+        items: [] as CartItemType[],
+        subtotal: 0,
+        total: 0,
+      };
+    }
+
+    const activeItemsById = new Map(currentItems.map((item) => [item.id, item]));
+
+    return {
+      items: freshActiveItems.map((item: CartApiItem) => {
+        const existingItem = activeItemsById.get(item.id.toString());
+        if (existingItem) {
+          return existingItem;
+        }
+
+        const variantInfo = extractVariantInfo(item.variant_info);
+        return {
+          id: item.id.toString(),
+          product_id: '',
+          variant_id: typeof variantInfo.id === 'number' ? variantInfo.id : 0,
+          quantity: item.quantity,
+          price:
+            typeof variantInfo.discounted_price === 'number'
+              ? variantInfo.discounted_price
+              : item.product_price,
+          product_name: item.product_name,
+          variant_name: variantInfo.variant || '',
+          image: variantInfo.img || '/default-image.jpg',
+          created_at: item.created_at,
+          updated_at: variantInfo.updated_at || item.created_at,
+          is_active: item.is_active,
+        };
+      }),
+      subtotal: freshCart.total_prices.all_item_active_prices,
+      total: freshCart.total_prices.total_all_active_prices,
+    };
+  };
+
   const canSubmitOrder =
     !isLoading &&
     !isReferenceLoading &&
@@ -451,6 +496,24 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     try {
       const selectedPayment = selectedPaymentMethod as TransactionPaymentMethod;
       const isOnlinePayment = requiresPendingPayment(selectedPayment);
+      const freshCheckoutCart = await buildCheckoutCartItems();
+
+      if (freshCheckoutCart.items.length === 0) {
+        setErrors((previous) => ({
+          ...previous,
+          cart: 'Keranjang aktif tidak ditemukan. Silakan pilih produk dari keranjang dulu.',
+        }));
+        toast.error('Keranjang aktif tidak ditemukan. Saya arahkan kembali ke keranjang.');
+        await refreshCart();
+        setTimeout(() => {
+          router.push('/cart');
+        }, 700);
+        return;
+      }
+
+      const checkoutSubtotal = freshCheckoutCart.subtotal;
+      const checkoutShipping = deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0;
+      const checkoutTotal = freshCheckoutCart.total + checkoutShipping;
       const backendCheckoutNotes = [
         `[PAYMENT: ${selectedPayment}]`,
         additionalNotes || (deliveryMethod === 'pickup' ? 'Ambil di toko' : undefined),
@@ -464,7 +527,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         payment_method: selectedPayment,
         notes: additionalNotes || (deliveryMethod === 'pickup' ? 'Ambil di toko' : undefined),
         shipment_id: deliveryMethod === 'delivery' ? selectedCourierService : undefined,
-        shipping_cost: deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0,
+        shipping_cost: checkoutShipping,
         shipment_address:
           deliveryMethod === 'delivery' && selectedAddress && selectedCourierData
             ? {
@@ -522,9 +585,9 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       const checkoutResponse = await checkoutOrder({
         notes: backendCheckoutNotes,
         payment_method: selectedPayment,
-        subtotal: totals.subtotal,
+        subtotal: checkoutSubtotal,
         discount_total: totals.discount,
-        final_total: totals.total,
+        final_total: checkoutTotal,
       });
 
       const backendOrder = checkoutResponse.data;
@@ -544,7 +607,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
           backend_order_status: normalizeBackendOrderStatus(backendOrder.status),
           backend_created_at: backendOrder.created_at,
         },
-        currentItems
+        freshCheckoutCart.items
       );
 
       if (!newTransaction) {
@@ -584,16 +647,16 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       
     } catch (error) {
       const rawMessage = error instanceof Error ? error.message : 'Unknown error';
-      const isActiveCartError = rawMessage.includes('Active cart items');
+      const isActiveCartError = rawMessage.includes('Active cart items') || rawMessage.includes('Keranjang aktif tidak ditemukan');
       const customerMessage = isActiveCartError
-        ? 'Pesanan kemungkinan sudah dibuat. Saya arahkan ke halaman transaksi agar pembayaran bisa dilanjutkan dari sana.'
+        ? 'Keranjang aktif tidak ditemukan. Jika pesanan baru saja dibuat, cek halaman transaksi. Jika belum, pilih ulang produk dari keranjang.'
         : rawMessage;
       toast.error(`Terjadi kesalahan saat memproses pesanan: ${customerMessage}`);
       if (isActiveCartError) {
         setIsRecoveringCreatedOrder(true);
         await refreshCart();
         setTimeout(() => {
-          router.push('/transaction');
+          router.push('/cart');
         }, 900);
       }
       isSubmittingRef.current = false;

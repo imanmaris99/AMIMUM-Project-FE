@@ -245,13 +245,24 @@ export async function withRetry<T>(
 ): Promise<T> {
   let lastError: unknown;
 
+  const shouldRetry = (error: unknown) => {
+    const maybeStatus = (error as { response?: { status?: number }; status?: number })?.response?.status ||
+      (error as { status?: number })?.status;
+
+    if (!maybeStatus) {
+      return true;
+    }
+
+    return maybeStatus === 429 || maybeStatus >= 500;
+  };
+
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error;
       
-      if (attempt === maxAttempts) {
+      if (attempt === maxAttempts || !shouldRetry(error)) {
         throw error;
       }
 

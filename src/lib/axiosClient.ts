@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { ErrorHandler, withRetry, safeAsync } from "./errorHandler";
 import { SessionManager, isJwtToken } from "./auth";
-import { API_BASE_URL } from "./apiConfig";
+import { API_BASE_URL, API_ENDPOINTS } from "./apiConfig";
 
 interface AxiosRequestConfigWithMetadata extends AxiosRequestConfig {
   metadata?: {
@@ -72,6 +72,13 @@ axiosClient.interceptors.response.use(
     ) && 
     !urlPath.includes('/product/detail/') &&
     !urlPath.includes('/product/discount/');
+    const expectedHandledEndpoints: string[] = [
+      API_ENDPOINTS.ORDERS_CHECKOUT,
+      API_ENDPOINTS.PAYMENTS_CREATE,
+      API_ENDPOINTS.CART_MY_CART,
+      API_ENDPOINTS.CART_TOTAL_ITEMS,
+    ];
+    const isExpectedHandledEndpoint = expectedHandledEndpoints.includes(urlPath);
     
     if (error.response) {
       switch (status) {
@@ -98,7 +105,7 @@ axiosClient.interceptors.response.use(
 
         case 404:
           // Skip ErrorHandler for search endpoints - 404 is expected (no products found)
-          if (!isSearchEndpoint) {
+          if (!isSearchEndpoint && !isExpectedHandledEndpoint) {
             await ErrorHandler.handleError(
               new Error('Resource not found'),
               'API_404',
@@ -137,11 +144,13 @@ axiosClient.interceptors.response.use(
           break;
 
         default:
-          await ErrorHandler.handleError(
+          if (!isExpectedHandledEndpoint) {
+            await ErrorHandler.handleError(
             new Error(errorMessage || 'Request failed'),
             'API_4xx',
             false
-          );
+            );
+          }
       }
     } else if (error.request) {
       await ErrorHandler.handleError(
