@@ -86,6 +86,26 @@ const writeCartMetadata = (metadataMap: CartMetadataMap) => {
 const createCartMetadataKey = (productName: string, variantId: number) =>
   `${productName}::${variantId}`;
 
+const calculateActiveCartTotals = (items: CartItemType[]): CartTotalPricesType => {
+  const activeItems = items.filter((item) => item.is_active !== false);
+  const subtotal = activeItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
+  return {
+    subtotal,
+    shipping_cost: 0,
+    total: subtotal,
+    promo_total: 0,
+  };
+};
+
+const countActiveCartItems = (items: CartItemType[]) =>
+  items
+    .filter((item) => item.is_active !== false)
+    .reduce((sum, item) => sum + item.quantity, 0);
+
 const normalizeCartItem = (
   item: {
     id: number;
@@ -250,9 +270,17 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         cartId,
         quantity,
       });
-      await refreshCart();
+
+      setCartItems((previousItems) => {
+        const nextItems = previousItems.map((item) =>
+          item.id === cartId ? { ...item, quantity } : item
+        );
+        setTotalItems(countActiveCartItems(nextItems));
+        setTotalPrices(calculateActiveCartTotals(nextItems));
+        return nextItems;
+      });
     },
-    [refreshCart]
+    []
   );
 
   const updateActiveStatus = useCallback(
@@ -265,9 +293,17 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         cartId,
         isActive,
       });
-      await refreshCart();
+
+      setCartItems((previousItems) => {
+        const nextItems = previousItems.map((item) =>
+          item.id === cartId ? { ...item, is_active: isActive } : item
+        );
+        setTotalItems(countActiveCartItems(nextItems));
+        setTotalPrices(calculateActiveCartTotals(nextItems));
+        return nextItems;
+      });
     },
-    [refreshCart]
+    []
   );
 
   const updateAllActiveStatus = useCallback(
@@ -277,9 +313,18 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       }
 
       await updateAllCartActivation(isActive);
-      await refreshCart();
+
+      setCartItems((previousItems) => {
+        const nextItems = previousItems.map((item) => ({
+          ...item,
+          is_active: isActive,
+        }));
+        setTotalItems(countActiveCartItems(nextItems));
+        setTotalPrices(calculateActiveCartTotals(nextItems));
+        return nextItems;
+      });
     },
-    [refreshCart]
+    []
   );
 
   const clearCart = useCallback(async () => {
