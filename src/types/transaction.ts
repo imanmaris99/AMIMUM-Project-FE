@@ -1,5 +1,6 @@
 export type TransactionStatus =
   | 'pending'
+  | 'paid'
   | 'processing'
   | 'shipped'
   | 'delivered'

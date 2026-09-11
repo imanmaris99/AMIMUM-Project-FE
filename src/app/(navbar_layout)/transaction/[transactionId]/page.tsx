@@ -300,8 +300,14 @@ const TransactionDetailPage: React.FC = () => {
     ? "Pesanan sudah tercatat. Selesaikan pembayaran agar pesanan bisa diproses toko."
     : canRetryPayment
       ? "Pembayaran belum berhasil. Coba bayar lagi atau hubungi admin jika butuh bantuan."
-      : transaction.deliveryType === "delivery"
-        ? "Pesanan sedang diproses toko. Resi akan tersedia setelah admin mengirim pesanan."
+      : transaction.status === "paid"
+        ? "Pembayaran sudah diterima. Pesanan menunggu admin memproses dan menyiapkan pengiriman."
+        : transaction.deliveryType === "delivery"
+        ? transaction.status === "shipped"
+          ? "Pesanan sedang dikirim. Gunakan nomor resi di halaman tracking untuk memantau pengiriman."
+          : transaction.status === "completed" || transaction.status === "delivered"
+            ? "Pesanan selesai. Terima kasih sudah berbelanja di Toko Herbal Amimum."
+            : "Pesanan sedang diproses toko. Resi akan tersedia setelah admin mengirim pesanan."
         : "Pesanan pickup sedang disiapkan toko. Ambil pesanan setelah status siap diambil.";
 
   return (

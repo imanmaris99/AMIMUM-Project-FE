@@ -22,7 +22,7 @@ const StatusOrder: React.FC<StatusOrderProps> = ({ currentStatus = 0, deliveryTy
       return [
         {
           id: "packed",
-          title: "Dibungkus",
+          title: "Dibayar",
           icon: "box",
           isCompleted: currentStatus >= 0
         },
@@ -43,13 +43,13 @@ const StatusOrder: React.FC<StatusOrderProps> = ({ currentStatus = 0, deliveryTy
       return [
         {
           id: "packed",
-          title: "Dibungkus",
+          title: "Dibayar",
           icon: "box",
           isCompleted: currentStatus >= 0
         },
         {
           id: "processing",
-          title: "Diproses ke kurir",
+          title: "Diproses toko",
           icon: "box-time",
           isCompleted: currentStatus >= 1
         },

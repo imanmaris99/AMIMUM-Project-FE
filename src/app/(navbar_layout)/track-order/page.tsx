@@ -153,9 +153,12 @@ const TrackOrderPage: React.FC = () => {
     switch (status) {
       case "pending":
         return -1;
-      case "processing":
+      case "paid":
       case "capture":
+      case "settlement":
         return 0;
+      case "processing":
+        return deliveryType === "pickup" ? 0 : 1;
       case "shipped":
         return deliveryType === "pickup" ? 1 : 2;
       case "delivered":
@@ -180,6 +183,12 @@ const TrackOrderPage: React.FC = () => {
 
     if (transaction.deliveryType !== "delivery") {
       return "Pesanan pickup akan disiapkan toko. Datang ke toko setelah status siap diambil.";
+    }
+
+    if (["paid", "processing"].includes(transaction.status)) {
+      return transaction.status === "paid"
+        ? "Pembayaran sudah diterima. Pesanan menunggu admin memproses dan menyiapkan pengiriman."
+        : "Pesanan sedang diproses toko. Resi akan muncul setelah admin menyerahkan paket ke kurir.";
     }
 
     if (transaction.status === "shipped") {

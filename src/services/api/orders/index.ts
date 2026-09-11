@@ -147,16 +147,17 @@ const normalizeTransactionStatus = (status: string): TransactionStatus => {
       return "pending";
     case "processing":
     case "process":
-    case "capture":
       return "processing";
+    case "capture":
+    case "settlement":
+    case "paid":
+      return "paid";
     case "shipped":
     case "shipping":
       return "shipped";
     case "delivered":
       return "delivered";
     case "completed":
-    case "settlement":
-    case "paid":
       return "completed";
     case "cancelled":
     case "canceled":

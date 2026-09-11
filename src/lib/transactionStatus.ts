@@ -37,6 +37,7 @@ export const getCustomerStatusConfig = (
   status: string,
   paymentMethod?: TransactionPaymentMethod
 ): CustomerStatusConfig => {
+  void paymentMethod;
   switch (status) {
     case "pending":
       return {
@@ -45,12 +46,18 @@ export const getCustomerStatusConfig = (
         textColor: "text-yellow-700",
         borderColor: "border-yellow-200",
       };
-    case "processing":
+    case "paid":
     case "capture":
+    case "settlement":
       return {
-        text: isOnlinePaymentMethod(paymentMethod)
-          ? "Pembayaran Berhasil"
-          : "Pesanan Diproses",
+        text: "Pembayaran Berhasil",
+        bgColor: "bg-blue-100",
+        textColor: "text-blue-600",
+        borderColor: "border-blue-200",
+      };
+    case "processing":
+      return {
+        text: "Pesanan Diproses",
         bgColor: "bg-blue-100",
         textColor: "text-blue-600",
         borderColor: "border-blue-200",
@@ -70,10 +77,8 @@ export const getCustomerStatusConfig = (
         borderColor: "border-green-200",
       };
     case "completed":
-    case "settlement":
-    case "paid":
       return {
-        text: "Pembayaran Berhasil",
+        text: "Pesanan Selesai",
         bgColor: "bg-green-100",
         textColor: "text-green-600",
         borderColor: "border-green-200",
