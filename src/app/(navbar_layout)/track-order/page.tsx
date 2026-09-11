@@ -318,7 +318,7 @@ const TrackOrderPage: React.FC = () => {
                 <DeliveryAddress
                   orderDate={currentTransaction.date}
                   paymentStatus={getStatusConfig(currentTransaction.status).text}
-                  trackingNumber={undefined}
+                  trackingNumber={currentTransaction.shipmentAddress?.trackingNumber}
                   recipientName={currentTransaction.shipmentAddress?.recipientName}
                   phone={currentTransaction.shipmentAddress?.phone}
                   address={currentTransaction.shipmentAddress?.address}

@@ -48,6 +48,7 @@ export interface OrderDetailDto extends OrderListItemDto {
       estimated_delivery: string;
       created_at: string;
     };
+    code_tracking?: string | null;
     created_at: string;
   };
 }
@@ -294,6 +295,7 @@ export const mapOrderDetailToTransaction = (
             courier: order.my_shipping.my_courier?.courier_name || "-",
             service: order.my_shipping.my_courier?.service_type || "-",
             estimatedDelivery: order.my_shipping.my_courier?.estimated_delivery || "-",
+            trackingNumber: order.my_shipping.code_tracking || undefined,
           }
         : undefined,
   };

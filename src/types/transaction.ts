@@ -33,6 +33,7 @@ export interface TransactionShipmentAddress {
   courier: string;
   service: string;
   estimatedDelivery?: string;
+  trackingNumber?: string;
 }
 
 export interface Transaction {
