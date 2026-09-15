@@ -15,7 +15,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
     setImageError(true);
   };
 
-  const imageUrl = product.image || product.all_variants[0]?.img || "/buyungupik_agr-1.svg";
+  const imageUrl = product.image || product.all_variants[0]?.img || "/default-image.jpg";
   
   // Check if URL is external (http/https) - simple string check
   // Use regular img tag for ALL external images to prevent Next.js Image optimizer retry loops
@@ -112,7 +112,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
               onError={(e) => {
-                e.currentTarget.src = "/buyungupik_agr-1.svg";
+                e.currentTarget.src = "/default-image.jpg";
               }}
               unoptimized
             />

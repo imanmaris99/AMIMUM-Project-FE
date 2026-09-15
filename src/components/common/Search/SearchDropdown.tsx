@@ -15,7 +15,7 @@ interface SearchDropdownProps {
 
 const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardProductProps; handleSelectProduct: (productId: string) => void }) => {
   const [imageError, setImageError] = useState(false);
-  const imageUrl = product.image || product.all_variants[0]?.img || "/buyungupik_agr-1.svg";
+  const imageUrl = product.image || product.all_variants[0]?.img || "/default-image.jpg";
 
   const handleImageError = () => {
     setImageError(true);
@@ -48,7 +48,7 @@ const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardPro
               width={50}
               height={50}
               onError={(e) => {
-                e.currentTarget.src = "/buyungupik_agr-1.svg";
+                e.currentTarget.src = "/default-image.jpg";
               }}
               unoptimized
             />

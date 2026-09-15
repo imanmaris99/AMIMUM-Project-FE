@@ -40,17 +40,17 @@ export default function RootLayout({
       <head suppressHydrationWarning={true}>
         <meta name="viewport" content="width=device-width, initial-scale=1" suppressHydrationWarning={true} />
         <meta name="theme-color" content="#001E14" suppressHydrationWarning={true} />
-        <meta name="description" content="Toko Herbal AmImUm - Produk herbal berkualitas tinggi" suppressHydrationWarning={true} />
+        <meta name="description" content="Toko Herbal AmImUm - Katalog produk herbal dan jamu" suppressHydrationWarning={true} />
         <meta name="robots" content="index, follow" suppressHydrationWarning={true} />
         <link rel="icon" href="/favicon.ico" suppressHydrationWarning={true} />
         <link rel="apple-touch-icon" href="/logo_toko.svg" suppressHydrationWarning={true} />
         <meta property="og:title" content="AmImUm - Toko Herbal" suppressHydrationWarning={true} />
-        <meta property="og:description" content="Produk herbal berkualitas tinggi untuk kesehatan Anda" suppressHydrationWarning={true} />
+        <meta property="og:description" content="Katalog produk herbal dan jamu Toko Herbal AmImUm" suppressHydrationWarning={true} />
         <meta property="og:type" content="website" suppressHydrationWarning={true} />
         <meta property="og:image" content="/logo_toko.svg" suppressHydrationWarning={true} />
         <meta name="twitter:card" content="summary_large_image" suppressHydrationWarning={true} />
         <meta name="twitter:title" content="AmImUm - Toko Herbal" suppressHydrationWarning={true} />
-        <meta name="twitter:description" content="Produk herbal berkualitas tinggi untuk kesehatan Anda" suppressHydrationWarning={true} />
+        <meta name="twitter:description" content="Katalog produk herbal dan jamu Toko Herbal AmImUm" suppressHydrationWarning={true} />
         <meta name="twitter:image" content="/logo_toko.svg" suppressHydrationWarning={true} />
         <script
           suppressHydrationWarning={true}

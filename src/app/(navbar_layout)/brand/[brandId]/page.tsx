@@ -46,23 +46,12 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   try {
     const allProducts = await GetProductsByProductionIdServer(productionId);
 
-    products = allProducts.map((product) => {
-      const variants = Array.isArray(product.all_variants) && product.all_variants.length > 0
+    products = allProducts.map((product) => ({
+      ...product,
+      all_variants: Array.isArray(product.all_variants)
         ? product.all_variants
-        : [{
-            id: 0,
-            variant: "default",
-            img: "/default-image.jpg",
-            discount: 0,
-            discounted_price: Number(product.price || 0),
-            updated_at: product.created_at || new Date().toISOString(),
-          }];
-
-      return {
-        ...product,
-        all_variants: variants,
-      };
-    });
+        : [],
+    }));
   } catch {
     products = [];
   }
