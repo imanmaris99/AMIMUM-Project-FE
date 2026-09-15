@@ -7,6 +7,15 @@ export interface CustomerStatusConfig {
   borderColor: string;
 }
 
+export interface CustomerOrderAlert {
+  title: string;
+  message: string;
+  bgColor: string;
+  borderColor: string;
+  textColor: string;
+  icon: string;
+}
+
 export const failedPaymentStatuses = [
   "cancelled",
   "canceled",
@@ -109,6 +118,99 @@ export const getCustomerStatusConfig = (
         bgColor: "bg-gray-100",
         textColor: "text-gray-600",
         borderColor: "border-gray-200",
+      };
+  }
+};
+
+export const getCustomerOrderAlert = (
+  status: string,
+  trackingNumber?: string,
+  deliveryType: string = "delivery"
+): CustomerOrderAlert => {
+  const hasTrackingNumber = Boolean(trackingNumber?.trim());
+  const isPickupOrder = deliveryType === "pickup";
+
+  switch (status) {
+    case "pending":
+      return {
+        title: "Menunggu pembayaran",
+        message:
+          "Pesanan sudah tercatat. Selesaikan pembayaran agar toko bisa mulai memproses pesanan.",
+        bgColor: "bg-yellow-50",
+        borderColor: "border-yellow-200",
+        textColor: "text-yellow-800",
+        icon: "💳",
+      };
+    case "paid":
+    case "capture":
+    case "settlement":
+      return {
+        title: "Pembayaran berhasil",
+        message:
+          "Pembayaran sudah diterima. Pesanan sekarang menunggu admin memproses dan menyiapkan pengiriman.",
+        bgColor: "bg-blue-50",
+        borderColor: "border-blue-200",
+        textColor: "text-blue-800",
+        icon: "✅",
+      };
+    case "processing":
+      return {
+        title: isPickupOrder ? "Pesanan sedang disiapkan" : "Pesanan sedang diproses",
+        message:
+          isPickupOrder
+            ? "Toko sedang menyiapkan pesanan pickup. Datang ke toko setelah pesanan siap diambil."
+            : "Toko sedang menyiapkan pesanan. Nomor resi akan muncul setelah paket diserahkan ke kurir.",
+        bgColor: "bg-blue-50",
+        borderColor: "border-blue-200",
+        textColor: "text-blue-800",
+        icon: "📦",
+      };
+    case "shipped":
+      return {
+        title: "Pesanan sedang dikirim",
+        message: hasTrackingNumber
+          ? `Pesanan sudah dikirim. No. resi: ${trackingNumber}. Gunakan nomor ini untuk memantau pengiriman di website kurir.`
+          : "Pesanan sudah dikirim. Nomor resi belum tersedia di sistem, silakan hubungi admin jika membutuhkan bantuan.",
+        bgColor: "bg-indigo-50",
+        borderColor: "border-indigo-200",
+        textColor: "text-indigo-800",
+        icon: "🚚",
+      };
+    case "delivered":
+    case "completed":
+      return {
+        title: "Pesanan selesai",
+        message:
+          "Pesanan sudah selesai. Terima kasih sudah berbelanja di Toko Herbal Amimum.",
+        bgColor: "bg-green-50",
+        borderColor: "border-green-200",
+        textColor: "text-green-800",
+        icon: "🌿",
+      };
+    case "cancelled":
+    case "canceled":
+    case "failed":
+    case "expire":
+    case "expired":
+    case "cancel":
+    case "deny":
+      return {
+        title: "Pembayaran belum berhasil",
+        message:
+          "Pembayaran belum berhasil atau sudah kedaluwarsa. Coba bayar ulang dari halaman transaksi atau hubungi admin.",
+        bgColor: "bg-red-50",
+        borderColor: "border-red-200",
+        textColor: "text-red-800",
+        icon: "⚠️",
+      };
+    default:
+      return {
+        title: "Status pesanan diperbarui",
+        message: "Cek halaman transaksi atau tracking untuk melihat perkembangan terbaru pesanan.",
+        bgColor: "bg-gray-50",
+        borderColor: "border-gray-200",
+        textColor: "text-gray-700",
+        icon: "ℹ️",
       };
   }
 };

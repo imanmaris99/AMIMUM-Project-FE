@@ -12,7 +12,10 @@ import { Transaction } from "@/types/transaction";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 import LoginProtection from "@/components/common/LoginProtection";
 import { SessionManager } from "@/lib/auth";
-import { getCustomerStatusConfig } from "@/lib/transactionStatus";
+import {
+  getCustomerOrderAlert,
+  getCustomerStatusConfig,
+} from "@/lib/transactionStatus";
 import {
   getMyOrders,
   getOrderDetail,
@@ -198,6 +201,14 @@ const TrackOrderPage: React.FC = () => {
     return "Pesanan sedang diproses toko. Nomor resi akan muncul setelah admin mengirim pesanan.";
   };
 
+  const currentOrderAlert = currentTransaction
+    ? getCustomerOrderAlert(
+        currentTransaction.status,
+        currentTransaction.shipmentAddress?.trackingNumber,
+        currentTransaction.deliveryType || "delivery"
+      )
+    : null;
+
   return (
     <LoginProtection useModal={true} feature="tracking">
       <div className="min-h-screen bg-gray-100">
@@ -276,6 +287,26 @@ const TrackOrderPage: React.FC = () => {
             </div>
           ) : (
             <>
+              {currentOrderAlert && (
+                <div
+                  className={`w-full max-w-sm rounded-lg border ${currentOrderAlert.borderColor} ${currentOrderAlert.bgColor} p-4`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl" aria-hidden="true">
+                      {currentOrderAlert.icon}
+                    </span>
+                    <div>
+                      <h2 className={`text-sm font-semibold ${currentOrderAlert.textColor}`}>
+                        {currentOrderAlert.title}
+                      </h2>
+                      <p className={`mt-1 text-xs leading-relaxed ${currentOrderAlert.textColor}`}>
+                        {currentOrderAlert.message}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {transactionId && currentTransaction && (
                 <div className="w-full max-w-sm bg-white rounded-lg shadow-sm border p-4">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">

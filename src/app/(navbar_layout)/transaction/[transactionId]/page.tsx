@@ -17,6 +17,7 @@ import {
 import { createPayment, syncPaymentStatus } from "@/services/api/payments";
 import { useTransaction } from "@/contexts/TransactionContext";
 import {
+  getCustomerOrderAlert,
   getCustomerStatusConfig,
   isFailedPaymentStatus,
   isOfflinePaymentMethod,
@@ -327,6 +328,11 @@ const TransactionDetailPage: React.FC = () => {
             ? "Pesanan selesai. Terima kasih sudah berbelanja di Toko Herbal Amimum."
             : "Pesanan sedang diproses toko. Resi akan tersedia setelah admin mengirim pesanan."
         : "Pesanan pickup sedang disiapkan toko. Ambil pesanan setelah status siap diambil.";
+  const orderAlert = getCustomerOrderAlert(
+    transaction.status,
+    transaction.shipmentAddress?.trackingNumber,
+    transaction.deliveryType || "delivery"
+  );
 
   return (
     <LoginProtection useModal={true} feature="transaction">
@@ -341,6 +347,24 @@ const TransactionDetailPage: React.FC = () => {
 
       <div className="px-4 py-6">
         <div className="max-w-sm mx-auto space-y-4">
+          <div
+            className={`rounded-lg border ${orderAlert.borderColor} ${orderAlert.bgColor} p-4`}
+          >
+            <div className="flex items-start gap-3">
+              <span className="text-xl" aria-hidden="true">
+                {orderAlert.icon}
+              </span>
+              <div>
+                <h2 className={`text-sm font-semibold ${orderAlert.textColor}`}>
+                  {orderAlert.title}
+                </h2>
+                <p className={`mt-1 text-xs leading-relaxed ${orderAlert.textColor}`}>
+                  {orderAlert.message}
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-semibold text-gray-900">
