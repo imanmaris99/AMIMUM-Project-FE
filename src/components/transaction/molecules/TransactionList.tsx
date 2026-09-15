@@ -7,11 +7,13 @@ import { Transaction } from "@/types/transaction";
 interface TransactionListProps {
   transactions: Transaction[];
   onViewDetails: (id: string) => void;
+  onTrackOrder?: (id: string) => void;
 }
 
 const TransactionList: React.FC<TransactionListProps> = ({ 
   transactions, 
-  onViewDetails 
+  onViewDetails,
+  onTrackOrder,
 }) => {
   if (transactions.length === 0) {
     return (
@@ -48,6 +50,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
           <TransactionItem
             transaction={transaction}
             onViewDetails={onViewDetails}
+            onTrackOrder={onTrackOrder}
           />
         </div>
       ))}

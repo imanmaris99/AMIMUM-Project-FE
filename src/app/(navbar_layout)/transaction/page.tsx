@@ -64,6 +64,10 @@ const TransactionPage = () => {
     router.push(`/transaction/${transactionId}`);
   };
 
+  const handleTrackOrder = (transactionId: string) => {
+    router.push(`/track-order?transactionId=${transactionId}`);
+  };
+
   const handleClearSimulatedTransactions = () => {
     if (localTransactions.length === 0) {
       toast("Tidak ada transaksi simulasi untuk dihapus");
@@ -146,6 +150,7 @@ const TransactionPage = () => {
               <TransactionList
                 transactions={transactions}
                 onViewDetails={handleViewDetails}
+                onTrackOrder={handleTrackOrder}
               />
             </div>
           )}
