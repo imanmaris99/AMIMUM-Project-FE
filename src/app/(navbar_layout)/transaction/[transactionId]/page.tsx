@@ -105,29 +105,47 @@ const TransactionDetailPage: React.FC = () => {
       transaction.paymentMethod
     ).text;
 
+    const deliveryLabel =
+      transaction.deliveryType === "delivery" ? "Kirim ke tujuan" : "Ambil di toko";
+    const shipment = transaction.shipmentAddress;
     const invoiceLines = [
-      `Invoice ${transaction.transactionId}`,
-      `Tanggal: ${transaction.date}`,
-      `Status: ${customerStatus}`,
-      `Metode Pengiriman: ${
-        transaction.deliveryType === "delivery" ? "Kirim ke tujuan" : "Ambil di toko"
-      }`,
-      `Subtotal: ${rupiahFormater(transaction.subtotal)}`,
-      `Ongkir: ${rupiahFormater(transaction.shippingCost)}`,
-      `Total: ${rupiahFormater(transaction.total)}`,
+      "TOKO HERBAL AMIMUM",
+      "Bukti Transaksi Customer",
+      "========================================",
+      `Invoice ID     : ${transaction.transactionId}`,
+      `Tanggal        : ${transaction.date}`,
+      `Status         : ${customerStatus}`,
+      `Metode Bayar   : ${getPaymentMethodLabel(transaction.paymentMethod)}`,
+      `Pengiriman     : ${deliveryLabel}`,
       "",
-      "Item:",
-      ...transaction.items.map(
-        (item) =>
-          `- ${item.name}${item.variantName ? ` (${item.variantName})` : ""} x${
-            item.quantity
-          } = ${rupiahFormater(item.price * item.quantity)}`
-      ),
+      "Rincian Item",
+      "----------------------------------------",
+      ...transaction.items.map((item, index) => {
+        const itemSubtotal = item.price * item.quantity;
+        return `${index + 1}. ${item.name}${item.variantName ? ` (${item.variantName})` : ""}\n   Qty ${item.quantity} x ${rupiahFormater(item.price)} = ${rupiahFormater(itemSubtotal)}`;
+      }),
       "",
-      `Alamat: ${transaction.shipmentAddress?.address || "-"}`,
-      `Kurir: ${transaction.shipmentAddress?.courier || "-"}`,
-      `Layanan: ${transaction.shipmentAddress?.service || "-"}`,
-      `Estimasi: ${transaction.shipmentAddress?.estimatedDelivery || "-"}`,
+      "Ringkasan Pembayaran",
+      "----------------------------------------",
+      `Subtotal       : ${rupiahFormater(transaction.subtotal)}`,
+      `Ongkir         : ${rupiahFormater(transaction.shippingCost)}`,
+      `Total          : ${rupiahFormater(transaction.total)}`,
+      "",
+      "Detail Pengiriman",
+      "----------------------------------------",
+      `Penerima       : ${shipment?.recipientName || "-"}`,
+      `Telepon        : ${shipment?.phone || "-"}`,
+      `Alamat         : ${shipment?.address || "-"}`,
+      `Kota/Kode Pos  : ${[shipment?.city, shipment?.postalCode].filter(Boolean).join(" ") || "-"}`,
+      `Kurir          : ${[shipment?.courier, shipment?.service].filter(Boolean).join(" - ") || "-"}`,
+      `Estimasi       : ${shipment?.estimatedDelivery || "-"}`,
+      `No. Resi       : ${shipment?.trackingNumber || "Belum tersedia"}`,
+      "",
+      "Catatan",
+      "----------------------------------------",
+      transaction.notes || "Simpan bukti transaksi ini untuk arsip atau kebutuhan komplain/retur sesuai kebijakan toko.",
+      "",
+      "Terima kasih sudah berbelanja di Toko Herbal Amimum.",
     ].join("\n");
 
     const blob = new Blob([invoiceLines], {
