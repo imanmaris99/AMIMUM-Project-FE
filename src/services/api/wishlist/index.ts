@@ -13,6 +13,7 @@ export interface WishlistVariantApiItem {
 
 export interface WishlistApiItem {
   id: number;
+  product_id?: string;
   product_name: string;
   product_variant: WishlistVariantApiItem[];
   created_at: string;

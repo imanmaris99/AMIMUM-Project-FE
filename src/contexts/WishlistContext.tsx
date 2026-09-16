@@ -62,7 +62,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     return {
       id: item.id.toString(),
       wishlistId: item.id,
-      productId: productIdCache[item.id.toString()],
+      productId: item.product_id || productIdCache[item.id.toString()],
       name: item.product_name,
       variant: primaryVariant?.variant || 'Varian tidak tersedia',
       quantity: 1,
