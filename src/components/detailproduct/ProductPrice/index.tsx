@@ -34,6 +34,11 @@ const ProductPrice = ({
   const router = useRouter();
 
 
+  const waitForCartRecovery = () => new Promise((resolve) => setTimeout(resolve, 2500));
+
+  const isSlowCartProcessingError = (error: unknown) =>
+    error instanceof Error && error.message.includes("Koneksi sedang lambat saat memproses keranjang");
+
   const ensureTargetCartItemActive = async (cartIdFromAdd?: number | string) => {
     if (cartIdFromAdd) {
       await updateActiveStatus(cartIdFromAdd.toString(), true);
@@ -85,6 +90,18 @@ const ProductPrice = ({
       setTimeout(() => setShowFeedback(false), 2000);
       router.push("/cart");
     } catch (error) {
+      if (isSlowCartProcessingError(error)) {
+        try {
+          await waitForCartRecovery();
+          await ensureTargetCartItemActive();
+          toast.success("Produk berhasil tersimpan di keranjang. Membuka keranjang...");
+          router.push("/cart");
+          return;
+        } catch {
+          // Fall through to the safe customer message below.
+        }
+      }
+
       toast.error(
         error instanceof Error
           ? error.message
@@ -120,10 +137,25 @@ const ProductPrice = ({
       localStorage.removeItem("directCheckoutItem");
       const addResponse = await addToCart(data, datavariant);
       await ensureTargetCartItemActive(addResponse.data?.cart_id);
-      toast.success("Produk siap checkout. Membuka halaman pembayaran...");
+      toast.success("Produk siap checkout. Membuka halaman checkout...");
       router.push("/order-1");
     } catch (error) {
       setShowFeedback(false);
+
+      if (isSlowCartProcessingError(error)) {
+        try {
+          toast.loading("Koneksi lambat. Mengecek ulang produk checkout...", { id: "buy-now-recovery" });
+          await waitForCartRecovery();
+          await ensureTargetCartItemActive();
+          toast.success("Produk siap checkout. Membuka halaman checkout...", { id: "buy-now-recovery" });
+          router.push("/order-1");
+          return;
+        } catch {
+          toast.dismiss("buy-now-recovery");
+          // Fall through to the safe customer message below.
+        }
+      }
+
       toast.error(
         error instanceof Error
           ? error.message

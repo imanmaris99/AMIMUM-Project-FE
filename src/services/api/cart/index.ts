@@ -63,6 +63,11 @@ interface ValidationErrorResponse {
   detail?: Array<{ msg: string }>;
 }
 
+const CART_MUTATION_TIMEOUT_MS = 30000;
+const CART_READ_TIMEOUT_MS = 20000;
+const CART_TIMEOUT_MESSAGE =
+  "Koneksi sedang lambat saat memproses keranjang. Coba ulangi sekali lagi; sistem tidak akan lanjut checkout sebelum produk benar-benar siap.";
+
 export interface AddCartProductPayload {
   productId: string;
   variantId: number;
@@ -90,6 +95,10 @@ const extractCartError = (
   error: unknown,
   fallbackMessage: string
 ): never => {
+  if (axios.isAxiosError(error) && error.code === "ECONNABORTED") {
+    throw new Error(CART_TIMEOUT_MESSAGE);
+  }
+
   if (axios.isAxiosError(error) && error.response) {
     const status = error.response.status;
     const errorData = error.response.data as
@@ -116,7 +125,9 @@ const extractCartError = (
 
 export const getMyCartProducts = async (): Promise<CartListResponse> => {
   try {
-    const response = await apiClient.get<CartListResponse>(API_ENDPOINTS.CART_MY_CART);
+    const response = await apiClient.get<CartListResponse>(API_ENDPOINTS.CART_MY_CART, {
+      timeout: CART_READ_TIMEOUT_MS,
+    });
 
     if (response?.status_code === 200 && Array.isArray(response.data)) {
       return response;
@@ -124,6 +135,10 @@ export const getMyCartProducts = async (): Promise<CartListResponse> => {
 
     throw new Error(response?.message || "Gagal mengambil keranjang.");
   } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.code === "ECONNABORTED") {
+      throw new Error(CART_TIMEOUT_MESSAGE);
+    }
+
     if (axios.isAxiosError(error) && error.response) {
       const status = error.response.status;
       const errorData = error.response.data as CartErrorResponse;
@@ -155,7 +170,8 @@ export const getMyCartProducts = async (): Promise<CartListResponse> => {
 export const getCartTotalItems = async (): Promise<CartTotalItemsResponse> => {
   try {
     const response = await apiClient.get<CartTotalItemsResponse>(
-      API_ENDPOINTS.CART_TOTAL_ITEMS
+      API_ENDPOINTS.CART_TOTAL_ITEMS,
+      { timeout: CART_READ_TIMEOUT_MS }
     );
 
     if (response?.status_code === 200 && response.data) {
@@ -164,6 +180,10 @@ export const getCartTotalItems = async (): Promise<CartTotalItemsResponse> => {
 
     throw new Error(response?.message || "Gagal mengambil total item keranjang.");
   } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.code === "ECONNABORTED") {
+      throw new Error(CART_TIMEOUT_MESSAGE);
+    }
+
     if (axios.isAxiosError(error) && error.response) {
       const status = error.response.status;
       const errorData = error.response.data as CartErrorResponse;
@@ -200,7 +220,8 @@ export const addCartProduct = async (
       {
         product_id: payload.productId,
         variant_id: payload.variantId,
-      }
+      },
+      { timeout: CART_MUTATION_TIMEOUT_MS }
     );
 
     if ((response?.status_code === 200 || response?.status_code === 201) && response.data) {
@@ -227,7 +248,8 @@ export const updateCartQuantity = async (
         quantity_update: {
           quantity: payload.quantity,
         },
-      }
+      },
+      { timeout: CART_MUTATION_TIMEOUT_MS }
     );
 
     if ((response?.status_code === 200 || response?.status_code === 201)) {
@@ -254,7 +276,8 @@ export const updateCartActivation = async (
         activate_update: {
           is_active: payload.isActive,
         },
-      }
+      },
+      { timeout: CART_MUTATION_TIMEOUT_MS }
     );
 
     if ((response?.status_code === 200 || response?.status_code === 201)) {
@@ -276,7 +299,8 @@ export const updateAllCartActivation = async (
       API_ENDPOINTS.CART_UPDATE_ACTIVATE_ALL,
       {
         is_active: isActive,
-      }
+      },
+      { timeout: CART_MUTATION_TIMEOUT_MS }
     );
 
     if ((response?.status_code === 200 || response?.status_code === 201)) {
@@ -302,6 +326,7 @@ export const deleteCartProduct = async (
         data: {
           cart_id: Number(cartId),
         },
+        timeout: CART_MUTATION_TIMEOUT_MS,
       }
     );
 
