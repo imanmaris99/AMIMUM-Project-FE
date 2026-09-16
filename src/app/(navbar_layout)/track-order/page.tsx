@@ -16,6 +16,7 @@ import {
   getCustomerOrderAlert,
   getCustomerStatusConfig,
 } from "@/lib/transactionStatus";
+import { getPaymentMethodLabel } from "@/lib/paymentMethods";
 import {
   getMyOrders,
   getOrderDetail,
@@ -26,6 +27,9 @@ import { useTransaction } from "@/contexts/TransactionContext";
 
 const BACKEND_ORDER_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const getTrackingDisplay = (trackingNumber?: string) =>
+  trackingNumber?.trim() || "Belum tersedia";
 
 const TrackOrderPage: React.FC = () => {
   const searchParams = useSearchParams();
@@ -208,6 +212,13 @@ const TrackOrderPage: React.FC = () => {
         currentTransaction.deliveryType || "delivery"
       )
     : null;
+  const trackingDisplay = getTrackingDisplay(
+    currentTransaction?.shipmentAddress?.trackingNumber
+  );
+  const deliveryLabel =
+    currentTransaction?.deliveryType === "delivery"
+      ? "Kirim ke tujuan"
+      : "Ambil di toko";
 
   return (
     <LoginProtection useModal={true} feature="tracking">
@@ -313,9 +324,9 @@ const TrackOrderPage: React.FC = () => {
                     Informasi Transaksi
                   </h3>
                   <div className="space-y-2">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between gap-4">
                       <span className="text-sm text-gray-600">ID Transaksi:</span>
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="break-words text-right text-sm font-medium text-gray-900">
                         {currentTransaction.transactionId}
                       </span>
                     </div>
@@ -332,15 +343,62 @@ const TrackOrderPage: React.FC = () => {
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Metode:</span>
                       <span className="text-sm font-medium text-gray-900">
-                        {currentTransaction.deliveryType === "delivery"
-                          ? "Kirim ke tujuan"
-                          : "Ambil di toko"}
+                        {deliveryLabel}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Metode bayar:</span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {getPaymentMethodLabel(currentTransaction.paymentMethod)}
                       </span>
                     </div>
                   </div>
                   <div className="mt-4 rounded-lg bg-primary/5 px-3 py-2 text-xs font-medium text-primary">
                     {getTrackingHelpText(currentTransaction)}
                   </div>
+                </div>
+              )}
+
+              {currentTransaction && (
+                <div className="w-full max-w-sm rounded-lg border border-primary/10 bg-white p-4 shadow-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                        Ringkasan Pelacakan
+                      </p>
+                      <h3 className="mt-1 text-lg font-semibold text-gray-900">
+                        Status dan Resi Pesanan
+                      </h3>
+                    </div>
+                    <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                      Tracking
+                    </span>
+                  </div>
+                  <div className="mt-4 space-y-2 text-sm">
+                    <div className="flex justify-between gap-4">
+                      <span className="text-gray-600">No. Resi</span>
+                      <span className="text-right font-semibold text-gray-900">
+                        {trackingDisplay}
+                      </span>
+                    </div>
+                    <div className="flex justify-between gap-4">
+                      <span className="text-gray-600">Kurir</span>
+                      <span className="text-right font-semibold text-gray-900">
+                        {[currentTransaction.shipmentAddress?.courier, currentTransaction.shipmentAddress?.service]
+                          .filter(Boolean)
+                          .join(" - ") || "Belum tersedia"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between gap-4">
+                      <span className="text-gray-600">Estimasi</span>
+                      <span className="text-right font-semibold text-gray-900">
+                        {currentTransaction.shipmentAddress?.estimatedDelivery || "Belum tersedia"}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="mt-3 rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
+                    No. resi hanya ditampilkan jika admin sudah memasukkan kode tracking resmi dari kurir.
+                  </p>
                 </div>
               )}
 

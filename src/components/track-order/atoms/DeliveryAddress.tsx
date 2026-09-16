@@ -27,12 +27,14 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
   service,
   estimatedDelivery
 }) => {
+  const trackingDisplay = trackingNumber?.trim() || "Belum tersedia";
+
   return (
     <div className="bg-white rounded-2xl p-4 w-full max-w-sm">
       <div className="space-y-4">
         {/* Title */}
         <h3 className="text-lg font-semibold text-[#313131]">
-          Detail Order
+          Detail Pelacakan
         </h3>
         
         {/* Order Details */}
@@ -62,12 +64,12 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
               No. Resi
             </span>
             <span className="text-sm font-medium text-[#0D0E09] text-right">
-              {trackingNumber || "Belum tersedia"}
+              {trackingDisplay}
             </span>
           </div>
           {!trackingNumber && (
             <div className="rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
-              Resi akan muncul setelah admin memproses dan mengirim pesanan.
+              No. resi belum tersedia. Resi akan muncul setelah admin mengirim paket dan memasukkan kode tracking resmi dari kurir.
             </div>
           )}
           {recipientName && (
