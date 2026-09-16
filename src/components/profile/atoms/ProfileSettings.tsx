@@ -68,9 +68,14 @@ const ProfileSettings: React.FC = () => {
               height={20}
               className="text-[#007A4F]"
             />
-            <span className="text-sm font-medium text-[#0D0E09]">
-              Alamat pengiriman tersimpan
-            </span>
+            <div>
+              <span className="text-sm font-medium text-[#0D0E09]">
+                Alamat Pengiriman Tersimpan
+              </span>
+              <p className="text-xs text-[#A2A2A2]">
+                Kelola alamat tujuan valid untuk ongkir checkout
+              </p>
+            </div>
           </div>
           <Image
             src="/arrow-right.svg"
@@ -94,9 +99,14 @@ const ProfileSettings: React.FC = () => {
               height={20}
               className="text-[#007A4F]"
             />
-            <span className="text-sm font-medium text-[#0D0E09]">
-              Kontak admin
-            </span>
+            <div>
+              <span className="text-sm font-medium text-[#0D0E09]">
+                Kontak Admin
+              </span>
+              <p className="text-xs text-[#A2A2A2]">
+                Kanal resmi toko, tanpa nomor dummy
+              </p>
+            </div>
           </div>
           <Image
             src="/arrow-right.svg"
@@ -120,9 +130,14 @@ const ProfileSettings: React.FC = () => {
               height={20}
               className="text-[#007A4F]"
             />
-            <span className="text-sm font-medium text-[#0D0E09]">
-              Log out
-            </span>
+            <div>
+              <span className="text-sm font-medium text-[#0D0E09]">
+                Keluar Akun
+              </span>
+              <p className="text-xs text-[#A2A2A2]">
+                Menghapus sesi login dari perangkat ini
+              </p>
+            </div>
           </div>
           <Image
             src="/arrow-right.svg"

@@ -48,6 +48,11 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
       return;
     }
 
+    if (!formData.firstname.trim() && !formData.lastname.trim()) {
+      setSubmitError("Isi minimal nama depan atau nama belakang agar profil mudah dikenali.");
+      return;
+    }
+
     setIsSaving(true);
     setSubmitError(null);
     try {
@@ -76,7 +81,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             <div className="space-y-6">
               {/* Edit Akunku Title */}
               <div className="flex items-center justify-center">
-                <h3 className="text-lg font-medium text-[#0D0E09]">Edit Akunku</h3>
+                <h3 className="text-lg font-medium text-[#0D0E09]">Edit Profil Customer</h3>
               </div>
               
               {/* Divider Line */}
@@ -90,10 +95,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                   </div>
                 )}
 
-                {/* Firstname Field */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-sm text-[#999999]">Firstname</label>
+                    <label className="text-sm text-[#999999]">Nama depan</label>
                   </div>
                   <input
                     type="text"
@@ -105,10 +109,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                   <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
                 </div>
 
-                {/* Lastname Field */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-sm text-[#999999]">Lastname</label>
+                    <label className="text-sm text-[#999999]">Nama belakang</label>
                   </div>
                   <input
                     type="text"
@@ -120,10 +123,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                   <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
                 </div>
 
-                {/* Phone Field */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-sm text-[#999999]">Phone</label>
+                    <label className="text-sm text-[#999999]">Nomor telepon</label>
                   </div>
                   <input
                     type="tel"
@@ -135,19 +137,21 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                   <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
                 </div>
 
-                {/* Address Field */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-sm text-[#999999]">Address</label>
+                    <label className="text-sm text-[#999999]">Alamat profil</label>
                   </div>
                   <input
                     type="text"
                     value={formData.address}
                     onChange={(e) => handleInputChange('address', e.target.value)}
                     className="w-full text-sm text-[#0D0E09] bg-transparent border-none outline-none placeholder-[#999999]"
-                    placeholder="Masukkan alamat"
+                    placeholder="Tulis alamat profil bila ingin ditampilkan di akun"
                   />
                   <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
+                  <p className="text-xs text-[#999999]">
+                    Alamat pengiriman checkout tetap dikelola dari menu Alamat Pengiriman Tersimpan.
+                  </p>
                 </div>
               </div>
             </div>
@@ -167,7 +171,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               disabled={isSaving}
               className="flex-1 py-4 px-6 rounded-2xl text-lg font-medium bg-[#006A47] text-white hover:bg-[#005A3C] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isSaving ? "Menyimpan..." : "Save"}
+              {isSaving ? "Menyimpan..." : "Simpan"}
             </button>
           </div>
         </div>

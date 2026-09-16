@@ -170,7 +170,8 @@ const ProfileInfo: React.FC = () => {
     return `${profile.firstname ?? ""} ${profile.lastname ?? ""}`.trim() || profile.email;
   }, [profile]);
 
-  const displayAddress = profile?.address?.trim() || "Alamat belum tersedia.";
+  const displayAddress = profile?.address?.trim() || "Alamat profil belum tersedia.";
+  const displayPhone = profile?.phone?.trim() || "Nomor telepon belum tersedia.";
   const initialEditData = {
     firstname: profile?.firstname ?? "",
     lastname: profile?.lastname ?? "",
@@ -220,17 +221,20 @@ const ProfileInfo: React.FC = () => {
               </div>
             ) : (
               <>
-                <p className="text-sm text-[#313131]">
-                  {profile?.role ? `Role: ${profile.role}` : "Role belum tersedia"}
+                <p className="text-sm font-medium text-[#313131]">
+                  Data Akun Customer
                 </p>
                 <p className="text-xs text-[#A2A2A2]">
-                  {displayAddress}
+                  Email: {profile?.email ?? "Belum tersedia"}
                 </p>
                 <p className="text-xs text-[#A2A2A2]">
-                  {profile?.email ?? "-"}
+                  Telepon: {displayPhone}
                 </p>
                 <p className="text-xs text-[#A2A2A2]">
-                  {profile?.phone ?? "Nomor telepon belum tersedia."}
+                  Alamat profil: {displayAddress}
+                </p>
+                <p className="mx-auto max-w-xs rounded-lg bg-primary/5 px-3 py-2 text-xs font-medium text-primary">
+                  Alamat pengiriman dikelola terpisah di menu Alamat Pengiriman Tersimpan agar ongkir checkout tetap akurat.
                 </p>
               </>
             )}
