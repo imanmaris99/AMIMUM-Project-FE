@@ -186,7 +186,7 @@ export async function GetAllBrandServer(): Promise<ProductionProps[]> {
       }
 
       if (!res.ok) {
-        throw new Error(`Gagal mengambil data brand: ${res.status}`);
+        throw new Error('Data brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
       }
 
       const payload = await res.json();
@@ -263,7 +263,7 @@ export async function GetBrandDetailByIDServer(productionId: number): Promise<Br
 
     if (!res.ok) {
       // Other errors
-      throw new Error(`Gagal mengambil data brand: ${res.status}`);
+      throw new Error('Data brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     // Parse response

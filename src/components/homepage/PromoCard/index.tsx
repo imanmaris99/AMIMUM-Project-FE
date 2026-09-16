@@ -9,6 +9,9 @@ import { useMemo, useState } from "react";
 const PromoCard = ({ promo }: { promo: PromoProps }) => {
   const router = useRouter();
   const [imageError, setImageError] = useState(false);
+  const promoName = promo.name?.trim() || "Promo toko";
+  const promoPercent = Number(promo.promo_special);
+  const hasValidPromoPercent = Number.isFinite(promoPercent) && promoPercent > 0;
 
   const handleCardClick = () => {
     router.push(`/promo/${promo.id}`);
@@ -41,7 +44,7 @@ const PromoCard = ({ promo }: { promo: PromoProps }) => {
             // Use Next.js Image ONLY for local images (no server-side fetch issues)
             <Image
               src="/default-image.jpg"
-              alt="promo"
+              alt={promoName}
               width={50}
               height={50}
               style={{ width: "auto", height: "auto" }}
@@ -54,7 +57,7 @@ const PromoCard = ({ promo }: { promo: PromoProps }) => {
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={promo.photo_url || "/default-image.jpg"}
-              alt="promo"
+              alt={promoName}
               width={50}
               height={50}
               style={{ width: "auto", height: "auto", maxWidth: "50px", maxHeight: "50px" }}
@@ -70,16 +73,22 @@ const PromoCard = ({ promo }: { promo: PromoProps }) => {
             <p
               className={`font-jakarta text-xs text-center ${styles.textEllipsis}`}
             >
-              {promo.name}
+              {promoName}
             </p>
           </div>
 
           <div className="flex justify-center items-center bg-red-100 w-20 py-1 rounded-md">
             <p className="font-jakarta text-[8px]">
-              up to{" "}
-              <span className="text-red-500 font-extrabold">
-                {promo.promo_special}%
-              </span>
+              {hasValidPromoPercent ? (
+                <>
+                  hingga{" "}
+                  <span className="text-red-500 font-extrabold">
+                    {promoPercent}%
+                  </span>
+                </>
+              ) : (
+                <span className="text-red-500 font-semibold">Promo aktif</span>
+              )}
             </p>
           </div>
         </div>

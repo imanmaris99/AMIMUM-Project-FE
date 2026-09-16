@@ -103,7 +103,11 @@ export default function HomeClient({
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
       />
-      <Production productions={finalProductions} errorMessage={productionError} />
+      <Production
+        productions={finalProductions}
+        errorMessage={productionError}
+        selectedCategoryName={selectedCategoryName}
+      />
       <ArticleSection articles={articlesData} errorMessage={articleError} />
     </div>
   );

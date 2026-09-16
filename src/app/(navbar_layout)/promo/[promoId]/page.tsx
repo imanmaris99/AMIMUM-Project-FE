@@ -16,9 +16,9 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
   if (!promoId || typeof promoId !== 'string') {
     return (
       <main className="pb-20">
-        <UnifiedHeader type="main" title="Promo Not Found" />
+        <UnifiedHeader type="main" title="Promo tidak ditemukan" />
         <div className="p-4 text-center">
-          <p className="text-red-500">Invalid promo ID provided</p>
+          <p className="text-red-500">Promo yang dibuka tidak valid.</p>
         </div>
       </main>
     );
@@ -28,9 +28,9 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
   if (isNaN(productionId)) {
     return (
       <main className="pb-20">
-        <UnifiedHeader type="main" title="Promo Not Found" />
+        <UnifiedHeader type="main" title="Promo tidak ditemukan" />
         <div className="p-4 text-center">
-          <p className="text-red-500">Invalid promo ID format</p>
+          <p className="text-red-500">Format promo tidak valid.</p>
         </div>
       </main>
     );
@@ -38,8 +38,8 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
   
   try {
     brandData = await GetBrandDetailByIDServer(productionId);
-  } catch (error) {
-    errorMessage = error instanceof Error ? error.message : 'Gagal mengambil data brand';
+  } catch {
+    errorMessage = 'Detail promo belum bisa dimuat. Produk promo yang tersedia tetap ditampilkan jika ada.';
   }
     
   try {
@@ -65,7 +65,7 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
       <ProductListWithPagination 
         products={products} 
         title={`Produk Promo ${brandData?.name || "Brand"}`}
-        emptyMessage="Produk promo belum tersedia."
+        emptyMessage="Produk promo belum tersedia di katalog toko. Harga final tetap mengikuti data toko saat checkout."
       />
     </main>
   );

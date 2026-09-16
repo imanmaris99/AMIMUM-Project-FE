@@ -9,6 +9,8 @@ import { useState, useMemo } from "react";
 const ProductionCard = ({ production }: { production: ProductionProps }) => {
   const router = useRouter();
   const [imageError, setImageError] = useState(false);
+  const productionName = production.name?.trim() || "Brand produk";
+  const productionCategory = production.category?.trim() || "Kategori belum tersedia";
 
   const handleCardClick = () => {
     router.push(`/brand/${production.id}`);
@@ -40,7 +42,7 @@ const ProductionCard = ({ production }: { production: ProductionProps }) => {
           // Use Next.js Image ONLY for local images (no server-side fetch issues)
           <Image
             src="/default-image.jpg"
-            alt={production.name}
+            alt={productionName}
             width={50}
             height={50}
             style={{ width: "auto", height: "auto" }}
@@ -54,7 +56,7 @@ const ProductionCard = ({ production }: { production: ProductionProps }) => {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={production.photo_url || "/default-image.jpg"}
-            alt={production.name}
+            alt={productionName}
             width={50}
             height={50}
             style={{ width: "auto", height: "auto", maxWidth: "50px", maxHeight: "50px" }}
@@ -70,7 +72,7 @@ const ProductionCard = ({ production }: { production: ProductionProps }) => {
           <p
             className={`font-jakarta text-xs font-semibold text-center ${styles.textEllipsis}`}
           >
-            {production.name}
+            {productionName}
           </p>
         </div>
 
@@ -78,7 +80,7 @@ const ProductionCard = ({ production }: { production: ProductionProps }) => {
           <p
             className={`font-jakarta text-[8px] text-gray-500 text-center ${styles.textEllipsis}`}
           >
-            {production.category}
+            {productionCategory}
           </p>
         </div>
       </div>

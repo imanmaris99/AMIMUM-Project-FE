@@ -9,21 +9,21 @@ interface PromoSectionProps {
 }
 
 const Promo = ({ promo, errorMessage }: PromoSectionProps) => {
-  if (!promo || promo.length === 0) {
-    return null;
-  }
-
   if (errorMessage) {
     return (
       <>
         <div className="mx-6 mt-6">
           <h6 className="font-semibold font-jakarta">Promo spesial</h6>
         </div>
-        <div className="mx-6 mt-6 text-red-500 font-semibold">
+        <div className="mx-6 mt-4 rounded-lg border border-yellow-100 bg-yellow-50 px-4 py-3 text-center font-jakarta text-sm text-yellow-800">
           {errorMessage}
         </div>
       </>
     );
+  }
+
+  if (!promo || promo.length === 0) {
+    return null;
   }
 
   return (

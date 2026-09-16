@@ -17,9 +17,9 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   if (!brandId || typeof brandId !== 'string') {
     return (
       <main className="pb-20">
-        <UnifiedHeader type="main" title="Brand Not Found" />
+        <UnifiedHeader type="main" title="Brand tidak ditemukan" />
         <div className="p-4 text-center">
-          <p className="text-red-500">Invalid brand ID provided</p>
+          <p className="text-red-500">Brand yang dibuka tidak valid.</p>
         </div>
       </main>
     );
@@ -29,9 +29,9 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   if (isNaN(productionId)) {
     return (
       <main className="pb-20">
-        <UnifiedHeader type="main" title="Brand Not Found" />
+        <UnifiedHeader type="main" title="Brand tidak ditemukan" />
         <div className="p-4 text-center">
-          <p className="text-red-500">Invalid brand ID format</p>
+          <p className="text-red-500">Format brand tidak valid.</p>
         </div>
       </main>
     );
@@ -39,8 +39,8 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   
   try {
     brandData = await GetBrandDetailByIDServer(productionId);
-  } catch (error) {
-    errorMessage = error instanceof Error ? error.message : 'Gagal mengambil data brand';
+  } catch {
+    errorMessage = 'Detail brand belum bisa dimuat. Produk yang tersedia tetap ditampilkan jika ada.';
   }
     
   try {
@@ -81,7 +81,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
       <ProductListWithPagination 
         products={products} 
         title={`Daftar Produk ${brandData?.name || "Brand"}`}
-        emptyMessage="Produk brand belum tersedia."
+        emptyMessage="Produk brand ini belum tersedia di katalog toko."
       />
     </main>
   );

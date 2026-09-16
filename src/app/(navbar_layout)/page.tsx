@@ -9,8 +9,8 @@ export default async function Home() {
   
   try {
     categories = await fetchCategoriesServer();
-  } catch (error) {
-    categoryError = error instanceof Error ? error.message : 'Gagal mengambil data kategori';
+  } catch {
+    categoryError = 'Kategori belum bisa dimuat. Produk tetap bisa dilihat dari katalog yang tersedia.';
   }
 
   let productions = null;
@@ -18,8 +18,8 @@ export default async function Home() {
   
   try {
     productions = await GetAllBrandServer();
-  } catch (error) {
-    productionError = error instanceof Error ? error.message : 'Gagal mengambil data produksi';
+  } catch {
+    productionError = 'Katalog produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.';
   }
 
   let promos = null;
@@ -27,8 +27,8 @@ export default async function Home() {
   
   try {
     promos = await GetAllPromoServer();
-  } catch (error) {
-    promoError = error instanceof Error ? error.message : 'Gagal mengambil data promo';
+  } catch {
+    promoError = 'Promo belum bisa dimuat. Harga dan promo final tetap mengikuti data toko saat checkout.';
   }
 
   let articles = null;
@@ -36,8 +36,8 @@ export default async function Home() {
   
   try {
     articles = await fetchArticlesServer();
-  } catch (error) {
-    articleError = error instanceof Error ? error.message : 'Gagal mengambil data artikel';
+  } catch {
+    articleError = 'Artikel belum bisa dimuat. Silakan coba lagi nanti.';
   }
 
   return (
