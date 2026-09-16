@@ -271,7 +271,7 @@ export async function GetBrandDetailByIDServer(productionId: number): Promise<Br
     
     // Validate response structure
     if (!data || !data.data) {
-      throw new Error('Invalid response format: data is missing');
+      throw new Error('Format detail brand belum sesuai. Silakan coba lagi nanti.');
     }
 
     // Return the brand detail data
@@ -281,6 +281,6 @@ export async function GetBrandDetailByIDServer(productionId: number): Promise<Br
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error('Unknown error occurred while fetching brand detail');
+    throw new Error('Detail brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
   }
 }

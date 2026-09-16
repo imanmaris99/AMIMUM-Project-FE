@@ -38,7 +38,7 @@ const ProductImage = ({ detailProduct, selectedVariantImg }: ProductImageProps) 
       {!imageUrl ? null : !isExternalUrl ? (
         <Image 
           src={imageUrl} 
-          alt={detailProduct?.name || "Product Image"} 
+          alt={detailProduct?.name || "Gambar produk katalog"}
           fill
           style={{ objectFit: "contain" }}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -49,7 +49,7 @@ const ProductImage = ({ detailProduct, selectedVariantImg }: ProductImageProps) 
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={imageUrl}
-          alt={detailProduct?.name || "Product Image"}
+          alt={detailProduct?.name || "Gambar produk katalog"}
           style={{ 
             width: "100%", 
             height: "100%", 

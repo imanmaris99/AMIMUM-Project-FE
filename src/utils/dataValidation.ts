@@ -102,7 +102,7 @@ export function validateDetailProductData(product: unknown): product is DetailPr
     typeof p.id === 'string' &&
     typeof p.name === 'string' &&
     typeof p.price === 'number' &&
-    p.price > 0 &&
+    p.price >= 0 &&
     typeof p.is_active === 'boolean' &&
     typeof p.company === 'string' &&
     Array.isArray(p.variants_list) &&

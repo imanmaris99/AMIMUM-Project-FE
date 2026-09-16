@@ -28,7 +28,7 @@ export default async function DetailProduct({ params }: { params: Promise<{ prod
   try {
     detailProduct = await getDetailProductServer(productId);
   } catch (error) {
-    errorMessage = error instanceof Error ? error.message : 'Gagal mengambil detail produk.';
+    errorMessage = 'Detail produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.';
     ErrorHandler.handleError(error instanceof Error ? error : new Error(String(error)), 'DetailProduct');
   }
 

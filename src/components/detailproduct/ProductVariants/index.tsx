@@ -36,8 +36,9 @@ const ProductVariants = ({
           <div className="grid grid-cols-1 gap-3">
             {productVariants.map((variant) => {
               const hasDiscount = Boolean(variant.discount && variant.discount > 0);
-              const discountedPrice = variant.discounted_price || product?.price || 0;
-              const originalPrice = hasDiscount
+              const discountedPrice = Number(variant.discounted_price || product?.price || 0);
+              const hasValidPrice = Number.isFinite(discountedPrice) && discountedPrice > 0;
+              const originalPrice = hasDiscount && hasValidPrice
                 ? Math.round(discountedPrice / (1 - variant.discount / 100))
                 : discountedPrice;
               const isSelected = propSelectedVariant?.id === variant.id;
@@ -73,7 +74,11 @@ const ProductVariants = ({
                     </div>
 
                     <div className="text-xs">
-                      {hasDiscount ? (
+                      {!hasValidPrice ? (
+                        <div className="text-gray-500 font-medium">
+                          Harga varian belum tersedia
+                        </div>
+                      ) : hasDiscount ? (
                         <div className="space-y-1">
                           <div className="flex items-center gap-1">
                             <span className="text-red-500 font-semibold">

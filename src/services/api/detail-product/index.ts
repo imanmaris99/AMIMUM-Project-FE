@@ -34,31 +34,25 @@ export async function getDetailProductServer(productId: string): Promise<DetailP
     });
 
     if (res.status === 404) {
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'Produk dengan ID yang diberikan tidak ditemukan.';
-      throw new Error(errorMessage);
+      throw new Error('Produk tidak ditemukan atau belum tersedia di katalog toko.');
     }
 
     if (res.status === 422) {
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.detail?.[0]?.msg || 'Kesalahan validasi saat mengambil detail produk.';
-      throw new Error(errorMessage);
+      throw new Error('Format produk tidak valid. Silakan buka produk dari katalog toko.');
     }
 
     if (res.status === 500) {
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'Kesalahan tak terduga saat mengambil detail produk.';
-      throw new Error(errorMessage);
+      throw new Error('Detail produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     if (!res.ok) {
-      throw new Error(`Gagal mengambil detail produk: ${res.status}`);
+      throw new Error('Detail produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     const data: DetailProductResponseType = await res.json();
     
     if (!data || !data.data) {
-      throw new Error('Invalid response format: data is missing');
+      throw new Error('Format detail produk belum sesuai. Silakan coba lagi nanti.');
     }
 
     return data.data;
@@ -66,6 +60,6 @@ export async function getDetailProductServer(productId: string): Promise<DetailP
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error('Unknown error occurred while fetching product detail');
+    throw new Error('Detail produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
   }
 }

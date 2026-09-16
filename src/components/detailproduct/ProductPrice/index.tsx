@@ -102,11 +102,7 @@ const ProductPrice = ({
         }
       }
 
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Gagal menyimpan produk ke keranjang."
-      );
+      toast.error("Produk belum bisa disimpan ke keranjang. Silakan coba lagi beberapa saat lagi.");
     } finally {
       setIsAdding(false);
     }
@@ -156,11 +152,7 @@ const ProductPrice = ({
         }
       }
 
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Gagal menyiapkan checkout langsung."
-      );
+      toast.error("Checkout langsung belum bisa disiapkan. Silakan coba lagi beberapa saat lagi.");
     } finally {
       setIsBuying(false);
     }
@@ -179,39 +171,15 @@ const ProductPrice = ({
   }
 
   if (isError) {
-    switch (isError) {
-      case 403:
-        return (
-          <div>
-            Token tidak valid atau pengguna tidak terautentikasi. Silakan coba
-            lagi nanti.
-          </div>
-        );
-      case 404:
-        return (
-          <div>
-            Pengguna tidak ditemukan atau tidak memiliki rating produk. Silakan
-            coba lagi nanti.
-          </div>
-        );
-      case 409:
-        return (
-          <div>
-            Terjadi konflik saat mengakses data. Silakan coba lagi nanti.
-          </div>
-        );
-      case 500:
-        return <div>Terjadi kesalahan server. Silakan coba lagi nanti.</div>;
-      default:
-        break;
-    }
+    return <div className="text-sm text-gray-600">Harga produk belum bisa dimuat. Silakan coba lagi nanti.</div>;
   }
   // Check if variant has discount
   const hasDiscount = datavariant?.discount && datavariant.discount > 0;
   const discountPercentage = datavariant?.discount || 0;
-  const discountedPrice = datavariant?.discounted_price || data?.price || 0;
-  const originalPrice = hasDiscount ? Math.round(discountedPrice / (1 - discountPercentage / 100)) : (discountedPrice || 0);
-  const savings = hasDiscount ? Math.max(0, originalPrice - discountedPrice) : 0;
+  const discountedPrice = Number(datavariant?.discounted_price || data?.price || 0);
+  const hasValidPrice = Number.isFinite(discountedPrice) && discountedPrice > 0;
+  const originalPrice = hasDiscount && hasValidPrice ? Math.round(discountedPrice / (1 - discountPercentage / 100)) : (discountedPrice || 0);
+  const savings = hasDiscount && hasValidPrice ? Math.max(0, originalPrice - discountedPrice) : 0;
 
   return (
     <div className={`${isSticky ? 'shadow-lg' : 'shadow-sm'} bg-white ${isSticky ? 'rounded-none' : 'rounded-lg'}`}>
@@ -241,18 +209,25 @@ const ProductPrice = ({
             
             {/* Show price only when variant is selected */}
             {datavariant ? (
-              hasDiscount ? (
+              !hasValidPrice ? (
+                <div className="text-center">
+                  <p className="font-semibold text-gray-500 text-sm">Harga belum tersedia</p>
+                  {!isSticky && (
+                    <p className="text-xs text-gray-500 mt-1">Silakan hubungi admin toko sebelum membeli.</p>
+                  )}
+                </div>
+              ) : hasDiscount ? (
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 justify-center">
                     <span className="bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
                       -{discountPercentage}%
                     </span>
                     <span className="text-gray-400 line-through text-sm">
-                      Rp {originalPrice?.toLocaleString()}
+                      Rp {originalPrice.toLocaleString()}
                     </span>
                   </div>
                   <p className={`font-bold text-green-600 ${isSticky ? 'text-lg' : 'text-xl'} text-center`}>
-                    Rp {discountedPrice?.toLocaleString()}
+                    Rp {discountedPrice.toLocaleString()}
                   </p>
                   {!isSticky && (
                     <p className="text-xs text-gray-500">
@@ -263,14 +238,13 @@ const ProductPrice = ({
               ) : (
                 <div>
                   <p className={`font-bold text-gray-900 ${isSticky ? 'text-lg' : 'text-xl'} ${isSticky ? 'text-center' : ''}`}>
-                    Rp {discountedPrice?.toLocaleString()}
+                    Rp {discountedPrice.toLocaleString()}
                   </p>
                 </div>
               )
             ) : (
-              /* Show placeholder when no variant selected */
               <div className="text-center">
-                <p className="text-gray-400 text-sm">-</p>
+                <p className="text-gray-500 text-sm">Pilih varian untuk melihat harga</p>
               </div>
             )}
           </div>
@@ -282,7 +256,7 @@ const ProductPrice = ({
                 <Button 
                   variant="default" 
                   onClick={handleAddToCart}
-                  disabled={isAdding || isBuying}
+                  disabled={isAdding || isBuying || !hasValidPrice}
                   className={`${
                     isItemInCart 
                       ? "bg-green-600 hover:bg-green-700" 
@@ -291,6 +265,8 @@ const ProductPrice = ({
                 >
                   {isAdding ? (
                     <ButtonSpinner size="sm" color="white" text="Menambah..." />
+                  ) : !hasValidPrice ? (
+                    "Harga Belum Tersedia"
                   ) : isItemInCart ? (
                     "✓ Di Keranjang"
                   ) : (
@@ -301,11 +277,13 @@ const ProductPrice = ({
                 <Button 
                   variant="outline" 
                   onClick={handleBuyNow}
-                  disabled={isBuying || isAdding}
+                  disabled={isBuying || isAdding || !hasValidPrice}
                   className="w-full px-4 py-2 text-sm border-primary text-primary hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 >
                   {isBuying ? (
                     <ButtonSpinner size="sm" color="primary" text="Memproses..." />
+                  ) : !hasValidPrice ? (
+                    "Harga Belum Tersedia"
                   ) : (
                     "🚀 Beli Langsung"
                   )}
@@ -316,11 +294,11 @@ const ProductPrice = ({
               <Button 
                 variant="default" 
                 onClick={handleAddToCart}
-                disabled={isAdding || isBuying || !datavariant}
+                disabled={isAdding || isBuying || !datavariant || !hasValidPrice}
                 className={`${
                   isItemInCart 
                     ? "bg-green-600 hover:bg-green-700" 
-                    : !datavariant
+                    : !datavariant || !hasValidPrice
                     ? "bg-gray-400 hover:bg-gray-400"
                     : "bg-[#006A47] hover:bg-[#005A3C]"
                 } text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 px-4 py-2`}
@@ -334,6 +312,8 @@ const ProductPrice = ({
                   "✓ Di Keranjang"
                 ) : !datavariant ? (
                   "Pilih Varian"
+                ) : !hasValidPrice ? (
+                  "Harga Belum Tersedia"
                 ) : (
                   "Simpan Keranjang"
                 )}

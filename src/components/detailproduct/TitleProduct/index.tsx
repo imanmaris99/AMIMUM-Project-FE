@@ -21,21 +21,33 @@ const TitleProduct = ({ isError, isLoading, data }: TitleProductProps) => {
     );
   }
   if (!data) {
-    return <div className="text-gray-500">Data produk tidak tersedia.</div>;
+    return <div className="text-gray-500">Data produk belum tersedia.</div>;
   }
+
+  const productName = data.name?.trim() || "Produk katalog";
+  const brandName = data.company?.trim() || "Brand belum tersedia";
+  const rating = Number(data.avg_rating);
+  const hasRating = Number.isFinite(rating) && rating > 0;
+
   return (
     <div className="bg-white shadow-sm rounded-lg">
-      <div className="p-4 flex items-center justify-between">
-        <div>
-          <p className="text-sm text-green-700">Produk : {data.company}</p>
-          <h1 className="text-lg font-semibold text-gray-900">{data.name}</h1>
+      <div className="p-4 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm text-green-700">Brand: {brandName}</p>
+          <h1 className="text-lg font-semibold text-gray-900">{productName}</h1>
         </div>
-        <div className="flex items-center gap-1 bg-orange-100 px-2 py-1 rounded-full">
-          <AiFillStar className="text-orange-500" />
-          <span className="text-orange-500 font-semibold text-sm">
-            {data.avg_rating?.toFixed(1)}
+        {hasRating ? (
+          <div className="flex items-center gap-1 bg-orange-100 px-2 py-1 rounded-full shrink-0">
+            <AiFillStar className="text-orange-500" />
+            <span className="text-orange-500 font-semibold text-sm">
+              {rating.toFixed(1)}
+            </span>
+          </div>
+        ) : (
+          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full shrink-0">
+            Belum ada rating
           </span>
-        </div>
+        )}
       </div>
     </div>
   );
