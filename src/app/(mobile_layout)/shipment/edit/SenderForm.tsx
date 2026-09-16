@@ -242,7 +242,7 @@ const SenderForm: React.FC<SenderFormProps> = ({ onSubmit, initialData }) => {
           className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 min-h-[100px] resize-none ${
             errors.fullAddress ? 'border-red-500' : 'border-gray-300'
           }`}
-          placeholder="Jl. Raya Industri No. 88, Kawasan Industri"
+          placeholder="Alamat toko dikelola admin"
         />
         {errors.fullAddress && (
           <p className="text-red-500 text-xs mt-1">{errors.fullAddress}</p>

@@ -245,7 +245,7 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
           className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 min-h-[100px] resize-none ${
             errors.fullAddress ? 'border-red-500' : 'border-gray-300'
           }`}
-          placeholder="Jalan Patriot No. 15, Kecamatan Bayat"
+          placeholder="Tulis alamat lengkap tujuan pengiriman"
         />
         {errors.fullAddress && (
           <p className="text-red-500 text-xs mt-1">{errors.fullAddress}</p>

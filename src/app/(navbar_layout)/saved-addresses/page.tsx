@@ -295,23 +295,47 @@ const SavedAddressesPage: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="flex flex-col justify-center items-center gap-4 mt-20 mb-8 px-4">
+      <div className="flex flex-col items-center gap-4 mt-10 mb-8 px-4">
         <div className="w-full max-w-sm space-y-4">
           {isLoading ? (
-            <div className="rounded-lg bg-white p-6 text-center">
-              <p className="text-sm text-[#A2A2A2]">
+            <div className="rounded-2xl bg-white p-6 text-center shadow-sm">
+              <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-4 border-[#006A47] border-t-transparent" />
+              <p className="text-sm text-[#666666]">
                 Mengambil alamat pengiriman dari server...
               </p>
             </div>
           ) : errorMessage ? (
-            <div className="rounded-lg bg-red-50 p-6 text-center">
+            <div className="rounded-2xl border border-red-100 bg-red-50 p-6 text-center shadow-sm">
+              <h2 className="mb-2 text-base font-semibold text-red-700">
+                Alamat Belum Bisa Dimuat
+              </h2>
               <p className="text-sm text-red-600">{errorMessage}</p>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="mt-4 rounded-2xl border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+              >
+                Muat Ulang
+              </button>
             </div>
           ) : addresses.length === 0 ? (
-            <div className="rounded-lg bg-white p-6 text-center">
-              <p className="text-sm text-[#A2A2A2]">
-                Belum ada alamat pengiriman tersimpan.
+            <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-6 text-center shadow-sm">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#E6F2F0] text-2xl font-bold text-[#006A47]">
+                +
+              </div>
+              <h2 className="mb-2 text-base font-semibold text-[#313131]">
+                Belum Ada Alamat Pengiriman
+              </h2>
+              <p className="text-sm text-[#666666]">
+                Tambahkan alamat tujuan yang valid dari RajaOngkir agar ongkir checkout dapat dihitung otomatis.
               </p>
+              <button
+                type="button"
+                onClick={handleAddAddress}
+                className="mt-5 rounded-2xl bg-[#006A47] px-5 py-3 text-sm font-semibold text-white hover:bg-[#005A3C]"
+              >
+                Tambah Alamat Pengiriman
+              </button>
             </div>
           ) : (
             addresses.map((item) => {
@@ -375,6 +399,11 @@ const SavedAddressesPage: React.FC = () => {
                           Perlu update lokasi RajaOngkir sebelum dipakai checkout.
                         </p>
                       )}
+                      {hasValidRajaOngkirCity && (
+                        <p className="mt-2 inline-flex rounded-full bg-[#E6F2F0] px-3 py-1 text-xs font-semibold text-[#006A47]">
+                          Siap dipakai checkout
+                        </p>
+                      )}
                     </div>
 
                     <button
@@ -410,12 +439,12 @@ const SavedAddressesPage: React.FC = () => {
         </div>
 
         {/* Add Address Button */}
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-4">
           <button
             onClick={handleAddAddress}
-            className="w-8 h-8 bg-[#E6F2F0] rounded-2xl flex items-center justify-center"
+            className="rounded-2xl bg-[#E6F2F0] px-5 py-3 text-sm font-semibold text-[#0D0E09] hover:bg-[#D4E8E0]"
           >
-            <span className="text-[#0D0E09] text-lg font-medium">+</span>
+            + Tambah Alamat Pengiriman
           </button>
         </div>
       </div>

@@ -82,7 +82,10 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
       <div className="w-full max-w-[375px] bg-white rounded-t-2xl shadow-2xl">
         <div className="p-6">
           <div className="flex flex-col items-center justify-center gap-2">
-            <h3 className="text-lg font-medium text-[#0D0E09]">Tambah Alamat</h3>
+            <h3 className="text-lg font-medium text-[#0D0E09]">Tambah Alamat Pengiriman</h3>
+            <p className="text-center text-xs text-[#666666]">
+              Pilih provinsi dan kota dari RajaOngkir agar ongkir checkout akurat.
+            </p>
           </div>
           
           {/* Divider Line */}
@@ -203,7 +206,7 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
               disabled={isSaving || !hasRajaOngkirCity}
               className="flex-1 py-4 px-6 rounded-2xl text-lg font-medium bg-[#006A47] text-white hover:bg-[#005A3C] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isSaving ? "Menyimpan..." : "Save"}
+              {isSaving ? "Menyimpan..." : "Simpan"}
             </button>
           </div>
         </div>

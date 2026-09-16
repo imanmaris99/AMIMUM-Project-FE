@@ -16,7 +16,7 @@ const ProfileSettings: React.FC = () => {
   };
 
   const handleAdminClick = () => {
-    // Handle admin contact
+    toast("Kontak admin akan tersedia dari kanal resmi toko.");
   };
 
   const handleLogoutClick = () => {
