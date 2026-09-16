@@ -94,6 +94,13 @@ const resolveCityIdFromRajaOngkir = async (
   return matchedCity?.city_id;
 };
 
+const getCourierName = (courierId: string) =>
+  SUPPORTED_COURIERS.find((courier) => courier.id === courierId)?.name ||
+  courierId.toUpperCase();
+
+const getCourierUnavailableNotice = () =>
+  'Belum ada layanan ongkir untuk kombinasi alamat dan ekspedisi yang tersedia. Coba cek ulang kota tujuan, berat paket, atau pilih alamat lain.';
+
 const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const router = useRouter();
   const { cartItems, isLoading: isCartLoading, refreshCart, removeActiveItems } = useCart();
@@ -124,6 +131,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     Record<string, boolean>
   >({});
   const [isRecoveringCreatedOrder, setIsRecoveringCreatedOrder] = useState(false);
+  const fallbackCourierNoticeRef = React.useRef<string | null>(null);
+  const fallbackCourierNoticeTextRef = React.useRef('');
 
   const paymentMethodGroups = getPaymentMethodGroups(deliveryMethod);
 
@@ -216,40 +225,99 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       }
 
       setIsCourierLoading(true);
-      setCourierNotice('');
+      const preservedFallbackNotice =
+        fallbackCourierNoticeRef.current === selectedCourierCompany
+          ? fallbackCourierNoticeTextRef.current
+          : '';
+      setCourierNotice(preservedFallbackNotice);
 
       try {
-        const response = await getRajaOngkirShippingCost({
-          origin: storeAddress.cityId,
-          destination: selectedAddress.city_id,
-          weight: 1000,
-          courier: selectedCourierCompany,
-        });
+        const selectedCourier = selectedCourierCompany;
+        const courierQueue = [
+          selectedCourier,
+          ...SUPPORTED_COURIERS
+            .map((courier) => courier.id)
+            .filter((courierId) => courierId !== selectedCourier),
+        ];
+        let successfulCourier = selectedCourier;
+        let nextServices: CourierCompany['services'] = [];
+        let lastError: unknown = null;
 
-        const nextServices = response.details.map((detail) => ({
-          id: `${selectedCourierCompany}-${detail.service}`,
-          serviceType: detail.service,
-          cost: detail.cost,
-          estimatedDelivery: detail.etd,
-          description: detail.description,
-          weight: 1000,
-        }));
+        for (const courier of courierQueue) {
+          try {
+            const response = await getRajaOngkirShippingCost({
+              origin: storeAddress.cityId,
+              destination: selectedAddress.city_id,
+              weight: 1000,
+              courier,
+            });
+
+            const services = response.details.map((detail) => ({
+              id: `${courier}-${detail.service}`,
+              serviceType: detail.service,
+              cost: detail.cost,
+              estimatedDelivery: detail.etd,
+              description: detail.description,
+              weight: 1000,
+            }));
+
+            if (services.length > 0) {
+              successfulCourier = courier;
+              nextServices = services;
+              break;
+            }
+          } catch (error) {
+            lastError = error;
+          }
+        }
 
         setCourierCompanies((prevCompanies) =>
           prevCompanies.map((company) =>
-            company.id === selectedCourierCompany
+            company.id === successfulCourier
               ? {
                   ...company,
                   services: nextServices,
                 }
-              : company
+              : company.id === selectedCourier
+                ? {
+                    ...company,
+                    services: [],
+                  }
+                : company
           )
         );
 
         if (nextServices.length === 0) {
-          setCourierNotice('Layanan ongkir belum tersedia untuk alamat dan ekspedisi ini. Coba pilih ekspedisi lain atau cek ulang alamat tujuan.');
+          const notice = getCourierUnavailableNotice();
+          setCourierNotice(notice);
+          toast.error(
+            lastError instanceof Error ? notice : 'Layanan ongkir belum tersedia.'
+          );
+          return;
         }
-      } catch (error) {
+
+        const firstService = nextServices[0];
+
+        if (successfulCourier !== selectedCourier) {
+          const notice = `${getCourierName(selectedCourier)} belum tersedia untuk rute ini. Sistem memilih ${getCourierName(successfulCourier)} yang tersedia.`;
+          fallbackCourierNoticeRef.current = successfulCourier;
+          fallbackCourierNoticeTextRef.current = notice;
+          setSelectedCourierCompany(successfulCourier);
+          setSelectedCourierService(firstService.id);
+          setCourierNotice(notice);
+          toast.success(notice);
+          return;
+        }
+
+        fallbackCourierNoticeRef.current = null;
+        fallbackCourierNoticeTextRef.current = '';
+        setSelectedCourierService((currentService) =>
+          nextServices.some((service) => service.id === currentService)
+            ? currentService
+            : firstService.id
+        );
+      } catch {
+        const notice = getCourierUnavailableNotice();
         setCourierCompanies((prevCompanies) =>
           prevCompanies.map((company) =>
             company.id === selectedCourierCompany
@@ -260,16 +328,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
               : company
           )
         );
-        setCourierNotice(
-          error instanceof Error
-            ? error.message
-            : 'Gagal mengambil layanan kurir. Coba pilih ekspedisi lain atau cek ulang alamat tujuan.'
-        );
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : 'Gagal mengambil layanan kurir.'
-        );
+        setCourierNotice(notice);
+        toast.error(notice);
       } finally {
         setIsCourierLoading(false);
       }
