@@ -96,7 +96,7 @@ const resolveCityIdFromRajaOngkir = async (
 
 const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const router = useRouter();
-  const { cartItems, totalPrices, refreshCart, removeActiveItems } = useCart();
+  const { cartItems, refreshCart, removeActiveItems } = useCart();
   const { addTransaction } = useTransaction();
   
   // State management
@@ -119,6 +119,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const [courierCompanies, setCourierCompanies] = useState<CourierCompany[]>([]);
   const [isReferenceLoading, setIsReferenceLoading] = useState(true);
   const [isCourierLoading, setIsCourierLoading] = useState(false);
+  const [courierNotice, setCourierNotice] = useState('');
   const [expandedPaymentGroups, setExpandedPaymentGroups] = useState<
     Record<string, boolean>
   >({});
@@ -215,6 +216,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       }
 
       setIsCourierLoading(true);
+      setCourierNotice('');
 
       try {
         const response = await getRajaOngkirShippingCost({
@@ -224,23 +226,29 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
           courier: selectedCourierCompany,
         });
 
+        const nextServices = response.details.map((detail) => ({
+          id: `${selectedCourierCompany}-${detail.service}`,
+          serviceType: detail.service,
+          cost: detail.cost,
+          estimatedDelivery: detail.etd,
+          description: detail.description,
+          weight: 1000,
+        }));
+
         setCourierCompanies((prevCompanies) =>
           prevCompanies.map((company) =>
             company.id === selectedCourierCompany
               ? {
                   ...company,
-                  services: response.details.map((detail) => ({
-                    id: `${selectedCourierCompany}-${detail.service}`,
-                    serviceType: detail.service,
-                    cost: detail.cost,
-                    estimatedDelivery: detail.etd,
-                    description: detail.description,
-                    weight: 1000,
-                  })),
+                  services: nextServices,
                 }
               : company
           )
         );
+
+        if (nextServices.length === 0) {
+          setCourierNotice('Layanan ongkir belum tersedia untuk alamat dan ekspedisi ini. Coba pilih ekspedisi lain atau cek ulang alamat tujuan.');
+        }
       } catch (error) {
         setCourierCompanies((prevCompanies) =>
           prevCompanies.map((company) =>
@@ -251,6 +259,11 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                 }
               : company
           )
+        );
+        setCourierNotice(
+          error instanceof Error
+            ? error.message
+            : 'Gagal mengambil layanan kurir. Coba pilih ekspedisi lain atau cek ulang alamat tujuan.'
         );
         toast.error(
           error instanceof Error
@@ -314,6 +327,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     );
 
   const currentItems = cartItems.filter((item) => item.is_active !== false);
+  const activeSubtotal = currentItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
   const buildCheckoutCartItems = async () => {
     const freshCart = await getMyCartProducts();
@@ -409,6 +426,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     !isReferenceLoading &&
     !isCourierLoading &&
     currentItems.length > 0 &&
+    activeSubtotal > 0 &&
     hasValidDeliverySelection &&
     Boolean(selectedPaymentMethod);
   
@@ -416,7 +434,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   
   // Calculate totals from active cart rows; buy-now also routes through cart first.
   const calculateTotals = () => {
-    const subtotal = totalPrices.subtotal || 0;
+    const subtotal = activeSubtotal;
     const discount = 0;
     const shippingCost = deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0;
 
@@ -424,7 +442,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       subtotal,
       discount,
       shipping: shippingCost,
-      total: totalPrices.total + shippingCost,
+      total: subtotal + shippingCost,
     };
   };
 
@@ -494,7 +512,11 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     }
     
     if (currentItems.length === 0) {
-      newErrors.cart = 'Keranjang kosong';
+      newErrors.cart = 'Keranjang aktif kosong. Pilih minimal satu produk dari keranjang.';
+    }
+
+    if (currentItems.length > 0 && activeSubtotal <= 0) {
+      newErrors.cart = 'Subtotal produk belum valid. Kembali ke keranjang dan pilih ulang produk.';
     }
 
     if (!selectedPaymentMethod) {
@@ -732,6 +754,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     setSelectedAddress(address);
     setSelectedCourierCompany('');
     setSelectedCourierService('');
+    setCourierNotice('');
     setShowAddressSelector(false);
     clearError('address');
     clearError('courier');
@@ -748,6 +771,58 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       [groupId]: !previous[groupId],
     }));
   };
+
+  const getCheckoutReadinessMessage = () => {
+    if (isReferenceLoading) {
+      return 'Memuat data alamat dan opsi checkout...';
+    }
+
+    if (isCourierLoading) {
+      return 'Memuat layanan ongkir. Mohon tunggu sebentar.';
+    }
+
+    if (currentItems.length === 0) {
+      return 'Keranjang aktif kosong. Pilih minimal satu produk dari keranjang.';
+    }
+
+    if (activeSubtotal <= 0) {
+      return 'Subtotal produk belum valid. Kembali ke keranjang dan pilih ulang produk.';
+    }
+
+    if (deliveryMethod === 'delivery' && !selectedAddress) {
+      return 'Pilih alamat tujuan yang valid dari RajaOngkir terlebih dahulu.';
+    }
+
+    if (
+      deliveryMethod === 'delivery' &&
+      selectedAddress &&
+      !hasValidRajaOngkirCityId(selectedAddress.city_id)
+    ) {
+      return 'Alamat tujuan belum memiliki kota RajaOngkir. Update alamat dulu sebelum checkout.';
+    }
+
+    if (deliveryMethod === 'delivery' && !storeAddress?.cityId) {
+      return 'Alamat toko belum memiliki kota RajaOngkir valid. Checkout delivery belum bisa dilanjutkan.';
+    }
+
+    if (deliveryMethod === 'delivery' && (!selectedCourierCompany || !selectedCourierService)) {
+      return 'Pilih ekspedisi dan layanan ongkir terlebih dahulu.';
+    }
+
+    if (deliveryMethod === 'delivery' && (!selectedCourierData || selectedCourierData.cost <= 0)) {
+      return 'Layanan ongkir belum valid. Pilih ulang layanan pengiriman.';
+    }
+
+    if (!selectedPaymentMethod) {
+      return 'Pilih metode pembayaran terlebih dahulu.';
+    }
+
+    return requiresPendingPayment(selectedPaymentMethod)
+      ? 'Siap membuat pesanan. Setelah itu Anda akan diarahkan ke Midtrans.'
+      : 'Siap mengonfirmasi pesanan. Pesanan akan langsung masuk untuk diproses toko.';
+  };
+
+  const checkoutReadinessMessage = getCheckoutReadinessMessage();
 
   const renderPaymentBadge = (badge: string, isAvailable: boolean) => (
     <div
@@ -921,6 +996,11 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                   <p className="text-sm text-gray-600 mt-1">
                     {storeAddress?.address || 'Alamat toko belum tersedia'}
                   </p>
+                  {!storeAddress?.cityId && (
+                    <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
+                      Kota RajaOngkir alamat toko belum valid. Checkout delivery belum bisa dilanjutkan.
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -937,6 +1017,15 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                     <p className="text-sm text-gray-600 mt-1">
                       {selectedAddress.address}, {selectedAddress.city} {selectedAddress.postal_code}
                     </p>
+                    {hasValidRajaOngkirCityId(selectedAddress.city_id) ? (
+                      <p className="mt-2 inline-flex rounded-full bg-[#E6F2F0] px-3 py-1 text-xs font-semibold text-primary">
+                        Alamat RajaOngkir valid untuk hitung ongkir.
+                      </p>
+                    ) : (
+                      <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
+                        Alamat ini perlu update kota RajaOngkir sebelum checkout delivery.
+                      </p>
+                    )}
                   </div>
                   <button
                     onClick={() => {
@@ -1015,6 +1104,11 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             {errors.courier && (
               <p className="text-red-500 text-xs mt-2">{errors.courier}</p>
             )}
+            {courierNotice && (
+              <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
+                {courierNotice}
+              </p>
+            )}
           </div>
         )}
 
@@ -1050,7 +1144,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
               <p className="text-sm text-blue-800 font-medium mb-2">
-                💡 Contoh catatan yang berguna:
+                💡 Catatan berguna untuk toko:
               </p>
               <ul className="text-xs text-blue-700 space-y-1">
                 <li>• &ldquo;Ambil jam 3 sore&rdquo;</li>
@@ -1193,27 +1287,15 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             ) : (
               `${
                 requiresPendingPayment(selectedPaymentMethod || undefined)
-                  ? 'Buat Pesanan'
+                  ? 'Buat Pesanan & Lanjut Bayar'
                   : 'Konfirmasi Pesanan'
               } ${rupiahFormater(totals.total)}`
             )}
           </button>
           
-          {currentItems.length === 0 && (
-            <p className="text-center text-sm text-gray-500 mt-2">
-              Keranjang kosong, tidak dapat melanjutkan pembayaran
-            </p>
-          )}
-          {deliveryMethod === 'delivery' && currentItems.length > 0 && !hasValidDeliverySelection && (
-            <p className="text-center text-sm text-gray-500 mt-2">
-              Pilih alamat RajaOngkir dan layanan ongkir terlebih dahulu.
-            </p>
-          )}
-          {currentItems.length > 0 && hasValidDeliverySelection && !selectedPaymentMethod && (
-            <p className="text-center text-sm text-gray-500 mt-2">
-              Pilih metode pembayaran terlebih dahulu.
-            </p>
-          )}
+          <p className={`mt-2 text-center text-sm ${canSubmitOrder ? 'text-primary' : 'text-gray-500'}`}>
+            {checkoutReadinessMessage}
+          </p>
         </div>
       </div>
 
