@@ -96,7 +96,7 @@ const resolveCityIdFromRajaOngkir = async (
 
 const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const router = useRouter();
-  const { cartItems, refreshCart, removeActiveItems } = useCart();
+  const { cartItems, isLoading: isCartLoading, refreshCart, removeActiveItems } = useCart();
   const { addTransaction } = useTransaction();
   
   // State management
@@ -423,6 +423,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
   const canSubmitOrder =
     !isLoading &&
+    !isCartLoading &&
     !isReferenceLoading &&
     !isCourierLoading &&
     currentItems.length > 0 &&
@@ -773,6 +774,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   };
 
   const getCheckoutReadinessMessage = () => {
+    if (isCartLoading) {
+      return 'Memuat produk checkout dari keranjang...';
+    }
+
     if (isReferenceLoading) {
       return 'Memuat data alamat dan opsi checkout...';
     }
@@ -823,6 +828,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   };
 
   const checkoutReadinessMessage = getCheckoutReadinessMessage();
+  const isCheckoutCartLoading = isCartLoading;
+  const isCheckoutCartEmpty = !isCartLoading && !isLoading && !isReferenceLoading && currentItems.length === 0;
 
   const renderPaymentBadge = (badge: string, isAvailable: boolean) => (
     <div
@@ -868,6 +875,51 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             </div>
           </div>
         )}
+
+        {isCheckoutCartLoading ? (
+          <div className="px-4 py-8">
+            <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5 text-center">
+              <ButtonSpinner size="md" color="primary" text="Memuat produk checkout..." />
+              <p className="mt-3 text-sm text-blue-800">
+                Sistem sedang memastikan produk aktif dari keranjang sebelum checkout ditampilkan.
+              </p>
+            </div>
+          </div>
+        ) : isCheckoutCartEmpty ? (
+          <div className="px-4 py-8">
+            <div className="rounded-2xl border border-yellow-200 bg-yellow-50 p-5 text-center">
+              <GoPackage className="mx-auto mb-3 h-12 w-12 text-yellow-600" />
+              <h2 className="text-lg font-semibold text-gray-900">
+                Produk checkout belum siap
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-gray-700">
+                Belum ada produk aktif untuk diproses. Jika tadi menekan Beli Langsung,
+                kembali ke produk lalu tekan Beli Langsung sekali lagi sampai muncul notifikasi
+                produk siap checkout.
+              </p>
+              <div className="mt-5 grid grid-cols-1 gap-3">
+                <button
+                  type="button"
+                  onClick={() => router.push('/cart')}
+                  className="w-full rounded-xl bg-primary px-4 py-3 font-semibold text-white transition hover:bg-primary/90"
+                >
+                  Cek Keranjang
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push('/')}
+                  className="w-full rounded-xl border border-primary px-4 py-3 font-semibold text-primary transition hover:bg-primary/5"
+                >
+                  Mulai Belanja
+                </button>
+              </div>
+              <p className="mt-4 text-xs font-medium text-yellow-800">
+                Checkout diamankan: alamat, ongkir, dan pembayaran tidak akan diproses sebelum produk aktif tersedia.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
 
         {/* Delivery Method Selection */}
         <div className="px-4 py-4">
@@ -1297,6 +1349,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             {checkoutReadinessMessage}
           </p>
         </div>
+          </>
+        )}
       </div>
 
       {/* Address Selector Modal */}
