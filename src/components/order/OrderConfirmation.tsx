@@ -8,6 +8,7 @@ import { useTransaction } from '@/contexts/TransactionContext';
 import { Transaction } from '@/types/transaction';
 import { getPaymentMethodLabel } from '@/lib/paymentMethods';
 import {
+  getCustomerOrderAlert,
   getCustomerStatusConfig,
   isFailedPaymentStatus,
   isPendingPaymentStatus,
@@ -17,6 +18,9 @@ import {
   getOrderDetail,
   mapOrderDetailToTransaction,
 } from '@/services/api/orders';
+
+const BACKEND_ORDER_ID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 interface OrderConfirmationProps {
   orderId?: string;
@@ -41,13 +45,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
     const loadConfirmationTransaction = async () => {
       setIsResolvingTransaction(true);
 
-      if (!confirmationTransactionId) {
-        if (transactions.length > 0) {
-          setLatestTransaction(transactions[0]); // First transaction is the latest
-          setIsResolvingTransaction(false);
-          return;
-        }
-
+      if (!confirmationTransactionId || !BACKEND_ORDER_ID_PATTERN.test(confirmationTransactionId)) {
         setLatestTransaction(null);
         setIsResolvingTransaction(false);
         return;
@@ -119,6 +117,13 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
   );
   const isPendingPayment = isPendingPaymentStatus(latestTransaction?.status);
   const isFailedPayment = isFailedPaymentStatus(latestTransaction?.status);
+  const orderAlert = latestTransaction
+    ? getCustomerOrderAlert(
+        latestTransaction.status,
+        latestTransaction.shipmentAddress?.trackingNumber,
+        latestTransaction.deliveryType
+      )
+    : null;
 
   if (isResolvingTransaction) {
     return (
@@ -156,13 +161,19 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
             Belum Ada Pesanan Baru
           </h2>
           <p className="text-sm text-gray-600 mb-6">
-            Halaman ini hanya menampilkan detail jika checkout berhasil dan data pesanan tersedia.
+            Halaman konfirmasi hanya tampil setelah checkout berhasil dan ID pesanan valid tersedia dari server.
           </p>
           <button
             onClick={() => router.push('/cart')}
             className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-[#005A3C] transition-colors mb-3"
           >
             Lihat Keranjang
+          </button>
+          <button
+            onClick={handleViewOrders}
+            className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors mb-3"
+          >
+            Cek Riwayat Transaksi
           </button>
           <button
             onClick={handleBackToHome}
@@ -204,10 +215,10 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
           </div>
           
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            {isPendingPayment ? 'Pesanan Dibuat' : 'Pesanan Berhasil Dicatat'}
+            {isPendingPayment ? 'Pesanan Dibuat, Menunggu Bayar' : 'Pesanan Tercatat di Sistem'}
           </h2>
           <p className="text-gray-600 mb-4">
-            Terima kasih telah berbelanja di Amimum Herbal Store
+            Terima kasih telah berbelanja di Toko Herbal Amimum.
           </p>
           
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
@@ -215,10 +226,26 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
               ID Pesanan: {latestTransaction?.transactionId || orderId}
             </p>
             <p className="text-xs text-green-600 mt-1">
-              Simpan ID ini untuk melacak pesanan Anda
+              ID ini berasal dari server dan bisa dipakai untuk cek transaksi/tracking.
             </p>
           </div>
         </div>
+
+        {orderAlert && (
+          <div className="px-4 pb-4">
+            <div className={`${orderAlert.bgColor} ${orderAlert.borderColor} rounded-2xl border p-4`}>
+              <div className="flex items-start gap-3">
+                <span className="text-xl" aria-hidden="true">{orderAlert.icon}</span>
+                <div>
+                  <p className={`${orderAlert.textColor} font-semibold`}>{orderAlert.title}</p>
+                  <p className={`${orderAlert.textColor} mt-1 text-sm leading-relaxed`}>
+                    {orderAlert.message}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Order Details */}
         <div className="px-4 py-4 border-b border-gray-200">
@@ -303,7 +330,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                 <div>
                   <p className="font-medium text-gray-900">Setelah Pembayaran Berhasil</p>
                   <p className="text-sm text-gray-600">
-                    Pesanan akan masuk ke proses penyiapan dan siap dipantau dari halaman transaksi
+                    Setelah pembayaran berhasil, status pesanan akan diperbarui dari server dan bisa dipantau dari halaman transaksi.
                   </p>
                 </div>
               </div>
@@ -318,7 +345,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                   <p className="font-medium text-gray-900">Pesanan Diproses</p>
                   <p className="text-sm text-gray-600">
                     {latestTransaction?.shipmentAddress
-                      ? `${latestTransaction.shipmentAddress.courier} ${latestTransaction.shipmentAddress.service} akan memproses pengiriman`
+                      ? `${latestTransaction.shipmentAddress.courier} ${latestTransaction.shipmentAddress.service} akan digunakan untuk pengiriman setelah admin memproses pesanan.`
                       : 'Kami akan memproses dan mengirim pesanan Anda'}
                   </p>
                 </div>
@@ -333,7 +360,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                 <div>
                   <p className="font-medium text-gray-900">Siap Diambil</p>
                   <p className="text-sm text-gray-600">
-                    Pesanan siap diambil di toko setelah pembayaran
+                    Pesanan pickup akan disiapkan toko sesuai status transaksi.
                   </p>
                 </div>
               </div>
@@ -382,15 +409,9 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
             <p className="text-sm text-gray-600 mb-2">
               Butuh bantuan?
             </p>
-            <div className="flex justify-center space-x-4">
-              <button className="text-primary text-sm font-medium hover:underline">
-                Hubungi Kami
-              </button>
-              <span className="text-gray-300">|</span>
-              <button className="text-primary text-sm font-medium hover:underline">
-                FAQ
-              </button>
-            </div>
+            <p className="text-xs leading-relaxed text-gray-500">
+              Simpan ID pesanan ini. Jika membutuhkan bantuan, sampaikan ID pesanan ke admin melalui kanal resmi toko.
+            </p>
           </div>
         </div>
       </div>
