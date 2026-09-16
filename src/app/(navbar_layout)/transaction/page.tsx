@@ -52,13 +52,8 @@ const TransactionPage = () => {
 
   const transactions = [
     ...apiTransactions,
-    ...localTransactions.filter(
-      (localTransaction) =>
-        !apiTransactions.some(
-          (apiTransaction) => apiTransaction.id === localTransaction.id
-        )
-    ),
   ];
+  const hasLocalLegacyTransactions = localTransactions.length > 0;
 
   const handleViewDetails = (transactionId: string) => {
     router.push(`/transaction/${transactionId}`);
@@ -69,18 +64,18 @@ const TransactionPage = () => {
   };
 
   const handleClearSimulatedTransactions = () => {
-    if (localTransactions.length === 0) {
-      toast("Tidak ada transaksi simulasi untuk dihapus");
+    if (!hasLocalLegacyTransactions) {
+      toast("Tidak ada data lokal lama untuk dibersihkan");
       return;
     }
 
     if (
       window.confirm(
-        "Hapus semua transaksi simulasi hasil testing? Data order dari backend tidak akan ikut terhapus."
+        "Bersihkan data transaksi lokal lama dari perangkat ini? Data pesanan backend tidak akan ikut terhapus."
       )
     ) {
       clearTransactions();
-      toast.success("Semua transaksi simulasi berhasil dihapus");
+      toast.success("Data transaksi lokal lama berhasil dibersihkan");
     }
   };
 
@@ -100,18 +95,28 @@ const TransactionPage = () => {
               <h1 className="text-[#0D0E09] text-lg font-semibold">
                 Riwayat Transaksi
               </h1>
-              {localTransactions.length > 0 && (
+              {hasLocalLegacyTransactions && (
                 <button
                   onClick={handleClearSimulatedTransactions}
-                  className="text-red-500 text-sm font-medium hover:text-red-700 transition-colors"
+                  className="text-primary text-sm font-medium hover:text-primary/80 transition-colors"
                 >
-                  Hapus Simulasi
+                  Bersihkan Lokal
                 </button>
               )}
             </div>
             {!isLoading && !errorMessage && transactions.length > 0 && (
-              <p className="text-gray-500 text-sm mt-1">
-                {transactions.length} transaksi ditemukan
+              <div className="mt-2 rounded-xl bg-primary/5 px-3 py-2">
+                <p className="text-sm font-medium text-primary">
+                  {transactions.length} transaksi backend ditemukan
+                </p>
+                <p className="mt-1 text-xs text-gray-600">
+                  Riwayat ini mengambil data pesanan dari server toko agar status, pembayaran, dan tracking tetap akurat.
+                </p>
+              </div>
+            )}
+            {!isLoading && !errorMessage && hasLocalLegacyTransactions && (
+              <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
+                Data transaksi lokal lama disembunyikan dari daftar customer agar tidak tertukar dengan pesanan backend.
               </p>
             )}
           </div>

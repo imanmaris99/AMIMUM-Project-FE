@@ -36,8 +36,8 @@ const TransactionList: React.FC<TransactionListProps> = ({
         <h3 className="text-lg font-medium text-gray-900 mb-2">
           Belum Ada Transaksi
         </h3>
-        <p className="text-gray-500 text-sm">
-          Riwayat transaksi akan muncul di sini
+        <p className="max-w-xs text-gray-500 text-sm">
+          Riwayat transaksi backend akan muncul setelah pesanan berhasil dibuat dari checkout.
         </p>
       </div>
     );

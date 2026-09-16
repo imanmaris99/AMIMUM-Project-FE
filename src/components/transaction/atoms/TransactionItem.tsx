@@ -23,8 +23,12 @@ const formatRupiah = (value: number) =>
   }).format(value);
 
 const getPrimaryActionLabel = (transaction: Transaction) => {
-  if (isPendingPaymentStatus(transaction.status) || isFailedPaymentStatus(transaction.status)) {
-    return "Bayar sekarang";
+  if (isPendingPaymentStatus(transaction.status)) {
+    return "Lihat pembayaran";
+  }
+
+  if (isFailedPaymentStatus(transaction.status)) {
+    return "Cek pembayaran";
   }
 
   if (transaction.deliveryType === "delivery" && ["shipped", "delivered", "completed"].includes(transaction.status)) {
@@ -32,6 +36,30 @@ const getPrimaryActionLabel = (transaction: Transaction) => {
   }
 
   return "Lihat detail";
+};
+
+const getTransactionHelperText = (transaction: Transaction) => {
+  if (isPendingPaymentStatus(transaction.status)) {
+    return "Pesanan sudah tercatat. Buka detail untuk melanjutkan pembayaran atau cek status terbaru.";
+  }
+
+  if (isFailedPaymentStatus(transaction.status)) {
+    return "Pembayaran belum berhasil. Buka detail untuk melihat opsi pembayaran ulang atau bantuan.";
+  }
+
+  if (transaction.deliveryType === "delivery") {
+    if (transaction.status === "shipped") {
+      return transaction.shipmentAddress?.trackingNumber
+        ? "Pesanan sedang dikirim. Gunakan nomor resi untuk memantau paket di website kurir."
+        : "Pesanan sedang dikirim. No. resi akan tampil jika admin sudah memasukkan kode tracking resmi.";
+    }
+
+    if (["processing", "paid"].includes(transaction.status)) {
+      return "Pesanan sedang disiapkan toko. No. resi akan muncul setelah paket dikirim.";
+    }
+  }
+
+  return "Buka detail untuk melihat item, alamat, invoice, status pembayaran, dan tracking.";
 };
 
 const TransactionItem: React.FC<TransactionItemProps> = ({
@@ -46,11 +74,16 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
   const firstItem = transaction.items[0];
   const remainingItems = Math.max(transaction.items.length - 1, 0);
   const trackingNumber = transaction.shipmentAddress?.trackingNumber;
+  const selectedQuantity = transaction.items.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
   const shouldTrackDirectly =
     transaction.deliveryType === "delivery" &&
     ["shipped", "delivered", "completed"].includes(transaction.status) &&
     Boolean(onTrackOrder);
   const primaryActionLabel = getPrimaryActionLabel(transaction);
+  const helperText = getTransactionHelperText(transaction);
 
   const handlePrimaryAction = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -97,9 +130,27 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
 
         <div className="grid grid-cols-2 gap-3 rounded-lg bg-gray-50 p-3 text-xs">
           <div>
+            <p className="text-gray-400">Item</p>
+            <p className="mt-1 font-semibold text-gray-900">
+              {selectedQuantity} item
+            </p>
+          </div>
+          <div>
             <p className="text-gray-400">Total</p>
             <p className="mt-1 font-semibold text-gray-900">
               {formatRupiah(transaction.total)}
+            </p>
+          </div>
+          <div>
+            <p className="text-gray-400">Subtotal</p>
+            <p className="mt-1 font-medium text-gray-800">
+              {formatRupiah(transaction.subtotal)}
+            </p>
+          </div>
+          <div>
+            <p className="text-gray-400">Ongkir</p>
+            <p className="mt-1 font-medium text-gray-800">
+              {formatRupiah(transaction.shippingCost)}
             </p>
           </div>
           <div>
@@ -116,13 +167,19 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
                 : "Ambil di toko"}
             </p>
           </div>
+          {transaction.deliveryType === "delivery" && (
           <div>
             <p className="text-gray-400">No. resi</p>
             <p className="mt-1 font-medium text-gray-800">
               {trackingNumber || "Belum tersedia"}
             </p>
           </div>
+          )}
         </div>
+
+        <p className="rounded-lg bg-primary/5 px-3 py-2 text-xs font-medium text-primary">
+          {helperText}
+        </p>
 
         <div className="flex gap-2">
           <button
