@@ -1,5 +1,19 @@
 import React from 'react';
-import { ProductRatingSummary } from '@/data/dummyData';
+
+interface ProductRatingReview {
+  id: number | string;
+  rate: number;
+  review: string;
+  rater_name: string;
+  created_at: string;
+}
+
+interface ProductRatingSummary {
+  avg_rating: number;
+  total_rater: number;
+  rating_distribution: Record<1 | 2 | 3 | 4 | 5, number>;
+  recent_reviews: ProductRatingReview[];
+}
 
 interface RatingDisplayProps {
   ratingData: ProductRatingSummary;
