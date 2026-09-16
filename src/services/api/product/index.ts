@@ -1,7 +1,7 @@
 import axiosClient from "@/lib/axiosClient";
 import axios from "axios";
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/apiConfig";
-import { AllProductInfoType, AllProductInfoResponseType, ProductSearchResponseType, ProductSearchItemType, ProductSearchByBrandResponseType, ProductSearchByBrandItemType } from "@/types/apiTypes";
+import { AllProductInfoType, AllProductInfoResponseType, ProductSearchResponseType, ProductSearchItemType, ProductSearchByBrandResponseType, ProductSearchByBrandItemType, VariantAllProductType } from "@/types/apiTypes";
 
 /**
  * Search products by name (Client-side)
@@ -23,21 +23,9 @@ export const SearchGetProduct = async (productName: string): Promise<AllProductI
     
     if (responseData && responseData.status_code === 200 && responseData.data && Array.isArray(responseData.data)) {
       const mappedProducts: AllProductInfoType[] = responseData.data.map((product: ProductSearchItemType) => {
-        let variants = product.all_variants || [];
-        
-        if (variants.length === 0) {
-          const highestDiscount = product.highest_promo || 0;
-          variants = [{
-            id: 0,
-            variant: "default",
-            img: "/default-image.jpg",
-            discount: highestDiscount,
-            discounted_price: highestDiscount 
-              ? Math.round(product.price * (1 - highestDiscount / 100))
-              : product.price,
-            updated_at: new Date().toISOString(),
-          }];
-        }
+        const variants = Array.isArray(product.all_variants)
+          ? product.all_variants
+          : [];
 
         const productImage = variants.length > 0 && variants[0].img 
           ? variants[0].img 
@@ -58,7 +46,7 @@ export const SearchGetProduct = async (productName: string): Promise<AllProductI
             photo_url: undefined,
           },
           all_variants: variants,
-          created_at: product.created_at || new Date().toISOString(),
+          created_at: product.created_at || "",
           brand_highest_discount: highestDiscount > 0 ? highestDiscount : undefined,
         };
       });
@@ -132,16 +120,7 @@ export const SearchGetProductByBrand = async (productionId: number, productName:
     if (responseData && responseData.status_code === 200 && responseData.data && Array.isArray(responseData.data)) {
       const mappedProducts: AllProductInfoType[] = responseData.data.map((product: ProductSearchByBrandItemType) => {
         const highestDiscount = product.highest_promo || 0;
-        const variants = [{
-          id: 0,
-          variant: "default",
-          img: "/default-image.jpg",
-          discount: highestDiscount,
-          discounted_price: highestDiscount 
-            ? Math.round(product.price * (1 - highestDiscount / 100))
-            : product.price,
-          updated_at: new Date().toISOString(),
-        }];
+        const variants: VariantAllProductType[] = [];
 
         const productImage = "/default-image.jpg";
 
@@ -156,7 +135,7 @@ export const SearchGetProductByBrand = async (productionId: number, productName:
             photo_url: undefined,
           },
           all_variants: variants,
-          created_at: new Date().toISOString(),
+          created_at: "",
           brand_highest_discount: highestDiscount > 0 ? highestDiscount : undefined,
         };
       });
