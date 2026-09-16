@@ -15,6 +15,7 @@ import { CartItemType, CartTotalPricesType } from "@/types/apiTypes";
 import { SessionManager } from "@/lib/auth";
 import {
   addCartProduct,
+  CartMutationResponse,
   deleteCartProduct,
   extractVariantInfo,
   getCartTotalItems,
@@ -29,7 +30,7 @@ interface CartContextType {
   totalItems: number;
   totalPrices: CartTotalPricesType;
   isLoading: boolean;
-  addToCart: (product: DetailProductType, variant: VariantProductType) => Promise<void>;
+  addToCart: (product: DetailProductType, variant: VariantProductType) => Promise<CartMutationResponse>;
   removeFromCart: (cartId: string) => Promise<void>;
   updateQuantity: (cartId: string, quantity: number) => Promise<void>;
   updateActiveStatus: (cartId: string, isActive: boolean) => Promise<void>;
@@ -227,7 +228,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         throw new Error("Login diperlukan untuk menambahkan produk ke keranjang.");
       }
 
-      await addCartProduct({
+      const response = await addCartProduct({
         productId: product.id,
         variantId: variant.id,
       });
@@ -240,6 +241,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       writeCartMetadata(metadataMap);
 
       await refreshCart();
+      return response;
     },
     [refreshCart]
   );

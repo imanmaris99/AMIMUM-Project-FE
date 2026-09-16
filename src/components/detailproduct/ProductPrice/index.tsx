@@ -8,6 +8,8 @@ import { useCart } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
 import { SessionManager } from "@/lib/auth";
 import LoginRequiredModal from "@/components/common/LoginRequiredModal";
+import { toast } from "react-hot-toast";
+import { extractVariantInfo, getMyCartProducts } from "@/services/api/cart";
 
 interface ProductPriceProps {
   data: DetailProductType | undefined;
@@ -28,66 +30,105 @@ const ProductPrice = ({
   const [isAdding, setIsAdding] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const { addToCart, isInCart, updateAllActiveStatus } = useCart();
+  const { addToCart, isInCart, updateActiveStatus, updateAllActiveStatus, refreshCart } = useCart();
   const router = useRouter();
 
 
-  const handleAddToCart = async () => {
-    
-    if (!data || !datavariant) {
+  const ensureTargetCartItemActive = async (cartIdFromAdd?: number | string) => {
+    if (cartIdFromAdd) {
+      await updateActiveStatus(cartIdFromAdd.toString(), true);
+      await refreshCart();
       return;
     }
-    
-    
+
+    if (!data || !datavariant) {
+      throw new Error("Produk atau varian tidak valid.");
+    }
+
+    const latestCart = await getMyCartProducts();
+    const targetItem = latestCart.data.find((item) => {
+      const variantInfo = extractVariantInfo(item.variant_info);
+      const variantId = Number(variantInfo.id);
+
+      return (
+        item.product_name === data.name &&
+        Number.isFinite(variantId) &&
+        variantId === Number(datavariant.id)
+      );
+    });
+
+    if (!targetItem?.id) {
+      throw new Error("Item checkout belum ditemukan di keranjang. Coba tekan Beli Sekarang sekali lagi.");
+    }
+
+    await updateActiveStatus(targetItem.id.toString(), true);
+    await refreshCart();
+  };
+
+  const handleAddToCart = async () => {
+    if (!data || !datavariant) {
+      toast.error("Pilih varian produk terlebih dahulu.");
+      return;
+    }
+
+    if (!SessionManager.isAuthenticated()) {
+      setShowLoginModal(true);
+      return;
+    }
+
     setIsAdding(true);
-    
+
     try {
-      // Add to cart using CartContext
       await addToCart(data, datavariant);
-      
-      
-      // Show feedback
       setShowFeedback(true);
-      setTimeout(() => setShowFeedback(false), 3000);
-      
-    } catch {
-      // Ignore add to cart errors
+      toast.success("Produk berhasil tersimpan di keranjang. Membuka keranjang...");
+      setTimeout(() => setShowFeedback(false), 2000);
+      router.push("/cart");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Gagal menyimpan produk ke keranjang."
+      );
     } finally {
       setIsAdding(false);
     }
   };
 
   const handleBuyNow = async () => {
-    
     if (!data || !datavariant) {
+      toast.error("Pilih varian produk terlebih dahulu.");
       return;
     }
-    
-    // Check if user is logged in using SessionManager
-    const isLoggedIn = SessionManager.isAuthenticated();
-    
-    if (!isLoggedIn) {
+
+    if (!SessionManager.isAuthenticated()) {
       setShowLoginModal(true);
       return;
     }
-    
+
     setIsBuying(true);
-    
+
     try {
-      // Buy Now must use the same backend cart-based checkout contract as /cart.
-      // Deactivate existing cart rows first so only this item proceeds to checkout.
+      // Backend checkout tetap berbasis cart aktif, tapi customer langsung diarahkan ke checkout.
+      // Item lain dinonaktifkan agar Beli Langsung hanya memproses produk yang dipilih.
       try {
         await updateAllActiveStatus(false);
       } catch {
-        // Empty cart can return a not-found style response; continue by adding this item.
+        // Jika cart masih kosong, lanjut tambahkan item target.
       }
 
-      localStorage.removeItem('directCheckoutItem');
-      await addToCart(data, datavariant);
-      router.push('/order-1');
-      
-    } catch {
+      localStorage.removeItem("directCheckoutItem");
+      const addResponse = await addToCart(data, datavariant);
+      await ensureTargetCartItemActive(addResponse.data?.cart_id);
+      toast.success("Produk siap checkout. Membuka halaman pembayaran...");
+      router.push("/order-1");
+    } catch (error) {
       setShowFeedback(false);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Gagal menyiapkan checkout langsung."
+      );
     } finally {
       setIsBuying(false);
     }
@@ -209,7 +250,7 @@ const ProductPrice = ({
                 <Button 
                   variant="default" 
                   onClick={handleAddToCart}
-                  disabled={isAdding}
+                  disabled={isAdding || isBuying}
                   className={`${
                     isItemInCart 
                       ? "bg-green-600 hover:bg-green-700" 
@@ -221,14 +262,14 @@ const ProductPrice = ({
                   ) : isItemInCart ? (
                     "✓ Di Keranjang"
                   ) : (
-                    "+ Keranjang"
+                    "Simpan Keranjang"
                   )}
                 </Button>
                 
                 <Button 
                   variant="outline" 
                   onClick={handleBuyNow}
-                  disabled={isBuying}
+                  disabled={isBuying || isAdding}
                   className="w-full px-4 py-2 text-sm border-primary text-primary hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 >
                   {isBuying ? (
@@ -243,7 +284,7 @@ const ProductPrice = ({
               <Button 
                 variant="default" 
                 onClick={handleAddToCart}
-                disabled={isAdding || !datavariant}
+                disabled={isAdding || isBuying || !datavariant}
                 className={`${
                   isItemInCart 
                     ? "bg-green-600 hover:bg-green-700" 
@@ -262,7 +303,7 @@ const ProductPrice = ({
                 ) : !datavariant ? (
                   "Pilih Varian"
                 ) : (
-                  "+ Keranjang"
+                  "Simpan Keranjang"
                 )}
               </Button>
             )}
