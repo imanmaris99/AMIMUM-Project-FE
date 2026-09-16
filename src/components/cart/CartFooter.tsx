@@ -13,7 +13,7 @@ interface CartFooterProps {
 
 export default function CartFooter({ onCheckout }: CartFooterProps) {
   const router = useRouter();
-  const { cartItems, totalPrices, updateAllActiveStatus, isLoading } = useCart();
+  const { cartItems, totalPrices, updateAllActiveStatus, isLoading, isSyncing } = useCart();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isSelectingAll, setIsSelectingAll] = useState(false);
 
@@ -30,7 +30,8 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
   const hasSelectedItems = activeItems.length > 0;
   const hasValidTotal = total > 0;
   const hasSyncMismatch = hasSelectedItems && !hasValidTotal && !isLoading;
-  const canCheckout = !isLoading && !isSelectingAll && hasSelectedItems && hasValidTotal;
+  const isSavingSelection = isSelectingAll || isSyncing;
+  const canCheckout = !isLoading && !isSavingSelection && hasSelectedItems && hasValidTotal;
   const allItemsSelected =
     cartItems.length > 0 && cartItems.every((item) => item.is_active !== false);
 
@@ -48,7 +49,7 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
   }, [cartItems.length, allItemsSelected, updateAllActiveStatus, isSelectingAll]);
 
   const handleCheckout = () => {
-    if (isLoading || isSelectingAll) {
+    if (isLoading || isSavingSelection) {
       return;
     }
 
@@ -83,7 +84,7 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
               onClick={() => {
                 void handleSelectAll();
               }}
-              disabled={isLoading || isSelectingAll || cartItems.length === 0}
+              disabled={isLoading || isSavingSelection || cartItems.length === 0}
               aria-pressed={allItemsSelected}
               aria-label="Pilih semua produk"
               className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${
@@ -99,8 +100,8 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
               )}
             </button>
             <span className="text-gray-600 text-sm">
-              {isSelectingAll
-                ? 'Menyinkronkan...'
+              {isSavingSelection
+                ? 'Menyimpan pilihan...'
                 : selectedItemCount > 0
                   ? `${selectedItemCount} dipilih`
                   : 'Pilih item'}
@@ -113,8 +114,10 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
             aria-disabled={!canCheckout}
             className="bg-primary text-white px-6 py-3 rounded-full font-medium text-sm disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
-            {isLoading || isSelectingAll
+            {isLoading
               ? 'Memuat...'
+              : isSavingSelection && hasSelectedItems
+                ? `Menyimpan (${rupiahFormater(total)})`
               : hasSelectedItems
                 ? `Checkout (${rupiahFormater(total)})`
                 : 'Pilih item dulu'}
@@ -128,6 +131,11 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
         {hasSyncMismatch && (
           <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
             Data keranjang sedang disinkronkan. Coba pilih ulang produk atau refresh halaman.
+          </p>
+        )}
+        {isSyncing && hasSelectedItems && (
+          <p className="mt-2 rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-800">
+            Harga sudah diperbarui. Menyimpan pilihan ke server sebelum checkout dibuka.
           </p>
         )}
       </div>

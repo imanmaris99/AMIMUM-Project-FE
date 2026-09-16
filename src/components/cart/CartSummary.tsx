@@ -4,7 +4,7 @@ import { useCart } from '@/contexts/CartContext';
 import rupiahFormater from '@/utils/rupiahFormater';
 
 export default function CartSummary() {
-  const { cartItems, totalPrices } = useCart();
+  const { cartItems, totalPrices, isSyncing } = useCart();
 
   const selectedItems = cartItems.filter((item) => item.is_active !== false);
   const hasCartItems = cartItems.length > 0;
@@ -36,6 +36,11 @@ export default function CartSummary() {
                 <p className="text-xs font-semibold text-primary">
                   {selectedQuantity} item dipilih untuk checkout.
                 </p>
+                {isSyncing && (
+                  <p className="mt-1 text-xs text-primary/80">
+                    Harga tampil langsung, pilihan sedang disimpan ke server.
+                  </p>
+                )}
               </div>
             )}
 

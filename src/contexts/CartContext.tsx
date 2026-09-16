@@ -30,6 +30,7 @@ interface CartContextType {
   totalItems: number;
   totalPrices: CartTotalPricesType;
   isLoading: boolean;
+  isSyncing: boolean;
   addToCart: (product: DetailProductType, variant: VariantProductType) => Promise<CartMutationResponse>;
   removeFromCart: (cartId: string) => Promise<void>;
   updateQuantity: (cartId: string, quantity: number) => Promise<void>;
@@ -161,6 +162,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     promo_total: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [pendingMutationCount, setPendingMutationCount] = useState(0);
+  const isSyncing = pendingMutationCount > 0;
+
+  const beginCartSync = useCallback(() => {
+    setPendingMutationCount((count) => count + 1);
+
+    return () => {
+      setPendingMutationCount((count) => Math.max(0, count - 1));
+    };
+  }, []);
 
   const refreshCart = useCallback(async () => {
     setIsLoading(true);
@@ -218,6 +229,18 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     void refreshCart();
   }, [refreshCart]);
 
+  const commitCartItems = useCallback(
+    (updater: (previousItems: CartItemType[]) => CartItemType[]) => {
+      setCartItems((previousItems) => {
+        const nextItems = updater(previousItems);
+        setTotalItems(countActiveCartItems(nextItems));
+        setTotalPrices(calculateActiveCartTotals(nextItems));
+        return nextItems;
+      });
+    },
+    []
+  );
+
   const addToCart = useCallback(
     async (product: DetailProductType, variant: VariantProductType) => {
       if (!product?.id || !variant?.id) {
@@ -268,21 +291,29 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         throw new Error("Login diperlukan untuk mengubah keranjang.");
       }
 
-      await updateCartQuantityApi({
-        cartId,
-        quantity,
-      });
-
-      setCartItems((previousItems) => {
-        const nextItems = previousItems.map((item) =>
+      let previousSnapshot: CartItemType[] = [];
+      commitCartItems((previousItems) => {
+        previousSnapshot = previousItems;
+        return previousItems.map((item) =>
           item.id === cartId ? { ...item, quantity } : item
         );
-        setTotalItems(countActiveCartItems(nextItems));
-        setTotalPrices(calculateActiveCartTotals(nextItems));
-        return nextItems;
       });
+
+      const finishCartSync = beginCartSync();
+
+      try {
+        await updateCartQuantityApi({
+          cartId,
+          quantity,
+        });
+      } catch (error) {
+        commitCartItems(() => previousSnapshot);
+        throw error;
+      } finally {
+        finishCartSync();
+      }
     },
-    []
+    [beginCartSync, commitCartItems]
   );
 
   const updateActiveStatus = useCallback(
@@ -291,21 +322,29 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         throw new Error("Login diperlukan untuk mengubah keranjang.");
       }
 
-      await updateCartActivation({
-        cartId,
-        isActive,
-      });
-
-      setCartItems((previousItems) => {
-        const nextItems = previousItems.map((item) =>
+      let previousSnapshot: CartItemType[] = [];
+      commitCartItems((previousItems) => {
+        previousSnapshot = previousItems;
+        return previousItems.map((item) =>
           item.id === cartId ? { ...item, is_active: isActive } : item
         );
-        setTotalItems(countActiveCartItems(nextItems));
-        setTotalPrices(calculateActiveCartTotals(nextItems));
-        return nextItems;
       });
+
+      const finishCartSync = beginCartSync();
+
+      try {
+        await updateCartActivation({
+          cartId,
+          isActive,
+        });
+      } catch (error) {
+        commitCartItems(() => previousSnapshot);
+        throw error;
+      } finally {
+        finishCartSync();
+      }
     },
-    []
+    [beginCartSync, commitCartItems]
   );
 
   const updateAllActiveStatus = useCallback(
@@ -314,19 +353,27 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         throw new Error("Login diperlukan untuk mengubah keranjang.");
       }
 
-      await updateAllCartActivation(isActive);
-
-      setCartItems((previousItems) => {
-        const nextItems = previousItems.map((item) => ({
+      let previousSnapshot: CartItemType[] = [];
+      commitCartItems((previousItems) => {
+        previousSnapshot = previousItems;
+        return previousItems.map((item) => ({
           ...item,
           is_active: isActive,
         }));
-        setTotalItems(countActiveCartItems(nextItems));
-        setTotalPrices(calculateActiveCartTotals(nextItems));
-        return nextItems;
       });
+
+      const finishCartSync = beginCartSync();
+
+      try {
+        await updateAllCartActivation(isActive);
+      } catch (error) {
+        commitCartItems(() => previousSnapshot);
+        throw error;
+      } finally {
+        finishCartSync();
+      }
     },
-    []
+    [beginCartSync, commitCartItems]
   );
 
   const clearCart = useCallback(async () => {
@@ -383,6 +430,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       totalItems,
       totalPrices,
       isLoading,
+      isSyncing,
       addToCart,
       removeFromCart,
       updateQuantity,
@@ -399,6 +447,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       totalItems,
       totalPrices,
       isLoading,
+      isSyncing,
       addToCart,
       removeFromCart,
       updateQuantity,
