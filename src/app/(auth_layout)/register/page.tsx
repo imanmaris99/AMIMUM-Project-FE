@@ -277,7 +277,7 @@ const Register = () => {
                 type="tel"
                 value={formData.nomorHp}
                 onChange={(e) => handleInputChange("nomorHp", e.target.value)}
-                placeholder="Nomor Hp"
+                placeholder="Nomor HP"
                 className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1 ${errors.nomorHp ? 'text-red-500' : ''}`}
                 aria-label="Phone Number"
                 autoComplete="tel"
@@ -295,7 +295,7 @@ const Register = () => {
                 type={showPassword ? "text" : "password"}
                 value={formData.password}
                 onChange={(e) => handleInputChange("password", e.target.value)}
-                placeholder="Password"
+                placeholder="Password minimal 6 karakter"
                 className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm pr-10 py-3 pb-1 ${errors.password ? 'text-red-500' : ''}`}
                 aria-label="Password"
                 autoComplete="new-password"
@@ -326,7 +326,7 @@ const Register = () => {
                 type={showConfirmPassword ? "text" : "password"}
                 value={formData.cekPassword}
                 onChange={(e) => handleInputChange("cekPassword", e.target.value)}
-                placeholder="Cek Password"
+                placeholder="Konfirmasi password"
                 className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm pr-10 py-3 pb-1 ${errors.cekPassword ? 'text-red-500' : ''}`}
                 aria-label="Confirm Password"
                 autoComplete="new-password"
@@ -373,7 +373,7 @@ const Register = () => {
                   Mendaftar...
                 </>
               ) : (
-                "Submit"
+                "Daftar Akun"
               )}
             </button>
 
@@ -385,7 +385,7 @@ const Register = () => {
                   className="text-primary font-medium ml-1 cursor-pointer hover:underline"
                   onClick={() => router.push("/login")}
                 >
-                  Log in disini
+                  Masuk di sini
                 </span>
               </p>
             </div>

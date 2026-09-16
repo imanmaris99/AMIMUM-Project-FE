@@ -30,6 +30,7 @@ const FormVerifyAccount = () => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isResending, setIsResending] = React.useState(false);
   const [resendCooldown, setResendCooldown] = React.useState(0);
+  const [apiError, setApiError] = React.useState<string | null>(null);
   const { login: handleGoogleLogin, isLoading: isGoogleLoading } = useGoogleLogin();
 
   const initialEmail = React.useMemo(
@@ -110,23 +111,32 @@ const FormVerifyAccount = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
+    setApiError(null);
     const normalizedEmail = values.email.trim().toLowerCase();
     saveAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.verifyEmail, normalizedEmail);
 
-    await postVerifyAccount(
-      {
-        ...values,
-        email: normalizedEmail,
-        code: values.code.trim(),
-      },
-      () => {
-        saveAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.verifyEmail, "");
-        saveAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.loginEmail, normalizedEmail);
-        router.push(`/login?email=${encodeURIComponent(normalizedEmail)}`);
-      }
-    );
-
-    setIsSubmitting(false);
+    try {
+      await postVerifyAccount(
+        {
+          ...values,
+          email: normalizedEmail,
+          code: values.code.trim(),
+        },
+        () => {
+          saveAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.verifyEmail, "");
+          saveAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.loginEmail, normalizedEmail);
+          toast.success("Akun berhasil diverifikasi. Silakan masuk untuk melanjutkan belanja.");
+          router.push(`/login?email=${encodeURIComponent(normalizedEmail)}`);
+        }
+      );
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Gagal memverifikasi akun. Cek ulang email dan kode verifikasi.";
+      setApiError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   React.useEffect(() => {
@@ -150,6 +160,14 @@ const FormVerifyAccount = () => {
         <p className="mt-2 text-sm text-slate-500">Masukkan kode yang dikirim ke email Anda.</p>
       </div>
 
+      {initialCode && (
+        <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-center">
+          <p className="text-xs font-medium text-green-800">
+            Kode dari link email sudah terisi otomatis. Periksa email lalu tekan Verifikasi Akun.
+          </p>
+        </div>
+      )}
+
       {/* Card informasi */}
       <Card className="bg-white/70 rounded-xl border border-white/60 shadow-sm">
         <CardContent className="px-5 py-4">
@@ -166,6 +184,12 @@ const FormVerifyAccount = () => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-4">
             {/* Email Field */}
+            {apiError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+                <p className="text-red-600 text-sm">{apiError}</p>
+              </div>
+            )}
+
             <FormField
               control={form.control}
               name="email"
@@ -239,7 +263,7 @@ const FormVerifyAccount = () => {
                   <span>Memverifikasi...</span>
                 </>
               ) : (
-                "Kirim Permintaan"
+                "Verifikasi Akun"
               )}
             </Button>
           </div>
@@ -273,7 +297,7 @@ const FormVerifyAccount = () => {
               <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
                 G
               </div>
-              Log In dengan Google
+              Masuk dengan Google
             </>
           )}
         </div>

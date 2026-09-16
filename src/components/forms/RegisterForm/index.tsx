@@ -20,20 +20,20 @@ import React from "react";
 
 const formSchema = z
   .object({
-    firstname: z.string().min(2, { message: "First Name must be at least 2 characters long" }),
-    lastname: z.string().min(2, { message: "Last Name must be at least 2 characters long" }),
-    gender: z.enum(["male", "female"], { message: "Choose gender male or female" }),
-    email: z.string().email({ message: "Invalid email address" }),
-    phone: z.string().min(13, { message: "Phone number must be 10 digits" }).max(14,{ message: "Phone number must be 11 digits" }),
+    firstname: z.string().min(2, { message: "Nama depan minimal 2 karakter" }),
+    lastname: z.string().min(2, { message: "Nama belakang minimal 2 karakter" }),
+    gender: z.enum(["male", "female"], { message: "Pilih jenis kelamin" }),
+    email: z.string().email({ message: "Format email tidak valid" }),
+    phone: z.string().min(13, { message: "Nomor HP minimal 10 digit" }).max(14,{ message: "Nomor HP maksimal 11 digit" }),
     password: z
       .string()
-      .min(6, { message: "Password must be at least 6 characters long" })
-      .regex(/[a-zA-Z0-9]/, { message: "Password must be alphanumeric" }),
+      .min(6, { message: "Password minimal 6 karakter" })
+      .regex(/[a-zA-Z0-9]/, { message: "Password harus berisi huruf atau angka" }),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
-    message: "Passwords do not match",
+    message: "Password tidak sama",
   });
 
 const RegisterForm = () => {
@@ -59,16 +59,16 @@ const RegisterForm = () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword, ...registerData } = values;
       await postRegister(registerData);
-      toast.success("Silahkan Verifikasi Akun")
+      toast.success("Silakan verifikasi akun melalui email Anda.")
       setTimeout(() => {
         router.push("/verify-account");
       }, 5000);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         const apiError = error.response.data?.detail;
-        toast.error(apiError?.message || "An error occurred. Please try again.");
+        toast.error(apiError?.message || "Gagal mendaftar. Silakan coba lagi.");
       } else {
-        toast.error("An unexpected error occurred.");
+        toast.error("Terjadi kendala saat mendaftar. Silakan coba lagi.");
       }
     } finally {
       setIsSubmitting(false);
@@ -79,7 +79,7 @@ const RegisterForm = () => {
     <div className="flex flex-col justify-center items-center mt-7">
       <Card className="bg-transparent shadow-none border-none">
         <CardHeader>
-          <CardTitle className="text-center text-[32px] font-bold text-primary">Register</CardTitle>
+          <CardTitle className="text-center text-[32px] font-bold text-primary">Daftar Akun</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -91,7 +91,7 @@ const RegisterForm = () => {
                   render={({ field }) => (
                     <FormItem className="grid gap-2">
                       <FormLabel htmlFor="fullname" className="hidden">
-                        First Name
+                        Nama depan
                       </FormLabel>
                       <FormControl>
                         <Input id="firstname" placeholder="Nama Depan" {...field} />
@@ -106,7 +106,7 @@ const RegisterForm = () => {
                   render={({ field }) => (
                     <FormItem className="grid gap-2">
                       <FormLabel htmlFor="lastname" className="hidden">
-                        Last Name
+                        Nama belakang
                       </FormLabel>
                       <FormControl>
                         <Input id="lastname" placeholder="Nama Belakang" {...field} />
@@ -121,7 +121,7 @@ const RegisterForm = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel htmlFor="gender" className="hidden">
-                        Gender
+                        Jenis kelamin
                       </FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
@@ -159,10 +159,10 @@ const RegisterForm = () => {
                   render={({ field }) => (
                     <FormItem className="grid gap-2">
                       <FormLabel htmlFor="phone" className="hidden">
-                        Phone Number
+                        Nomor HP
                       </FormLabel>
                       <FormControl>
-                        <PhoneInput {...field} defaultCountry="ID" placeholder="Nomor Telpon" />
+                        <PhoneInput {...field} defaultCountry="ID" placeholder="Nomor HP" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -177,7 +177,7 @@ const RegisterForm = () => {
                         Password
                       </FormLabel>
                       <FormControl>
-                        <PasswordInput id="password" placeholder="Password" autoComplete="new-password" {...field} />
+                        <PasswordInput id="password" placeholder="Password minimal 6 karakter" autoComplete="new-password" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -188,9 +188,9 @@ const RegisterForm = () => {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem className="grid gap-2">
-                      <FormLabel className="hidden">Confirm Password</FormLabel>
+                      <FormLabel className="hidden">Konfirmasi password</FormLabel>
                       <FormControl>
-                        <PasswordInput id="confirmPassword" placeholder="Cek Password" autoComplete="new-password" {...field} />
+                        <PasswordInput id="confirmPassword" placeholder="Konfirmasi password" autoComplete="new-password" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -203,16 +203,16 @@ const RegisterForm = () => {
                     <span>Mendaftar...</span>
                   </>
                 ) : (
-                  "Submit"
+                  "Daftar Akun"
                 )}
               </Button>
               </div>
             </form>
           </Form>
           <div className="mt-4 text-center text-sm">
-            Already have an account?{" "}
+            Sudah memiliki akun?{" "}
             <Link href="/login" className="underline font-bold">
-              Login Now
+              Masuk sekarang
             </Link>
           </div>
         </CardContent>

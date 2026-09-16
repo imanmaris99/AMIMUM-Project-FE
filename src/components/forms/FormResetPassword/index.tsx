@@ -181,6 +181,14 @@ const FormResetPassword = () => {
         <p className="mt-2 text-sm text-slate-500">Masukkan kode dari email dan password baru.</p>
       </div>
 
+      {!initialCode && (
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-center">
+          <p className="text-xs font-medium text-yellow-800">
+            Buka link reset dari email agar kode otomatis terisi. Jika kode kosong, salin kode reset dari email Anda.
+          </p>
+        </div>
+      )}
+
       {/* Card informasi */}
       <Card className="bg-white/70 rounded-xl border border-white/60 shadow-sm">
         <CardContent className="px-5 py-4">
@@ -350,7 +358,7 @@ const FormResetPassword = () => {
                   <span>Mereset password...</span>
                 </>
               ) : (
-                "Reset Password"
+                "Simpan Password Baru"
               )}
             </Button>
           </div>
@@ -384,7 +392,7 @@ const FormResetPassword = () => {
               <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
                 G
               </div>
-              Log In dengan Google
+              Masuk dengan Google
             </>
           )}
         </div>
