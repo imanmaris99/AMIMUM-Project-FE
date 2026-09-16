@@ -11,9 +11,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const response = await axios.get(`${API_BASE_URL}${API_ENDPOINTS.PRODUCT_SEARCH(name)}`);
     res.status(200).json(response.data);
   } catch (error: unknown) {
-    const axiosError = error as { response?: { status?: number; data?: { message?: string } } };
+    const axiosError = error as { response?: { status?: number } };
     res.status(axiosError?.response?.status || 500).json({
-      message: axiosError?.response?.data?.message || 'Gagal mengambil data produk dari backend.'
+      message: 'Data pencarian produk belum tersedia. Silakan coba lagi beberapa saat lagi.'
     });
   }
 } 

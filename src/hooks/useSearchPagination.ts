@@ -74,9 +74,9 @@ const useSearchPagination = ({
       setHasMore(endIndex < filteredProducts.length);
       setCurrentPage(page);
 
-    } catch (error) {
+    } catch {
       setIsError(true);
-      setErrorMessage(error instanceof Error ? error.message : 'Gagal mengambil data produk');
+      setErrorMessage('Data pencarian produk belum tersedia. Silakan coba lagi beberapa saat lagi.');
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);

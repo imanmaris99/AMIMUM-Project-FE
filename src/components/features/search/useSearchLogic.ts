@@ -58,9 +58,9 @@ const useSearchLogic = () => {
       const limitedProducts = products.slice(0, 5);
       
       setProducts(limitedProducts);
-    } catch (err: unknown) {
+    } catch {
       setIsError(true);
-      setErrorMessage(err instanceof Error ? err.message : "Gagal mengambil data produk.");
+      setErrorMessage("Data pencarian produk belum tersedia. Silakan coba lagi beberapa saat lagi.");
       setProducts([]);
     } finally {
       setIsLoading(false);

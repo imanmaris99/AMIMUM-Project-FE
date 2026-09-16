@@ -15,22 +15,21 @@ interface SearchDropdownProps {
 
 const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardProductProps; handleSelectProduct: (productId: string) => void }) => {
   const [imageError, setImageError] = useState(false);
-  const imageUrl = product.image || product.all_variants[0]?.img || "/default-image.jpg";
+  const variants = Array.isArray(product?.all_variants) ? product.all_variants : [];
+  const productName = product?.name?.trim() || "Produk katalog";
+  const imageUrl = product?.image || variants[0]?.img || "/default-image.jpg";
 
   const handleImageError = () => {
     setImageError(true);
   };
 
-  // Check if URL is external (http/https) - simple string check
-  // Use regular img tag for ALL external images to prevent Next.js Image optimizer retry loops
   const isExternalUrl = useMemo(() => {
-    if (!imageUrl || imageError || imageUrl.startsWith('/')) {
-      return false; // Use Next.js Image for local images
+    if (!imageUrl || imageError || imageUrl.startsWith("/")) {
+      return false;
     }
-    
-    // Simple check: if URL starts with http:// or https://, it's external
+
     const url = imageUrl.trim();
-    return url.startsWith('http://') || url.startsWith('https://');
+    return url.startsWith("http://") || url.startsWith("https://");
   }, [imageUrl, imageError]);
 
   return (
@@ -41,10 +40,9 @@ const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardPro
       <div className="flex items-center gap-2">
         <div className="w-10 h-10 rounded-lg flex justify-center items-center bg-gray-100 p-1">
           {!isExternalUrl ? (
-            // Use Next.js Image ONLY for local images (no server-side fetch issues)
             <Image
               src={imageUrl}
-              alt={product.name}
+              alt={productName}
               width={50}
               height={50}
               onError={(e) => {
@@ -53,12 +51,10 @@ const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardPro
               unoptimized
             />
           ) : (
-            // Use regular img tag for ALL external images (http/https) to prevent Next.js Image optimizer retry loops
-            // This completely avoids server-side fetch attempts that cause infinite retry loops
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={imageUrl}
-              alt={product.name}
+              alt={productName}
               width={50}
               height={50}
               style={{ maxWidth: "50px", maxHeight: "50px", objectFit: "contain" }}
@@ -68,11 +64,11 @@ const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardPro
           )}
         </div>
         <div className="flex-1">
-          <p className="text-sm font-medium">{product.name}</p>
+          <p className="text-sm font-medium">{productName}</p>
           <p className="text-xs text-gray-500">
-            {product.all_variants && product.all_variants.length > 0 
-              ? `${product.all_variants.length} varian tersedia`
-              : "Produk tersedia"}
+            {variants.length > 0
+              ? `${variants.length} varian tersedia`
+              : "Varian produk belum tersedia di katalog"}
           </p>
         </div>
       </div>
@@ -92,7 +88,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
       <ul className="absolute w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg z-10">
         <li className="p-2 flex flex-col items-center justify-center">
           <PulseLoader color="hsl(var(--primary))" size={10} />
-          <span className="text-gray-500 text-xs mt-2">Mencari produk...</span>
+          <span className="text-gray-500 text-xs mt-2">Mencari produk katalog...</span>
         </li>
       </ul>
     );
@@ -101,8 +97,8 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
   if (isError) {
     return (
       <ul className="absolute w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg z-10">
-        <li className="p-2 text-gray-500 flex justify-center">
-          {errorMessage || "Gagal mengambil data produk"}
+        <li className="p-2 text-gray-500 flex justify-center text-center text-xs">
+          {errorMessage || "Data pencarian produk belum tersedia. Silakan coba lagi beberapa saat lagi."}
         </li>
       </ul>
     );
@@ -111,8 +107,8 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
   if (!products || products.length === 0) {
     return (
       <ul className="absolute w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg z-10">
-        <li className="p-2 text-gray-500 flex justify-center">
-          Produk tidak ditemukan
+        <li className="p-2 text-gray-500 flex justify-center text-center text-xs">
+          Belum ada produk katalog yang cocok.
         </li>
       </ul>
     );

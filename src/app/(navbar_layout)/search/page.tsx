@@ -1,6 +1,5 @@
 import Header from "@/components/homepage/HeaderSection";
 import SearchWithPagination from "@/components/common/Search/SearchWithPagination";
-import { notFound } from "next/navigation";
 
 interface SearchPageProps {
   searchParams: Promise<{ q?: string; brand?: string }>;
@@ -8,18 +7,13 @@ interface SearchPageProps {
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
-  const query = params?.q || "";
-  const brand = params?.brand || "";
-  
-  // Jika tidak ada query, redirect ke homepage
-  if (!query.trim()) {
-    notFound();
-  }
-  
+  const query = params?.q?.trim() || "";
+  const brand = params?.brand?.trim() || "";
+
   return (
     <main className="pb-20">
       <Header />
-      <SearchWithPagination 
+      <SearchWithPagination
         searchQuery={query}
         brandFilter={brand}
       />

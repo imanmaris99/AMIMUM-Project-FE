@@ -66,25 +66,24 @@ export const SearchGetProduct = async (productName: string): Promise<AllProductI
 
       if (status === 422) {
         const errorData = error.response.data as { detail?: Array<{ msg: string }> };
-        const errorMessage = errorData.detail?.[0]?.msg || 'Validation error occurred.';
+        const errorMessage = errorData.detail?.[0]?.msg || 'Kata kunci atau filter produk belum valid.';
         throw new Error(errorMessage);
       }
 
       if (status === 500) {
         const errorData = error.response.data as { message?: string };
-        const errorMessage = errorData.message || 'Kesalahan tak terduga saat mencari produk.';
+        const errorMessage = errorData.message || 'Data pencarian produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.';
         throw new Error(errorMessage);
       }
 
-      const errorData = error.response.data as { message?: string };
-      throw new Error(errorData.message || `Gagal mencari produk: ${status}`);
+      throw new Error('Data pencarian produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     if (error instanceof Error) {
       throw error;
     }
 
-    throw new Error('Unknown error occurred while searching products');
+    throw new Error('Data pencarian produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
   }
 };
 
@@ -154,25 +153,24 @@ export const SearchGetProductByBrand = async (productionId: number, productName:
 
       if (status === 422) {
         const errorData = error.response.data as { detail?: Array<{ msg: string }> };
-        const errorMessage = errorData.detail?.[0]?.msg || 'Validation error occurred.';
+        const errorMessage = errorData.detail?.[0]?.msg || 'Kata kunci atau filter produk belum valid.';
         throw new Error(errorMessage);
       }
 
       if (status === 500) {
         const errorData = error.response.data as { message?: string };
-        const errorMessage = errorData.message || 'Kesalahan tak terduga saat mencari produk berdasarkan filter production_id dan nama produk.';
+        const errorMessage = errorData.message || 'Data pencarian brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.';
         throw new Error(errorMessage);
       }
 
-      const errorData = error.response.data as { message?: string };
-      throw new Error(errorData.message || `Gagal mencari produk: ${status}`);
+      throw new Error('Data pencarian produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     if (error instanceof Error) {
       throw error;
     }
 
-    throw new Error('Unknown error occurred while searching products');
+    throw new Error('Data pencarian produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
   }
 };
 
@@ -213,24 +211,24 @@ export async function GetProductDiscountByBrandIdServer(productionId: number): P
 
     if (res.status === 422) {
       const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.detail?.[0]?.msg || 'Validation error occurred.';
+      const errorMessage = errorData.detail?.[0]?.msg || 'Kata kunci atau filter produk belum valid.';
       throw new Error(errorMessage);
     }
 
     if (res.status === 500) {
       const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'Kesalahan tak terduga saat mengambil produk diskon berdasarkan production_id.';
+      const errorMessage = errorData.message || 'Data produk promo belum bisa dimuat. Silakan coba lagi beberapa saat lagi.';
       throw new Error(errorMessage);
     }
 
     if (!res.ok) {
-      throw new Error(`Gagal mengambil data produk diskon: ${res.status}`);
+      throw new Error('Data produk promo belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     const data: AllProductInfoResponseType = await res.json();
     
     if (!data || !data.data || !Array.isArray(data.data)) {
-      throw new Error('Invalid response format: data is not an array');
+      throw new Error('Format data produk belum sesuai. Silakan coba lagi nanti.');
     }
 
     const mappedProducts: AllProductInfoType[] = data.data.map((product) => {
@@ -252,7 +250,7 @@ export async function GetProductDiscountByBrandIdServer(productionId: number): P
         image: productImage,
         brand_info: brandInfo,
         all_variants: product.all_variants || [],
-        created_at: product.created_at || new Date().toISOString(),
+        created_at: product.created_at || '',
         brand_highest_discount: product.brand_highest_discount,
       };
     });
@@ -262,7 +260,7 @@ export async function GetProductDiscountByBrandIdServer(productionId: number): P
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error('Unknown error occurred while fetching discounted products');
+    throw new Error('Data produk promo belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
   }
 }
 
@@ -294,24 +292,24 @@ export async function GetProductsByProductionIdServer(productionId: number): Pro
 
     if (res.status === 422) {
       const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.detail?.[0]?.msg || 'Validation error occurred.';
+      const errorMessage = errorData.detail?.[0]?.msg || 'Kata kunci atau filter produk belum valid.';
       throw new Error(errorMessage);
     }
 
     if (res.status === 500) {
       const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'Kesalahan tak terduga saat mengambil produk berdasarkan production_id.';
+      const errorMessage = errorData.message || 'Data produk brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.';
       throw new Error(errorMessage);
     }
 
     if (!res.ok) {
-      throw new Error(`Gagal mengambil data produk: ${res.status}`);
+      throw new Error('Data produk brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     const data: AllProductInfoResponseType = await res.json();
     
     if (!data || !data.data || !Array.isArray(data.data)) {
-      throw new Error('Invalid response format: data is not an array');
+      throw new Error('Format data produk belum sesuai. Silakan coba lagi nanti.');
     }
 
     const mappedProducts: AllProductInfoType[] = data.data.map((product) => {
@@ -338,6 +336,6 @@ export async function GetProductsByProductionIdServer(productionId: number): Pro
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error('Unknown error occurred while fetching products');
+    throw new Error('Data produk brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
   }
 }

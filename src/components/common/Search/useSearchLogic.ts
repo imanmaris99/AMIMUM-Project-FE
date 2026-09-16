@@ -71,9 +71,9 @@ const useSearchLogic = () => {
       setProducts(limitedProducts);
       setIsError(false);
       setShowDropdown(true);
-    } catch (err: unknown) {
+    } catch {
       setIsError(true);
-      setErrorMessage(err instanceof Error ? err.message : "Gagal mengambil data produk.");
+      setErrorMessage("Data pencarian produk belum tersedia. Silakan coba lagi beberapa saat lagi.");
       setProducts([]);
       setShowDropdown(true);
     } finally {

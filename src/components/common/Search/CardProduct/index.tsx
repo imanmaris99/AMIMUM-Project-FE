@@ -11,87 +11,69 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
   const { handleSelectProduct } = useSearchLogic();
   const [imageError, setImageError] = useState(false);
 
+  const variants = Array.isArray(product?.all_variants) ? product.all_variants : [];
+  const productName = product?.name?.trim() || "Produk katalog";
+  const basePrice = Number(product?.price);
+  const hasValidBasePrice = Number.isFinite(basePrice) && basePrice > 0;
+  const imageUrl = product?.image || variants[0]?.img || "/default-image.jpg";
+
   const handleImageError = () => {
     setImageError(true);
   };
 
-  const imageUrl = product.image || product.all_variants[0]?.img || "/default-image.jpg";
-  
-  // Check if URL is external (http/https) - simple string check
-  // Use regular img tag for ALL external images to prevent Next.js Image optimizer retry loops
   const isExternalUrl = useMemo(() => {
-    if (!imageUrl || imageError || imageUrl.startsWith('/')) {
-      return false; // Use Next.js Image for local images
+    if (!imageUrl || imageError || imageUrl.startsWith("/")) {
+      return false;
     }
-    
-    // Simple check: if URL starts with http:// or https://, it's external
+
     const url = imageUrl.trim();
-    return url.startsWith('http://') || url.startsWith('https://');
+    return url.startsWith("http://") || url.startsWith("https://");
   }, [imageUrl, imageError]);
 
-  // Validate product data - allow products with at least minimal variant data
-  if (!product || !product.id || !product.name) {
+  if (!product || !product.id || !productName) {
     return null;
   }
 
-  // Calculate highest discount from all variants
-  // If brand_highest_discount is available (for promo pages), use it instead
-  const highestDiscount = product.brand_highest_discount || (product.all_variants && product.all_variants.length > 0
-    ? product.all_variants.reduce((max, variant) => {
-        const discount = variant.discount || 0;
-        return discount > max ? discount : max;
-      }, 0)
-    : 0);
+  const highestVariantDiscount = variants.reduce((max, variant) => {
+    const discount = Number(variant.discount || 0);
+    return Number.isFinite(discount) && discount > max ? discount : max;
+  }, 0);
+  const highestDiscount = Number(product.brand_highest_discount || highestVariantDiscount || 0);
 
-  // Calculate lowest discounted price from all variants
-  const lowestDiscountedPrice = product.all_variants && product.all_variants.length > 0
-    ? product.all_variants.reduce((min, variant) => {
-        const discountedPrice = variant.discounted_price || product.price;
-        return discountedPrice < min ? discountedPrice : min;
-      }, product.price)
-    : product.price;
+  const variantPrices = variants
+    .map((variant) => Number(variant.discounted_price || basePrice))
+    .filter((price) => Number.isFinite(price) && price > 0);
 
-  // Find the variant with lowest discounted price to get its original price
-  const lowestPriceVariant = product.all_variants && product.all_variants.length > 0
-    ? product.all_variants.find(variant => 
-        variant.discounted_price === lowestDiscountedPrice
-      )
-    : null;
-  
-  // Use the original price of the variant with lowest discounted price
-  // If using brand_highest_discount, calculate original price based on that discount
-  let originalPriceForDisplay = product.price;
-  if (product.brand_highest_discount) {
-    // Calculate original price based on brand's highest discount
-    originalPriceForDisplay = Math.round(lowestDiscountedPrice / (1 - product.brand_highest_discount / 100));
-  } else if (lowestPriceVariant) {
-    // Use the original price of the variant with lowest discounted price
-    originalPriceForDisplay = Math.round(lowestDiscountedPrice / (1 - (lowestPriceVariant.discount || 0) / 100));
-  }
+  const lowestDiscountedPrice = variantPrices.length > 0
+    ? Math.min(...variantPrices)
+    : basePrice;
 
-  // Check if product has any discount
-  const hasDiscount = highestDiscount > 0;
+  const hasDiscount = hasValidBasePrice && Number.isFinite(highestDiscount) && highestDiscount > 0;
+  const displayPrice = hasDiscount ? lowestDiscountedPrice : basePrice;
+  const hasDisplayPrice = Number.isFinite(displayPrice) && displayPrice > 0;
+  const originalPriceForDisplay = hasDiscount && product.brand_highest_discount
+    ? Math.round(displayPrice / (1 - highestDiscount / 100))
+    : basePrice;
 
   return (
     <div onClick={() => product.id && handleSelectProduct(product.id)} className="w-40 h-56 rounded-lg shadow-md flex flex-col justify-center items-center gap-2 relative cursor-pointer">
-      <div 
+      <div
         className="absolute top-2 right-2"
         onClick={(e) => e.stopPropagation()}
       >
-        <WishlistButton 
+        <WishlistButton
           product={{
             id: product.id,
-            name: product.name,
-            price: product.price,
-            image: product.image || (product.all_variants && product.all_variants.length > 0 ? product.all_variants[0].img : "/default-image.jpg"),
+            name: productName,
+            price: hasValidBasePrice ? basePrice : 0,
+            image: product.image || variants[0]?.img || "/default-image.jpg",
             brand: product.brand_info?.name,
-          }} 
+          }}
           className="bg-white rounded-full p-1 hover:bg-gray-50"
           size="md"
         />
       </div>
-      
-      {/* Discount Badge */}
+
       {hasDiscount && (
         <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md z-10">
           -{highestDiscount}%
@@ -101,10 +83,9 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
       <div className="flex flex-col justify-center items-center">
         <div className="bg-gray-100 w-32 h-28 rounded-lg flex justify-center items-center">
           {!isExternalUrl ? (
-            // Use Next.js Image ONLY for local images (no server-side fetch issues)
             <Image
               src={imageUrl}
-              alt={product.name}
+              alt={productName}
               width={100}
               height={100}
               className="rounded-lg"
@@ -117,12 +98,10 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
               unoptimized
             />
           ) : (
-            // Use regular img tag for ALL external images (http/https) to prevent Next.js Image optimizer retry loops
-            // This completely avoids server-side fetch attempts that cause infinite retry loops
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={imageUrl}
-              alt={product.name}
+              alt={productName}
               width={100}
               height={100}
               className="rounded-lg"
@@ -136,31 +115,37 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
       <div className="flex flex-col justify-center w-32 min-h-20">
         <div className="space-y-1">
           <p className="font-bold text-xs whitespace-nowrap overflow-hidden text-ellipsis">
-            {product.name}
+            {productName}
           </p>
           <p className="text-gray-500 text-[10px]">
-            {product.all_variants && product.all_variants.length > 0 
-              ? `${product.all_variants.length} varian tersedia`
-              : "Produk tersedia"}
+            {variants.length > 0
+              ? `${variants.length} varian tersedia`
+              : "Varian produk belum tersedia di katalog"}
           </p>
           <div className="flex items-center gap-2">
             <p className="text-[10px] text-gray-500">
-              Mulai dari {hasDiscount ? rupiahFormater(lowestDiscountedPrice) : rupiahFormater(product.price)}
+              {hasDisplayPrice ? `Mulai dari ${rupiahFormater(displayPrice)}` : "Harga belum tersedia"}
             </p>
           </div>
           <div className="flex items-center gap-2">
-            {hasDiscount ? (
+            {!hasDisplayPrice ? (
+              <p className="font-bold text-sm text-gray-500">
+                Harga belum tersedia
+              </p>
+            ) : hasDiscount ? (
               <>
                 <p className="font-bold text-sm text-red-500">
-                  {rupiahFormater(lowestDiscountedPrice)}
+                  {rupiahFormater(displayPrice)}
                 </p>
-                <p className="text-xs text-gray-400 line-through">
-                  {rupiahFormater(originalPriceForDisplay)}
-                </p>
+                {originalPriceForDisplay > displayPrice && (
+                  <p className="text-xs text-gray-400 line-through">
+                    {rupiahFormater(originalPriceForDisplay)}
+                  </p>
+                )}
               </>
             ) : (
               <p className="font-bold text-sm">
-                {rupiahFormater(product.price)}
+                {rupiahFormater(displayPrice)}
               </p>
             )}
           </div>

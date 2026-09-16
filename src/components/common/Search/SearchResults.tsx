@@ -32,7 +32,9 @@ const SearchResults = ({
   totalAvailable = 0
 }: SearchResultsProps) => {
   const hasResults = searchResults && searchResults.length > 0;
-  const isSearching = searchQuery.trim().length > 0;
+  const sanitizedSearchQuery = searchQuery.trim();
+  const sanitizedBrandFilter = brandFilter?.trim();
+  const isSearching = sanitizedSearchQuery.length > 0;
 
   // Use provided props or fallback to internal state for backward compatibility
   const displayHasMore = hasMore !== undefined ? hasMore : (searchResults.length > 10);
@@ -61,13 +63,13 @@ const SearchResults = ({
         <div className="text-sm text-gray-600">
           {isSearching ? (
             <span>
-              Menampilkan hasil untuk: <span className="font-semibold text-[#00764F]">&ldquo;{searchQuery}&rdquo;</span>
-              {brandFilter && (
-                <span> dari merek <span className="font-semibold text-[#00764F]">&ldquo;{brandFilter}&rdquo;</span></span>
+              Menampilkan hasil katalog untuk: <span className="font-semibold text-[#00764F]">&ldquo;{sanitizedSearchQuery}&rdquo;</span>
+              {sanitizedBrandFilter && (
+                <span> dari merek <span className="font-semibold text-[#00764F]">&ldquo;{sanitizedBrandFilter}&rdquo;</span></span>
               )}
             </span>
           ) : (
-            <span className="text-gray-500">Masukkan kata kunci untuk mencari produk</span>
+            <span className="text-gray-500">Masukkan kata kunci produk di kolom pencarian untuk melihat katalog toko.</span>
           )}
         </div>
       </div>
@@ -79,9 +81,11 @@ const SearchResults = ({
             <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
-            <span className="text-red-700 font-medium">Terjadi kesalahan</span>
+            <span className="text-red-700 font-medium">Pencarian belum bisa dimuat</span>
           </div>
-          <p className="text-red-600 text-sm mt-1">{errorMessage}</p>
+          <p className="text-red-600 text-sm mt-1">
+            {errorMessage || "Data pencarian produk belum tersedia. Silakan coba lagi beberapa saat lagi."}
+          </p>
         </div>
       )}
 
@@ -98,6 +102,19 @@ const SearchResults = ({
         </div>
       )}
 
+      {/* No Query State */}
+      {!isLoading && !isSearching && !errorMessage && (
+        <div className="text-center py-12 rounded-2xl border border-dashed border-gray-200 bg-white px-5">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+            <CiSearch className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Cari Produk Toko</h3>
+          <p className="text-gray-500 text-sm mb-4">
+            Ketik nama produk, brand, atau kategori di kolom pencarian. Hasil yang tampil berasal dari katalog toko.
+          </p>
+        </div>
+      )}
+
       {/* No Results Message */}
       {!isLoading && isSearching && !hasResults && !errorMessage && (
         <div className="text-center py-12">
@@ -106,15 +123,15 @@ const SearchResults = ({
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak ada produk ditemukan</h3>
           <p className="text-gray-500 text-sm mb-4">
-            Tidak ada produk yang cocok dengan pencarian <span className="font-semibold">&ldquo;{searchQuery}&rdquo;</span>
-            {brandFilter && (
-              <span> dari merek <span className="font-semibold">&ldquo;{brandFilter}&rdquo;</span></span>
+            Belum ada produk katalog yang cocok dengan pencarian <span className="font-semibold">&ldquo;{sanitizedSearchQuery}&rdquo;</span>
+            {sanitizedBrandFilter && (
+              <span> dari merek <span className="font-semibold">&ldquo;{sanitizedBrandFilter}&rdquo;</span></span>
             )}
           </p>
           <div className="text-sm text-gray-400">
-            <p>Coba gunakan kata kunci yang berbeda atau lebih umum</p>
-            {brandFilter && (
-              <p className="mt-1">Atau cari produk dari merek lain</p>
+            <p>Coba gunakan kata kunci yang lebih umum atau cek kategori produk di halaman utama.</p>
+            {sanitizedBrandFilter && (
+              <p className="mt-1">Atau cari produk dari brand lain yang tersedia di katalog toko.</p>
             )}
           </div>
         </div>
@@ -125,8 +142,8 @@ const SearchResults = ({
         <div className="mb-4">
           <p className="text-sm text-gray-600">
             Ditemukan <span className="font-semibold text-[#00764F]">{displayTotalAvailable}</span> produk
-            {brandFilter && (
-              <span> dari merek <span className="font-semibold text-[#00764F]">&ldquo;{brandFilter}&rdquo;</span></span>
+            {sanitizedBrandFilter && (
+              <span> dari merek <span className="font-semibold text-[#00764F]">&ldquo;{sanitizedBrandFilter}&rdquo;</span></span>
             )}
           </p>
         </div>
