@@ -27,6 +27,20 @@ import {
 const BACKEND_ORDER_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+const getCustomerSafeNote = (notes?: string) => {
+  const sanitized = notes
+    ?.replace(/\[(?:PAYMENT|POS_SUBTOTAL|POS_DISCOUNT|POS_TOTAL):[^\]]*\]/gi, "")
+    .split("|")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(" | ");
+
+  return sanitized || undefined;
+};
+
+const getTrackingDisplay = (trackingNumber?: string) =>
+  trackingNumber?.trim() || "Belum tersedia";
+
 const TransactionDetailPage: React.FC = () => {
   const params = useParams();
   const router = useRouter();
@@ -109,6 +123,7 @@ const TransactionDetailPage: React.FC = () => {
     const deliveryLabel =
       transaction.deliveryType === "delivery" ? "Kirim ke tujuan" : "Ambil di toko";
     const shipment = transaction.shipmentAddress;
+    const customerSafeNote = getCustomerSafeNote(transaction.notes);
     const invoiceLines = [
       "TOKO HERBAL AMIMUM",
       "Bukti Transaksi Customer",
@@ -144,7 +159,7 @@ const TransactionDetailPage: React.FC = () => {
       "",
       "Catatan",
       "----------------------------------------",
-      transaction.notes || "Simpan bukti transaksi ini untuk arsip atau kebutuhan komplain/retur sesuai kebijakan toko.",
+      customerSafeNote || "Simpan bukti transaksi ini untuk arsip atau kebutuhan komplain/retur sesuai kebijakan toko.",
       "",
       "Terima kasih sudah berbelanja di Toko Herbal Amimum.",
     ].join("\n");
@@ -333,6 +348,10 @@ const TransactionDetailPage: React.FC = () => {
     transaction.shipmentAddress?.trackingNumber,
     transaction.deliveryType || "delivery"
   );
+  const deliveryLabel =
+    transaction.deliveryType === "delivery" ? "Kirim ke tujuan" : "Ambil di toko";
+  const trackingDisplay = getTrackingDisplay(transaction.shipmentAddress?.trackingNumber);
+  const customerSafeNote = getCustomerSafeNote(transaction.notes);
 
   return (
     <LoginProtection useModal={true} feature="transaction">
@@ -422,11 +441,55 @@ const TransactionDetailPage: React.FC = () => {
           </div>
 
           <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                  TOKO HERBAL AMIMUM
+                </p>
+                <h3 className="mt-1 text-lg font-semibold text-gray-900">
+                  Bukti Transaksi Customer
+                </h3>
+                <p className="mt-1 text-xs text-gray-500">
+                  Simpan bukti ini untuk arsip pembelian, komplain, atau retur sesuai kebijakan toko.
+                </p>
+              </div>
+              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                Invoice
+              </span>
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+              <div className="rounded-lg bg-gray-50 p-3">
+                <p className="text-gray-500">Invoice ID</p>
+                <p className="mt-1 break-words font-semibold text-gray-900">
+                  {transaction.transactionId}
+                </p>
+              </div>
+              <div className="rounded-lg bg-gray-50 p-3">
+                <p className="text-gray-500">Status</p>
+                <p className="mt-1 font-semibold text-gray-900">{statusConfig.text}</p>
+              </div>
+              <div className="rounded-lg bg-gray-50 p-3">
+                <p className="text-gray-500">Metode bayar</p>
+                <p className="mt-1 font-semibold text-gray-900">
+                  {getPaymentMethodLabel(transaction.paymentMethod)}
+                </p>
+              </div>
+              <div className="rounded-lg bg-gray-50 p-3">
+                <p className="text-gray-500">Pengiriman</p>
+                <p className="mt-1 font-semibold text-gray-900">{deliveryLabel}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border p-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              Item Pesanan
+              Ringkasan Pesanan
             </h3>
             <div className="space-y-3">
-              {transaction.items.map((item) => (
+              {transaction.items.map((item) => {
+                const itemSubtotal = item.price * item.quantity;
+
+                return (
                 <div
                   key={item.id}
                   className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
@@ -454,11 +517,15 @@ const TransactionDetailPage: React.FC = () => {
                       {item.quantity}
                     </p>
                     <p className="text-sm font-medium text-gray-900">
-                      {rupiahFormater(item.price)}
+                      {rupiahFormater(item.price)} / item
+                    </p>
+                    <p className="text-xs font-semibold text-primary">
+                      Subtotal item: {rupiahFormater(itemSubtotal)}
                     </p>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -513,18 +580,27 @@ const TransactionDetailPage: React.FC = () => {
                       {transaction.shipmentAddress?.estimatedDelivery || "-"}
                     </span>
                   </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">No. Resi:</span>
+                    <span className="text-sm font-medium text-gray-900 text-right">
+                      {trackingDisplay}
+                    </span>
+                  </div>
+                  <p className="rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600">
+                    Resi tampil setelah admin mengirim paket dan memasukkan nomor resi dari kurir.
+                  </p>
                 </>
               )}
             </div>
           </div>
 
-          {transaction.notes && (
+          {customerSafeNote && (
             <div className="bg-white rounded-lg shadow-sm border p-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 Catatan Tambahan
               </h3>
               <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
-                &ldquo;{transaction.notes}&rdquo;
+                &ldquo;{customerSafeNote}&rdquo;
               </p>
             </div>
           )}
