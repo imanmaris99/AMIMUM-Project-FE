@@ -29,14 +29,21 @@ const CartList: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {cartItems.length === 0 ? (
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-100 bg-white py-14 text-center shadow-sm">
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+          <p className="text-sm text-gray-600">Memuat isi keranjang dari server...</p>
+        </div>
+      ) : cartItems.length === 0 ? (
         <div className="text-center py-12">
           <div className="mb-6">
             <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
               <GiShoppingCart className="w-8 h-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Keranjang Kosong</h3>
-            <p className="text-gray-500 mb-6">Belum ada produk di keranjang belanja Anda</p>
+            <p className="text-gray-500 mb-6">
+              Belum ada produk terpilih untuk checkout. Silakan pilih produk herbal dari katalog.
+            </p>
           </div>
           <button
             onClick={handleStartShopping}

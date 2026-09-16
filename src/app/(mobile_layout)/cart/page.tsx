@@ -13,9 +13,10 @@ import LoginProtection from "@/components/common/LoginProtection";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 
 export default function CartPage() {
-  const { totalItems, clearAll, cartItems } = useCart();
+  const { totalItems, clearAll, cartItems, isLoading } = useCart();
   const { resetNotification } = useNotification();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isClearingCart, setIsClearingCart] = useState(false);
 
   // Reset cart notification when user visits cart page
   useEffect(() => {
@@ -29,10 +30,25 @@ export default function CartPage() {
     setShowConfirmDialog(true);
   };
 
-  const confirmClearAll = () => {
-    void clearAll();
-    setShowConfirmDialog(false);
-    toast.success("Semua item telah dihapus dari keranjang");
+  const confirmClearAll = async () => {
+    if (isClearingCart) {
+      return;
+    }
+
+    setIsClearingCart(true);
+    try {
+      await clearAll();
+      setShowConfirmDialog(false);
+      toast.success("Semua item telah dihapus dari keranjang.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Gagal menghapus semua item keranjang."
+      );
+    } finally {
+      setIsClearingCart(false);
+    }
   };
 
   const cancelClearAll = () => {
@@ -68,7 +84,7 @@ export default function CartPage() {
                   {totalItems} Item
                 </span>
               </div>
-              {totalItems > 0 && (
+              {!isLoading && totalItems > 0 && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -85,14 +101,16 @@ export default function CartPage() {
           {/* Cart Items */}
           <div className="space-y-4">
             <CartList />
-            <CartSummary />
+            {!isLoading && cartItems.length > 0 && <CartSummary />}
           </div>
         </div>
 
         {/* Cart Footer - Fixed at bottom */}
-        <div className="fixed bottom-0 left-0 right-0 z-40">
-          <CartFooter />
-        </div>
+        {!isLoading && cartItems.length > 0 && (
+          <div className="fixed bottom-0 left-0 right-0 z-40">
+            <CartFooter />
+          </div>
+        )}
 
         {/* Confirmation Dialog */}
         {showConfirmDialog && (
@@ -112,15 +130,19 @@ export default function CartPage() {
                   <Button
                     variant="outline"
                     onClick={cancelClearAll}
+                    disabled={isClearingCart}
                     className="flex-1"
                   >
                     Batal
                   </Button>
                   <Button
-                    onClick={confirmClearAll}
+                    onClick={() => {
+                      void confirmClearAll();
+                    }}
+                    disabled={isClearingCart}
                     className="flex-1 bg-red-600 hover:bg-red-700"
                   >
-                    Hapus Semua
+                    {isClearingCart ? "Menghapus..." : "Hapus Semua"}
                   </Button>
                 </div>
               </div>
