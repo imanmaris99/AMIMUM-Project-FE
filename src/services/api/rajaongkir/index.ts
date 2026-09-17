@@ -41,39 +41,11 @@ export interface RajaOngkirCity {
   postal_code: number;
 }
 
-interface RajaOngkirErrorResponse {
-  status_code?: number;
-  error?: string;
-  message?: string;
-  detail?:
-    | Array<{
-        msg?: string;
-        message?: string;
-      }>
-    | {
-        message?: string;
-        error?: string;
-      };
-}
+const RAJAONGKIR_LOCATION_ERROR =
+  "Data lokasi RajaOngkir belum bisa dimuat. Silakan coba lagi beberapa saat lagi.";
 
-function getRajaOngkirErrorMessage(errorData: RajaOngkirErrorResponse): string | undefined {
-  if (errorData.message) {
-    return errorData.message;
-  }
-
-  if (Array.isArray(errorData.detail)) {
-    return errorData.detail
-      .map((item) => item.message || item.msg)
-      .filter(Boolean)
-      .join(", ");
-  }
-
-  if (errorData.detail && typeof errorData.detail === "object") {
-    return errorData.detail.message || errorData.detail.error;
-  }
-
-  return undefined;
-}
+const RAJAONGKIR_SHIPPING_ERROR =
+  "Estimasi ongkir belum bisa dimuat. Silakan coba kurir lain atau coba lagi beberapa saat lagi.";
 
 export async function getRajaOngkirProvinces(): Promise<RajaOngkirProvince[]> {
   try {
@@ -85,18 +57,17 @@ export async function getRajaOngkirProvinces(): Promise<RajaOngkirProvince[]> {
       return response.data;
     }
 
-    throw new Error("Gagal mengambil daftar provinsi.");
+    throw new Error(RAJAONGKIR_LOCATION_ERROR);
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response) {
-      const errorData = error.response.data as RajaOngkirErrorResponse;
-      throw new Error(errorData.message || "Gagal mengambil daftar provinsi.");
+      throw new Error(RAJAONGKIR_LOCATION_ERROR);
     }
 
-    if (error instanceof Error) {
+    if (error instanceof Error && error.message === RAJAONGKIR_LOCATION_ERROR) {
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error(RAJAONGKIR_LOCATION_ERROR);
   }
 }
 
@@ -112,18 +83,17 @@ export async function getRajaOngkirCities(
       return response.data;
     }
 
-    throw new Error("Gagal mengambil daftar kota.");
+    throw new Error(RAJAONGKIR_LOCATION_ERROR);
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response) {
-      const errorData = error.response.data as RajaOngkirErrorResponse;
-      throw new Error(errorData.message || "Gagal mengambil daftar kota.");
+      throw new Error(RAJAONGKIR_LOCATION_ERROR);
     }
 
-    if (error instanceof Error) {
+    if (error instanceof Error && error.message === RAJAONGKIR_LOCATION_ERROR) {
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error(RAJAONGKIR_LOCATION_ERROR);
   }
 }
 
@@ -140,47 +110,26 @@ export async function getRajaOngkirShippingCost(
       return response.data;
     }
 
-    throw new Error("Gagal mengambil estimasi ongkos kirim.");
+    throw new Error(RAJAONGKIR_SHIPPING_ERROR);
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response) {
       const status = error.response.status;
-      const errorData = error.response.data as RajaOngkirErrorResponse;
-      const errorMessage = getRajaOngkirErrorMessage(errorData);
 
-      if (status === 400) {
-        throw new Error(
-          errorMessage ||
-            "Parameter yang diberikan tidak valid, periksa ulang nilai origin, destination, weight, atau courier."
-        );
+      if (status === 400 || status === 422) {
+        throw new Error("Data alamat atau berat pengiriman belum valid untuk menghitung ongkir.");
       }
 
       if (status === 404) {
-        throw new Error(
-          errorMessage ||
-            "Layanan kurir ini belum tersedia untuk alamat tujuan tersebut. Silakan pilih kurir lain."
-        );
+        throw new Error("Layanan kurir ini belum tersedia untuk alamat tujuan tersebut. Silakan pilih kurir lain.");
       }
 
-      if (status === 422) {
-        throw new Error(errorMessage || "Permintaan ongkir tidak lolos validasi.");
-      }
-
-      if (status === 500) {
-        throw new Error(
-          errorMessage ||
-            "Kesalahan tak terduga saat memproses permintaan."
-        );
-      }
-
-      throw new Error(
-        errorMessage || "Gagal mengambil estimasi ongkos kirim."
-      );
+      throw new Error(RAJAONGKIR_SHIPPING_ERROR);
     }
 
-    if (error instanceof Error) {
+    if (error instanceof Error && error.message !== RAJAONGKIR_SHIPPING_ERROR) {
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error(RAJAONGKIR_SHIPPING_ERROR);
   }
 }

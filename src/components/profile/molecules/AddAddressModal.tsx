@@ -139,7 +139,7 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
                 value={formData.address}
                 onChange={(e) => handleInputChange('address', e.target.value)}
                 className="w-full text-sm text-[#0D0E09] bg-transparent border-none outline-none placeholder-[#999999]"
-                placeholder="Masukkan alamat"
+                placeholder="Tulis alamat lengkap tujuan pengiriman"
               />
               <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
             </div>

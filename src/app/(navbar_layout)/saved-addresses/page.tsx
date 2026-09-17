@@ -48,16 +48,12 @@ const SavedAddressesPage: React.FC = () => {
         setSelectedAddress((prev) =>
           prev || response.data[0]?.id?.toString() || ""
         );
-      } catch (error) {
+      } catch {
         if (!isMounted) {
           return;
         }
 
-        setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "Gagal memuat alamat pengiriman."
-        );
+        setErrorMessage("Alamat pengiriman belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -207,12 +203,8 @@ const SavedAddressesPage: React.FC = () => {
       toast.success("Alamat pengiriman berhasil dihapus.");
       setIsDeleteModalOpen(false);
       setAddressPendingDelete(null);
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Gagal menghapus alamat pengiriman."
-      );
+    } catch {
+      toast.error("Alamat pengiriman belum bisa dihapus. Silakan coba lagi beberapa saat lagi.");
     } finally {
       setDeletingAddressId(null);
     }

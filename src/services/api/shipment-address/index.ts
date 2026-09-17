@@ -28,139 +28,6 @@ export interface ShipmentAddressSingleResponse {
   data: ShipmentAddress;
 }
 
-interface ShipmentAddressErrorResponse {
-  status_code?: number;
-  error?: string;
-  message?: string;
-  detail?: Array<{
-    msg?: string;
-    message?: string;
-  }> | {
-    message?: string;
-  };
-}
-
-export const getMyShipmentAddresses =
-  async (): Promise<ShipmentAddressListResponse> => {
-    try {
-      const session = SessionManager.getSession();
-      const token = session?.token?.token;
-
-      const response = await axiosInstance.get<ShipmentAddressListResponse>(
-        API_ENDPOINTS.SHIPMENT_ADDRESS_MY_ADDRESS,
-        token && isJwtToken(token)
-          ? {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          : undefined
-      );
-
-      if (response.data?.status_code === 200 && Array.isArray(response.data.data)) {
-        return response.data;
-      }
-
-      throw new Error(
-        response.data?.message || "Gagal mengambil alamat pengiriman."
-      );
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error) && error.response) {
-        const status = error.response.status;
-        const errorData = error.response.data as ShipmentAddressErrorResponse;
-
-        if (status === 401) {
-          throw new Error(
-            errorData.message ||
-              "Pengguna harus login untuk mengakses alamat pengiriman."
-          );
-        }
-
-        if (status === 500) {
-          throw new Error(
-            errorData.message ||
-              "Terjadi kesalahan tak terduga saat mengambil data alamat."
-          );
-        }
-
-        throw new Error(
-          errorData.message || "Gagal mengambil alamat pengiriman."
-        );
-      }
-
-      if (error instanceof Error) {
-        throw error;
-      }
-
-      throw new Error("Terjadi kesalahan yang tidak diketahui.");
-    }
-  };
-
-export const getOwnerShipmentAddress =
-  async (): Promise<ShipmentAddressSingleResponse> => {
-    try {
-      const session = SessionManager.getSession();
-      const token = session?.token?.token;
-
-      const response = await axiosInstance.get<ShipmentAddressSingleResponse>(
-        API_ENDPOINTS.SHIPMENT_ADDRESS_OWNER,
-        token && isJwtToken(token)
-          ? {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          : undefined
-      );
-
-      if (
-        (response.data?.status_code === 200 || response.data?.status_code === 201) &&
-        response.data.data
-      ) {
-        return response.data;
-      }
-
-      throw new Error(
-        response.data?.message || "Gagal mengambil alamat pemilik toko."
-      );
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error) && error.response) {
-        const status = error.response.status;
-        const errorData = error.response.data as ShipmentAddressErrorResponse;
-
-        if (status === 403) {
-          throw new Error(
-            errorData.message ||
-              "Pengguna tidak diizinkan untuk mengakses informasi ini."
-          );
-        }
-
-        if (status === 404) {
-          throw new Error(
-            errorData.message || "Alamat pemilik toko tidak ditemukan."
-          );
-        }
-
-        if (status === 500) {
-          throw new Error(
-            errorData.message ||
-              "Terjadi kesalahan tak terduga saat mengambil data alamat."
-          );
-        }
-
-        throw new Error(
-          errorData.message || "Gagal mengambil alamat pemilik toko."
-        );
-      }
-
-      if (error instanceof Error) {
-        throw error;
-      }
-
-      throw new Error("Terjadi kesalahan yang tidak diketahui.");
-    }
-  };
-
 export interface CreateShipmentAddressRequest {
   name: string;
   phone: string;
@@ -178,8 +45,7 @@ export interface CreateShipmentAddressResponse {
   data: ShipmentAddress;
 }
 
-export interface UpdateShipmentAddressRequest
-  extends CreateShipmentAddressRequest {
+export interface UpdateShipmentAddressRequest extends CreateShipmentAddressRequest {
   address_id: number;
 }
 
@@ -200,23 +66,122 @@ export interface DeleteShipmentAddressResponse {
   };
 }
 
-export const createShipmentAddress = async (
-  data: CreateShipmentAddressRequest
-): Promise<CreateShipmentAddressResponse> => {
-  try {
-    const session = SessionManager.getSession();
-    const token = session?.token?.token;
+type ShipmentAddressAction = "load" | "loadOwner" | "create" | "update" | "delete";
 
-    const response = await axiosInstance.post<CreateShipmentAddressResponse>(
-      API_ENDPOINTS.SHIPMENT_ADDRESS_CREATE,
-      data,
-      token && isJwtToken(token)
-        ? {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        : undefined
+const customerAddressActionMessage = (action: ShipmentAddressAction) => {
+  switch (action) {
+    case "load":
+      return "Alamat pengiriman belum bisa dimuat. Silakan coba lagi beberapa saat lagi.";
+    case "loadOwner":
+      return "Alamat toko belum bisa dimuat. Silakan coba lagi beberapa saat lagi.";
+    case "create":
+      return "Alamat pengiriman belum bisa disimpan. Silakan coba lagi beberapa saat lagi.";
+    case "update":
+      return "Alamat pengiriman belum bisa diperbarui. Silakan coba lagi beberapa saat lagi.";
+    case "delete":
+      return "Alamat pengiriman belum bisa dihapus. Silakan coba lagi beberapa saat lagi.";
+  }
+};
+
+const customerAddressAuthMessage = () => "Silakan login kembali untuk mengelola alamat pengiriman.";
+
+const customerAddressNotFoundMessage = (action: ShipmentAddressAction) => {
+  if (action === "load") {
+    return "Belum ada alamat pengiriman tersimpan di akun Anda.";
+  }
+
+  if (action === "loadOwner") {
+    return "Alamat toko belum tersedia. Hubungi admin toko sebelum checkout.";
+  }
+
+  return "Alamat pengiriman ini belum tersedia atau sudah tidak dapat diubah.";
+};
+
+const safeAddressValidationMessage = () =>
+  "Data alamat belum valid. Pastikan nama, nomor telepon, alamat, provinsi, kota/kabupaten RajaOngkir, dan kode pos sudah benar.";
+
+const getAuthConfig = () => {
+  const session = SessionManager.getSession();
+  const token = session?.token?.token;
+
+  return token && isJwtToken(token)
+    ? {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    : undefined;
+};
+
+const handleShipmentAddressError = (error: unknown, action: ShipmentAddressAction): never => {
+  if (axios.isAxiosError(error) && error.response) {
+    const status = error.response.status;
+
+    if (status === 401 || status === 403) {
+      throw new Error(customerAddressAuthMessage());
+    }
+
+    if (status === 404) {
+      throw new Error(customerAddressNotFoundMessage(action));
+    }
+
+    if (status === 400 || status === 422) {
+      throw new Error(safeAddressValidationMessage());
+    }
+
+    throw new Error(customerAddressActionMessage(action));
+  }
+
+  if (error instanceof Error) {
+    const message = error.message;
+    const safePrefixes = [
+      "Nomor telepon",
+      "Alamat wajib",
+      "Provinsi dan Kota",
+      "Negara wajib",
+      "Kode pos",
+      "Kota/Kabupaten",
+      "Alamat yang akan",
+    ];
+
+    if (safePrefixes.some((prefix) => message.startsWith(prefix))) {
+      throw error;
+    }
+  }
+
+  throw new Error(customerAddressActionMessage(action));
+};
+
+export const getMyShipmentAddresses = async (): Promise<ShipmentAddressListResponse> => {
+  try {
+    const response = await axiosInstance.get<ShipmentAddressListResponse>(
+      API_ENDPOINTS.SHIPMENT_ADDRESS_MY_ADDRESS,
+      getAuthConfig()
+    );
+
+    if (response.data?.status_code === 200 && Array.isArray(response.data.data)) {
+      return response.data;
+    }
+
+    throw new Error(customerAddressActionMessage("load"));
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return {
+        status_code: 200,
+        message: customerAddressNotFoundMessage("load"),
+        data: [],
+      };
+    }
+
+    return handleShipmentAddressError(error, "load");
+  }
+};
+
+export const getOwnerShipmentAddress = async (): Promise<ShipmentAddressSingleResponse> => {
+  try {
+    const response = await axiosInstance.get<ShipmentAddressSingleResponse>(
+      API_ENDPOINTS.SHIPMENT_ADDRESS_OWNER,
+      getAuthConfig()
     );
 
     if (
@@ -226,56 +191,32 @@ export const createShipmentAddress = async (
       return response.data;
     }
 
-    throw new Error(
-      response.data?.message || "Gagal menyimpan alamat pengiriman."
-    );
+    throw new Error(customerAddressActionMessage("loadOwner"));
   } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      const status = error.response.status;
-      const errorData = error.response.data as ShipmentAddressErrorResponse;
+    return handleShipmentAddressError(error, "loadOwner");
+  }
+};
 
-      if (status === 400) {
-        throw new Error(
-          errorData.message ||
-            "Data yang dikirimkan tidak sesuai dengan format yang diharapkan."
-        );
-      }
+export const createShipmentAddress = async (
+  data: CreateShipmentAddressRequest
+): Promise<CreateShipmentAddressResponse> => {
+  try {
+    const response = await axiosInstance.post<CreateShipmentAddressResponse>(
+      API_ENDPOINTS.SHIPMENT_ADDRESS_CREATE,
+      data,
+      getAuthConfig()
+    );
 
-      if (status === 401) {
-        throw new Error(
-          errorData.message ||
-            "Token autentikasi tidak valid atau tidak ditemukan."
-        );
-      }
-
-      if (status === 422) {
-        const detail = errorData.detail;
-        const errorMessages = Array.isArray(detail)
-          ? detail.map((item) => item.msg || item.message).filter(Boolean).join(', ')
-          : detail?.message;
-
-        throw new Error(
-          errorMessages || errorData.message || "Data alamat tidak lolos validasi."
-        );
-      }
-
-      if (status === 500) {
-        throw new Error(
-          errorData.message ||
-            "Terjadi kesalahan tak terduga saat memproses permintaan."
-        );
-      }
-
-      throw new Error(
-        errorData.message || "Gagal menyimpan alamat pengiriman."
-      );
+    if (
+      (response.data?.status_code === 200 || response.data?.status_code === 201) &&
+      response.data.data
+    ) {
+      return response.data;
     }
 
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error(customerAddressActionMessage("create"));
+  } catch (error: unknown) {
+    return handleShipmentAddressError(error, "create");
   }
 };
 
@@ -283,9 +224,6 @@ export const updateShipmentAddress = async (
   data: UpdateShipmentAddressRequest
 ): Promise<UpdateShipmentAddressResponse> => {
   try {
-    const session = SessionManager.getSession();
-    const token = session?.token?.token;
-
     const response = await axiosInstance.put<UpdateShipmentAddressResponse>(
       `/shipment-address/edit/${data.address_id}`,
       {
@@ -303,13 +241,7 @@ export const updateShipmentAddress = async (
           zip_code: data.zip_code,
         },
       },
-      token && isJwtToken(token)
-        ? {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        : undefined
+      getAuthConfig()
     );
 
     if (
@@ -319,63 +251,9 @@ export const updateShipmentAddress = async (
       return response.data;
     }
 
-    throw new Error(
-      response.data?.message || "Gagal memperbarui alamat pengiriman."
-    );
+    throw new Error(customerAddressActionMessage("update"));
   } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      const status = error.response.status;
-      const errorData = error.response.data as ShipmentAddressErrorResponse;
-
-      if (status === 400) {
-        throw new Error(
-          errorData.message ||
-            "Data yang diberikan tidak valid atau format tidak sesuai."
-        );
-      }
-
-      if (status === 403) {
-        throw new Error(
-          errorData.message ||
-            "Token tidak valid atau pengguna tidak memiliki akses untuk memperbarui data ini."
-        );
-      }
-
-      if (status === 404) {
-        throw new Error(
-          errorData.message ||
-            "Alamat dengan ID yang diberikan tidak ditemukan."
-        );
-      }
-
-      if (status === 422) {
-        const detail = errorData.detail;
-        const errorMessages = Array.isArray(detail)
-          ? detail.map((item) => item.msg || item.message).filter(Boolean).join(', ')
-          : detail?.message;
-
-        throw new Error(
-          errorMessages || errorData.message || "Data alamat tidak lolos validasi."
-        );
-      }
-
-      if (status === 500) {
-        throw new Error(
-          errorData.message ||
-            "Kesalahan tak terduga saat memperbarui data alamat tujuan pengiriman."
-        );
-      }
-
-      throw new Error(
-        errorData.message || "Gagal memperbarui alamat pengiriman."
-      );
-    }
-
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    return handleShipmentAddressError(error, "update");
   }
 };
 
@@ -383,25 +261,14 @@ export const deleteShipmentAddress = async (
   addressId: number
 ): Promise<DeleteShipmentAddressResponse> => {
   try {
-    const session = SessionManager.getSession();
-    const token = session?.token?.token;
-
     const response = await axiosInstance.delete<DeleteShipmentAddressResponse>(
       `/shipment-address/delete/${addressId}`,
-      token && isJwtToken(token)
-        ? {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            data: {
-              address_id: addressId,
-            },
-          }
-        : {
-            data: {
-              address_id: addressId,
-            },
-          }
+      {
+        ...getAuthConfig(),
+        data: {
+          address_id: addressId,
+        },
+      }
     );
 
     if (
@@ -411,55 +278,8 @@ export const deleteShipmentAddress = async (
       return response.data;
     }
 
-    throw new Error(
-      response.data?.message || "Gagal menghapus alamat pengiriman."
-    );
+    throw new Error(customerAddressActionMessage("delete"));
   } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      const status = error.response.status;
-      const errorData = error.response.data as ShipmentAddressErrorResponse;
-
-      if (status === 403) {
-        throw new Error(
-          errorData.message ||
-            "You do not have permission to delete this address item."
-        );
-      }
-
-      if (status === 404) {
-        throw new Error(
-          errorData.message ||
-            "Alamat dengan ID yang diberikan tidak ditemukan."
-        );
-      }
-
-      if (status === 422) {
-        const detail = errorData.detail;
-        const errorMessages = Array.isArray(detail)
-          ? detail.map((item) => item.msg || item.message).filter(Boolean).join(', ')
-          : detail?.message;
-
-        throw new Error(
-          errorMessages || errorData.message || "Permintaan hapus alamat tidak lolos validasi."
-        );
-      }
-
-      if (status === 500) {
-        throw new Error(
-          errorData.message ||
-            "Terjadi kesalahan tak terduga saat menghapus alamat."
-        );
-      }
-
-      throw new Error(
-        errorData.message || "Gagal menghapus alamat pengiriman."
-      );
-    }
-
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    return handleShipmentAddressError(error, "delete");
   }
 };

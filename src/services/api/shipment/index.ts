@@ -78,14 +78,24 @@ export interface DeleteShipmentResponse {
   data: ShipmentListItem;
 }
 
-interface ShipmentErrorResponse {
-  status_code?: number;
-  error?: string;
-  message?: string;
-  detail?: Array<{
-    msg: string;
-  }>;
-}
+type ShipmentAction = "load" | "create" | "activate" | "delete";
+
+const shipmentActionMessage = (action: ShipmentAction) => {
+  switch (action) {
+    case "load":
+      return "Data pengiriman belum bisa dimuat. Silakan coba lagi beberapa saat lagi.";
+    case "create":
+      return "Pengiriman belum bisa dibuat. Periksa alamat, kurir, dan ongkir lalu coba lagi.";
+    case "activate":
+      return "Pilihan pengiriman belum bisa diperbarui. Silakan coba lagi beberapa saat lagi.";
+    case "delete":
+      return "Pengiriman belum bisa dihapus. Silakan coba lagi beberapa saat lagi.";
+  }
+};
+
+const shipmentAuthMessage = "Silakan login kembali untuk mengelola pengiriman.";
+const shipmentValidationMessage =
+  "Data pengiriman belum valid. Pastikan alamat tujuan, kurir, layanan ongkir, dan berat produk sudah benar.";
 
 function getAuthorizedConfig() {
   const session = SessionManager.getSession();
@@ -102,6 +112,41 @@ function getAuthorizedConfig() {
   return undefined;
 }
 
+const handleShipmentError = (error: unknown, action: ShipmentAction): never => {
+  if (axios.isAxiosError(error) && error.response) {
+    const status = error.response.status;
+
+    if (status === 401 || status === 403) {
+      throw new Error(shipmentAuthMessage);
+    }
+
+    if (status === 400 || status === 422) {
+      throw new Error(shipmentValidationMessage);
+    }
+
+    if (status === 404) {
+      throw new Error("Data pengiriman ini belum tersedia atau sudah berubah. Silakan muat ulang halaman.");
+    }
+
+    throw new Error(shipmentActionMessage(action));
+  }
+
+  if (error instanceof Error) {
+    const safeMessages = [
+      shipmentActionMessage(action),
+      shipmentAuthMessage,
+      shipmentValidationMessage,
+      "Data pengiriman ini belum tersedia atau sudah berubah. Silakan muat ulang halaman.",
+    ];
+
+    if (safeMessages.includes(error.message)) {
+      throw error;
+    }
+  }
+
+  throw new Error(shipmentActionMessage(action));
+};
+
 export async function getMyShipments(): Promise<ShipmentListResponse> {
   try {
     const response = await axiosInstance.get<ShipmentListResponse>(
@@ -113,38 +158,9 @@ export async function getMyShipments(): Promise<ShipmentListResponse> {
       return response.data;
     }
 
-    throw new Error(
-      response.data?.message || "Gagal mengambil data pengiriman."
-    );
+    throw new Error(shipmentActionMessage("load"));
   } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      const status = error.response.status;
-      const errorData = error.response.data as ShipmentErrorResponse;
-
-      if (status === 401) {
-        throw new Error(
-          errorData.message ||
-            "Pengguna harus login untuk mengakses alamat pengiriman."
-        );
-      }
-
-      if (status === 500) {
-        throw new Error(
-          errorData.message ||
-            "Terjadi kesalahan tak terduga saat mengambil data alamat."
-        );
-      }
-
-      throw new Error(
-        errorData.message || "Gagal mengambil data pengiriman."
-      );
-    }
-
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    return handleShipmentError(error, "load");
   }
 }
 
@@ -165,46 +181,9 @@ export async function createShipment(
       return response.data;
     }
 
-    throw new Error(response.data?.message || "Gagal membuat pengiriman.");
+    throw new Error(shipmentActionMessage("create"));
   } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      const status = error.response.status;
-      const errorData = error.response.data as ShipmentErrorResponse;
-
-      if (status === 400) {
-        throw new Error(
-          errorData.message ||
-            "Data yang diberikan tidak valid. Pastikan semua informasi lengkap dan benar."
-        );
-      }
-
-      if (status === 401) {
-        throw new Error(
-          errorData.message ||
-            "Token tidak valid atau pengguna tidak terautentikasi."
-        );
-      }
-
-      if (status === 422) {
-        const messages = (errorData.detail || []).map((item) => item.msg).join(", ");
-        throw new Error(messages || "Data shipment tidak lolos validasi.");
-      }
-
-      if (status === 500) {
-        throw new Error(
-          errorData.message ||
-            "Terjadi kesalahan tak terduga saat mencoba membuat shipment."
-        );
-      }
-
-      throw new Error(errorData.message || "Gagal membuat pengiriman.");
-    }
-
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    return handleShipmentError(error, "create");
   }
 }
 
@@ -230,57 +209,9 @@ export async function activateShipment(
       return response.data;
     }
 
-    throw new Error(
-      response.data?.message || "Gagal memperbarui status pengiriman."
-    );
+    throw new Error(shipmentActionMessage("activate"));
   } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      const status = error.response.status;
-      const errorData = error.response.data as ShipmentErrorResponse;
-
-      if (status === 400) {
-        throw new Error(
-          errorData.message ||
-            "Data yang diberikan tidak valid atau format tidak sesuai."
-        );
-      }
-
-      if (status === 403) {
-        throw new Error(
-          errorData.message ||
-            "Token tidak valid atau pengguna tidak memiliki akses untuk memperbarui data ini."
-        );
-      }
-
-      if (status === 404) {
-        throw new Error(
-          errorData.message ||
-            "Alamat dengan ID yang diberikan tidak ditemukan."
-        );
-      }
-
-      if (status === 422) {
-        const messages = (errorData.detail || []).map((item) => item.msg).join(", ");
-        throw new Error(messages || "Permintaan aktivasi tidak lolos validasi.");
-      }
-
-      if (status === 500) {
-        throw new Error(
-          errorData.message ||
-            "Kesalahan tak terduga saat memperbarui data pengiriman."
-        );
-      }
-
-      throw new Error(
-        errorData.message || "Gagal memperbarui status pengiriman."
-      );
-    }
-
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    return handleShipmentError(error, "activate");
   }
 }
 
@@ -305,45 +236,8 @@ export async function deleteShipment(
       return response.data;
     }
 
-    throw new Error(response.data?.message || "Gagal menghapus pengiriman.");
+    throw new Error(shipmentActionMessage("delete"));
   } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      const status = error.response.status;
-      const errorData = error.response.data as ShipmentErrorResponse;
-
-      if (status === 403) {
-        throw new Error(
-          errorData.message ||
-            "You do not have permission to delete this address item."
-        );
-      }
-
-      if (status === 404) {
-        throw new Error(
-          errorData.message ||
-            "Shipment dengan ID yang diberikan tidak ditemukan."
-        );
-      }
-
-      if (status === 422) {
-        const messages = (errorData.detail || []).map((item) => item.msg).join(", ");
-        throw new Error(messages || "Permintaan hapus shipment tidak valid.");
-      }
-
-      if (status === 500) {
-        throw new Error(
-          errorData.message ||
-            "Terjadi kesalahan tak terduga saat menghapus shipment."
-        );
-      }
-
-      throw new Error(errorData.message || "Gagal menghapus pengiriman.");
-    }
-
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    return handleShipmentError(error, "delete");
   }
 }
