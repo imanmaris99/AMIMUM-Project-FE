@@ -23,22 +23,27 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<CardProductProps[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const router = useRouter();
+  const safeBrandName = brandName?.trim() || brandData?.name?.trim() || "brand ini";
 
   const handleSearch = async () => {
-    if (!searchQuery.trim()) {
+    const trimmedQuery = searchQuery.trim();
+    if (!trimmedQuery) {
       return;
     }
 
     setIsSearching(true);
     setHasSearched(true);
     setSearchResults([]);
+    setSearchError(null);
 
     try {
-      const brandProducts = await SearchGetProductByBrand(brandId, searchQuery.trim());
-      
+      const brandProducts = await SearchGetProductByBrand(brandId, trimmedQuery);
+
       const productsWithBrandInfo = brandProducts.map(product => ({
         ...product,
+        all_variants: Array.isArray(product.all_variants) ? product.all_variants : [],
         brand_info: {
           ...product.brand_info,
           id: brandId,
@@ -46,10 +51,11 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
           photo_url: brandData?.photo_url || undefined,
         },
       }));
-      
+
       setSearchResults(productsWithBrandInfo);
     } catch {
       setSearchResults([]);
+      setSearchError("Pencarian produk brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
     } finally {
       setIsSearching(false);
     }
@@ -57,7 +63,7 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !isSearching) {
-      handleSearch();
+      void handleSearch();
     }
   };
 
@@ -69,47 +75,55 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
     setSearchQuery("");
     setSearchResults([]);
     setHasSearched(false);
+    setSearchError(null);
   };
 
   return (
     <div className="flex flex-col gap-3 mt-2 mx-6">
-      {/* Search Input */}
       <div className="relative">
         <input
           type="text"
-          placeholder={`Cari produk dari merek ${brandName || `ID ${brandId}`}`}
+          placeholder={`Cari produk dari ${safeBrandName}`}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyPress}
           disabled={isSearching}
           className="w-full border border-gray-300 rounded-lg p-3 pl-6 outline-none placeholder:text-sm focus:border-[#006A47] focus:ring-1 focus:ring-[#006A47] disabled:bg-gray-50 disabled:cursor-not-allowed"
         />
-        <CiSearch 
+        <CiSearch
           className={`absolute w-6 h-6 right-4 top-1/2 -translate-y-1/2 cursor-pointer transition-colors ${
-            isSearching 
-              ? 'text-gray-400 cursor-not-allowed' 
+            isSearching
+              ? 'text-gray-400 cursor-not-allowed'
               : 'text-gray-500 hover:text-[#006A47]'
           }`}
-          onClick={!isSearching ? handleSearch : undefined}
+          onClick={!isSearching ? () => void handleSearch() : undefined}
         />
       </div>
 
-      {/* Search Feedback */}
       {isSearching && (
         <div className="flex items-center gap-2 text-sm text-[#00764F]">
           <div className="w-4 h-4 border-2 border-[#00764F] border-t-transparent rounded-full animate-spin"></div>
-          <span>Mencari produk dari merek {brandName}...</span>
+          <span>Mencari produk katalog dari {safeBrandName}...</span>
         </div>
       )}
 
-      {/* Search Results */}
       {hasSearched && !isSearching && (
         <div className="mt-2">
-          {searchResults.length > 0 ? (
+          {searchError ? (
+            <div className="text-center py-8 bg-yellow-50 border border-yellow-200 rounded-lg px-4">
+              <p className="text-yellow-800 text-sm">{searchError}</p>
+              <button
+                onClick={handleClearSearch}
+                className="mt-3 text-sm text-[#00764F] hover:underline"
+              >
+                Hapus pencarian
+              </button>
+            </div>
+          ) : searchResults.length > 0 ? (
             <div>
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm text-gray-600">
-                  Ditemukan <span className="font-semibold text-[#00764F]">{searchResults.length}</span> produk
+                  Ditemukan <span className="font-semibold text-[#00764F]">{searchResults.length}</span> produk katalog
                 </p>
                 <button
                   onClick={handleClearSearch}
@@ -121,10 +135,10 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
               <ListProductSection products={searchResults} />
             </div>
           ) : (
-            <div className="text-center py-8 bg-gray-50 rounded-lg">
-              <p className="text-gray-600 text-sm mb-1">Tidak ada produk ditemukan</p>
+            <div className="text-center py-8 bg-gray-50 rounded-lg px-4">
+              <p className="text-gray-600 text-sm mb-1">Belum ada produk katalog yang cocok.</p>
               <p className="text-gray-500 text-xs">
-                Tidak ada produk yang cocok dengan &ldquo;{searchQuery}&rdquo; dari merek {brandName}
+                Belum ada produk yang cocok dengan &ldquo;{searchQuery.trim()}&rdquo; dari {safeBrandName}.
               </p>
               <button
                 onClick={handleClearSearch}
@@ -137,19 +151,18 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
         </div>
       )}
 
-      {/* Promo Section */}
       {!hasSearched && (
         <div className="flex justify-center items-center gap-2 mt-2">
           <p className="text-gray-500 text-sm font-jakarta font-semibold">
-            Mau tau info produk yang sedang promo?
+            Lihat produk yang sedang promo?
           </p>
-          <Button 
-            variant="destructive" 
+          <Button
+            variant="destructive"
             type="button"
             onClick={handleCheckPromo}
             className="bg-red-500 hover:bg-red-600 text-white transition-colors"
           >
-            Cek Disini!
+            Cek Promo
           </Button>
         </div>
       )}
@@ -157,4 +170,4 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
   );
 };
 
-export default SearchProductByBrand; 
+export default SearchProductByBrand;

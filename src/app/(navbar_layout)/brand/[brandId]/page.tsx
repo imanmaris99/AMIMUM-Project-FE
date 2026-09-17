@@ -80,7 +80,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
       />
       <ProductListWithPagination 
         products={products} 
-        title={`Daftar Produk ${brandData?.name || "Brand"}`}
+        title={`Daftar Produk ${brandData?.name || "Brand produk"}`}
         emptyMessage="Produk brand ini belum tersedia di katalog toko."
       />
     </main>

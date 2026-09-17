@@ -11,21 +11,21 @@ interface ProductListWithPaginationProps {
   emptyMessage?: string;
 }
 
-const ProductListWithPagination = ({ 
-  products, 
+const ProductListWithPagination = ({
+  products,
   title = "Daftar Produk Brand",
-  emptyMessage = "Produk belum tersedia."
+  emptyMessage = "Produk brand belum tersedia di katalog toko."
 }: ProductListWithPaginationProps) => {
   const [displayedProducts, setDisplayedProducts] = useState<CardProductProps[]>([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  
-  const ITEMS_PER_PAGE = 10; // Sama dengan search page
-  
-  // Load initial data
+
+  const ITEMS_PER_PAGE = 10;
+
   useEffect(() => {
     setDisplayedProducts(products.slice(0, ITEMS_PER_PAGE));
     setCurrentPage(1);
+    setIsLoadingMore(false);
   }, [products]);
 
   const hasMore = displayedProducts.length < products.length;
@@ -33,19 +33,16 @@ const ProductListWithPagination = ({
   const totalAvailable = products.length;
 
   const handleLoadMore = () => {
+    if (!hasMore || isLoadingMore) {
+      return;
+    }
+
     setIsLoadingMore(true);
-    
-    // Simulate loading delay
-    setTimeout(() => {
-      const nextPage = currentPage + 1;
-      const startIndex = (nextPage - 1) * ITEMS_PER_PAGE;
-      const endIndex = startIndex + ITEMS_PER_PAGE;
-      const newProducts = products.slice(0, endIndex);
-      
-      setDisplayedProducts(newProducts);
-      setCurrentPage(nextPage);
-      setIsLoadingMore(false);
-    }, 500);
+    const nextPage = currentPage + 1;
+    const endIndex = nextPage * ITEMS_PER_PAGE;
+    setDisplayedProducts(products.slice(0, endIndex));
+    setCurrentPage(nextPage);
+    setIsLoadingMore(false);
   };
 
   return (
@@ -54,8 +51,6 @@ const ProductListWithPagination = ({
       {products && products.length > 0 ? (
         <>
           <ListProductSection products={displayedProducts} />
-          
-          {/* Load More Button */}
           <LoadMoreButton
             isLoading={isLoadingMore}
             hasMore={hasMore}
@@ -65,7 +60,9 @@ const ProductListWithPagination = ({
           />
         </>
       ) : (
-        <div className="text-gray-500">{emptyMessage}</div>
+        <div className="rounded-lg border border-dashed border-gray-200 bg-white p-4 text-sm text-gray-600">
+          {emptyMessage}
+        </div>
       )}
     </div>
   );

@@ -12,9 +12,12 @@ const ProductList = ({ products }: ProductListProps) => {
       {products && products.length > 0 ? (
         <ListProductSection products={products} />
       ) : (
-        <div className="text-gray-500">Produk belum tersedia.</div>
+        <div className="rounded-lg border border-dashed border-gray-200 bg-white p-4 text-sm text-gray-600">
+          Produk brand belum tersedia di katalog toko.
+        </div>
       )}
     </div>
   );
 };
+
 export default ProductList;

@@ -4,7 +4,6 @@ import { CardProductProps } from "@/components/common/Search/CardProduct/types";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 import { GetBrandDetailByIDServer } from "@/services/api/brand";
 import { GetProductDiscountByBrandIdServer } from "@/services/api/product";
-import { validateProductData } from "@/utils/dataValidation";
 import { BrandDetailType } from "@/types/detailProduct";
 
 export default async function PromoDetailPage({ params }: { params: Promise<{ promoId: string }> }) {
@@ -44,8 +43,12 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
     
   try {
     const allProducts = await GetProductDiscountByBrandIdServer(productionId);
-    const validProducts = allProducts.filter(validateProductData);
-    products = validProducts;
+    products = allProducts.map((product) => ({
+      ...product,
+      all_variants: Array.isArray(product.all_variants)
+        ? product.all_variants
+        : [],
+    }));
   } catch {
     products = [];
   }
@@ -64,7 +67,7 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
       />
       <ProductListWithPagination 
         products={products} 
-        title={`Produk Promo ${brandData?.name || "Brand"}`}
+        title={`Produk Promo ${brandData?.name || "Brand produk"}`}
         emptyMessage="Produk promo belum tersedia di katalog toko. Harga final tetap mengikuti data toko saat checkout."
       />
     </main>
