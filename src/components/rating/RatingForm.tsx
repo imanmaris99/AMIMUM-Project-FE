@@ -19,11 +19,12 @@ const RatingForm: React.FC<RatingFormProps> = ({
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
   const [hoveredRating, setHoveredRating] = useState(0);
+  const safeProductName = productName?.trim() || "Produk katalog";
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (rating > 0) {
-      onSubmit(rating, review);
+      onSubmit(rating, review.trim());
     }
   };
 
@@ -44,7 +45,7 @@ const RatingForm: React.FC<RatingFormProps> = ({
   return (
     <div className={`bg-white p-6 rounded-lg shadow-sm border ${className}`}>
       <h3 className="text-lg font-semibold text-gray-900 mb-4">
-        Berikan Rating untuk {productName}
+        Berikan Rating untuk {safeProductName}
       </h3>
       
       <form onSubmit={handleSubmit} className="space-y-4">

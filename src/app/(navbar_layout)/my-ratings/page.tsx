@@ -27,6 +27,17 @@ const formatRatingDate = (value: string) => {
   });
 };
 
+const sanitizeRatingItem = (rating: ProductRatingItem): ProductRatingItem => {
+  const rate = Number(rating.rate);
+
+  return {
+    ...rating,
+    rate: Number.isInteger(rate) && rate >= 1 && rate <= 5 ? rate : 0,
+    review: rating.review?.trim() || "",
+    product_name: rating.product_name?.trim() || "Produk katalog",
+  };
+};
+
 export default function MyRatingsPage() {
   const [ratings, setRatings] = useState<ProductRatingItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,13 +51,9 @@ export default function MyRatingsPage() {
     const loadRatings = async () => {
       try {
         const response = await getMyProductRatings();
-        setRatings(Array.isArray(response.data) ? response.data : []);
-      } catch (error) {
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : "Gagal mengambil rating Anda."
-        );
+        setRatings(Array.isArray(response.data) ? response.data.map(sanitizeRatingItem) : []);
+      } catch {
+        toast.error("Rating Anda belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
         setRatings([]);
       } finally {
         setIsLoading(false);
@@ -58,7 +65,7 @@ export default function MyRatingsPage() {
 
   const handleEditRating = (rating: ProductRatingItem) => {
     setSelectedRating(rating);
-    setEditableRate(rating.rate);
+    setEditableRate(rating.rate > 0 ? rating.rate : 0);
     setEditableReview(rating.review || "");
   };
 
@@ -85,7 +92,13 @@ export default function MyRatingsPage() {
   };
 
   const handleSubmitEdit = async () => {
-    if (!selectedRating || editableRate < 1) {
+    if (!selectedRating || editableRate < 1 || editableRate > 5) {
+      toast.error("Pilih rating 1 sampai 5 bintang sebelum menyimpan ulasan.");
+      return;
+    }
+
+    if (editableReview.trim().length > 500) {
+      toast.error("Ulasan maksimal 500 karakter.");
       return;
     }
 
@@ -172,7 +185,7 @@ export default function MyRatingsPage() {
                         {rating.product_name || 'Produk tidak tersedia'}
                       </h3>
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="flex items-center" aria-label={`${rating.rate} dari 5 bintang`}>
+                        <div className="flex items-center" aria-label={rating.rate > 0 ? `${rating.rate} dari 5 bintang` : "Rating belum valid"}>
                           {[1, 2, 3, 4, 5].map((star) => (
                             <svg
                               key={star}
@@ -184,7 +197,7 @@ export default function MyRatingsPage() {
                             </svg>
                           ))}
                         </div>
-                        <span className="text-sm text-gray-600">{rating.rate} bintang</span>
+                        <span className="text-sm text-gray-600">{rating.rate > 0 ? `${rating.rate} bintang` : "Rating belum valid"}</span>
                       </div>
                       {rating.review ? (
                         <p className="text-sm text-gray-700 mb-2 whitespace-pre-line">{rating.review}</p>
@@ -258,6 +271,7 @@ export default function MyRatingsPage() {
                       onChange={(event) => setEditableReview(event.target.value)}
                       rows={4}
                       className="w-full rounded border border-gray-300 p-3 text-sm text-gray-700"
+                      maxLength={500}
                       placeholder="Bagikan pengalaman Anda terhadap produk ini"
                     />
                   </div>

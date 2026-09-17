@@ -31,12 +31,6 @@ export interface ProductRatingResponse {
   };
 }
 
-interface RatingErrorResponse {
-  status_code?: number;
-  error?: string;
-  message?: string;
-}
-
 interface ValidationErrorResponse {
   detail?: Array<{ msg: string }>;
 }
@@ -53,12 +47,85 @@ export interface UpdateRatingPayload {
   review: string;
 }
 
-const extractValidationMessage = (errorData: ValidationErrorResponse) => {
-  if (!Array.isArray(errorData.detail)) {
-    return "Data rating tidak lolos validasi.";
+const validateRatingInput = (rate: number, review: string) => {
+  const safeRate = Number(rate);
+
+  if (!Number.isInteger(safeRate) || safeRate < 1 || safeRate > 5) {
+    throw new Error("Pilih rating 1 sampai 5 bintang sebelum menyimpan ulasan.");
   }
 
-  return errorData.detail.map((item) => item.msg).join(", ");
+  if (review.length > 500) {
+    throw new Error("Ulasan maksimal 500 karakter.");
+  }
+};
+
+const safeValidationMessage = (errorData: ValidationErrorResponse) => {
+  if (!Array.isArray(errorData.detail) || errorData.detail.length === 0) {
+    return "Data rating belum valid. Periksa rating dan ulasan lalu coba lagi.";
+  }
+
+  return "Data rating belum valid. Periksa rating dan ulasan lalu coba lagi.";
+};
+
+const ratingActionMessage = (action: "load" | "create" | "update" | "delete") => {
+  switch (action) {
+    case "load":
+      return "Rating Anda belum bisa dimuat. Silakan coba lagi beberapa saat lagi.";
+    case "create":
+      return "Rating produk belum bisa disimpan. Silakan coba lagi beberapa saat lagi.";
+    case "update":
+      return "Rating produk belum bisa diperbarui. Silakan coba lagi beberapa saat lagi.";
+    case "delete":
+      return "Rating produk belum bisa dihapus. Silakan coba lagi beberapa saat lagi.";
+  }
+};
+
+const ratingAuthMessage = () => "Silakan login kembali untuk mengelola rating produk.";
+
+const ratingNotFoundMessage = (action: "load" | "create" | "update" | "delete") => {
+  if (action === "load") {
+    return "Belum ada rating produk dari akun Anda.";
+  }
+
+  if (action === "create") {
+    return "Produk belum tersedia untuk diberi rating dari akun ini.";
+  }
+
+  return "Rating produk ini belum tersedia atau sudah tidak dapat diubah.";
+};
+
+const handleRatingError = (error: unknown, action: "load" | "create" | "update" | "delete"): never => {
+  if (axios.isAxiosError(error) && error.response) {
+    const status = error.response.status;
+
+    if (status === 403 || status === 401) {
+      throw new Error(ratingAuthMessage());
+    }
+
+    if (status === 404) {
+      throw new Error(ratingNotFoundMessage(action));
+    }
+
+    if (status === 422) {
+      throw new Error(safeValidationMessage(error.response.data as ValidationErrorResponse));
+    }
+
+    if (status === 409) {
+      throw new Error("Rating produk sedang belum bisa diproses. Silakan cek kembali data pesanan atau coba lagi nanti.");
+    }
+
+    throw new Error(ratingActionMessage(action));
+  }
+
+  if (error instanceof Error && error.message.startsWith("Pilih rating")) {
+    throw error;
+  }
+
+  if (error instanceof Error && error.message.startsWith("Ulasan maksimal")) {
+    throw error;
+  }
+
+  throw new Error(ratingActionMessage(action));
 };
 
 export const getMyProductRatings = async (): Promise<ProductRatingListResponse> => {
@@ -71,52 +138,25 @@ export const getMyProductRatings = async (): Promise<ProductRatingListResponse> 
       return response;
     }
 
-    throw new Error(response?.message || "Gagal mengambil daftar rating.");
+    throw new Error(ratingActionMessage("load"));
   } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      const status = error.response.status;
-      const errorData = error.response.data as RatingErrorResponse;
-
-      if (status === 403) {
-        throw new Error(errorData.message || "Not Authenticated.");
-      }
-
-      if (status === 404) {
-        return {
-          status_code: 200,
-          message: errorData.message || "Belum ada rating produk.",
-          data: [],
-        };
-      }
-
-      if (status === 409) {
-        throw new Error(
-          errorData.message ||
-            "Terjadi konflik saat mengambil data rating produk pengguna."
-        );
-      }
-
-      if (status === 500) {
-        throw new Error(
-          errorData.message ||
-            "Terjadi kesalahan di server saat mengambil data rating produk."
-        );
-      }
-
-      throw new Error(errorData.message || "Gagal mengambil daftar rating.");
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return {
+        status_code: 200,
+        message: ratingNotFoundMessage("load"),
+        data: [],
+      };
     }
 
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    return handleRatingError(error, "load");
   }
 };
 
 export const createProductRating = async (
   payload: CreateRatingPayload
 ): Promise<ProductRatingResponse> => {
+  validateRatingInput(payload.rate, payload.review);
+
   try {
     const response = await apiClient.post<ProductRatingResponse>(
       API_ENDPOINTS.RATING_CREATE(payload.productId),
@@ -126,7 +166,7 @@ export const createProductRating = async (
         },
         create_rate: {
           rate: payload.rate,
-          review: payload.review,
+          review: payload.review.trim(),
         },
       }
     );
@@ -135,62 +175,17 @@ export const createProductRating = async (
       return response;
     }
 
-    throw new Error(response?.message || "Gagal membuat rating produk.");
+    throw new Error(ratingActionMessage("create"));
   } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      const status = error.response.status;
-      const errorData = error.response.data as
-        | RatingErrorResponse
-        | ValidationErrorResponse;
-
-      if (status === 403) {
-        throw new Error(
-          (errorData as RatingErrorResponse).message || "Not Authenticated."
-        );
-      }
-
-      if (status === 404) {
-        throw new Error(
-          (errorData as RatingErrorResponse).message ||
-            "Produk dengan ID ini tidak ditemukan atau pengguna tidak ditemukan."
-        );
-      }
-
-      if (status === 409) {
-        throw new Error(
-          (errorData as RatingErrorResponse).message ||
-            "Konflik saat menyimpan rating produk."
-        );
-      }
-
-      if (status === 422) {
-        throw new Error(extractValidationMessage(errorData as ValidationErrorResponse));
-      }
-
-      if (status === 500) {
-        throw new Error(
-          (errorData as RatingErrorResponse).message ||
-            "Kesalahan tak terduga saat menyimpan rating produk."
-        );
-      }
-
-      throw new Error(
-        (errorData as RatingErrorResponse).message ||
-          "Gagal membuat rating produk."
-      );
-    }
-
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    return handleRatingError(error, "create");
   }
 };
 
 export const updateProductRating = async (
   payload: UpdateRatingPayload
 ): Promise<ProductRatingResponse> => {
+  validateRatingInput(payload.rate, payload.review);
+
   try {
     const response = await apiClient.put<ProductRatingResponse>(
       API_ENDPOINTS.RATING_EDIT(payload.ratingId),
@@ -200,7 +195,7 @@ export const updateProductRating = async (
         },
         review_update: {
           rate: payload.rate,
-          review: payload.review,
+          review: payload.review.trim(),
         },
       }
     );
@@ -209,57 +204,9 @@ export const updateProductRating = async (
       return response;
     }
 
-    throw new Error(response?.message || "Gagal memperbarui rating produk.");
+    throw new Error(ratingActionMessage("update"));
   } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      const status = error.response.status;
-      const errorData = error.response.data as
-        | RatingErrorResponse
-        | ValidationErrorResponse;
-
-      if (status === 403) {
-        throw new Error(
-          (errorData as RatingErrorResponse).message ||
-            "Pengguna tidak diizinkan untuk memperbarui review ini."
-        );
-      }
-
-      if (status === 404) {
-        throw new Error(
-          (errorData as RatingErrorResponse).message ||
-            "Review dan rating untuk ID produk ini tidak ditemukan."
-        );
-      }
-
-      if (status === 409) {
-        throw new Error(
-          (errorData as RatingErrorResponse).message ||
-            "Konflik terjadi saat memperbarui review."
-        );
-      }
-
-      if (status === 422) {
-        throw new Error(extractValidationMessage(errorData as ValidationErrorResponse));
-      }
-
-      if (status === 500) {
-        throw new Error(
-          (errorData as RatingErrorResponse).message ||
-            "Kesalahan tak terduga saat memperbarui review."
-        );
-      }
-
-      throw new Error(
-        (errorData as RatingErrorResponse).message ||
-          "Gagal memperbarui rating produk."
-      );
-    }
-
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    return handleRatingError(error, "update");
   }
 };
 
@@ -280,56 +227,8 @@ export const deleteProductRating = async (
       return response;
     }
 
-    throw new Error(response?.message || "Gagal menghapus rating produk.");
+    throw new Error(ratingActionMessage("delete"));
   } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      const status = error.response.status;
-      const errorData = error.response.data as
-        | RatingErrorResponse
-        | ValidationErrorResponse;
-
-      if (status === 403) {
-        throw new Error(
-          (errorData as RatingErrorResponse).message ||
-            "Token tidak valid atau pengguna tidak memiliki akses."
-        );
-      }
-
-      if (status === 404) {
-        throw new Error(
-          (errorData as RatingErrorResponse).message ||
-            "Review dengan ID ini tidak ditemukan atau tidak dimiliki oleh pengguna."
-        );
-      }
-
-      if (status === 409) {
-        throw new Error(
-          (errorData as RatingErrorResponse).message ||
-            "Konflik saat menghapus review."
-        );
-      }
-
-      if (status === 422) {
-        throw new Error(extractValidationMessage(errorData as ValidationErrorResponse));
-      }
-
-      if (status === 500) {
-        throw new Error(
-          (errorData as RatingErrorResponse).message ||
-            "Kesalahan tak terduga saat menghapus review."
-        );
-      }
-
-      throw new Error(
-        (errorData as RatingErrorResponse).message ||
-          "Gagal menghapus rating produk."
-      );
-    }
-
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    return handleRatingError(error, "delete");
   }
 };
