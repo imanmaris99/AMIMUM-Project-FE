@@ -42,14 +42,20 @@ export interface CourierShippingCostResponse {
   };
 }
 
-interface CourierErrorResponse {
-  status_code?: number;
-  error?: string;
-  message?: string;
-  detail?: Array<{
-    msg: string;
-  }>;
-}
+type CourierAction = "list" | "shippingCost";
+
+const courierActionMessage = (action: CourierAction) => {
+  switch (action) {
+    case "list":
+      return "Data kurir belum bisa dimuat. Silakan coba lagi beberapa saat lagi.";
+    case "shippingCost":
+      return "Ongkir belum bisa dihitung. Periksa alamat tujuan, berat paket, atau coba lagi beberapa saat lagi.";
+  }
+};
+
+const courierAuthMessage = "Silakan login kembali untuk mengelola data kurir.";
+const courierValidationMessage =
+  "Data ongkir belum valid. Pastikan kota asal, kota tujuan, berat paket, dan kurir sudah benar.";
 
 function getAuthorizedConfig() {
   const session = SessionManager.getSession();
@@ -66,6 +72,46 @@ function getAuthorizedConfig() {
   return undefined;
 }
 
+const handleCourierError = (error: unknown, action: CourierAction): never => {
+  if (axios.isAxiosError(error) && error.response) {
+    const status = error.response.status;
+
+    if (status === 401 || status === 403) {
+      throw new Error(courierAuthMessage);
+    }
+
+    if (status === 400 || status === 422) {
+      throw new Error(courierValidationMessage);
+    }
+
+    if (status === 404) {
+      throw new Error(
+        action === "list"
+          ? "Belum ada data kurir tersimpan."
+          : "Layanan kurir belum tersedia untuk alamat tujuan ini."
+      );
+    }
+
+    throw new Error(courierActionMessage(action));
+  }
+
+  if (error instanceof Error) {
+    const safeMessages = [
+      courierActionMessage(action),
+      courierAuthMessage,
+      courierValidationMessage,
+      "Belum ada data kurir tersimpan.",
+      "Layanan kurir belum tersedia untuk alamat tujuan ini.",
+    ];
+
+    if (safeMessages.includes(error.message)) {
+      throw error;
+    }
+  }
+
+  throw new Error(courierActionMessage(action));
+};
+
 export async function getMyCouriers(): Promise<CourierListResponse> {
   try {
     const response = await axiosInstance.get<CourierListResponse>(
@@ -77,42 +123,17 @@ export async function getMyCouriers(): Promise<CourierListResponse> {
       return response.data;
     }
 
-    throw new Error(response.data?.message || "Gagal mengambil data kurir.");
+    throw new Error(courierActionMessage("list"));
   } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      const status = error.response.status;
-      const errorData = error.response.data as CourierErrorResponse;
-
-      if (status === 403) {
-        throw new Error(
-          errorData.message ||
-            "Token tidak valid atau pengguna tidak memiliki akses."
-        );
-      }
-
-      if (status === 404) {
-        return {
-          status_code: 200,
-          message: errorData.message || "Belum ada data kurir tersimpan.",
-          data: [],
-        };
-      }
-
-      if (status === 500) {
-        throw new Error(
-          errorData.message ||
-            "Kesalahan tak terduga saat mengambil data kurir."
-        );
-      }
-
-      throw new Error(errorData.message || "Gagal mengambil data kurir.");
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return {
+        status_code: 200,
+        message: "Belum ada data kurir tersimpan.",
+        data: [],
+      };
     }
 
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    return handleCourierError(error, "list");
   }
 }
 
@@ -133,49 +154,8 @@ export async function createCourierShippingCost(
       return response.data;
     }
 
-    throw new Error(
-      response.data?.message || "Gagal menghitung biaya pengiriman."
-    );
+    throw new Error(courierActionMessage("shippingCost"));
   } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      const status = error.response.status;
-      const errorData = error.response.data as CourierErrorResponse;
-
-      if (status === 400) {
-        throw new Error(
-          errorData.message ||
-            "Data yang dimasukkan tidak valid atau ada kesalahan dalam request."
-        );
-      }
-
-      if (status === 403) {
-        throw new Error(
-          errorData.message ||
-            "Token tidak valid atau pengguna tidak memiliki akses."
-        );
-      }
-
-      if (status === 422) {
-        const messages = (errorData.detail || []).map((item) => item.msg).join(", ");
-        throw new Error(messages || "Data pengiriman tidak lolos validasi.");
-      }
-
-      if (status === 500) {
-        throw new Error(
-          errorData.message ||
-            "Terjadi kesalahan saat memproses data pengiriman."
-        );
-      }
-
-      throw new Error(
-        errorData.message || "Gagal menghitung biaya pengiriman."
-      );
-    }
-
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    return handleCourierError(error, "shippingCost");
   }
 }

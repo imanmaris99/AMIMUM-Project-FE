@@ -199,12 +199,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             services: [],
           }))
         );
-      } catch (error) {
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : 'Gagal mengambil data checkout.'
-        );
+      } catch {
+        toast.error('Data checkout belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
       } finally {
         setIsReferenceLoading(false);
       }

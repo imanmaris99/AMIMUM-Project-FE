@@ -100,7 +100,7 @@ const getPaymentErrorMessage = (
       .map((item) => item.msg || item.message)
       .filter(Boolean)
       .join(", ");
-    if (messages) return messages;
+    if (messages) return sanitizePaymentError(messages) || PAYMENT_SERVICE_ERROR_MESSAGE;
   }
   return fallbackMessage;
 };
@@ -137,7 +137,7 @@ export const createPayment = async (
       );
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error(PAYMENT_SERVICE_ERROR_MESSAGE);
   }
 };
 
@@ -169,6 +169,6 @@ export const syncPaymentStatus = async (
       );
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error(PAYMENT_SERVICE_ERROR_MESSAGE);
   }
 };
