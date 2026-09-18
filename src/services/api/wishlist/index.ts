@@ -83,10 +83,7 @@ export const getMyWishlistProducts = async (): Promise<WishlistListResponse> => 
       const errorData = error.response.data as WishlistErrorResponse;
 
       if (status === 403) {
-        throw new Error(
-          errorData.message ||
-            "Silakan login kembali untuk mengelola wishlist."
-        );
+        throw new Error("Silakan login kembali untuk mengelola wishlist.");
       }
 
       if (status === 404) {
@@ -99,13 +96,10 @@ export const getMyWishlistProducts = async (): Promise<WishlistListResponse> => 
       }
 
       if (status === 500) {
-        throw new Error(
-          errorData.message ||
-            "Wishlist belum bisa dimuat. Silakan coba lagi beberapa saat lagi."
-        );
+        throw new Error("Wishlist belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
       }
 
-      throw new Error(errorData.message || "Gagal mengambil wishlist.");
+      throw new Error("Wishlist belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
     }
 
     if (error instanceof Error) {
@@ -140,9 +134,7 @@ export const getWishlistTotalItems = async (): Promise<WishlistTotalResponse> =>
         };
       }
 
-      throw new Error(
-        errorData.message || "Gagal mengambil total wishlist."
-      );
+      throw new Error("Jumlah wishlist belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
     }
 
     if (error instanceof Error) {
@@ -177,24 +169,15 @@ export const addWishlistProduct = async (
         | ValidationErrorResponse;
 
       if (status === 403) {
-        throw new Error(
-          (errorData as WishlistErrorResponse).message ||
-            "Silakan login kembali untuk menambahkan wishlist."
-        );
+        throw new Error("Silakan login kembali untuk menambahkan wishlist.");
       }
 
       if (status === 404) {
-        throw new Error(
-          (errorData as WishlistErrorResponse).message ||
-            "Produk tidak ditemukan di katalog."
-        );
+        throw new Error("Produk tidak ditemukan di katalog.");
       }
 
       if (status === 409) {
-        throw new Error(
-          (errorData as WishlistErrorResponse).message ||
-            "Produk sudah ada di wishlist."
-        );
+        throw new Error("Produk sudah ada di wishlist.");
       }
 
       if (status === 422) {
@@ -202,16 +185,10 @@ export const addWishlistProduct = async (
       }
 
       if (status === 500) {
-        throw new Error(
-          (errorData as WishlistErrorResponse).message ||
-            "Wishlist belum bisa ditambahkan. Silakan coba lagi beberapa saat lagi."
-        );
+        throw new Error("Wishlist belum bisa ditambahkan. Silakan coba lagi beberapa saat lagi.");
       }
 
-      throw new Error(
-        (errorData as WishlistErrorResponse).message ||
-          "Gagal menambahkan wishlist."
-      );
+      throw new Error("Wishlist belum bisa ditambahkan. Silakan coba lagi beberapa saat lagi.");
     }
 
     if (error instanceof Error) {
@@ -248,17 +225,11 @@ export const deleteWishlistProduct = async (
         | ValidationErrorResponse;
 
       if (status === 403) {
-        throw new Error(
-          (errorData as WishlistErrorResponse).message ||
-            "Silakan login kembali untuk menghapus wishlist."
-        );
+        throw new Error("Silakan login kembali untuk menghapus wishlist.");
       }
 
       if (status === 404) {
-        throw new Error(
-          (errorData as WishlistErrorResponse).message ||
-            "Item wishlist tidak ditemukan."
-        );
+        throw new Error("Item wishlist tidak ditemukan.");
       }
 
       if (status === 422) {
@@ -266,16 +237,10 @@ export const deleteWishlistProduct = async (
       }
 
       if (status === 500) {
-        throw new Error(
-          (errorData as WishlistErrorResponse).message ||
-            "Wishlist belum bisa dihapus. Silakan coba lagi beberapa saat lagi."
-        );
+        throw new Error("Wishlist belum bisa dihapus. Silakan coba lagi beberapa saat lagi.");
       }
 
-      throw new Error(
-        (errorData as WishlistErrorResponse).message ||
-          "Gagal menghapus wishlist."
-      );
+      throw new Error("Wishlist belum bisa dihapus. Silakan coba lagi beberapa saat lagi.");
     }
 
     if (error instanceof Error) {

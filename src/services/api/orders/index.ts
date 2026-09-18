@@ -363,7 +363,7 @@ export const getMyOrders = async (): Promise<OrdersListResponse> => {
         };
       }
 
-      throw new Error(errorData.message || "Gagal mengambil daftar pesanan.");
+      throw new Error("Daftar pesanan belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
     }
 
     if (error instanceof Error) {

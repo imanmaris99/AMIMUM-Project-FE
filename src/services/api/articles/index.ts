@@ -13,7 +13,7 @@ export const fetchArticles = async (): Promise<ArticleProps[]> => {
         
         // Validate response structure
         if (!response || !response.data || !Array.isArray(response.data)) {
-            throw new Error('Invalid response format: data is not an array');
+            throw new Error('Data artikel belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
         }
         
         // Return the articles array from response.data
@@ -48,21 +48,17 @@ export async function fetchArticlesServer(): Promise<ArticleProps[]> {
     // Handle different status codes according to API documentation
     if (res.status === 409) {
       // Conflict error
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'Terjadi konflik saat mengambil daftar artikel.';
-      throw new Error(errorMessage);
+      throw new Error('Data artikel belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     if (res.status === 500) {
       // Internal Server Error
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'Kesalahan tak terduga saat mengambil daftar artikel.';
-      throw new Error(errorMessage);
+      throw new Error('Data artikel belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     if (!res.ok) {
       // Other errors
-      throw new Error(`Gagal mengambil data artikel: ${res.status}`);
+      throw new Error('Data artikel belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     // Parse response
@@ -70,7 +66,7 @@ export async function fetchArticlesServer(): Promise<ArticleProps[]> {
     
     // Validate response structure
     if (!data || !data.data || !Array.isArray(data.data)) {
-      throw new Error('Invalid response format: data is not an array');
+      throw new Error('Format data artikel belum sesuai. Silakan coba lagi nanti.');
     }
 
     // Return the articles array from response.data
@@ -80,6 +76,6 @@ export async function fetchArticlesServer(): Promise<ArticleProps[]> {
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error('Unknown error occurred while fetching articles');
+    throw new Error('Data artikel belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
   }
 }

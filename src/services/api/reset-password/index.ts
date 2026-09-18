@@ -53,15 +53,15 @@ export const postResetPassword = async (data: ResetPasswordRequest): Promise<Res
       const errorData = error.response.data as ResetPasswordErrorResponse;
 
       if (status === 400) {
-        throw new Error(errorData.message || "Password tidak memenuhi kriteria. Password harus minimal 8 karakter, mengandung huruf besar, huruf kecil, angka, dan karakter spesial.");
+        throw new Error("Password tidak memenuhi kriteria. Password harus minimal 8 karakter, mengandung huruf besar, huruf kecil, angka, dan karakter spesial.");
       }
 
       if (status === 404) {
-        throw new Error(errorData.message || "Email tidak ditemukan.");
+        throw new Error("Email tidak ditemukan.");
       }
 
       if (status === 406) {
-        throw new Error(errorData.message || "Code verifikasi tidak sesuai.");
+        throw new Error("Kode verifikasi tidak sesuai.");
       }
 
       if (status === 422) {
@@ -71,10 +71,10 @@ export const postResetPassword = async (data: ResetPasswordRequest): Promise<Res
       }
 
       if (status === 500) {
-        throw new Error(errorData.message || "Gagal reset password. Silakan coba lagi nanti.");
+        throw new Error("Reset password belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
       }
 
-      throw new Error(errorData.message || "Gagal reset password. Silakan coba lagi.");
+      throw new Error("Reset password belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
     }
 
     if (error instanceof Error) {

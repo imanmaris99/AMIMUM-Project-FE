@@ -70,27 +70,20 @@ export const getUserProfile = async (): Promise<UserProfileResponse> => {
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response) {
       const status = error.response.status;
-      const errorData = error.response.data as UserProfileErrorResponse;
 
       if (status === 404) {
-        throw new Error(errorData.message || "Pengguna tidak ditemukan.");
+        throw new Error("Profil pengguna tidak ditemukan.");
       }
 
       if (status === 409) {
-        throw new Error(
-          errorData.message || "Terjadi konflik saat mengambil profil pengguna."
-        );
+        throw new Error("Profil belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
       }
 
       if (status === 500) {
-        throw new Error(
-          errorData.message || "Terjadi kesalahan saat mengambil profil pengguna."
-        );
+        throw new Error("Profil belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
       }
 
-      throw new Error(
-        errorData.message || "Gagal mengambil profil pengguna."
-      );
+      throw new Error("Profil belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
     }
 
     if (error instanceof Error) {
@@ -154,16 +147,10 @@ export const updateUserProfile = async (
       }
 
       if (status === 500) {
-        throw new Error(
-          (errorData as UserProfileErrorResponse).message ||
-            "Terjadi kesalahan saat memperbarui profil pengguna."
-        );
+        throw new Error("Profil belum bisa diperbarui. Silakan coba lagi beberapa saat lagi.");
       }
 
-      throw new Error(
-        (errorData as UserProfileErrorResponse).message ||
-          "Gagal memperbarui profil pengguna."
-      );
+      throw new Error("Profil belum bisa diperbarui. Silakan coba lagi beberapa saat lagi.");
     }
 
     if (error instanceof Error) {
@@ -212,24 +199,15 @@ export const updateUserPhoto = async (
         | { status?: string; message?: string; detail?: Array<{ msg: string }> };
 
       if (status === 400) {
-        throw new Error(
-          errorData.message ||
-            "File format not allowed. Please upload one of the following formats: png, jpeg, jpg, webp"
-        );
+        throw new Error("Format foto belum didukung. Gunakan png, jpeg, jpg, atau webp.");
       }
 
       if (status === 401) {
-        throw new Error(
-          errorData.message ||
-            "Unauthorized: Token JWT tidak valid atau kadaluarsa"
-        );
+        throw new Error("Silakan login kembali untuk memperbarui foto profil.");
       }
 
       if (status === 413) {
-        throw new Error(
-          errorData.message ||
-            "File too large. Maximum allowed size is 300 KB"
-        );
+        throw new Error("Ukuran foto terlalu besar. Maksimal 300 KB.");
       }
 
       if (status === 422) {
@@ -247,14 +225,10 @@ export const updateUserPhoto = async (
       }
 
       if (status === 500) {
-        throw new Error(
-          errorData.message || "Internal Server Error"
-        );
+        throw new Error("Foto profil belum bisa diperbarui. Silakan coba lagi beberapa saat lagi.");
       }
 
-      throw new Error(
-        errorData.message || "Gagal memperbarui foto profil."
-      );
+      throw new Error("Foto profil belum bisa diperbarui. Silakan coba lagi beberapa saat lagi.");
     }
 
     if (error instanceof Error) {

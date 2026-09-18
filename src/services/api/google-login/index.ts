@@ -54,18 +54,12 @@ export const postGoogleLogin = async (data: GoogleLoginRequest): Promise<GoogleL
       const status = error.response.status;
       const errorData = error.response.data as GoogleLoginErrorResponse;
 
-      let errorMessage = errorData.message;
-      if (errorData.detail && typeof errorData.detail === 'object' && 'message' in errorData.detail) {
-        const detailObj = errorData.detail as { message?: string };
-        errorMessage = detailObj.message || errorMessage;
-      }
-
       if (status === 401) {
-        throw new Error(errorMessage || "Token tidak valid atau login gagal.");
+        throw new Error("Login Google belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
       }
 
       if (status === 404) {
-        throw new Error(errorData.message || "User dengan email dari Google tidak ditemukan.");
+        throw new Error("Akun Google belum terdaftar. Silakan daftar terlebih dahulu.");
       }
 
       if (status === 422) {
@@ -75,10 +69,10 @@ export const postGoogleLogin = async (data: GoogleLoginRequest): Promise<GoogleL
       }
 
       if (status === 500) {
-        throw new Error(errorData.message || "Kesalahan server saat login dengan Google. Silakan coba lagi nanti.");
+        throw new Error("Login Google belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
       }
 
-      throw new Error(errorData.message || "Login dengan Google gagal. Silakan coba lagi.");
+      throw new Error("Login Google belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
     }
 
     if (axios.isAxiosError(error) && error.request) {

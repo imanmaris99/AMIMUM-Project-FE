@@ -71,9 +71,7 @@ export const SearchGetProduct = async (productName: string): Promise<AllProductI
       }
 
       if (status === 500) {
-        const errorData = error.response.data as { message?: string };
-        const errorMessage = errorData.message || 'Data pencarian produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.';
-        throw new Error(errorMessage);
+        throw new Error('Data pencarian produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
       }
 
       throw new Error('Data pencarian produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
@@ -158,9 +156,7 @@ export const SearchGetProductByBrand = async (productionId: number, productName:
       }
 
       if (status === 500) {
-        const errorData = error.response.data as { message?: string };
-        const errorMessage = errorData.message || 'Data pencarian brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.';
-        throw new Error(errorMessage);
+        throw new Error('Data pencarian brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
       }
 
       throw new Error('Data pencarian produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
@@ -216,9 +212,7 @@ export async function GetProductDiscountByBrandIdServer(productionId: number): P
     }
 
     if (res.status === 500) {
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'Data produk promo belum bisa dimuat. Silakan coba lagi beberapa saat lagi.';
-      throw new Error(errorMessage);
+      throw new Error('Data produk promo belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     if (!res.ok) {
@@ -297,9 +291,7 @@ export async function GetProductsByProductionIdServer(productionId: number): Pro
     }
 
     if (res.status === 500) {
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'Data produk brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.';
-      throw new Error(errorMessage);
+      throw new Error('Data produk brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     if (!res.ok) {

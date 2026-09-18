@@ -53,7 +53,7 @@ export const postResendVerification = async (data: ResendVerificationRequest): P
       const errorData = error.response.data as ResendVerificationErrorResponse;
 
       if (status === 404) {
-        throw new Error(errorData.message || "Email tidak ditemukan.");
+        throw new Error("Email tidak ditemukan.");
       }
 
       if (status === 422) {
@@ -63,14 +63,14 @@ export const postResendVerification = async (data: ResendVerificationRequest): P
       }
 
       if (status === 429) {
-        throw new Error(errorData.message || "Terlalu banyak permintaan. Silakan coba lagi nanti.");
+        throw new Error("Terlalu banyak permintaan. Silakan coba lagi nanti.");
       }
 
       if (status === 500) {
-        throw new Error(errorData.message || "Gagal mengirim ulang email verifikasi. Silakan coba lagi nanti.");
+        throw new Error("Email verifikasi belum bisa dikirim. Silakan coba lagi beberapa saat lagi.");
       }
 
-      throw new Error(errorData.message || "Gagal mengirim ulang email verifikasi. Silakan coba lagi.");
+      throw new Error("Email verifikasi belum bisa dikirim. Silakan coba lagi beberapa saat lagi.");
     }
 
     if (error instanceof Error) {

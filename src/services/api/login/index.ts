@@ -47,12 +47,12 @@ export const postLogin = async (data: LoginRequest): Promise<LoginResponse> => {
       const errorData = error.response.data as LoginErrorResponse;
 
       if (status === 401) {
-        throw new Error(errorData.message || "Email atau password salah.");
+        throw new Error("Email atau password salah.");
       }
 
       if (status === 403) {
         const inactiveError: AccountInactiveError = new Error(
-          errorData.message || "Akun Anda belum terverifikasi. Silakan verifikasi email Anda terlebih dahulu."
+          "Akun Anda belum terverifikasi. Silakan verifikasi email Anda terlebih dahulu."
         );
         inactiveError.isAccountInactive = true;
         inactiveError.statusCode = 403;
@@ -60,7 +60,7 @@ export const postLogin = async (data: LoginRequest): Promise<LoginResponse> => {
       }
 
       if (status === 404) {
-        throw new Error(errorData.message || "User dengan email yang diberikan tidak ditemukan.");
+        throw new Error("Email atau password salah.");
       }
 
       if (status === 422) {
@@ -70,14 +70,14 @@ export const postLogin = async (data: LoginRequest): Promise<LoginResponse> => {
       }
 
       if (status === 429) {
-        throw new Error(errorData.message || "Terlalu banyak percobaan login. Silakan coba lagi nanti.");
+        throw new Error("Terlalu banyak percobaan login. Silakan coba lagi nanti.");
       }
 
       if (status === 500) {
-        throw new Error(errorData.message || "Kesalahan server saat login. Silakan coba lagi nanti.");
+        throw new Error("Login belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
       }
 
-      throw new Error(errorData.message || "Login gagal. Silakan coba lagi.");
+      throw new Error("Login belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
     }
 
     if (error instanceof Error) {

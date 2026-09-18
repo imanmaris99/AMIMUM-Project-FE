@@ -13,7 +13,7 @@ export const fetchCategories = async (): Promise<CategoryProps[]> => {
         
         // Validate response structure
         if (!response || !response.data || !Array.isArray(response.data)) {
-            throw new Error('Invalid response format: data is not an array');
+            throw new Error('Data kategori belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
         }
         
         // Return the categories array from response.data
@@ -46,14 +46,12 @@ export async function fetchCategoriesServer(): Promise<CategoryProps[]> {
     // Handle different status codes according to API documentation
     if (res.status === 500) {
       // Internal Server Error
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'Kesalahan tak terduga saat mengambil daftar kategori.';
-      throw new Error(errorMessage);
+      throw new Error('Data kategori belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     if (!res.ok) {
       // Other errors
-      throw new Error(`Gagal mengambil data kategori: ${res.status}`);
+      throw new Error('Data kategori belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     // Parse response
@@ -61,7 +59,7 @@ export async function fetchCategoriesServer(): Promise<CategoryProps[]> {
     
     // Validate response structure
     if (!data || !data.data || !Array.isArray(data.data)) {
-      throw new Error('Invalid response format: data is not an array');
+      throw new Error('Format data kategori belum sesuai. Silakan coba lagi nanti.');
     }
 
     // Return the categories array from response.data
@@ -71,6 +69,6 @@ export async function fetchCategoriesServer(): Promise<CategoryProps[]> {
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error('Unknown error occurred while fetching categories');
+    throw new Error('Data kategori belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
   }
 }

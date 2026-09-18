@@ -16,7 +16,7 @@ export const fetchCategories = async (): Promise<CategoryProps[]> => {
     const response: CategoriesResponseType = await axiosClient.get(API_ENDPOINTS.CATEGORIES_ALL);
     
     if (!response || !response.data || !Array.isArray(response.data)) {
-      throw new Error('Invalid response format: data is not an array');
+      throw new Error('Data kategori belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
     
     return response.data;
@@ -57,7 +57,7 @@ export const fetchArticles = async (): Promise<ArticleProps[]> => {
     const response: ArticlesResponseType = await axiosClient.get(API_ENDPOINTS.ARTICLES_ALL);
     
     if (!response || !response.data || !Array.isArray(response.data)) {
-      throw new Error('Invalid response format: data is not an array');
+      throw new Error('Data artikel belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
     
     return response.data;

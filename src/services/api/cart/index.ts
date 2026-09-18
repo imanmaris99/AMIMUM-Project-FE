@@ -111,9 +111,7 @@ const extractCartError = (
       );
     }
 
-    throw new Error(
-      (errorData as CartErrorResponse).message || fallbackMessage
-    );
+    throw new Error(fallbackMessage);
   }
 
   if (error instanceof Error) {
@@ -156,7 +154,7 @@ export const getMyCartProducts = async (): Promise<CartListResponse> => {
         };
       }
 
-      throw new Error(errorData.message || "Gagal mengambil keranjang.");
+      throw new Error("Keranjang belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
     }
 
     if (error instanceof Error) {
@@ -198,9 +196,7 @@ export const getCartTotalItems = async (): Promise<CartTotalItemsResponse> => {
         };
       }
 
-      throw new Error(
-        errorData.message || "Gagal mengambil total item keranjang."
-      );
+      throw new Error("Jumlah keranjang belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
     }
 
     if (error instanceof Error) {

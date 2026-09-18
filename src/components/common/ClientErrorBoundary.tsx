@@ -37,21 +37,21 @@ export class ClientErrorBoundary extends React.Component<ErrorBoundaryProps, Err
 }
 
 // Default error fallback component
-function DefaultErrorFallback({ error }: { error: Error }) {
-  const errorMessage = error?.message || 'An unexpected error occurred';
+function DefaultErrorFallback() {
+  const errorMessage = 'Halaman belum bisa ditampilkan. Silakan muat ulang halaman atau coba lagi beberapa saat lagi.';
   
   return React.createElement(
     'div',
-    { className: 'min-h-screen flex items-center justify-center bg-gray-50' },
+    { className: 'min-h-screen flex items-center justify-center bg-gray-50 px-4' },
     React.createElement(
       'div',
-      { className: 'text-center' },
-      React.createElement('h1', { className: 'text-2xl font-bold text-gray-900 mb-4' }, 'Oops! Something went wrong'),
+      { className: 'max-w-sm text-center' },
+      React.createElement('h1', { className: 'text-2xl font-bold text-gray-900 mb-4' }, 'Halaman belum bisa ditampilkan'),
       React.createElement('p', { className: 'text-gray-600 mb-4' }, errorMessage),
       React.createElement('button', {
         onClick: () => window.location.reload(),
         className: 'bg-primary text-white px-4 py-2 rounded hover:bg-primary/90'
-      }, 'Reload Page')
+      }, 'Muat Ulang')
     )
   );
 }

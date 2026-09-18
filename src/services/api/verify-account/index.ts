@@ -1,6 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
-import { toast } from "react-hot-toast";
 import { API_ENDPOINTS } from "@/lib/apiConfig";
 
 export interface VerifyAccountRequest {
@@ -23,6 +22,7 @@ export interface VerifyAccountResponse {
 }
 
 export interface VerifyAccountErrorResponse {
+  message?: string;
   detail?: Array<{
     loc: (string | number)[];
     msg: string;
@@ -41,7 +41,7 @@ export const postVerifyAccount = async (
     );
 
     if (response.data.status_code === 200 || response.data.status_code === 0) {
-      toast.success(response.data.message || "Verifikasi berhasil! Akun Anda telah terverifikasi dan dapat digunakan untuk login!");
+      const successMessage = response.data.message || "Verifikasi berhasil! Akun Anda telah terverifikasi dan dapat digunakan untuk login!";
       
       setTimeout(() => {
         if (onConfirm) {
@@ -49,7 +49,7 @@ export const postVerifyAccount = async (
         }
       }, 2000);
 
-      return response.data;
+      return { ...response.data, message: successMessage };
     }
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response) {
@@ -59,15 +59,14 @@ export const postVerifyAccount = async (
       if (status === 422) {
         const validationErrors = errorData.detail || [];
         const errorMessages = validationErrors.map((err) => err.msg).join(", ");
-        toast.error(errorMessages || "Kesalahan validasi. Silakan periksa kode verifikasi dan email yang Anda masukkan.");
+        throw new Error(errorMessages || "Kesalahan validasi. Silakan periksa kode verifikasi dan email yang Anda masukkan.");
       } else {
-        const errorMessage = error.response.data?.message || "Verifikasi gagal! Terjadi kesalahan. Silakan coba lagi.";
-        toast.error(errorMessage);
+        throw new Error("Verifikasi akun belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
       }
     } else if (error instanceof Error) {
-      toast.error(error.message || "Terjadi kesalahan yang tidak terduga. Silakan coba lagi.");
+      throw error;
     } else {
-      toast.error("Terjadi kesalahan yang tidak terduga. Silakan coba lagi.");
+      throw new Error("Verifikasi akun belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
     }
   }
 };

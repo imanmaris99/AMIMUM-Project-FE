@@ -21,9 +21,8 @@ export const GetAllBrand = async (): Promise<ProductionProps[]> => {
     try {
         const response: BrandsResponseType = await axiosClient.get(API_ENDPOINTS.BRAND_ALL);
         
-        // Validate response structure
         if (!response || !response.data || !Array.isArray(response.data)) {
-            throw new Error('Invalid response format: data is not an array');
+            throw new Error('Data brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
         }
         
         // Return the brands/productions array from response.data
@@ -111,21 +110,17 @@ export async function GetAllPromoServer(): Promise<PromoProps[]> {
 
     if (res.status === 409) {
       // Conflict error
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'Konflik terjadi saat mencoba mengambil data promosi.';
-      throw new Error(errorMessage);
+      throw new Error('Data promo belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     if (res.status === 500) {
       // Internal Server Error
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'Kesalahan tak terduga saat mengambil data promosi.';
-      throw new Error(errorMessage);
+      throw new Error('Data promo belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     if (!res.ok) {
       // Other errors
-      throw new Error(`Gagal mengambil data promo: ${res.status}`);
+      throw new Error('Data promo belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     // Parse response
@@ -133,7 +128,7 @@ export async function GetAllPromoServer(): Promise<PromoProps[]> {
     
     // Validate response structure
     if (!data || !data.data || !Array.isArray(data.data)) {
-      throw new Error('Invalid response format: data is not an array');
+      throw new Error('Format data promo belum sesuai. Silakan coba lagi nanti.');
     }
 
     // Return the promos array from response.data
@@ -143,7 +138,7 @@ export async function GetAllPromoServer(): Promise<PromoProps[]> {
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error('Unknown error occurred while fetching promos');
+    throw new Error('Data promo belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
   }
 }
 
@@ -174,15 +169,11 @@ export async function GetAllBrandServer(): Promise<ProductionProps[]> {
       });
 
       if (res.status === 409) {
-        const errorData = await res.json().catch(() => ({}));
-        const errorMessage = errorData.message || 'Konflik terjadi saat mencoba mengambil data perusahaan produksi.';
-        throw new Error(errorMessage);
+        throw new Error('Data brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
       }
 
       if (res.status === 500) {
-        const errorData = await res.json().catch(() => ({}));
-        const errorMessage = errorData.message || 'Kesalahan tak terduga saat mengambil data perusahaan produksi.';
-        throw new Error(errorMessage);
+        throw new Error('Data brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
       }
 
       if (!res.ok) {
@@ -205,7 +196,7 @@ export async function GetAllBrandServer(): Promise<ProductionProps[]> {
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error('Unknown error occurred while fetching brands');
+    throw new Error('Data brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
   }
 }
 
@@ -235,30 +226,22 @@ export async function GetBrandDetailByIDServer(productionId: number): Promise<Br
     // Handle different status codes according to API documentation
     if (res.status === 404) {
       // Not Found
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'Production with the specified ID was not found.';
-      throw new Error(errorMessage);
+      throw new Error('Detail brand tidak ditemukan di katalog toko.');
     }
 
     if (res.status === 409) {
       // Conflict error
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'A conflict occurred while retrieving production details.';
-      throw new Error(errorMessage);
+      throw new Error('Detail brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     if (res.status === 422) {
       // Validation Error
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.detail?.[0]?.msg || 'Validation error occurred.';
-      throw new Error(errorMessage);
+      throw new Error('Data detail brand belum valid. Silakan coba lagi.');
     }
 
     if (res.status === 500) {
       // Internal Server Error
-      const errorData = await res.json().catch(() => ({}));
-      const errorMessage = errorData.message || 'An unexpected error occurred while retrieving production details.';
-      throw new Error(errorMessage);
+      throw new Error('Detail brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
     }
 
     if (!res.ok) {

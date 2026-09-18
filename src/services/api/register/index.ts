@@ -51,7 +51,7 @@ export const postRegister = async (data: RegisterRequest): Promise<RegisterRespo
       const errorData = error.response.data as RegisterErrorResponse;
 
       if (status === 400) {
-        throw new Error(errorData.message || "Email atau nomor telepon sudah terdaftar.");
+        throw new Error("Email atau nomor telepon sudah terdaftar.");
       }
 
       if (status === 422) {
@@ -61,10 +61,10 @@ export const postRegister = async (data: RegisterRequest): Promise<RegisterRespo
       }
 
       if (status === 500) {
-        throw new Error(errorData.message || "Kesalahan server saat membuat user. Silakan coba lagi nanti.");
+        throw new Error("Registrasi belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
       }
 
-      throw new Error(errorData.message || "Gagal mendaftar. Silakan coba lagi.");
+      throw new Error("Registrasi belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
     }
 
     if (error instanceof Error) {
