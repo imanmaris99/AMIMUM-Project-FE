@@ -77,6 +77,6 @@ export const postResendVerification = async (data: ResendVerificationRequest): P
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui. Silakan coba lagi.");
+    throw new Error("Verifikasi email belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };

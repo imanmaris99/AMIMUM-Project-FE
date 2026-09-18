@@ -119,6 +119,6 @@ export const postForgotPassword = async (data: ForgotPasswordRequest): Promise<F
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui. Silakan coba lagi.");
+    throw new Error("Reset password belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };

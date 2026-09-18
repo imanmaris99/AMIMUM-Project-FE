@@ -97,7 +97,7 @@ export const getUserProfile = async (): Promise<UserProfileResponse> => {
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error("Profil belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };
 
@@ -170,7 +170,7 @@ export const updateUserProfile = async (
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error("Profil belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };
 
@@ -261,6 +261,6 @@ export const updateUserPhoto = async (
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error("Profil belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };

@@ -81,6 +81,6 @@ export const postResetPassword = async (data: ResetPasswordRequest): Promise<Res
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui. Silakan coba lagi.");
+    throw new Error("Reset password belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };

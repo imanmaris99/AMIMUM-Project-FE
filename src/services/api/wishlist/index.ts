@@ -85,7 +85,7 @@ export const getMyWishlistProducts = async (): Promise<WishlistListResponse> => 
       if (status === 403) {
         throw new Error(
           errorData.message ||
-            "You do not have permission to view this wishlist."
+            "Silakan login kembali untuk mengelola wishlist."
         );
       }
 
@@ -101,7 +101,7 @@ export const getMyWishlistProducts = async (): Promise<WishlistListResponse> => 
       if (status === 500) {
         throw new Error(
           errorData.message ||
-            "An unexpected error occurred while retrieving the wishlist."
+            "Wishlist belum bisa dimuat. Silakan coba lagi beberapa saat lagi."
         );
       }
 
@@ -112,7 +112,7 @@ export const getMyWishlistProducts = async (): Promise<WishlistListResponse> => 
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error("Wishlist belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };
 
@@ -149,7 +149,7 @@ export const getWishlistTotalItems = async (): Promise<WishlistTotalResponse> =>
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error("Wishlist belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };
 
@@ -179,21 +179,21 @@ export const addWishlistProduct = async (
       if (status === 403) {
         throw new Error(
           (errorData as WishlistErrorResponse).message ||
-            "User is not authorized to add to the wishlist."
+            "Silakan login kembali untuk menambahkan wishlist."
         );
       }
 
       if (status === 404) {
         throw new Error(
           (errorData as WishlistErrorResponse).message ||
-            "The specified product was not found."
+            "Produk tidak ditemukan di katalog."
         );
       }
 
       if (status === 409) {
         throw new Error(
           (errorData as WishlistErrorResponse).message ||
-            "Product is already in the wishlist."
+            "Produk sudah ada di wishlist."
         );
       }
 
@@ -204,7 +204,7 @@ export const addWishlistProduct = async (
       if (status === 500) {
         throw new Error(
           (errorData as WishlistErrorResponse).message ||
-            "An unexpected error occurred while adding to the wishlist."
+            "Wishlist belum bisa ditambahkan. Silakan coba lagi beberapa saat lagi."
         );
       }
 
@@ -218,7 +218,7 @@ export const addWishlistProduct = async (
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error("Wishlist belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };
 
@@ -250,14 +250,14 @@ export const deleteWishlistProduct = async (
       if (status === 403) {
         throw new Error(
           (errorData as WishlistErrorResponse).message ||
-            "You do not have permission to delete this wishlist item."
+            "Silakan login kembali untuk menghapus wishlist."
         );
       }
 
       if (status === 404) {
         throw new Error(
           (errorData as WishlistErrorResponse).message ||
-            "Wishlist item with the specified ID does not exist."
+            "Item wishlist tidak ditemukan."
         );
       }
 
@@ -268,7 +268,7 @@ export const deleteWishlistProduct = async (
       if (status === 500) {
         throw new Error(
           (errorData as WishlistErrorResponse).message ||
-            "An unexpected error occurred while deleting the wishlist item."
+            "Wishlist belum bisa dihapus. Silakan coba lagi beberapa saat lagi."
         );
       }
 
@@ -282,6 +282,6 @@ export const deleteWishlistProduct = async (
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error("Wishlist belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };

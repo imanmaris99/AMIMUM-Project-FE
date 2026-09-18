@@ -120,7 +120,7 @@ const extractCartError = (
     throw error;
   }
 
-  throw new Error("Terjadi kesalahan yang tidak diketahui.");
+  throw new Error("Keranjang belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
 };
 
 export const getMyCartProducts = async (): Promise<CartListResponse> => {
@@ -163,7 +163,7 @@ export const getMyCartProducts = async (): Promise<CartListResponse> => {
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error("Keranjang belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };
 
@@ -207,7 +207,7 @@ export const getCartTotalItems = async (): Promise<CartTotalItemsResponse> => {
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error("Keranjang belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };
 

@@ -334,7 +334,7 @@ export const checkoutOrder = async (
       );
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error("Pesanan belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };
 
@@ -372,7 +372,7 @@ export const getMyOrders = async (): Promise<OrdersListResponse> => {
       );
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error("Pesanan belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };
 
@@ -408,6 +408,6 @@ export const getOrderDetail = async (
       );
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui.");
+    throw new Error("Pesanan belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };

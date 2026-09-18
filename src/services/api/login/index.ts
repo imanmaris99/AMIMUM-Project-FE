@@ -84,6 +84,6 @@ export const postLogin = async (data: LoginRequest): Promise<LoginResponse> => {
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui. Silakan coba lagi.");
+    throw new Error("Login belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };

@@ -76,7 +76,7 @@ export const handleGoogleLogin = async (): Promise<GoogleAuthResult> => {
       if (error.message.includes("auth/") || error.name === "FirebaseError") {
         return {
           success: false,
-          message: `Error autentikasi: ${error.message}`,
+          message: "Login Google belum bisa diproses. Silakan coba lagi beberapa saat lagi.",
         };
       }
 
@@ -88,7 +88,7 @@ export const handleGoogleLogin = async (): Promise<GoogleAuthResult> => {
 
     return {
       success: false,
-      message: "Terjadi kesalahan yang tidak diketahui. Silakan coba lagi.",
+      message: "Login Google belum bisa diproses. Silakan coba lagi beberapa saat lagi.",
     };
   }
 };

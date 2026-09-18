@@ -71,6 +71,6 @@ export const postRegister = async (data: RegisterRequest): Promise<RegisterRespo
       throw error;
     }
 
-    throw new Error("Terjadi kesalahan yang tidak diketahui. Silakan coba lagi.");
+    throw new Error("Registrasi belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };
