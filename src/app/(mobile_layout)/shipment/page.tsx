@@ -76,6 +76,28 @@ const ShipmentSkeleton = () => (
   </div>
 );
 
+const formatShipmentAddress = (shipment: ShipmentData) => {
+  const parts = [
+    shipment.address.address,
+    shipment.address.city,
+    shipment.address.zip_code ? `Kode Pos ${shipment.address.zip_code}` : "",
+    shipment.address.state,
+    shipment.address.country,
+  ].filter(Boolean);
+
+  return parts.length > 0 ? parts.join(", ") : "Alamat tujuan belum lengkap.";
+};
+
+const formatCourierSummary = (shipment: ShipmentData) => {
+  const courierName = shipment.courier.courier_name || "Kurir belum tersedia";
+  const serviceType = shipment.courier.service_type || "Layanan belum tersedia";
+  const cost = shipment.courier.cost && shipment.courier.cost > 0
+    ? `Rp ${shipment.courier.cost.toLocaleString()}`
+    : "Ongkir belum tersedia";
+
+  return `${courierName} - ${serviceType} | ${cost}`;
+};
+
 const Shipment = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -99,12 +121,8 @@ const Shipment = () => {
       setLoading(true);
       try {
         await refreshShipments();
-      } catch (error) {
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : "Gagal mengambil data pengiriman."
-        );
+      } catch {
+        toast.error("Data pengiriman belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
         setShipments([]);
         setActiveStates([]);
       } finally {
@@ -167,12 +185,8 @@ const Shipment = () => {
         shipments.map((_, currentIndex) => currentIndex === index)
       );
       toast.success("Alamat utama pengiriman berhasil diperbarui.");
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Gagal memperbarui status pengiriman."
-      );
+    } catch {
+      toast.error("Pilihan pengiriman belum bisa diperbarui. Silakan coba lagi beberapa saat lagi.");
     } finally {
       setSavingIndex(null);
     }
@@ -183,27 +197,32 @@ const Shipment = () => {
   };
 
   const handleDelete = async (shipmentId: string) => {
-    if (confirm("Apakah Anda yakin ingin menghapus alamat pengiriman ini?")) {
-      try {
-        await deleteShipment(shipmentId);
+    const selectedShipment = shipments.find((shipment) => shipment.id === shipmentId);
 
-        const deletedIndex = shipments.findIndex((shipment) => shipment.id === shipmentId);
-        const wasActive = activeStates[deletedIndex];
+    if (!selectedShipment) {
+      toast.error("Data pengiriman ini belum tersedia. Silakan muat ulang halaman.");
+      return;
+    }
 
-        const remainingShipments = shipments.filter((shipment) => shipment.id !== shipmentId);
+    setSavingIndex(shipments.findIndex((shipment) => shipment.id === shipmentId));
 
-        if (wasActive && remainingShipments.length > 0) {
-          await activateShipment(remainingShipments[0].id, true);
-        }
+    try {
+      await deleteShipment(shipmentId);
 
-        await refreshShipments();
+      const deletedIndex = shipments.findIndex((shipment) => shipment.id === shipmentId);
+      const wasActive = activeStates[deletedIndex];
+      const remainingShipments = shipments.filter((shipment) => shipment.id !== shipmentId);
 
-        toast.success("Data pengiriman berhasil dihapus.");
-      } catch (error) {
-        toast.error(
-          error instanceof Error ? error.message : "Gagal menghapus pengiriman."
-        );
+      if (wasActive && remainingShipments.length > 0) {
+        await activateShipment(remainingShipments[0].id, true);
       }
+
+      await refreshShipments();
+      toast.success("Data pengiriman berhasil dihapus.");
+    } catch {
+      toast.error("Pengiriman belum bisa dihapus. Silakan coba lagi beberapa saat lagi.");
+    } finally {
+      setSavingIndex(null);
     }
   };
 
@@ -280,7 +299,7 @@ const Shipment = () => {
               <div className="flex flex-col justify-start gap-1 flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-nowrap min-h-[20px]">
                   <p className="text-xs font-semibold text-gray-800 flex-shrink-0">
-                    {shipment.address.city}, {shipment.address.state}
+                    {[shipment.address.city, shipment.address.state].filter(Boolean).join(", ") || "Kota tujuan belum lengkap"}
                   </p>
                   {savingIndex === index ? (
                     <span className="text-xs bg-yellow-500 text-white px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0 animate-pulse">
@@ -293,10 +312,10 @@ const Shipment = () => {
                   )}
                 </div>
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  {shipment.address.address}, {shipment.address.city}, Kode Pos {shipment.address.zip_code}, {shipment.address.state}, {shipment.address.country}
+                  {formatShipmentAddress(shipment)}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  {shipment.courier.courier_name} - {shipment.courier.service_type} | Rp {shipment.courier.cost?.toLocaleString() || '0'}
+                  {formatCourierSummary(shipment)}
                 </p>
               </div>
 

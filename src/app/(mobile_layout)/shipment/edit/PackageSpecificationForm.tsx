@@ -254,7 +254,7 @@ const ShippingCostDetails = ({
                   </div>
                   <div className="text-right">
                     <p className="text-base font-bold text-primary">
-                      Rp {(courier.cost || 0).toLocaleString()}
+                      {courier.cost && courier.cost > 0 ? `Rp ${courier.cost.toLocaleString()}` : "Ongkir belum tersedia"}
                     </p>
                     {isSelected && (
                       <span className="mt-1 inline-block text-xs font-semibold text-primary">
@@ -273,7 +273,7 @@ const ShippingCostDetails = ({
         <div className="rounded-lg bg-primary/5 px-3 py-3">
           <p className="text-sm font-semibold text-primary">Ongkir dipilih</p>
           <p className="mt-1 text-sm text-gray-700">
-            {serviceType} • Rp {cost.toLocaleString()} • Estimasi {estimatedDelivery || "-"}
+            {serviceType} • {cost > 0 ? `Rp ${cost.toLocaleString()}` : "Ongkir belum tersedia"} • Estimasi {estimatedDelivery || "Belum tersedia"}
           </p>
         </div>
       )}
@@ -459,8 +459,6 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
       const courierQueue = [selectedCourier, ...fallbackCouriers];
       let response: Awaited<ReturnType<typeof getRajaOngkirShippingCost>> | null = null;
       let successfulCourier = selectedCourier;
-      let lastError: unknown = null;
-
       for (const courier of courierQueue) {
         try {
           const nextResponse = await getRajaOngkirShippingCost({
@@ -475,21 +473,16 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
             successfulCourier = courier;
             break;
           }
-        } catch (error) {
-          lastError = error;
+        } catch {
+          // Try next supported courier. Customer sees one safe message if all fail.
         }
       }
 
       if (!response) {
-        const message =
-          lastError instanceof Error
-            ? lastError.message
-            : "Tidak ada layanan pengiriman yang tersedia untuk rute ini.";
-
         setShippingNotice(
           "Belum ada layanan ongkir untuk kombinasi alamat dan kurir yang dipilih. Coba cek ulang kota tujuan, berat paket, atau pilih alamat lain."
         );
-        toast.error(message);
+        toast.error("Belum ada layanan ongkir yang tersedia untuk alamat tujuan ini.");
         setFormData((prev) => ({
           ...prev,
           serviceType: "",
@@ -518,12 +511,8 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
       } else {
         toast.success("Biaya pengiriman berhasil dihitung.");
       }
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Gagal menghitung biaya pengiriman."
-      );
+    } catch {
+      toast.error("Ongkir belum bisa dihitung. Periksa alamat tujuan, berat paket, atau coba lagi beberapa saat lagi.");
     } finally {
       setIsCalculating(false);
     }

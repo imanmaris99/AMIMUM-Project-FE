@@ -53,12 +53,8 @@ const EditShipment = () => {
             .filter(Boolean)
             .join(", "),
         });
-      } catch (error) {
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : "Gagal mengambil alamat toko."
-        );
+      } catch {
+        toast.error("Alamat toko belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
         setStoreAddress(null);
       } finally {
         setIsStoreAddressLoading(false);
@@ -79,7 +75,7 @@ const EditShipment = () => {
         const existingShipment = response.data.find((shipment) => shipment.id === shipmentId);
 
         if (!existingShipment) {
-          toast.error("Data shipment tidak ditemukan.");
+          toast.error("Data pengiriman ini belum tersedia. Silakan kembali dan pilih alamat lain.");
           return;
         }
 
@@ -104,12 +100,8 @@ const EditShipment = () => {
           cost: existingShipment.my_courier.cost || 0,
           estimatedDelivery: existingShipment.my_courier.estimated_delivery || "",
         });
-      } catch (error) {
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : "Gagal mengambil detail shipment."
-        );
+      } catch {
+        toast.error("Detail pengiriman belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
       }
     };
 
@@ -123,7 +115,7 @@ const EditShipment = () => {
 
   const handlePackageSubmit = async (data: PackageFormData) => {
     setPackageData(data);
-    toast.error("Endpoint update shipment belum tersedia, jadi data belum dapat disimpan.");
+    toast.error("Fitur ubah pengiriman belum tersedia. Hapus data pengiriman lama lalu buat pengiriman baru jika perlu mengganti alamat atau ongkir.");
   };
 
   const handlePreviousStep = () => {

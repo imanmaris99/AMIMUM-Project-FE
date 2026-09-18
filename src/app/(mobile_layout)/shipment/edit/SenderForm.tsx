@@ -48,12 +48,8 @@ const SenderForm: React.FC<SenderFormProps> = ({ onSubmit, initialData }) => {
           postalCode: ownerAddress.zip_code?.toString() || "",
           fullAddress: ownerAddress.address || "",
         });
-      } catch (error) {
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : "Gagal mengambil alamat pemilik toko."
-        );
+      } catch {
+        toast.error("Alamat toko belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
       } finally {
         setIsFetching(false);
       }
@@ -130,9 +126,6 @@ const SenderForm: React.FC<SenderFormProps> = ({ onSubmit, initialData }) => {
     }
 
     setIsLoading(true);
-    
-    // Simulasi delay API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
     
     onSubmit(formData);
     setIsLoading(false);

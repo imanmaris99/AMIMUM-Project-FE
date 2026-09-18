@@ -65,12 +65,8 @@ const CreateShipment = () => {
             .filter(Boolean)
             .join(", "),
         });
-      } catch (error) {
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : "Gagal mengambil alamat toko."
-        );
+      } catch {
+        toast.error("Alamat toko belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
         setStoreAddress(null);
       } finally {
         setIsStoreAddressLoading(false);
@@ -123,12 +119,8 @@ const CreateShipment = () => {
 
       toast.success("Alamat tujuan dan ongkir berhasil disimpan.");
       router.push(returnTo === "/shipment" ? "/shipment?created=true" : returnTo);
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Gagal membuat alamat pengiriman. Silakan coba lagi."
-      );
+    } catch {
+      toast.error("Alamat tujuan dan ongkir belum bisa disimpan. Periksa data lalu coba lagi.");
     } finally {
       setIsLoading(false);
     }

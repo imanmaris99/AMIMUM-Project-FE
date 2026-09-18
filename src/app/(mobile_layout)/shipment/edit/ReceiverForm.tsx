@@ -51,12 +51,8 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
             fullAddress: firstAddress.address || "",
           });
         }
-      } catch (error) {
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : "Gagal mengambil alamat penerima."
-        );
+      } catch {
+        toast.error("Alamat penerima belum bisa dimuat. Isi alamat tujuan secara manual atau coba lagi beberapa saat lagi.");
       } finally {
         setIsFetching(false);
       }
@@ -133,9 +129,6 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
     }
 
     setIsLoading(true);
-    
-    // Simulasi delay API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
     
     onSubmit(formData);
     setIsLoading(false);
