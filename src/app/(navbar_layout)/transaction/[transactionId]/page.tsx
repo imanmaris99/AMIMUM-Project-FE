@@ -127,6 +127,7 @@ const TransactionDetailPage: React.FC = () => {
     const invoiceLines = [
       "TOKO HERBAL AMIMUM",
       "Bukti Transaksi Customer",
+      "Shopee         : https://shopee.co.id/tokoherbalamimum",
       "========================================",
       `Invoice ID     : ${transaction.transactionId}`,
       `Tanggal        : ${transaction.date}`,
