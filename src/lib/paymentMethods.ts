@@ -21,8 +21,8 @@ const DELIVERY_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
     methods: [
       {
         id: "qris",
-        name: "Bayar Online via Midtrans",
-        description: "Pilih VA, QRIS, GoPay, atau kartu di halaman Midtrans",
+        name: "Bayar Online via Midtrans Sandbox",
+        description: "Mode uji coba sandbox: pilih VA, QRIS, GoPay, atau kartu di halaman Midtrans sandbox",
         badge: "MT",
         isAvailable: true,
       },
@@ -70,8 +70,8 @@ const PICKUP_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
     methods: [
       {
         id: "qris",
-        name: "Bayar Online via Midtrans",
-        description: "Pilih VA, QRIS, GoPay, atau kartu di halaman Midtrans",
+        name: "Bayar Online via Midtrans Sandbox",
+        description: "Mode uji coba sandbox: pilih VA, QRIS, GoPay, atau kartu di halaman Midtrans sandbox",
         badge: "MT",
         isAvailable: true,
       },

@@ -879,7 +879,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     }
 
     return requiresPendingPayment(selectedPaymentMethod)
-      ? 'Siap membuat pesanan. Setelah itu Anda akan diarahkan ke Midtrans.'
+      ? 'Siap membuat pesanan. Setelah itu Anda akan diarahkan ke Midtrans sandbox untuk uji coba pembayaran.'
       : 'Siap mengonfirmasi pesanan. Pesanan akan langsung masuk untuk diproses toko.';
   };
 
@@ -1303,7 +1303,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         <div className="px-4 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Metode Pembayaran</h2>
           <div className="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-3 py-3 text-sm text-blue-800">
-            Untuk pembayaran online, toko akan membuka halaman resmi Midtrans. Customer bisa pilih VA, QRIS, GoPay, atau kartu di sana.
+            Pembayaran online saat ini memakai mode uji coba Midtrans sandbox. Gunakan hanya untuk testing sampai akun production aktif.
           </div>
           <div className="space-y-4">
             {paymentMethodGroups.map((group: PaymentMethodGroup) => (

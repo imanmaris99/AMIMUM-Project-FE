@@ -45,7 +45,7 @@ const TransactionDetailPage: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const transactionId = params?.transactionId as string;
-  const { getTransactionById, updateTransactionStatus } = useTransaction();
+  const { getTransactionById } = useTransaction();
 
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -177,23 +177,6 @@ const TransactionDetailPage: React.FC = () => {
     toast.success("Invoice berhasil didownload!");
   };
 
-  const handleSimulatePayment = () => {
-    if (!transaction) {
-      return;
-    }
-
-    updateTransactionStatus(transaction.transactionId, "processing");
-    setTransaction((previous) =>
-      previous
-        ? {
-            ...previous,
-            status: "processing",
-          }
-        : previous
-    );
-    toast.success("Pembayaran berhasil disimulasikan.");
-  };
-
   const isLocalSimulatedTransaction = Boolean(
     transaction?.id.startsWith("trans-") || transaction?.id.startsWith("ORD-")
   );
@@ -213,7 +196,7 @@ const TransactionDetailPage: React.FC = () => {
     }
 
     if (isLocalSimulatedTransaction) {
-      handleSimulatePayment();
+      toast.error("Data transaksi lokal lama tidak bisa dibayar ulang. Gunakan transaksi backend dan Midtrans sandbox untuk testing pembayaran.");
       return;
     }
 
@@ -609,13 +592,9 @@ const TransactionDetailPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <div className="space-y-3">
               {isLocalSimulatedTransaction && isPendingPayment && (
-                <button
-                  onClick={handlePayNow}
-                  disabled={isPaymentActionLoading}
-                  className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  Simulasikan Pembayaran Berhasil
-                </button>
+                <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-800">
+                  Data transaksi lokal lama tidak bisa disimulasikan sebagai pembayaran berhasil. Gunakan transaksi backend dan Midtrans sandbox untuk testing pembayaran.
+                </div>
               )}
               {shouldShowPaymentActions && (
                 <>
