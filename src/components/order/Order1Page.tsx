@@ -770,7 +770,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       }, 500);
       
     } catch (error) {
-      const rawMessage = error instanceof Error ? error.message : 'Unknown error';
+      const rawMessage = error instanceof Error ? error.message : 'Kesalahan tidak dikenal';
       const isActiveCartError = rawMessage.includes('Active cart items') || rawMessage.includes('Keranjang aktif tidak ditemukan');
       const customerMessage = isActiveCartError
         ? 'Keranjang aktif tidak ditemukan. Jika pesanan baru saja dibuat, saya coba arahkan ke pembayaran atau detail transaksi.'

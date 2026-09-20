@@ -180,7 +180,7 @@ class ErrorTracker {
 
   captureError(errorData: Partial<ErrorReport>) {
     const report: ErrorReport = {
-      message: errorData.message || 'Unknown error',
+      message: errorData.message || 'Kesalahan tidak dikenal',
       stack: errorData.stack,
       url: errorData.url || window.location.href,
       lineNumber: errorData.lineNumber,

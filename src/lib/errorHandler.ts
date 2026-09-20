@@ -149,7 +149,7 @@ export class ErrorHandler {
     retryFunction?: () => Promise<unknown>
   ): Promise<void> {
     const errorType = classifyError(error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = error instanceof Error ? error.message : 'Kesalahan tidak dikenal';
     const errorCode = (error as { code?: string | number; status?: number })?.code || 
                      (error as { status?: number })?.status;
     const errorDetails = (error as { details?: unknown })?.details || error;
