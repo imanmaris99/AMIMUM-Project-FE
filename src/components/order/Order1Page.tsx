@@ -685,7 +685,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             zip_code: Number(selectedAddress.postal_code || 0),
           },
           courier: {
-            courier_name: selectedCourierCompany as 'jne' | 'pos' | 'tiki',
+            courier_name: selectedCourierCompany as 'jne' | 'pos' | 'tiki' | 'jnt',
             weight: selectedCourierData.weight || 1000,
             length: 1,
             width: 1,

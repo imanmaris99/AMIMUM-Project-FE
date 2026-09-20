@@ -26,7 +26,7 @@ export interface ShipmentAddressCreate {
 
 export interface Courier {
   id: number;
-  courier_name: string; // 'jne', 'pos', 'tiki'
+  courier_name: string; // 'jne', 'pos', 'tiki', 'jnt'
   weight: number;
   phone_number?: string;
   service_type?: string;
@@ -41,7 +41,7 @@ export interface Courier {
 
 // Untuk create courier
 export interface CourierCreate {
-  courier_name: 'jne' | 'pos' | 'tiki';
+  courier_name: 'jne' | 'pos' | 'tiki' | 'jnt';
   weight?: number;
   length?: number;
   width?: number;

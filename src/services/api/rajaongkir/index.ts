@@ -6,6 +6,7 @@ export const SUPPORTED_COURIERS = [
   { id: "jne", name: "JNE" },
   { id: "pos", name: "POS" },
   { id: "tiki", name: "TIKI" },
+  { id: "jnt", name: "J&T Express" },
 ] as const;
 
 export interface RajaOngkirShippingCostRequest {
