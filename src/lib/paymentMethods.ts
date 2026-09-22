@@ -14,15 +14,30 @@ export interface PaymentMethodGroup {
   methods: PaymentMethodOption[];
 }
 
+export const QRIS_MANUAL_IMAGE_PATH = "/payments/qris-toko-herbal-amimum.png";
+
 const DELIVERY_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
   {
+    id: "qris_manual",
+    title: "QRIS Resmi Toko",
+    methods: [
+      {
+        id: "qris_manual",
+        name: "QRIS Toko Herbal Amimum",
+        description: "Scan QRIS resmi toko. Bisa pakai OVO, GoPay, DANA, ShopeePay, LinkAja, mobile banking, dan aplikasi QRIS lain.",
+        badge: "QRIS",
+        isAvailable: true,
+      },
+    ],
+  },
+  {
     id: "online_payment",
-    title: "Pembayaran Online",
+    title: "Midtrans Sandbox",
     methods: [
       {
         id: "qris",
-        name: "Bayar Online via Midtrans Sandbox",
-        description: "Mode uji coba sandbox: pilih VA, QRIS, GoPay, atau kartu di halaman Midtrans sandbox",
+        name: "Midtrans Sandbox (Testing)",
+        description: "Mode uji coba: VA, QRIS, GoPay, atau kartu di halaman Midtrans sandbox",
         badge: "MT",
         isAvailable: true,
       },
@@ -65,13 +80,26 @@ const DELIVERY_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
 
 const PICKUP_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
   {
+    id: "qris_manual",
+    title: "QRIS Resmi Toko",
+    methods: [
+      {
+        id: "qris_manual",
+        name: "QRIS Toko Herbal Amimum",
+        description: "Scan QRIS resmi toko. Bisa pakai OVO, GoPay, DANA, ShopeePay, LinkAja, mobile banking, dan aplikasi QRIS lain.",
+        badge: "QRIS",
+        isAvailable: true,
+      },
+    ],
+  },
+  {
     id: "online_payment",
-    title: "Pembayaran Online",
+    title: "Midtrans Sandbox",
     methods: [
       {
         id: "qris",
-        name: "Bayar Online via Midtrans Sandbox",
-        description: "Mode uji coba sandbox: pilih VA, QRIS, GoPay, atau kartu di halaman Midtrans sandbox",
+        name: "Midtrans Sandbox (Testing)",
+        description: "Mode uji coba: VA, QRIS, GoPay, atau kartu di halaman Midtrans sandbox",
         badge: "MT",
         isAvailable: true,
       },
@@ -109,6 +137,14 @@ export const getPaymentMethodLabel = (
 
   return allMethods.find((item) => item.id === method)?.name || "Belum dipilih";
 };
+
+export const isManualQrisPaymentMethod = (
+  method?: TransactionPaymentMethod
+): boolean => method === "qris_manual";
+
+export const isMidtransSandboxPaymentMethod = (
+  method?: TransactionPaymentMethod
+): boolean => method === "qris";
 
 export const requiresPendingPayment = (
   method?: TransactionPaymentMethod

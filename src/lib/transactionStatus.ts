@@ -46,11 +46,10 @@ export const getCustomerStatusConfig = (
   status: string,
   paymentMethod?: TransactionPaymentMethod
 ): CustomerStatusConfig => {
-  void paymentMethod;
   switch (status) {
     case "pending":
       return {
-        text: "Menunggu Bayar",
+        text: paymentMethod === "qris_manual" ? "Menunggu Konfirmasi QRIS" : "Menunggu Bayar",
         bgColor: "bg-yellow-100",
         textColor: "text-yellow-700",
         borderColor: "border-yellow-200",

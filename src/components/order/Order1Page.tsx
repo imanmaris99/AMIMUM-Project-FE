@@ -22,6 +22,8 @@ import { TransactionPaymentMethod, TransactionStatus } from '@/types/transaction
 import {
   getPaymentMethodGroups,
   requiresPendingPayment,
+  isManualQrisPaymentMethod,
+  isMidtransSandboxPaymentMethod,
   PaymentMethodGroup,
 } from '@/lib/paymentMethods';
 import {
@@ -455,6 +457,12 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       return false;
     }
 
+    if (isManualQrisPaymentMethod(selectedPayment)) {
+      toast.success('Pesanan QRIS ditemukan. Saya arahkan ke detail pembayaran QRIS.');
+      router.push(`/transaction/${recentPendingOnlineOrder.id}`);
+      return true;
+    }
+
     try {
       const paymentResponse = await createPayment({
         order_id: recentPendingOnlineOrder.id,
@@ -619,11 +627,12 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     
     try {
       const selectedPayment = selectedPaymentMethod as TransactionPaymentMethod;
-      const isOnlinePayment = requiresPendingPayment(selectedPayment);
+      const isPendingPaymentMethod = requiresPendingPayment(selectedPayment);
+      const shouldOpenMidtrans = isMidtransSandboxPaymentMethod(selectedPayment);
       const freshCheckoutCart = await buildCheckoutCartItems();
 
       if (freshCheckoutCart.items.length === 0) {
-        if (isOnlinePayment && await recoverLatestPendingPayment(selectedPayment)) {
+        if (isPendingPaymentMethod && await recoverLatestPendingPayment(selectedPayment)) {
           return;
         }
 
@@ -739,7 +748,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         throw new Error('Gagal menyimpan data transaksi. Silakan cek riwayat pesanan.');
       }
 
-      if (isOnlinePayment) {
+      if (shouldOpenMidtrans) {
         try {
           const paymentResponse = await createPayment({ order_id: backendOrder.id });
           if (paymentResponse.data.redirect_url) {
@@ -760,12 +769,17 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
       await refreshCart();
       toast.success(
-        isOnlinePayment
+        isPendingPaymentMethod
           ? 'Pesanan berhasil dibuat. Menunggu pembayaran.'
           : 'Pesanan berhasil dibuat!'
       );
 
       setTimeout(() => {
+        if (isManualQrisPaymentMethod(selectedPayment)) {
+          router.push(`/transaction/${backendOrder.id}`);
+          return;
+        }
+
         router.push(`/order-confirmation?transactionId=${newTransaction.id}`);
       }, 500);
       
@@ -876,6 +890,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
     if (!selectedPaymentMethod) {
       return 'Pilih metode pembayaran terlebih dahulu.';
+    }
+
+    if (isManualQrisPaymentMethod(selectedPaymentMethod)) {
+      return 'Siap membuat pesanan QRIS. Setelah checkout, scan QRIS resmi toko dan admin akan mengonfirmasi pembayaran.';
     }
 
     return requiresPendingPayment(selectedPaymentMethod)
@@ -1303,7 +1321,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         <div className="px-4 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Metode Pembayaran</h2>
           <div className="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-3 py-3 text-sm text-blue-800">
-            Pembayaran online saat ini memakai mode uji coba Midtrans sandbox. Gunakan hanya untuk testing sampai akun production aktif.
+            Pilih QRIS resmi toko untuk pembayaran praktis via e-wallet/mobile banking, atau Midtrans Sandbox hanya untuk testing internal.
           </div>
           <div className="space-y-4">
             {paymentMethodGroups.map((group: PaymentMethodGroup) => (

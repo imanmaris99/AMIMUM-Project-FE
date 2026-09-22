@@ -7,7 +7,11 @@ import { toast } from "react-hot-toast";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 import LoginProtection from "@/components/common/LoginProtection";
 import rupiahFormater from "@/utils/rupiahFormater";
-import { getPaymentMethodLabel } from "@/lib/paymentMethods";
+import {
+  getPaymentMethodLabel,
+  isManualQrisPaymentMethod,
+  QRIS_MANUAL_IMAGE_PATH,
+} from "@/lib/paymentMethods";
 import { Transaction } from "@/types/transaction";
 import { SessionManager } from "@/lib/auth";
 import {
@@ -312,9 +316,12 @@ const TransactionDetailPage: React.FC = () => {
   const isPendingPayment = isPendingPaymentStatus(transaction.status);
   const canRetryPayment = isFailedPaymentStatus(transaction.status);
   const isOfflinePayment = isOfflinePaymentMethod(transaction.paymentMethod);
+  const isManualQrisPayment = isManualQrisPaymentMethod(transaction.paymentMethod);
   const shouldShowPaymentActions =
-    !isLocalSimulatedTransaction && !isOfflinePayment && (isPendingPayment || canRetryPayment);
-  const transactionGuidance = isPendingPayment
+    !isLocalSimulatedTransaction && !isOfflinePayment && !isManualQrisPayment && (isPendingPayment || canRetryPayment);
+  const transactionGuidance = isManualQrisPayment && isPendingPayment
+    ? "Pesanan QRIS sudah tercatat. Scan QRIS resmi toko, bayar sesuai nominal total, lalu tunggu admin mengonfirmasi pembayaran."
+    : isPendingPayment
     ? "Pesanan sudah tercatat. Selesaikan pembayaran agar pesanan bisa diproses toko."
     : canRetryPayment
       ? "Pembayaran belum berhasil. Coba bayar lagi atau hubungi admin jika butuh bantuan."
@@ -464,6 +471,39 @@ const TransactionDetailPage: React.FC = () => {
               </div>
             </div>
           </div>
+
+
+          {isManualQrisPayment && isPendingPayment && (
+            <div className="bg-white rounded-lg shadow-sm border border-emerald-200 p-4">
+              <div className="mb-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                  QRIS Resmi Toko Herbal Amimum
+                </p>
+                <h3 className="mt-1 text-lg font-semibold text-gray-900">
+                  Scan QRIS untuk Membayar
+                </h3>
+                <p className="mt-1 text-xs leading-relaxed text-gray-600">
+                  Bayar sesuai nominal total pesanan. QRIS bisa digunakan melalui OVO, GoPay, DANA, ShopeePay, LinkAja, mobile banking, dan aplikasi QRIS lain.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-gray-200 bg-white p-3">
+                <Image
+                  src={QRIS_MANUAL_IMAGE_PATH}
+                  alt="QRIS resmi Toko Herbal Amimum"
+                  width={360}
+                  height={360}
+                  className="mx-auto h-auto w-full max-w-[260px] rounded-lg"
+                  priority={false}
+                />
+              </div>
+              <div className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+                <p className="font-semibold">Total yang dibayar: {rupiahFormater(transaction.total)}</p>
+                <p className="mt-1 text-xs leading-relaxed">
+                  Setelah transfer/scan berhasil, simpan bukti pembayaran. Admin akan memverifikasi pembayaran dan mengubah status pesanan sebelum diproses.
+                </p>
+              </div>
+            </div>
+          )}
 
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">

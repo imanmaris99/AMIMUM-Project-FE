@@ -194,6 +194,8 @@ const extractPaymentMethodFromNotes = (
 
   const aliases: Record<string, TransactionPaymentMethod> = {
     qris: "qris",
+    qris_manual: "qris_manual",
+    "qris manual": "qris_manual",
     cod: "cod",
     cash: "cod",
     pay_at_store: "pay_at_store",

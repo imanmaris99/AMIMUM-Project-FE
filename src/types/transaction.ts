@@ -20,6 +20,7 @@ export type TransactionPaymentMethod =
   | 'ovo'
   | 'dana'
   | 'qris'
+  | 'qris_manual'
   | 'alfamart'
   | 'indomaret'
   | 'cod'

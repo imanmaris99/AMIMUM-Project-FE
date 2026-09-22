@@ -6,7 +6,7 @@ import { GoCheckCircle, GoHome, GoPackage, GoCreditCard, GoLocation } from 'reac
 import { IoCheckmarkCircle } from 'react-icons/io5';
 import { useTransaction } from '@/contexts/TransactionContext';
 import { Transaction } from '@/types/transaction';
-import { getPaymentMethodLabel } from '@/lib/paymentMethods';
+import { getPaymentMethodLabel, isManualQrisPaymentMethod } from '@/lib/paymentMethods';
 import {
   getCustomerOrderAlert,
   getCustomerStatusConfig,
@@ -117,6 +117,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
   );
   const isPendingPayment = isPendingPaymentStatus(latestTransaction?.status);
   const isFailedPayment = isFailedPaymentStatus(latestTransaction?.status);
+  const isManualQrisPayment = isManualQrisPaymentMethod(latestTransaction?.paymentMethod);
   const orderAlert = latestTransaction
     ? getCustomerOrderAlert(
         latestTransaction.status,
@@ -314,7 +315,9 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                 </p>
                 <p className="text-sm text-gray-600">
                   {isPendingPayment
-                    ? `Silakan selesaikan pembayaran ${getPaymentMethodLabel(latestTransaction?.paymentMethod).toLowerCase()} untuk melanjutkan pesanan.`
+                    ? isManualQrisPayment
+                      ? 'Scan QRIS resmi Toko Herbal Amimum di detail transaksi, bayar sesuai nominal, lalu tunggu konfirmasi admin.'
+                      : `Silakan selesaikan pembayaran ${getPaymentMethodLabel(latestTransaction?.paymentMethod).toLowerCase()} untuk melanjutkan pesanan.`
                     : isFailedPayment
                       ? 'Silakan cek riwayat transaksi untuk mencoba pembayaran ulang jika tersedia.'
                       : 'Pesanan sudah tercatat dan bisa dipantau dari halaman transaksi.'}
@@ -330,7 +333,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                 <div>
                   <p className="font-medium text-gray-900">Setelah Pembayaran Berhasil</p>
                   <p className="text-sm text-gray-600">
-                    Setelah pembayaran berhasil, status pesanan akan diperbarui dari server dan bisa dipantau dari halaman transaksi.
+                    Setelah pembayaran berhasil, status pesanan akan diperbarui oleh sistem/admin dan bisa dipantau dari halaman transaksi.
                   </p>
                 </div>
               </div>
@@ -375,7 +378,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
               onClick={handleContinuePayment}
               className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-[#005A3C] transition-colors"
             >
-              Lanjutkan Pembayaran
+              {isManualQrisPayment ? 'Lihat QRIS Pembayaran' : 'Lanjutkan Pembayaran'}
             </button>
           )}
           <button
