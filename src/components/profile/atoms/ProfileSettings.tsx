@@ -52,15 +52,15 @@ const ProfileSettings: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-2xl mx-4 mt-4 p-6">
+    <div className="mx-4 mt-4 rounded-2xl bg-white p-4 sm:p-6">
       {/* Settings List */}
-      <div className="space-y-4">
+      <div className="space-y-2">
         {/* Location */}
         <div 
-          className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 rounded-lg px-2 -mx-2 transition-colors"
+          className="-mx-2 flex cursor-pointer items-center justify-between rounded-lg px-2 py-3 transition-colors hover:bg-gray-50"
           onClick={handleLocationClick}
         >
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-3">
             <Image
               src="/location.svg"
               alt="Location"
@@ -68,11 +68,11 @@ const ProfileSettings: React.FC = () => {
               height={20}
               className="text-[#007A4F]"
             />
-            <div>
-              <span className="text-sm font-medium text-[#0D0E09]">
+            <div className="min-w-0">
+              <span className="block text-sm font-medium text-[#0D0E09]">
                 Alamat Pengiriman Tersimpan
               </span>
-              <p className="text-xs text-[#A2A2A2]">
+              <p className="text-xs leading-snug text-[#A2A2A2]">
                 Kelola alamat tujuan valid untuk ongkir checkout
               </p>
             </div>
@@ -82,16 +82,16 @@ const ProfileSettings: React.FC = () => {
             alt="Arrow"
             width={24}
             height={24}
-            className="text-[#292D32]"
+            className="shrink-0 text-[#292D32]"
           />
         </div>
 
         {/* Admin Contact */}
         <div 
-          className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 rounded-lg px-2 -mx-2 transition-colors"
+          className="-mx-2 flex cursor-pointer items-center justify-between rounded-lg px-2 py-3 transition-colors hover:bg-gray-50"
           onClick={handleAdminClick}
         >
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-3">
             <Image
               src="/call-calling.svg"
               alt="Call"
@@ -99,11 +99,11 @@ const ProfileSettings: React.FC = () => {
               height={20}
               className="text-[#007A4F]"
             />
-            <div>
-              <span className="text-sm font-medium text-[#0D0E09]">
+            <div className="min-w-0">
+              <span className="block text-sm font-medium text-[#0D0E09]">
                 Kontak Admin
               </span>
-              <p className="text-xs text-[#A2A2A2]">
+              <p className="text-xs leading-snug text-[#A2A2A2]">
                 Kanal resmi toko, tanpa nomor dummy
               </p>
             </div>
@@ -113,16 +113,16 @@ const ProfileSettings: React.FC = () => {
             alt="Arrow"
             width={24}
             height={24}
-            className="text-[#292D32]"
+            className="shrink-0 text-[#292D32]"
           />
         </div>
 
         {/* Logout */}
         <div 
-          className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 rounded-lg px-2 -mx-2 transition-colors"
+          className="-mx-2 flex cursor-pointer items-center justify-between rounded-lg px-2 py-3 transition-colors hover:bg-gray-50"
           onClick={handleLogoutClick}
         >
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-3">
             <Image
               src="/logout.svg"
               alt="Logout"
@@ -130,11 +130,11 @@ const ProfileSettings: React.FC = () => {
               height={20}
               className="text-[#007A4F]"
             />
-            <div>
-              <span className="text-sm font-medium text-[#0D0E09]">
+            <div className="min-w-0">
+              <span className="block text-sm font-medium text-[#0D0E09]">
                 Keluar Akun
               </span>
-              <p className="text-xs text-[#A2A2A2]">
+              <p className="text-xs leading-snug text-[#A2A2A2]">
                 Menghapus sesi login dari perangkat ini
               </p>
             </div>
@@ -144,7 +144,7 @@ const ProfileSettings: React.FC = () => {
             alt="Arrow"
             width={24}
             height={24}
-            className="text-[#292D32]"
+            className="shrink-0 text-[#292D32]"
           />
         </div>
       </div>

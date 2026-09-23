@@ -111,7 +111,7 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
 
       {/* Sticky Cart Section - Only show when variant is selected */}
       {selectedVariant && detailProduct && (
-        <div className="fixed bottom-14 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-30" style={{ maxWidth: '440px', margin: '0 auto' }}>
+        <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] left-0 right-0 z-30 border-t border-gray-200 bg-white shadow-lg" style={{ maxWidth: '440px', margin: '0 auto' }}>
           <div className="px-4 py-3">
             <ProductPrice 
               isLoading={false} 

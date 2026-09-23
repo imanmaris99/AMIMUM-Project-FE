@@ -76,7 +76,7 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
   };
 
   return (
-    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-white border-t border-gray-200 z-50" style={{ maxWidth: '440px', width: '100%' }}>
+    <div className="fixed bottom-0 left-1/2 z-50 -translate-x-1/2 border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom)]" style={{ maxWidth: '440px', width: '100%' }}>
       <div className="px-4 py-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center space-x-2">

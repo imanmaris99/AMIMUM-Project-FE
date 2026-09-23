@@ -8,7 +8,7 @@ export default function NavbarLayout({
 }>) {
   return (
     <>
-      <main>
+      <main className="min-h-screen pb-[calc(5rem+env(safe-area-inset-bottom))]">
         <Suspense>{children}</Suspense>
       </main>
       <Navbar />

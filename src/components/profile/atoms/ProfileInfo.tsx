@@ -182,24 +182,24 @@ const ProfileInfo: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Profile Photo Section */}
-      <div className="flex flex-col items-center py-8 px-4">
+      <div className="flex flex-col items-center px-4 pb-6 pt-5 sm:py-8">
         {/* Profile Avatar */}
-        <div className="relative mb-6">
-          <div className="w-20 h-20 bg-[#E6F2F0] rounded-full flex items-center justify-center">
+        <div className="relative mb-4 sm:mb-6">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#E6F2F0] sm:h-20 sm:w-20">
             {profile?.photo_url ? (
               // Use native img to avoid remote image configuration issues.
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={profile.photo_url}
                 alt={displayName}
-                className="h-20 w-20 rounded-full object-cover"
+                className="h-16 w-16 rounded-full object-cover sm:h-20 sm:w-20"
               />
             ) : (
               <Image
                 src="/profile-circle.svg"
                 alt="Profile"
-                width={80}
-                height={80}
+                width={64}
+                height={64}
                 className="text-[#292D32]"
               />
             )}
@@ -207,8 +207,8 @@ const ProfileInfo: React.FC = () => {
         </div>
 
         {/* User Info */}
-        <div className="text-center space-y-2">
-          <h2 className="text-xl font-semibold text-[#242424]">
+        <div className="max-w-[360px] space-y-1.5 text-center">
+          <h2 className="text-lg font-semibold text-[#242424] sm:text-xl">
             {isLoading ? "Memuat profil..." : displayName}
           </h2>
           
@@ -230,10 +230,10 @@ const ProfileInfo: React.FC = () => {
                 <p className="text-xs text-[#A2A2A2]">
                   Telepon: {displayPhone}
                 </p>
-                <p className="text-xs text-[#A2A2A2]">
+                <p className="text-xs leading-relaxed text-[#A2A2A2]">
                   Alamat profil: {displayAddress}
                 </p>
-                <p className="mx-auto max-w-xs rounded-lg bg-primary/5 px-3 py-2 text-xs font-medium text-primary">
+                <p className="mx-auto max-w-xs rounded-lg bg-primary/5 px-3 py-2 text-xs font-medium leading-relaxed text-primary">
                   Alamat pengiriman dikelola terpisah di menu Alamat Pengiriman Tersimpan agar ongkir checkout tetap akurat.
                 </p>
               </>
@@ -242,11 +242,11 @@ const ProfileInfo: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2 mt-6">
+        <div className="mt-5 flex w-full max-w-[340px] gap-2 sm:mt-6">
           <button 
             onClick={handleEditProfileClick}
             disabled={isLoading || Boolean(errorMessage)}
-            className="bg-[#007A4F] text-[#E6F2F0] px-4 py-2 rounded-2xl text-sm font-medium border border-[#A2A2A2] flex items-center gap-2 hover:bg-[#005A3C] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl border border-[#A2A2A2] bg-[#007A4F] px-3 py-2 text-sm font-medium text-[#E6F2F0] transition-colors hover:bg-[#005A3C] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Image
               src="/edit.svg"
@@ -261,7 +261,7 @@ const ProfileInfo: React.FC = () => {
           <button 
             onClick={handleChangePhotoClick}
             disabled={isLoading || Boolean(errorMessage)}
-            className="bg-[#E6F2F0] text-[#0D0E09] px-4 py-2 rounded-2xl text-sm font-medium border border-[#A2A2A2] flex items-center gap-2 hover:bg-[#D4E8E0] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl border border-[#A2A2A2] bg-[#E6F2F0] px-3 py-2 text-sm font-medium text-[#0D0E09] transition-colors hover:bg-[#D4E8E0] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Image
               src="/gallery-export.svg"

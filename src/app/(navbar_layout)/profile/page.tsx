@@ -22,7 +22,7 @@ const ProfilePage: React.FC = () => {
         />
 
         {/* Content */}
-        <div className="py-4">
+        <div className="py-3 pb-6">
           {/* Profile Info Section */}
           <ProfileInfo />
 

@@ -44,12 +44,12 @@ const Navbar = () => {
 
   return (
     <div
-      className="flex flex-col gap-4 fixed bottom-0 right-0 left-0 bg-white mx-auto z-50"
+      className="fixed bottom-0 right-0 left-0 z-50 mx-auto border-t border-gray-100 bg-white/95 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur supports-[padding:max(0px)]:pb-[env(safe-area-inset-bottom)]"
       style={{ maxWidth: "440px", width: "100%" }}
       suppressHydrationWarning={true}
     >
-      <div className="shadow-box" suppressHydrationWarning={true}>
-        <div className="flex justify-center items-center gap-8 h-14" suppressHydrationWarning={true}>
+      <div suppressHydrationWarning={true}>
+        <div className="flex h-16 items-center justify-around px-3" suppressHydrationWarning={true}>
           <div
             className={`${getIconClass("/")} rounded-full p-2 cursor-pointer`}
             onClick={() => handleClick("/")}
