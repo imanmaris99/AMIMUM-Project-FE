@@ -12,16 +12,16 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose, onConfirm })
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-50">
-      <div className="w-full max-w-[375px] bg-white rounded-t-2xl shadow-2xl">
+    <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <div className="max-h-[calc(100dvh-2rem)] w-full max-w-[392px] overflow-y-auto rounded-2xl bg-white shadow-2xl">
         {/* Modal Content */}
-        <div className="p-6">
+        <div className="p-4">
           {/* Header Section */}
-          <div className="bg-white rounded-2xl shadow-lg p-4 mb-4">
+          <div className="mb-4 rounded-2xl bg-white p-4 shadow-lg">
             <div className="space-y-4">
               {/* Log Out Title */}
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-[#0D0E09]">Log Out</h3>
+                <h3 className="text-lg font-medium text-[#0D0E09]">Keluar Akun</h3>
                 <div className="w-4 h-4"></div>
               </div>
               
@@ -38,11 +38,11 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose, onConfirm })
           </div>
 
           {/* Button Section */}
-          <div className="flex gap-5">
+          <div className="sticky bottom-0 -mx-4 flex gap-3 bg-white px-4 pb-1 pt-2">
             {/* Iya Button */}
             <button
               onClick={onConfirm}
-              className="flex-1 bg-[#006A47] text-white text-sm font-medium py-3 px-6 rounded-[10px] hover:bg-[#005A3C] transition-colors"
+              className="flex-1 rounded-2xl bg-[#006A47] px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-[#005A3C]"
             >
               Iya
             </button>
@@ -50,16 +50,11 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose, onConfirm })
             {/* Tidak Button */}
             <button
               onClick={onClose}
-              className="flex-1 bg-white text-[#005A3C] text-sm font-medium py-3 px-6 rounded-[10px] border border-[#005A3C] hover:bg-gray-50 transition-colors"
+              className="flex-1 rounded-2xl border border-[#005A3C] bg-white px-5 py-3 text-sm font-medium text-[#005A3C] transition-colors hover:bg-gray-50"
             >
               Tidak
             </button>
           </div>
-        </div>
-
-        {/* Home Indicator */}
-        <div className="flex justify-center pb-4">
-          <div className="w-[134px] h-[5px] bg-[#0D0E09] rounded-full"></div>
         </div>
       </div>
     </div>

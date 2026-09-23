@@ -72,23 +72,23 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-50">
-      <div className="w-full max-w-[375px] bg-white rounded-t-2xl shadow-2xl">
+    <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <div className="max-h-[calc(100dvh-2rem)] w-full max-w-[392px] overflow-y-auto rounded-2xl bg-white shadow-2xl">
         {/* Modal Content */}
-        <div className="p-6 space-y-5">
+        <div className="space-y-4 p-4">
           {/* Header Section */}
-          <div className="bg-white rounded-2xl shadow-lg p-4">
-            <div className="space-y-6">
+          <div className="rounded-2xl bg-white p-4 shadow-lg">
+            <div className="space-y-4">
               {/* Edit Akunku Title */}
               <div className="flex items-center justify-center">
                 <h3 className="text-lg font-medium text-[#0D0E09]">Edit Profil Customer</h3>
               </div>
               
               {/* Divider Line */}
-              <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
+              <div className="h-[1.5px] w-full bg-[#F2F2F2]"></div>
               
               {/* Form Fields */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {submitError && (
                   <div className="rounded-lg bg-red-50 px-4 py-3 text-center">
                     <p className="text-sm text-red-600">{submitError}</p>
@@ -106,7 +106,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                     className="w-full text-sm text-[#0D0E09] bg-transparent border-none outline-none placeholder-[#999999]"
                     placeholder="Masukkan nama depan"
                   />
-                  <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
+                  <div className="h-[1.5px] w-full bg-[#F2F2F2]"></div>
                 </div>
 
                 <div className="space-y-2">
@@ -120,7 +120,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                     className="w-full text-sm text-[#0D0E09] bg-transparent border-none outline-none placeholder-[#999999]"
                     placeholder="Masukkan nama belakang"
                   />
-                  <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
+                  <div className="h-[1.5px] w-full bg-[#F2F2F2]"></div>
                 </div>
 
                 <div className="space-y-2">
@@ -134,22 +134,22 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                     className="w-full text-sm text-[#0D0E09] bg-transparent border-none outline-none placeholder-[#999999]"
                     placeholder="Masukkan nomor telepon"
                   />
-                  <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
+                  <div className="h-[1.5px] w-full bg-[#F2F2F2]"></div>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="text-sm text-[#999999]">Alamat profil</label>
                   </div>
-                  <input
-                    type="text"
+                  <textarea
+                    rows={2}
                     value={formData.address}
                     onChange={(e) => handleInputChange('address', e.target.value)}
-                    className="w-full text-sm text-[#0D0E09] bg-transparent border-none outline-none placeholder-[#999999]"
+                    className="max-h-20 w-full resize-none bg-transparent text-sm text-[#0D0E09] outline-none placeholder-[#999999]"
                     placeholder="Tulis alamat profil bila ingin ditampilkan di akun"
                   />
-                  <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
-                  <p className="text-xs text-[#999999]">
+                  <div className="h-[1.5px] w-full bg-[#F2F2F2]"></div>
+                  <p className="text-xs leading-relaxed text-[#999999]">
                     Alamat pengiriman checkout tetap dikelola dari menu Alamat Pengiriman Tersimpan.
                   </p>
                 </div>
@@ -158,27 +158,22 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3">
+          <div className="sticky bottom-0 -mx-4 flex gap-3 bg-white px-4 pb-1 pt-2">
             <button
               onClick={onClose}
               disabled={isSaving}
-              className="flex-1 py-4 px-6 rounded-2xl text-lg font-medium bg-white text-[#006A47] border border-[#006A47] hover:bg-[#E6F2F0] transition-colors"
+              className="flex-1 rounded-2xl border border-[#006A47] bg-white px-5 py-3 text-base font-medium text-[#006A47] transition-colors hover:bg-[#E6F2F0] disabled:cursor-not-allowed disabled:opacity-60"
             >
               Batal
             </button>
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="flex-1 py-4 px-6 rounded-2xl text-lg font-medium bg-[#006A47] text-white hover:bg-[#005A3C] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex-1 rounded-2xl bg-[#006A47] px-5 py-3 text-base font-medium text-white transition-colors hover:bg-[#005A3C] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSaving ? "Menyimpan..." : "Simpan"}
             </button>
           </div>
-        </div>
-
-        {/* Home Indicator */}
-        <div className="flex justify-center pb-4">
-          <div className="w-[134px] h-[5px] bg-[#0D0E09] rounded-full"></div>
         </div>
       </div>
     </div>
