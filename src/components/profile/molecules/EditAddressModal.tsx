@@ -22,6 +22,42 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const scrollY = window.scrollY;
+    const previousBodyStyles = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      left: document.body.style.left,
+      right: document.body.style.right,
+      width: document.body.style.width,
+      overflow: document.body.style.overflow,
+    };
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.body.style.position = previousBodyStyles.position;
+      document.body.style.top = previousBodyStyles.top;
+      document.body.style.left = previousBodyStyles.left;
+      document.body.style.right = previousBodyStyles.right;
+      document.body.style.width = previousBodyStyles.width;
+      document.body.style.overflow = previousBodyStyles.overflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
     if (isOpen) {
       setFormData(initialData);
       setSubmitError(null);
@@ -59,9 +95,9 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-50">
-      <div className="w-full max-w-[375px] bg-white rounded-t-2xl shadow-2xl">
-        <div className="p-6">
+    <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <div className="max-h-[calc(100dvh-2rem)] w-full max-w-[392px] overflow-y-auto rounded-2xl bg-white shadow-2xl">
+        <div className="space-y-4 p-4">
           <div className="flex flex-col items-center justify-center gap-2">
             <h3 className="text-lg font-medium text-[#0D0E09]">Edit Alamat Pengiriman</h3>
             <p className="text-center text-xs text-[#666666]">
@@ -73,7 +109,7 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
           <div className="w-full h-[1.5px] bg-[#F2F2F2] mt-4"></div>
           
           {/* Form Fields */}
-          <div className="space-y-6 mt-6">
+          <div className="mt-4 space-y-4">
             {submitError && (
               <div className="rounded-lg bg-red-50 px-4 py-3 text-center">
                 <p className="text-sm text-red-600">{submitError}</p>
@@ -173,28 +209,23 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="px-6 pb-6">
+        <div className="sticky bottom-0 bg-white px-4 pb-4 pt-2">
           <div className="flex gap-3">
             <button
               onClick={onClose}
               disabled={isSaving}
-              className="flex-1 py-4 px-6 rounded-2xl text-lg font-medium bg-white text-[#006A47] border border-[#006A47] hover:bg-[#E6F2F0] transition-colors"
+              className="flex-1 rounded-2xl border border-[#006A47] bg-white px-5 py-3 text-base font-medium text-[#006A47] transition-colors hover:bg-[#E6F2F0] disabled:cursor-not-allowed disabled:opacity-60"
             >
               Batal
             </button>
             <button
               onClick={handleSave}
               disabled={isSaving || !hasRajaOngkirCity}
-              className="flex-1 py-4 px-6 rounded-2xl text-lg font-medium bg-[#006A47] text-white hover:bg-[#005A3C] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex-1 rounded-2xl bg-[#006A47] px-5 py-3 text-base font-medium text-white transition-colors hover:bg-[#005A3C] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSaving ? "Menyimpan..." : "Simpan"}
             </button>
           </div>
-        </div>
-
-        {/* Home Indicator */}
-        <div className="flex justify-center items-center h-9 bg-white">
-          <div className="w-36 h-1.5 bg-[#0D0E09] rounded-full"></div>
         </div>
       </div>
     </div>

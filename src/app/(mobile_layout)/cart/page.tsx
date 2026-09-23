@@ -18,6 +18,42 @@ export default function CartPage() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isClearingCart, setIsClearingCart] = useState(false);
 
+  useEffect(() => {
+    if (!showConfirmDialog) {
+      return;
+    }
+
+    const scrollY = window.scrollY;
+    const previousBodyStyles = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      left: document.body.style.left,
+      right: document.body.style.right,
+      width: document.body.style.width,
+      overflow: document.body.style.overflow,
+    };
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.body.style.position = previousBodyStyles.position;
+      document.body.style.top = previousBodyStyles.top;
+      document.body.style.left = previousBodyStyles.left;
+      document.body.style.right = previousBodyStyles.right;
+      document.body.style.width = previousBodyStyles.width;
+      document.body.style.overflow = previousBodyStyles.overflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [showConfirmDialog]);
+
   // Reset cart notification when user visits cart page
   useEffect(() => {
     resetNotification("cart");
@@ -67,7 +103,7 @@ export default function CartPage() {
         />
 
         {/* Cart Content */}
-        <div className="px-6 py-4">
+        <div className={`px-6 py-4 ${!isLoading && cartItems.length > 0 ? "pb-[calc(10rem+env(safe-area-inset-bottom))]" : ""}`}>
           {/* Keranjangku Header */}
           <div className="mb-6">
             <h1 className="text-[#0D0E09] text-lg font-semibold mb-4">
@@ -114,7 +150,7 @@ export default function CartPage() {
 
         {/* Confirmation Dialog */}
         {showConfirmDialog && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4">
             <div className="bg-white rounded-lg p-6 mx-4 max-w-sm w-full">
               <div className="text-center">
                 <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">

@@ -1396,7 +1396,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         </div>
 
         {/* Payment Button */}
-        <div className="px-4 py-6 bg-white sticky bottom-0">
+        <div className="sticky bottom-0 bg-white px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-6">
           <button
             onClick={handlePayment}
             disabled={!canSubmitOrder}
