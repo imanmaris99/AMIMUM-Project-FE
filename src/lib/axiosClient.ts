@@ -87,24 +87,29 @@ axiosClient.interceptors.response.use(
     if (error.response) {
       switch (status) {
         case 401:
-          // Unauthorized - clear session and redirect
+          // Unauthorized - clear session. Endpoint-specific screens/services handle
+          // their own UX so customers do not see duplicate/global error popups.
           SessionManager.clearSession();
-          await ErrorHandler.handleError(
-            new Error('Session expired'),
-            'API_401',
-            false
-          );
-          setTimeout(() => {
-            window.location.replace("/login");
-          }, 2000);
+          if (!isExpectedHandledEndpoint) {
+            await ErrorHandler.handleError(
+              new Error('Session expired'),
+              'API_401',
+              false
+            );
+            setTimeout(() => {
+              window.location.replace("/login");
+            }, 2000);
+          }
           break;
 
         case 403:
-          await ErrorHandler.handleError(
-            new Error('Access forbidden'),
-            'API_403',
-            false
-          );
+          if (!isExpectedHandledEndpoint) {
+            await ErrorHandler.handleError(
+              new Error('Access forbidden'),
+              'API_403',
+              false
+            );
+          }
           break;
 
         case 404:

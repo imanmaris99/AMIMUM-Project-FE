@@ -193,16 +193,19 @@ const Login = () => {
           lastLogin: new Date(),
         };
         
+        if (!backendToken) {
+          throw new Error("Login berhasil diterima, tetapi sesi toko belum siap. Silakan coba lagi beberapa saat lagi.");
+        }
+
         const token = {
-          token: backendToken || generateSecureToken(),
-          expiresAt: backendToken ? getTokenExpiry(backendToken) : new Date(Date.now() + 24 * 60 * 60 * 1000),
+          token: backendToken,
+          expiresAt: getTokenExpiry(backendToken),
           refreshToken: generateSecureToken(),
         };
         
         SessionManager.setSession(user, token);
 
-        if (backendToken) {
-          try {
+        try {
             const profileResponse = await axiosInstance.get<UserProfileResponseShape>(
               API_ENDPOINTS.USER_PROFILE,
               {
@@ -230,7 +233,6 @@ const Login = () => {
           } catch {
             // Keep login successful even when profile sync fails.
           }
-        }
 
         RateLimiter.resetLimit(clientId);
         

@@ -23,6 +23,10 @@ export interface GoogleLoginResponse {
     is_active: boolean;
     created_at: string;
     updated_at: string;
+    token?: string;
+    access_token?: string;
+    jwt?: string;
+    auth_token?: string;
   };
 }
 

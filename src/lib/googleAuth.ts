@@ -3,7 +3,7 @@
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../../utils/firebase-config";
 import { postGoogleLogin } from "@/services/api/google-login";
-import { SessionManager, generateSecureToken } from "./auth";
+import { SessionManager, isJwtToken } from "./auth";
 
 export interface GoogleAuthResult {
   success: boolean;
@@ -48,10 +48,28 @@ export const handleGoogleLogin = async (): Promise<GoogleAuthResult> => {
         lastLogin: new Date(),
       };
 
+      const backendToken =
+        [
+          response.data.token,
+          response.data.access_token,
+          response.data.jwt,
+          response.data.auth_token,
+        ].find((candidate): candidate is string =>
+          typeof candidate === "string" && isJwtToken(candidate)
+        );
+
+      if (!backendToken) {
+        SessionManager.clearSession();
+        return {
+          success: false,
+          message: "Login Google berhasil diverifikasi, tetapi sesi toko belum siap. Silakan masuk dengan email dan password dulu atau coba lagi beberapa saat lagi.",
+        };
+      }
+
       const token = {
-        token: generateSecureToken(),
+        token: backendToken,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        refreshToken: generateSecureToken(),
+        refreshToken: "",
       };
 
       SessionManager.setSession(sessionUser, token);

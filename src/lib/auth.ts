@@ -35,11 +35,13 @@ export function hashPassword(password: string): string {
   return createHash('sha256').update(password + process.env.PASSWORD_SALT).digest('hex');
 }
 
-// JWT-like token validation
+// Backend-auth token validation.
+// Customer account pages call protected backend APIs, so a local/random token must
+// not be treated as an authenticated session. Older builds could store fallback
+// local tokens; clearing them prevents repeated 403 toast popups on every page.
 export function validateToken(token: string): boolean {
   try {
-    // Session token can be either backend JWT or fallback local token.
-    return Boolean(token && token.length > 10);
+    return Boolean(token && isJwtToken(token));
   } catch {
     return false;
   }

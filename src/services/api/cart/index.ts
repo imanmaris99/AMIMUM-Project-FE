@@ -1,6 +1,7 @@
 import axios from "axios";
 import { apiClient } from "@/lib/axiosClient";
 import { API_ENDPOINTS } from "@/lib/apiConfig";
+import { SessionManager } from "@/lib/auth";
 
 export interface CartVariantInfo {
   id?: number;
@@ -141,6 +142,20 @@ export const getMyCartProducts = async (): Promise<CartListResponse> => {
       const status = error.response.status;
       const errorData = error.response.data as CartErrorResponse;
 
+      if (status === 401 || status === 403) {
+        SessionManager.clearSession();
+        return {
+          status_code: 200,
+          message: "Sesi perlu diperbarui.",
+          data: [],
+          total_prices: {
+            all_item_active_prices: 0,
+            all_promo_active_prices: 0,
+            total_all_active_prices: 0,
+          },
+        };
+      }
+
       if (status === 400 || status === 404) {
         return {
           status_code: 200,
@@ -185,6 +200,17 @@ export const getCartTotalItems = async (): Promise<CartTotalItemsResponse> => {
     if (axios.isAxiosError(error) && error.response) {
       const status = error.response.status;
       const errorData = error.response.data as CartErrorResponse;
+
+      if (status === 401 || status === 403) {
+        SessionManager.clearSession();
+        return {
+          status_code: 200,
+          message: "Sesi perlu diperbarui.",
+          data: {
+            total_items: 0,
+          },
+        };
+      }
 
       if (status === 404) {
         return {
