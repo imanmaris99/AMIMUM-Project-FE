@@ -65,6 +65,16 @@ export interface OrderDetailResponse {
   data: OrderDetailDto;
 }
 
+export interface QrisPaymentConfirmationResponse {
+  status_code: number;
+  message: string;
+  data: {
+    order_id: string;
+    status: string;
+    admin_notified: boolean;
+  };
+}
+
 interface OrderErrorResponse {
   status_code?: number;
   error?: string;
@@ -375,6 +385,39 @@ export const getMyOrders = async (): Promise<OrdersListResponse> => {
     }
 
     throw new Error("Pesanan belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
+  }
+};
+
+export const submitQrisPaymentConfirmation = async (
+  orderId: string
+): Promise<QrisPaymentConfirmationResponse> => {
+  try {
+    const response = await apiClient.post<QrisPaymentConfirmationResponse>(
+      API_ENDPOINTS.ORDERS_QRIS_PAYMENT_CONFIRMATION(orderId),
+      {},
+      { timeout: ORDER_REQUEST_TIMEOUT_MS }
+    );
+
+    if (response?.status_code === 200 && response.data?.order_id) {
+      return response;
+    }
+
+    throw new Error(response?.message || "Konfirmasi QRIS belum bisa dikirim.");
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response) {
+      const errorData = error.response.data as OrderErrorResponse;
+      throw new Error(
+        getOrderErrorMessage(errorData, "Konfirmasi QRIS belum bisa dikirim.")
+      );
+    }
+
+    if (error instanceof Error) {
+      throw new Error(
+        getOrderErrorMessage({ message: error.message }, "Konfirmasi QRIS belum bisa dikirim.")
+      );
+    }
+
+    throw new Error("Konfirmasi QRIS belum bisa dikirim. Silakan coba beberapa saat lagi.");
   }
 };
 

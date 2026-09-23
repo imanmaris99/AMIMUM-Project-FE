@@ -17,6 +17,7 @@ import { SessionManager } from "@/lib/auth";
 import {
   getOrderDetail,
   mapOrderDetailToTransaction,
+  submitQrisPaymentConfirmation,
 } from "@/services/api/orders";
 import { createPayment, syncPaymentStatus } from "@/services/api/payments";
 import { useTransaction } from "@/contexts/TransactionContext";
@@ -239,6 +240,32 @@ const TransactionDetailPage: React.FC = () => {
         error instanceof Error
           ? error.message
           : "Gagal memperbarui status pembayaran."
+      );
+    } finally {
+      setIsPaymentActionLoading(false);
+    }
+  };
+
+  const handleConfirmManualQrisPayment = async () => {
+    if (!transaction || isLocalSimulatedTransaction) {
+      toast.error("Konfirmasi QRIS hanya tersedia untuk transaksi server.");
+      return;
+    }
+
+    setIsPaymentActionLoading(true);
+    try {
+      const response = await submitQrisPaymentConfirmation(transaction.id);
+      if (response.data.admin_notified) {
+        toast.success("Konfirmasi QRIS terkirim ke admin. Pesanan akan diverifikasi dari mutasi QRIS toko.");
+      } else {
+        toast.success("Konfirmasi QRIS tercatat. Jika belum ada notifikasi admin, simpan bukti pembayaran dan hubungi admin.");
+      }
+      await refreshOrderDetail();
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Konfirmasi QRIS belum bisa dikirim."
       );
     } finally {
       setIsPaymentActionLoading(false);
@@ -502,6 +529,17 @@ const TransactionDetailPage: React.FC = () => {
                   Setelah transfer/scan berhasil, simpan bukti pembayaran. Admin akan memverifikasi pembayaran dan mengubah status pesanan sebelum diproses.
                 </p>
               </div>
+              <button
+                type="button"
+                onClick={handleConfirmManualQrisPayment}
+                disabled={isPaymentActionLoading || isLocalSimulatedTransaction}
+                className="mt-3 w-full rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isPaymentActionLoading ? "Mengirim Konfirmasi..." : "Saya Sudah Bayar QRIS"}
+              </button>
+              <p className="mt-2 text-center text-[11px] leading-relaxed text-gray-500">
+                Tombol ini mengirim notifikasi ke admin. Status order berubah setelah admin memverifikasi dana masuk.
+              </p>
             </div>
           )}
 
