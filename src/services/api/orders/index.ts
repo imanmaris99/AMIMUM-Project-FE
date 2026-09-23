@@ -120,8 +120,25 @@ const getOrderErrorMessage = (
   errorData: OrderErrorResponse,
   fallbackMessage: string
 ) => {
-  const normalizeMessage = (message?: string) => {
+  const normalizeMessage = (message?: string): string | undefined => {
     if (!message) return undefined;
+
+    const trimmedMessage = message.trim();
+
+    if (trimmedMessage.startsWith("{") && trimmedMessage.endsWith("}")) {
+      try {
+        const parsedMessage = JSON.parse(trimmedMessage) as {
+          message?: string;
+          detail?: string;
+          error?: string;
+        };
+        const nestedMessage = normalizeMessage(parsedMessage.message || parsedMessage.detail);
+        if (nestedMessage) return nestedMessage;
+      } catch {
+        return fallbackMessage;
+      }
+    }
+
     if (message.includes("timeout") || message.includes("ECONNABORTED")) {
       return "Server membutuhkan waktu lebih lama dari biasanya. Silakan coba lagi beberapa saat lagi.";
     }
@@ -130,6 +147,12 @@ const getOrderErrorMessage = (
     }
     if (message.includes("Active cart items")) {
       return "Keranjang aktif tidak ditemukan. Jika pesanan baru saja dibuat, cek halaman transaksi dan lanjutkan pembayaran dari sana.";
+    }
+    if (message.includes("Konfirmasi QRIS hanya tersedia")) {
+      return "Konfirmasi QRIS hanya tersedia untuk pesanan QRIS resmi toko.";
+    }
+    if (message.includes("Internal Server Error") || message.includes("Traceback") || message.includes("{\"")) {
+      return fallbackMessage;
     }
     return message;
   };
