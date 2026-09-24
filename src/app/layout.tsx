@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/contexts/CartContext";
@@ -25,9 +25,59 @@ const inter = Inter({
   display: "swap",
 });
 
+const siteUrl = "https://amimumherbalproject.vercel.app";
+const siteTitle = "Toko Herbal AmImUm";
+const siteDescription =
+  "Katalog produk herbal dan jamu Toko Herbal AmImUm. Lihat produk, promo, metode pembayaran, dan status pesanan dengan informasi yang mengikuti data katalog toko.";
+
 export const metadata: Metadata = {
-  title: "AmImUm",
-  description: "Toko Herbal AmImUm",
+  metadataBase: new URL(siteUrl),
+  applicationName: siteTitle,
+  title: {
+    default: `${siteTitle} | Katalog Herbal dan Jamu`,
+    template: `%s | ${siteTitle}`,
+  },
+  description: siteDescription,
+  keywords: [
+    "Toko Herbal AmImUm",
+    "katalog herbal",
+    "jamu",
+    "produk herbal",
+    "toko herbal",
+  ],
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    url: siteUrl,
+    siteName: siteTitle,
+    title: `${siteTitle} | Katalog Herbal dan Jamu`,
+    description: siteDescription,
+    images: [
+      {
+        url: "/logo_toko.svg",
+        alt: "Logo Toko Herbal AmImUm",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${siteTitle} | Katalog Herbal dan Jamu`,
+    description: siteDescription,
+    images: ["/logo_toko.svg"],
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#001E14",
 };
 
 export default function RootLayout({
@@ -36,22 +86,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning={true} className={`${plusJakartaSans.variable} ${inter.variable}`}>
+    <html lang="id" suppressHydrationWarning={true} className={`${plusJakartaSans.variable} ${inter.variable}`}>
       <head suppressHydrationWarning={true}>
-        <meta name="viewport" content="width=device-width, initial-scale=1" suppressHydrationWarning={true} />
-        <meta name="theme-color" content="#001E14" suppressHydrationWarning={true} />
-        <meta name="description" content="Toko Herbal AmImUm - Katalog produk herbal dan jamu" suppressHydrationWarning={true} />
-        <meta name="robots" content="index, follow" suppressHydrationWarning={true} />
         <link rel="icon" href="/favicon.ico" suppressHydrationWarning={true} />
         <link rel="apple-touch-icon" href="/logo_toko.svg" suppressHydrationWarning={true} />
-        <meta property="og:title" content="AmImUm - Toko Herbal" suppressHydrationWarning={true} />
-        <meta property="og:description" content="Katalog produk herbal dan jamu Toko Herbal AmImUm" suppressHydrationWarning={true} />
-        <meta property="og:type" content="website" suppressHydrationWarning={true} />
-        <meta property="og:image" content="/logo_toko.svg" suppressHydrationWarning={true} />
-        <meta name="twitter:card" content="summary_large_image" suppressHydrationWarning={true} />
-        <meta name="twitter:title" content="AmImUm - Toko Herbal" suppressHydrationWarning={true} />
-        <meta name="twitter:description" content="Katalog produk herbal dan jamu Toko Herbal AmImUm" suppressHydrationWarning={true} />
-        <meta name="twitter:image" content="/logo_toko.svg" suppressHydrationWarning={true} />
         <script
           suppressHydrationWarning={true}
           dangerouslySetInnerHTML={{

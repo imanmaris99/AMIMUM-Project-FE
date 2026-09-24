@@ -444,9 +444,7 @@ const SavedAddressesPage: React.FC = () => {
               {/* Footer */}
               <div className="flex justify-center items-center mt-auto mb-10">
                 <div className="flex justify-center items-center gap-1">
-                  <span className="text-xs font-bold text-black">©2025</span>
-                  <span className="text-xs text-gray-500">by</span>
-                  <span className="text-xs font-bold text-primary">Amimum Team.</span>
+                  <span className="text-xs font-bold text-primary">Toko Herbal AmImUm</span>
                 </div>
               </div>
 
