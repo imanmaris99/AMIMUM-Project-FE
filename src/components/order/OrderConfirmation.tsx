@@ -28,6 +28,17 @@ interface OrderConfirmationProps {
   onBack?: () => void;
 }
 
+const getCustomerSafeNote = (notes?: string) => {
+  const sanitized = notes
+    ?.replace(/\[(?:PAYMENT|POS_SUBTOTAL|POS_DISCOUNT|POS_TOTAL):[^\]]*\]/gi, '')
+    .split('|')
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(' | ');
+
+  return sanitized || undefined;
+};
+
 const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ 
   orderId, 
   additionalNotes,
@@ -125,6 +136,9 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
         latestTransaction.deliveryType
       )
     : null;
+  const customerSafeNote = getCustomerSafeNote(
+    latestTransaction?.notes || additionalNotes
+  );
 
   if (isResolvingTransaction) {
     return (
@@ -284,12 +298,12 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                 <span className="text-gray-900">Siap diambil</span>
               </div>
             )}
-            {(latestTransaction?.notes || additionalNotes) && (
+            {customerSafeNote && (
               <div className="pt-3 border-t border-gray-200">
                 <div className="flex items-start space-x-2">
                   <span className="text-gray-600 text-sm">Catatan:</span>
                   <p className="text-gray-900 text-sm flex-1">
-                    &ldquo;{latestTransaction?.notes || additionalNotes}&rdquo;
+                    &ldquo;{customerSafeNote}&rdquo;
                   </p>
                 </div>
               </div>

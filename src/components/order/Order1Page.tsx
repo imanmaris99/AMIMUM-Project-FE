@@ -762,7 +762,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
               ? `Pesanan sudah dibuat, tetapi halaman pembayaran belum terbuka: ${paymentError.message}`
               : 'Pesanan sudah dibuat, tetapi halaman pembayaran belum terbuka.'
           );
-          router.push(`/transaction/${newTransaction.id}`);
+          router.push(`/transaction/${backendOrder.id}`);
           return;
         }
       }
@@ -780,7 +780,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
           return;
         }
 
-        router.push(`/order-confirmation?transactionId=${newTransaction.id}`);
+        router.push(`/order-confirmation?transactionId=${backendOrder.id}`);
       }, 500);
       
     } catch (error) {

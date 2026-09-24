@@ -20,6 +20,7 @@ const TransactionPage = () => {
   const [apiTransactions, setApiTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showClearConfirmDialog, setShowClearConfirmDialog] = useState(false);
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -50,6 +51,42 @@ const TransactionPage = () => {
     void loadOrders();
   }, []);
 
+  useEffect(() => {
+    if (!showClearConfirmDialog) {
+      return;
+    }
+
+    const scrollY = window.scrollY;
+    const previousBodyStyles = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      left: document.body.style.left,
+      right: document.body.style.right,
+      width: document.body.style.width,
+      overflow: document.body.style.overflow,
+    };
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.body.style.position = previousBodyStyles.position;
+      document.body.style.top = previousBodyStyles.top;
+      document.body.style.left = previousBodyStyles.left;
+      document.body.style.right = previousBodyStyles.right;
+      document.body.style.width = previousBodyStyles.width;
+      document.body.style.overflow = previousBodyStyles.overflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [showClearConfirmDialog]);
+
   const transactions = [
     ...apiTransactions,
   ];
@@ -69,14 +106,13 @@ const TransactionPage = () => {
       return;
     }
 
-    if (
-      window.confirm(
-        "Bersihkan data transaksi lokal lama dari perangkat ini? Data pesanan backend tidak akan ikut terhapus."
-      )
-    ) {
-      clearTransactions();
-      toast.success("Data transaksi lokal lama berhasil dibersihkan");
-    }
+    setShowClearConfirmDialog(true);
+  };
+
+  const confirmClearSimulatedTransactions = () => {
+    clearTransactions();
+    setShowClearConfirmDialog(false);
+    toast.success("Data transaksi lokal lama berhasil dibersihkan");
   };
 
   return (
@@ -160,6 +196,36 @@ const TransactionPage = () => {
             </div>
           )}
         </div>
+
+        {showClearConfirmDialog && (
+          <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+            <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Bersihkan Data Lokal Lama?
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                Data transaksi lokal lama akan dihapus dari perangkat ini. Pesanan backend/server tidak ikut terhapus.
+              </p>
+              <div className="mt-5 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowClearConfirmDialog(false)}
+                  className="flex-1 rounded-2xl border border-gray-300 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmClearSimulatedTransactions}
+                  className="flex-1 rounded-2xl bg-primary px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+                >
+                  Bersihkan
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </LoginProtection>
   );
