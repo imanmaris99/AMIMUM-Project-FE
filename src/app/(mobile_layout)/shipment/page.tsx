@@ -16,6 +16,7 @@ import {
   ShipmentListItem,
 } from "@/services/api/shipment";
 import { toast } from "react-hot-toast";
+import LoginProtection from "@/components/common/LoginProtection";
 
 const mapShipmentToViewModel = (shipment: ShipmentListItem): ShipmentData => ({
   id: shipment.id,
@@ -107,6 +108,7 @@ const Shipment = () => {
   const [savingIndex, setSavingIndex] = useState<number | null>(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [shipmentPendingDelete, setShipmentPendingDelete] = useState<ShipmentData | null>(null);
 
   const refreshShipments = useCallback(async () => {
     const response = await getMyShipments();
@@ -157,6 +159,42 @@ const Shipment = () => {
     }
   }, [searchParams, router]);
 
+  useEffect(() => {
+    if (!shipmentPendingDelete) {
+      return;
+    }
+
+    const scrollY = window.scrollY;
+    const previousBodyStyles = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      left: document.body.style.left,
+      right: document.body.style.right,
+      width: document.body.style.width,
+      overflow: document.body.style.overflow,
+    };
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.body.style.position = previousBodyStyles.position;
+      document.body.style.top = previousBodyStyles.top;
+      document.body.style.left = previousBodyStyles.left;
+      document.body.style.right = previousBodyStyles.right;
+      document.body.style.width = previousBodyStyles.width;
+      document.body.style.overflow = previousBodyStyles.overflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [shipmentPendingDelete]);
+
   const handleIconClick = async (index: number) => {
     if (activeStates[index]) return;
 
@@ -196,7 +234,7 @@ const Shipment = () => {
     router.push(`/shipment/edit?shipmentId=${shipmentId}`);
   };
 
-  const handleDelete = async (shipmentId: string) => {
+  const handleDelete = (shipmentId: string) => {
     const selectedShipment = shipments.find((shipment) => shipment.id === shipmentId);
 
     if (!selectedShipment) {
@@ -204,6 +242,15 @@ const Shipment = () => {
       return;
     }
 
+    setShipmentPendingDelete(selectedShipment);
+  };
+
+  const confirmDeleteShipment = async () => {
+    if (!shipmentPendingDelete) {
+      return;
+    }
+
+    const shipmentId = shipmentPendingDelete.id;
     setSavingIndex(shipments.findIndex((shipment) => shipment.id === shipmentId));
 
     try {
@@ -219,6 +266,7 @@ const Shipment = () => {
 
       await refreshShipments();
       toast.success("Data pengiriman berhasil dihapus.");
+      setShipmentPendingDelete(null);
     } catch {
       toast.error("Pengiriman belum bisa dihapus. Silakan coba lagi beberapa saat lagi.");
     } finally {
@@ -227,7 +275,8 @@ const Shipment = () => {
   };
 
   const handleAddNew = () => {
-    router.push("/shipment/create");
+    const returnTo = searchParams?.get("returnTo");
+    router.push(returnTo ? `/shipment/create?returnTo=${encodeURIComponent(returnTo)}` : "/shipment/create");
   };
 
   const handleBack = () => {
@@ -240,7 +289,8 @@ const Shipment = () => {
   }
 
   return (
-    <div className="flex flex-col justify-between min-h-screen">
+    <LoginProtection useModal={true} feature="general">
+    <div className="flex flex-col justify-between min-h-screen pb-[calc(1rem+env(safe-area-inset-bottom))]">
       {/* Success Message */}
       {showSuccessMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
@@ -342,7 +392,40 @@ const Shipment = () => {
           {shipments.length === 0 ? 'Tambah Alamat' : 'Tambah Alamat Baru'}
         </Button>
       </div>
+
+      {shipmentPendingDelete && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl">
+            <h2 className="text-lg font-semibold text-gray-900">Hapus Pengiriman?</h2>
+            <p className="mt-2 text-sm leading-relaxed text-gray-600">
+              Data alamat dan ongkir ini akan dihapus. Jika ini alamat aktif, sistem akan mengaktifkan alamat lain yang tersedia.
+            </p>
+            <div className="mt-4 rounded-xl bg-gray-50 p-3 text-xs text-gray-600">
+              {formatShipmentAddress(shipmentPendingDelete)}
+            </div>
+            <div className="mt-5 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShipmentPendingDelete(null)}
+                disabled={savingIndex !== null}
+                className="flex-1 rounded-2xl border border-gray-300 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={() => void confirmDeleteShipment()}
+                disabled={savingIndex !== null}
+                className="flex-1 rounded-2xl bg-red-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {savingIndex !== null ? "Menghapus..." : "Hapus"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+    </LoginProtection>
   );
 };
 

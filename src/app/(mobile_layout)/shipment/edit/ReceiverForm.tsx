@@ -135,7 +135,7 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-gray-100 px-10 py-4 w-full flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="w-full bg-gray-100 px-5 py-4 sm:px-10 flex flex-col gap-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
       <div className="flex flex-col gap-2 relative">
         <label htmlFor="receiverName" className="text-[14px] font-semibold">Nama Penerima</label>
         <LuContact className="text-xl absolute left-2 top-9 stroke-1" />
@@ -245,18 +245,18 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
         )}
       </div>
 
-      <div className="flex justify-center items-center mt-auto mb-10 gap-2">
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Button 
           type="button" 
           onClick={onBack} 
-          className="bg-gray-500 text-white px-4 py-2 rounded-lg w-48 mt-10 h-14 text-lg"
+          className="h-12 w-full rounded-lg bg-gray-500 px-4 py-2 text-base text-white sm:h-14 sm:text-lg"
         >
           Kembali
         </Button>
         <Button 
           type="submit" 
           disabled={isLoading || isFetching}
-          className="bg-primary text-white px-4 py-2 rounded-lg w-48 mt-10 h-14 text-lg disabled:opacity-50"
+          className="h-12 w-full rounded-lg bg-primary px-4 py-2 text-base text-white disabled:opacity-50 sm:h-14 sm:text-lg"
         >
           {isLoading || isFetching ? "Memproses..." : "Selanjutnya"}
         </Button>

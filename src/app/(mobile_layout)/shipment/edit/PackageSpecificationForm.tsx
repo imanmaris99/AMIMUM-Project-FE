@@ -532,7 +532,7 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-gray-100 px-10 py-4 w-full">
+    <form onSubmit={handleSubmit} className="w-full bg-gray-100 px-5 py-4 sm:px-10 pb-[calc(1rem+env(safe-area-inset-bottom))]">
       <div className="flex flex-col gap-4">
         <CourierSelection 
           value={formData.courier}
@@ -599,18 +599,18 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
           </p>
         )}
       </div>
-      <div className="flex justify-center items-center gap-2">
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Button 
           type="button" 
           onClick={onBack} 
-          className="bg-gray-500 text-white px-4 py-2 rounded-lg w-48 mt-10 h-14 text-lg"
+          className="h-12 w-full rounded-lg bg-gray-500 px-4 py-2 text-base text-white sm:h-14 sm:text-lg"
         >
           Kembali
         </Button>
         <Button 
           type="submit" 
           disabled={isLoading || isCalculating || !selectedService || formData.cost <= 0}
-          className="bg-primary text-white px-4 py-2 rounded-lg w-48 mt-10 h-14 text-lg disabled:opacity-50"
+          className="h-12 w-full rounded-lg bg-primary px-4 py-2 text-base text-white disabled:opacity-50 sm:h-14 sm:text-lg"
         >
           {isLoading ? "Menyimpan..." : "Simpan"}
         </Button>

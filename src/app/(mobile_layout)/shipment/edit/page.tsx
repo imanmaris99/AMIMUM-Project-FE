@@ -133,7 +133,7 @@ const EditShipment = () => {
 
   return (
     <LoginProtection useModal={true} feature="general">
-    <div>
+    <div className="min-h-screen pb-[calc(1rem+env(safe-area-inset-bottom))]">
       <div className="flex justify-center items-center relative mt-16 px-6">
         <div className="absolute left-10">
           <button 

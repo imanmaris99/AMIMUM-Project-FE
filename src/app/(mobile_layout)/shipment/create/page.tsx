@@ -141,7 +141,7 @@ const CreateShipment = () => {
 
   return (
     <LoginProtection useModal={true} feature="general">
-    <div>
+    <div className="min-h-screen pb-[calc(1rem+env(safe-area-inset-bottom))]">
       <div className="flex justify-center items-center relative mt-16 px-6">
         <div className="absolute left-10">
           <button 
@@ -226,7 +226,7 @@ const CreateShipment = () => {
       </div>
 
       {isLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           <div className="bg-white rounded-lg p-6 flex flex-col items-center gap-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <p className="text-sm text-gray-600">Menyimpan alamat tujuan...</p>
