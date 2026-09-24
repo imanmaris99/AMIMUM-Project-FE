@@ -46,6 +46,7 @@ export default function MyRatingsPage() {
   const [editableReview, setEditableReview] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingRatingId, setDeletingRatingId] = useState<number | null>(null);
+  const [pendingDeleteRating, setPendingDeleteRating] = useState<ProductRatingItem | null>(null);
 
   useEffect(() => {
     const loadRatings = async () => {
@@ -69,23 +70,51 @@ export default function MyRatingsPage() {
     setEditableReview(rating.review || "");
   };
 
-  const handleDeleteRating = async (ratingId: number) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus rating ini?")) {
+  useEffect(() => {
+    if (!pendingDeleteRating && !selectedRating) return;
+
+    const scrollY = window.scrollY;
+    const { body, documentElement } = document;
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyPosition = body.style.position;
+    const previousBodyTop = body.style.top;
+    const previousBodyWidth = body.style.width;
+    const previousHtmlOverflow = documentElement.style.overflow;
+
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+    documentElement.style.overflow = "hidden";
+
+    return () => {
+      body.style.overflow = previousBodyOverflow;
+      body.style.position = previousBodyPosition;
+      body.style.top = previousBodyTop;
+      body.style.width = previousBodyWidth;
+      documentElement.style.overflow = previousHtmlOverflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [pendingDeleteRating, selectedRating]);
+
+  const requestDeleteRating = (rating: ProductRatingItem) => {
+    setPendingDeleteRating(rating);
+  };
+
+  const handleDeleteRating = async () => {
+    if (!pendingDeleteRating) {
       return;
     }
 
     try {
-      setDeletingRatingId(ratingId);
-      await deleteProductRating(ratingId);
-      setRatings((prev) => prev.filter((rating) => rating.id !== ratingId));
-      setSelectedRating(null);
+      setDeletingRatingId(pendingDeleteRating.id);
+      await deleteProductRating(pendingDeleteRating.id);
+      setRatings((prev) => prev.filter((rating) => rating.id !== pendingDeleteRating.id));
+      setSelectedRating((current) => current?.id === pendingDeleteRating.id ? null : current);
+      setPendingDeleteRating(null);
       toast.success("Rating berhasil dihapus.");
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Gagal menghapus rating."
-      );
+    } catch {
+      toast.error("Rating belum bisa dihapus. Silakan coba lagi beberapa saat lagi.");
     } finally {
       setDeletingRatingId(null);
     }
@@ -220,7 +249,7 @@ export default function MyRatingsPage() {
                         variant="outline"
                         size="sm"
                         disabled={deletingRatingId === rating.id}
-                        onClick={() => void handleDeleteRating(rating.id)}
+                        onClick={() => requestDeleteRating(rating)}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50 disabled:opacity-60"
                       >
                         {deletingRatingId === rating.id ? "Hapus..." : "Hapus"}
@@ -234,8 +263,8 @@ export default function MyRatingsPage() {
         </div>
 
         {selectedRating && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-md w-full">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[80]">
+            <div className="bg-white rounded-2xl max-w-md w-full max-h-[calc(100dvh-2rem)] overflow-y-auto pb-[calc(1rem+env(safe-area-inset-bottom))]">
               <div className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Edit Rating</h3>
                 <p className="text-sm text-gray-600 mb-4">
@@ -292,6 +321,40 @@ export default function MyRatingsPage() {
                       {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
                     </Button>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {pendingDeleteRating && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[80]">
+            <div className="bg-white rounded-2xl max-w-sm w-full max-h-[calc(100dvh-2rem)] overflow-y-auto pb-[calc(1rem+env(safe-area-inset-bottom))]">
+              <div className="p-5 space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Hapus Rating?</h3>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Rating untuk <span className="font-medium">{pendingDeleteRating.product_name || 'Produk katalog'}</span> akan dihapus dari akun Anda.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                    disabled={deletingRatingId === pendingDeleteRating.id}
+                    onClick={() => setPendingDeleteRating(null)}
+                  >
+                    Batal
+                  </Button>
+                  <Button
+                    type="button"
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white disabled:opacity-60"
+                    disabled={deletingRatingId === pendingDeleteRating.id}
+                    onClick={() => void handleDeleteRating()}
+                  >
+                    {deletingRatingId === pendingDeleteRating.id ? "Menghapus..." : "Hapus Rating"}
+                  </Button>
                 </div>
               </div>
             </div>
