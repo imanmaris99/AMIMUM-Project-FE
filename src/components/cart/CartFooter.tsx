@@ -6,6 +6,7 @@ import { useCart } from '@/contexts/CartContext';
 import rupiahFormater from '@/utils/rupiahFormater';
 import { SessionManager } from '@/lib/auth';
 import LoginRequiredModal from '@/components/common/LoginRequiredModal';
+import { toast } from 'react-hot-toast';
 
 interface CartFooterProps {
   onCheckout?: () => void;
@@ -25,9 +26,10 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
     (sum, item) => sum + item.price * item.quantity,
     0
   );
-  const total = selectedSubtotal > 0 ? selectedSubtotal : totalPrices.total;
   const selectedItemCount = activeItems.reduce((sum, item) => sum + item.quantity, 0);
   const hasSelectedItems = activeItems.length > 0;
+  const totalDiscount = hasSelectedItems ? totalPrices.promo_total || 0 : 0;
+  const total = hasSelectedItems ? Math.max(0, selectedSubtotal - totalDiscount) : 0;
   const hasValidTotal = total > 0;
   const hasSyncMismatch = hasSelectedItems && !hasValidTotal && !isLoading;
   const isSavingSelection = isSelectingAll || isSyncing;
@@ -43,6 +45,12 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
     setIsSelectingAll(true);
     try {
       await updateAllActiveStatus(newStatus);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Gagal menyimpan pilihan keranjang. Coba lagi sebentar.'
+      );
     } finally {
       setIsSelectingAll(false);
     }

@@ -23,8 +23,8 @@ const HeaderWithNotifications = ({
   onLogout
 }: HeaderWithNotificationsProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { totalItems: cartTotalItems } = useCart();
-  const cartBadgeCount = cartTotalItems;
+  const { cartItems } = useCart();
+  const cartBadgeCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const formatBadgeCount = (count: number) => (count > 99 ? "99+" : count);
 
   useEffect(() => {

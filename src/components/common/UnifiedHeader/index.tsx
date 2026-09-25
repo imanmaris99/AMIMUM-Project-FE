@@ -34,7 +34,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   rightAction
 }) => {
   const router = useRouter();
-  const { totalItems: cartTotalItems } = useCart();
+  const { cartItems } = useCart();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [userDisplayName, setUserDisplayName] = useState("");
@@ -123,9 +123,11 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
     router.push('/');
   };
 
-  const cartBadgeCount = showCart ? cartTotalItems : 0;
+  const cartBadgeCount = showCart
+    ? cartItems.reduce((sum, item) => sum + item.quantity, 0)
+    : 0;
   // Mobile header/avatar badge is used as the cart shortcut indicator on the storefront.
-  // Keep it tied to the actual active cart quantity so it cannot drift from the cart page.
+  // Keep it tied to the actual cart contents so it cannot drift from stale notification counts.
   const profileBadgeCount = cartBadgeCount;
 
   const formatBadgeCount = (count: number) => (count > 99 ? "99+" : count);

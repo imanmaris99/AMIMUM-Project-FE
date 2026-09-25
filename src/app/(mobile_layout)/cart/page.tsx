@@ -13,10 +13,14 @@ import LoginProtection from "@/components/common/LoginProtection";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 
 export default function CartPage() {
-  const { totalItems, clearAll, cartItems, isLoading } = useCart();
+  const { totalItems, clearAll, cartItems, isLoading, isSyncing } = useCart();
   const { resetNotification } = useNotification();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isClearingCart, setIsClearingCart] = useState(false);
+  const cartRowCount = cartItems.length;
+  const selectedQuantity = totalItems;
+  const hasCartItems = cartRowCount > 0;
+  const canClearCart = !isLoading && !isSyncing && hasCartItems && !isClearingCart;
 
   useEffect(() => {
     if (!showConfirmDialog) {
@@ -93,7 +97,7 @@ export default function CartPage() {
 
   return (
     <LoginProtection>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-[linear-gradient(180deg,#F7FCF9_0%,#FFFFFF_42%,#FFFDF7_100%)]">
         {/* Unified Header */}
         <UnifiedHeader 
           type="main"
@@ -103,7 +107,7 @@ export default function CartPage() {
         />
 
         {/* Cart Content */}
-        <div className={`px-6 py-4 ${!isLoading && cartItems.length > 0 ? "pb-[calc(10rem+env(safe-area-inset-bottom))]" : ""}`}>
+        <div className={`px-5 py-4 ${!isLoading && hasCartItems ? "pb-[calc(12rem+env(safe-area-inset-bottom))]" : ""}`}>
           {/* Keranjangku Header */}
           <div className="mb-6">
             <h1 className="text-[#0D0E09] text-lg font-semibold mb-4">
@@ -113,36 +117,46 @@ export default function CartPage() {
             {/* Total Item Info */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <span className="text-[#999999] text-sm">
-                  Total Item :
-                </span>
+                <span className="text-[#999999] text-sm">Isi keranjang:</span>
                 <span className="text-[#0D0E09] text-sm font-bold">
-                  {totalItems} Item
+                  {isLoading ? "Memuat..." : `${cartRowCount} produk`}
                 </span>
               </div>
-              {!isLoading && totalItems > 0 && (
+              {!isLoading && hasCartItems && (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleClearAll}
+                  disabled={!canClearCart}
                   className="flex items-center gap-1 text-red-600 border-red-200 hover:bg-red-50"
                 >
                   <HiOutlineTrash size={16} />
-                  <span className="text-xs">Hapus Semua</span>
+                  <span className="text-xs">{isClearingCart ? "Menghapus..." : "Hapus Semua"}</span>
                 </Button>
               )}
             </div>
+            {!isLoading && hasCartItems && (
+              <div className="rounded-2xl border border-[#D7EDE4] bg-white/85 px-4 py-3 text-xs text-gray-600 shadow-sm">
+                <span className="font-semibold text-primary">{selectedQuantity} item dipilih</span>
+                <span> untuk checkout. Centang produk yang ingin dibeli sekarang.</span>
+                {isSyncing && (
+                  <p className="mt-1 font-medium text-primary/80">
+                    Menyimpan perubahan keranjang ke server...
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Cart Items */}
           <div className="space-y-4">
             <CartList />
-            {!isLoading && cartItems.length > 0 && <CartSummary />}
+            {!isLoading && hasCartItems && <CartSummary />}
           </div>
         </div>
 
         {/* Cart Footer - Fixed at bottom */}
-        {!isLoading && cartItems.length > 0 && (
+        {!isLoading && hasCartItems && (
           <div className="fixed bottom-0 left-0 right-0 z-40">
             <CartFooter />
           </div>
@@ -151,7 +165,7 @@ export default function CartPage() {
         {/* Confirmation Dialog */}
         {showConfirmDialog && (
           <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4">
-            <div className="bg-white rounded-lg p-6 mx-4 max-w-sm w-full">
+            <div className="max-h-[calc(100dvh-2rem)] w-full max-w-sm overflow-y-auto rounded-2xl bg-white p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-xl">
               <div className="text-center">
                 <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
                   <HiOutlineTrash className="h-6 w-6 text-red-600" />

@@ -15,13 +15,13 @@ export default function CartSummary() {
     (sum, item) => sum + item.price * item.quantity,
     0
   );
-  const totalDiscount = totalPrices.promo_total || 0;
-  const total = Math.max(0, subtotal - totalDiscount);
+  const totalDiscount = hasSelectedItems ? totalPrices.promo_total || 0 : 0;
+  const total = hasSelectedItems ? Math.max(0, subtotal - totalDiscount) : 0;
 
   return (
-    <div className="px-4 py-4 min-h-[200px] mt-10">
+    <div className="px-1 py-3 mt-4">
       <div className="max-w-sm mx-auto">
-        <div className="bg-white rounded-2xl shadow-lg p-4">
+        <div className="bg-white/95 rounded-2xl border border-gray-100 shadow-lg shadow-gray-900/5 p-4">
           <div className="space-y-6">
             {hasCartItems && !hasSelectedItems && (
               <div className="rounded-lg bg-yellow-50 border border-yellow-200 px-3 py-2">
@@ -68,7 +68,7 @@ export default function CartSummary() {
 
             <div className="flex justify-between items-center">
               <span className="text-gray-600 text-sm font-medium">Total dipilih</span>
-              <span className="text-primary font-bold text-sm">
+              <span className="text-primary font-bold text-base">
                 {rupiahFormater(total)}
               </span>
             </div>
