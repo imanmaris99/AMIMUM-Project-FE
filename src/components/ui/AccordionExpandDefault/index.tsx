@@ -19,20 +19,29 @@ export default function AccordionExpandDefault({ article }: { article: ArticlePr
     <div>
       <Accordion
         expanded={isExpanded}
-        className={`border rounded-lg ${isExpanded ? 'bg-white' : 'bg-gray-100'}`}
+        className={`overflow-hidden rounded-2xl border transition-all duration-200 ${
+          isExpanded
+            ? "border-primary/20 bg-white shadow-md shadow-gray-900/5"
+            : "border-gray-100 bg-white shadow-sm shadow-gray-900/5"
+        }`}
         onChange={handleAccordionChange}
-        style={{ boxShadow: 'none' }}
+        disableGutters
+        style={{ boxShadow: "none" }}
       >
         <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1-content"
-          id="panel1-header"
+          expandIcon={<ExpandMoreIcon className="text-primary" />}
+          aria-controls="homepage-article-content"
+          id="homepage-article-header"
+          className="min-h-0 px-4 py-3"
         >
-          <Typography className="font-bold font-jakarta">{article.title}</Typography>
+          <Typography className="font-jakarta text-[15px] font-bold leading-6 text-gray-900">
+            {article.title}
+          </Typography>
         </AccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails className="border-t border-gray-100 px-4 pb-4 pt-3">
           <Typography
-            className="font-jakarta"
+            component="div"
+            className="font-jakarta text-sm leading-7 text-gray-700 [&_a]:font-semibold [&_a]:text-primary [&_strong]:font-bold [&_strong]:text-gray-900"
             dangerouslySetInnerHTML={{
               __html: (article.description_list?.join("\n") || "").replace(/\n/g, "<br><br>")
             }}
