@@ -49,7 +49,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
     const checkAuth = () => {
       const isAuthenticated = SessionManager.isAuthenticated();
       setIsLoggedIn(isAuthenticated);
-      
+
       if (isAuthenticated) {
         const session = SessionManager.getSession();
         const email = session?.user?.email || "";
@@ -68,14 +68,14 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
     };
 
     checkAuth();
-    
+
     // Listen for storage changes (login/logout from other tabs)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'isLoggedIn' || e.key === 'userEmail' || e.key === 'userProfile') {
         checkAuth();
       }
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
@@ -103,7 +103,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   const handleLogout = () => {
     // Use SessionManager to clear session
     SessionManager.clearSession();
-    
+
     // Immediately update local state
     setIsLoggedIn(false);
     setUserEmail("");
@@ -111,7 +111,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
     setUserPhotoUrl("");
     setShowProfileDropdown(false);
     setShowMobileMenu(false);
-    
+
     // Force trigger storage event for cross-tab synchronization
     window.dispatchEvent(new StorageEvent('storage', {
       key: 'isLoggedIn',
@@ -119,7 +119,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
       oldValue: 'true',
       storageArea: localStorage
     }));
-    
+
     // Redirect to homepage
     router.push('/');
   };
@@ -132,17 +132,21 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
         <div className="px-3 sm:px-4 py-2 sm:py-3" suppressHydrationWarning={true}>
           <div className="flex items-center justify-between" suppressHydrationWarning={true}>
             {/* Left: Logo + Brand */}
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink-0" suppressHydrationWarning={true}>
-              <Image 
-                src="/logo_toko.svg" 
-                alt="AmImUm Logo" 
-                width={32} 
-                height={32}
-                className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0"
+            <div className="flex min-w-0 flex-shrink-0 items-center gap-2.5 sm:gap-3" suppressHydrationWarning={true}>
+              <Image
+                src="/logo_toko.svg"
+                alt="Logo Toko Herbal AmImUm"
+                width={40}
+                height={40}
+                className="h-9 w-9 flex-shrink-0 sm:h-10 sm:w-10"
               />
-              <div className="min-w-0" suppressHydrationWarning>
-                <h1 className="text-base sm:text-lg font-bold text-gray-900 truncate">AmImUm</h1>
-                <p className="text-xs text-gray-500 hidden sm:block">Toko Herbal</p>
+              <div className="flex min-w-0 flex-col justify-center leading-none" suppressHydrationWarning>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-primary/80 sm:text-[11px]">
+                  Toko Herbal
+                </span>
+                <h1 className="mt-0.5 truncate font-jakarta text-[18px] font-extrabold leading-none text-gray-900 sm:text-xl">
+                  AmImUm
+                </h1>
               </div>
             </div>
 
@@ -163,7 +167,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                     <span className="hidden md:block text-sm text-gray-700 max-w-20 truncate">
                       {userDisplayName}
                     </span>
-                    
+
                     {/* Profile Avatar with Notification Badge */}
                     <div className="relative">
                       <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center overflow-hidden">
@@ -196,7 +200,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                         <p className="text-sm font-medium text-gray-900">{userEmail}</p>
                         <p className="text-xs text-gray-500">Terakhir login</p>
                       </div>
-                      
+
                       {/* Cart in Dropdown */}
                       {showCart && (
                         <Link
@@ -224,7 +228,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                         <HiOutlineUser className="w-4 h-4" />
                         Profil Saya
                       </Link>
-                      
+
                       <Link
                         href="/transaction"
                         className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
@@ -233,7 +237,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                         <HiOutlineCog className="w-4 h-4" />
                         Transaksi
                       </Link>
-                      
+
                       <button
                         onClick={handleLogout}
                         className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors w-full text-left"
@@ -414,10 +418,10 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
       <header className="bg-gradient-to-r from-primary to-primary/80 text-white">
         <div className="px-4 py-6">
           <div className="flex flex-col items-center text-center">
-            <Image 
-              src="/logo_toko.svg" 
-              alt="AmImUm Logo" 
-              width={60} 
+            <Image
+              src="/logo_toko.svg"
+              alt="AmImUm Logo"
+              width={60}
               height={60}
               className="w-15 h-15 mb-4"
             />

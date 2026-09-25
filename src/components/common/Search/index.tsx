@@ -21,13 +21,13 @@ const Search = () => {
   } = useSearchLogic();
 
   return (
-    <div className="relative mt-4 mx-6" ref={searchRef}>
-      <div className="flex items-center justify-center border border-gray-200 rounded-lg px-2 py-2">
-        <CiSearch className="w-8 h-8 text-gray-500 ml-2" />
+    <div className="relative mx-4 mt-4 sm:mx-6" ref={searchRef}>
+      <div className="flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-3 py-2.5 shadow-sm transition-colors focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10">
+        <CiSearch className="h-6 w-6 flex-shrink-0 text-gray-500" />
         <input
-          className="w-full px-2 focus:outline-none text-lg placeholder:text-sm"
+          className="min-w-0 flex-1 bg-transparent px-1 text-base font-medium leading-6 text-gray-900 placeholder:text-sm placeholder:font-normal placeholder:text-gray-400 focus:outline-none sm:text-[17px]"
           type="text"
-          placeholder="Cari produk"
+          placeholder="Cari produk herbal"
           value={search}
           onChange={handleInputChange}
           onFocus={() => {
@@ -36,7 +36,12 @@ const Search = () => {
             }
           }}
         />
-        <Button onClick={handleSearch} variant="default" disabled={!search.trim()}>
+        <Button
+          onClick={handleSearch}
+          variant="default"
+          disabled={!search.trim()}
+          className="h-10 rounded-xl px-5 text-sm font-semibold shadow-sm disabled:opacity-50"
+        >
           Cari
         </Button>
       </div>

@@ -34,11 +34,11 @@ const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardPro
 
   return (
     <li
-      className="p-2 hover:bg-gray-100 cursor-pointer"
+      className="cursor-pointer px-3 py-2.5 transition-colors hover:bg-primary/5"
       onClick={() => handleSelectProduct(product.id)}
     >
-      <div className="flex items-center gap-2">
-        <div className="w-10 h-10 rounded-lg flex justify-center items-center bg-gray-100 p-1">
+      <div className="flex items-center gap-3">
+        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gray-100 p-1.5">
           {!isExternalUrl ? (
             <Image
               src={imageUrl}
@@ -63,9 +63,9 @@ const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardPro
             />
           )}
         </div>
-        <div className="flex-1">
-          <p className="text-sm font-medium">{productName}</p>
-          <p className="text-xs text-gray-500">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[15px] font-semibold leading-5 text-gray-900">{productName}</p>
+          <p className="mt-0.5 text-xs leading-4 text-gray-500">
             {variants.length > 0
               ? `${variants.length} varian tersedia`
               : "Varian produk belum tersedia di katalog"}
@@ -85,8 +85,8 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <ul className="absolute w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg z-10">
-        <li className="p-2 flex flex-col items-center justify-center">
+      <ul className="absolute z-30 mt-2 w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl shadow-gray-900/10">
+        <li className="flex flex-col items-center justify-center px-4 py-4">
           <PulseLoader color="hsl(var(--primary))" size={10} />
           <span className="text-gray-500 text-xs mt-2">Mencari produk katalog...</span>
         </li>
@@ -96,8 +96,8 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
 
   if (isError) {
     return (
-      <ul className="absolute w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg z-10">
-        <li className="p-2 text-gray-500 flex justify-center text-center text-xs">
+      <ul className="absolute z-30 mt-2 w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl shadow-gray-900/10">
+        <li className="flex justify-center px-4 py-3 text-center text-xs leading-5 text-gray-500">
           {errorMessage || "Data pencarian produk belum tersedia. Silakan coba lagi beberapa saat lagi."}
         </li>
       </ul>
@@ -106,8 +106,8 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
 
   if (!products || products.length === 0) {
     return (
-      <ul className="absolute w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg z-10">
-        <li className="p-2 text-gray-500 flex justify-center text-center text-xs">
+      <ul className="absolute z-30 mt-2 w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl shadow-gray-900/10">
+        <li className="flex justify-center px-4 py-3 text-center text-xs leading-5 text-gray-500">
           Belum ada produk katalog yang cocok.
         </li>
       </ul>
@@ -115,7 +115,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
   }
 
   return (
-    <ul className="absolute w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg z-10">
+    <ul className="absolute z-30 mt-2 w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl shadow-gray-900/10">
       {products.slice(0, 5).map((product: CardProductProps) => (
         <SearchDropdownItem
           key={product.id}
