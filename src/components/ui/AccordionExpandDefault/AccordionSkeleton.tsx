@@ -10,20 +10,22 @@ const AccordionSkeleton = () => {
     <div>
       <Accordion
         expanded={false}
-        className="border rounded-lg bg-gray-100 animate-pulse"
+        disableGutters
+        className="animate-pulse overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm shadow-gray-900/5"
       >
         <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1-content"
-          id="panel1-header"
+          expandIcon={<ExpandMoreIcon className="text-gray-300" />}
+          aria-controls="homepage-article-skeleton-content"
+          id="homepage-article-skeleton-header"
+          className="min-h-0 px-4 py-3"
         >
-          <Typography component="div" style={{ fontWeight: "bold" }} className="font-jakarta bg-gray-300 w-1/2 h-6 rounded"></Typography>
+          <Typography component="div" className="h-5 w-2/3 rounded bg-gray-200 font-jakarta" />
         </AccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails className="border-t border-gray-100 px-4 pb-4 pt-3">
           <Typography component="div" className="font-jakarta">
-            <div className="bg-gray-300 h-4 rounded mb-2"></div>
-            <div className="bg-gray-300 h-4 rounded mb-2"></div>
-            <div className="bg-gray-300 h-4 rounded"></div>
+            <div className="mb-2 h-3.5 rounded bg-gray-200" />
+            <div className="mb-2 h-3.5 w-11/12 rounded bg-gray-200" />
+            <div className="h-3.5 w-8/12 rounded bg-gray-200" />
           </Typography>
         </AccordionDetails>
       </Accordion>
