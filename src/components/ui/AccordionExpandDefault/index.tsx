@@ -112,7 +112,6 @@ export default function AccordionExpandDefault({ article }: { article: ArticlePr
             ? "border-primary/20 bg-white shadow-md shadow-gray-900/5"
             : "border-gray-100 bg-white shadow-sm shadow-gray-900/5"
         }`}
-        onChange={handleAccordionChange}
         disableGutters
         style={{ boxShadow: "none" }}
       >
@@ -121,6 +120,7 @@ export default function AccordionExpandDefault({ article }: { article: ArticlePr
           aria-controls="homepage-article-content"
           id="homepage-article-header"
           className="min-h-0 px-4 py-3"
+          onClick={handleAccordionChange}
         >
           <Typography className="font-jakarta text-[15px] font-bold leading-6 text-gray-900">
             {article.title}
