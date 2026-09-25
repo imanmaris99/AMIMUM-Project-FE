@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { GoChevronLeft } from 'react-icons/go';
 import { HiOutlineShoppingBag, HiOutlineUser, HiOutlineMenu, HiOutlineX, HiOutlineLogout, HiOutlineCog } from 'react-icons/hi';
-import { useNotification } from '@/contexts/NotificationContext';
+import { useCart } from '@/contexts/CartContext';
 import { SessionManager } from '@/lib/auth';
 
 export type HeaderType = 'main' | 'secondary' | 'auth';
@@ -29,13 +29,12 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   subtitle,
   showBackButton = false,
   showCart = true,
-  showNotifications = true,
   // showSearch: _showSearch = true,
   onBack,
   rightAction
 }) => {
   const router = useRouter();
-  const { getNotificationCount } = useNotification();
+  const { totalItems: cartTotalItems } = useCart();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [userDisplayName, setUserDisplayName] = useState("");
@@ -124,6 +123,13 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
     router.push('/');
   };
 
+  const cartBadgeCount = showCart ? cartTotalItems : 0;
+  // Mobile header/avatar badge is used as the cart shortcut indicator on the storefront.
+  // Keep it tied to the actual active cart quantity so it cannot drift from the cart page.
+  const profileBadgeCount = cartBadgeCount;
+
+  const formatBadgeCount = (count: number) => (count > 99 ? "99+" : count);
+
 
   // Main Header (Homepage, Cart, Wishlist, etc.)
   if (type === 'main') {
@@ -185,9 +191,9 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                         )}
                       </div>
                       {/* Combined notification badge on avatar */}
-                      {(getNotificationCount("cart") > 0 || (showNotifications && getNotificationCount("tracking") + getNotificationCount("transaction") > 0)) && (
+                      {profileBadgeCount > 0 && (
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                          {getNotificationCount("cart") + (showNotifications ? getNotificationCount("tracking") + getNotificationCount("transaction") : 0) > 99 ? '99+' : getNotificationCount("cart") + (showNotifications ? getNotificationCount("tracking") + getNotificationCount("transaction") : 0)}
+                          {formatBadgeCount(profileBadgeCount)}
                         </span>
                       )}
                     </div>
@@ -210,9 +216,9 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                         >
                           <div className="relative">
                             <HiOutlineShoppingBag className="w-4 h-4" />
-                            {getNotificationCount("cart") > 0 && (
+                            {cartBadgeCount > 0 && (
                               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                                {getNotificationCount("cart") > 99 ? '99+' : getNotificationCount("cart")}
+                                {formatBadgeCount(cartBadgeCount)}
                               </span>
                             )}
                           </div>
@@ -306,9 +312,9 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                   >
                     <div className="relative">
                       <HiOutlineShoppingBag className="w-6 h-6 text-gray-700" />
-                      {getNotificationCount("cart") > 0 && (
+                      {cartBadgeCount > 0 && (
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                          {getNotificationCount("cart") > 99 ? '99+' : getNotificationCount("cart")}
+                          {formatBadgeCount(cartBadgeCount)}
                         </span>
                       )}
                     </div>

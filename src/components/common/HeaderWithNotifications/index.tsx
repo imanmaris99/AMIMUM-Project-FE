@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
-import { useNotification } from "@/contexts/NotificationContext";
 import { SessionManager } from "@/lib/auth";
 
 interface HeaderWithNotificationsProps {
@@ -24,8 +23,9 @@ const HeaderWithNotifications = ({
   onLogout
 }: HeaderWithNotificationsProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { } = useCart();
-  const { getNotificationCount, resetNotification } = useNotification();
+  const { totalItems: cartTotalItems } = useCart();
+  const cartBadgeCount = cartTotalItems;
+  const formatBadgeCount = (count: number) => (count > 99 ? "99+" : count);
 
   useEffect(() => {
     // Check if user is logged in using SessionManager
@@ -125,7 +125,6 @@ const HeaderWithNotifications = ({
               <Link 
                 href="/cart" 
                 className="relative"
-                onClick={() => resetNotification("cart")}
               >
                 <Image 
                   src="/bag-2.svg" 
@@ -134,10 +133,10 @@ const HeaderWithNotifications = ({
                   height={32} 
                   className="hover:opacity-70 transition-opacity cursor-pointer"
                 />
-                {/* Cart Badge - Show notification count only */}
-                {getNotificationCount("cart") > 0 && (
+                {/* Cart Badge - show actual active cart item count */}
+                {cartBadgeCount > 0 && (
                   <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                    {getNotificationCount("cart") > 99 ? '99+' : getNotificationCount("cart")}
+                    {formatBadgeCount(cartBadgeCount)}
                   </div>
                 )}
               </Link>
