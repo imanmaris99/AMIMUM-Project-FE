@@ -1,10 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ArticleProps } from "./types";
 
@@ -98,40 +94,45 @@ const ArticleContent = ({ descriptions }: { descriptions?: string[] }) => {
 
 export default function AccordionExpandDefault({ article }: { article: ArticleProps }) {
   const [isExpanded, setIsExpanded] = useState(false);
-
-  const handleAccordionChange = () => {
-    setIsExpanded(!isExpanded);
-  };
+  const panelId = `homepage-article-content-${article.display_id}`;
+  const buttonId = `homepage-article-header-${article.display_id}`;
 
   return (
-    <div>
-      <Accordion
-        expanded={isExpanded}
-        className={`overflow-hidden rounded-2xl border transition-all duration-200 ${
-          isExpanded
-            ? "border-primary/20 bg-white shadow-md shadow-gray-900/5"
-            : "border-gray-100 bg-white shadow-sm shadow-gray-900/5"
-        }`}
-        disableGutters
-        style={{ boxShadow: "none" }}
+    <article
+      className={`overflow-hidden rounded-2xl border bg-white transition-all duration-200 ${
+        isExpanded
+          ? "border-primary/20 shadow-md shadow-gray-900/5"
+          : "border-gray-100 shadow-sm shadow-gray-900/5"
+      }`}
+    >
+      <button
+        type="button"
+        id={buttonId}
+        aria-expanded={isExpanded}
+        aria-controls={panelId}
+        onClick={() => setIsExpanded((value) => !value)}
+        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
       >
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon className="text-primary" />}
-          aria-controls="homepage-article-content"
-          id="homepage-article-header"
-          className="min-h-0 px-4 py-3"
-          onClick={handleAccordionChange}
+        <span className="font-jakarta text-[15px] font-bold leading-6 text-gray-900">
+          {article.title}
+        </span>
+        <ExpandMoreIcon
+          className={`h-5 w-5 flex-shrink-0 text-primary transition-transform duration-200 ${
+            isExpanded ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {isExpanded && (
+        <div
+          id={panelId}
+          role="region"
+          aria-labelledby={buttonId}
+          className="border-t border-gray-100 px-4 pb-4 pt-3 font-jakarta"
         >
-          <Typography className="font-jakarta text-[15px] font-bold leading-6 text-gray-900">
-            {article.title}
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails className="border-t border-gray-100 px-4 pb-4 pt-3">
-          <div className="font-jakarta">
-            <ArticleContent descriptions={article.description_list} />
-          </div>
-        </AccordionDetails>
-      </Accordion>
-    </div>
+          <ArticleContent descriptions={article.description_list} />
+        </div>
+      )}
+    </article>
   );
 }
