@@ -105,7 +105,13 @@ const getCourierUnavailableNotice = () =>
 
 const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const router = useRouter();
-  const { cartItems, isLoading: isCartLoading, refreshCart, removeActiveItems } = useCart();
+  const {
+    cartItems,
+    isLoading: isCartLoading,
+    isSyncing: isCartSyncing,
+    refreshCart,
+    removeActiveItems,
+  } = useCart();
   const { addTransaction } = useTransaction();
   
   // State management
@@ -487,7 +493,9 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
   const canSubmitOrder =
     !isLoading &&
+    !isRecoveringCreatedOrder &&
     !isCartLoading &&
+    !isCartSyncing &&
     !isReferenceLoading &&
     !isCourierLoading &&
     currentItems.length > 0 &&
@@ -848,6 +856,14 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       return 'Memuat produk checkout dari keranjang...';
     }
 
+    if (isCartSyncing) {
+      return 'Menyimpan pilihan keranjang ke server sebelum checkout dibuka.';
+    }
+
+    if (isRecoveringCreatedOrder) {
+      return 'Mengarahkan ke transaksi yang baru dibuat. Mohon tunggu sebentar.';
+    }
+
     if (isReferenceLoading) {
       return 'Memuat data alamat dan opsi checkout...';
     }
@@ -902,7 +918,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   };
 
   const checkoutReadinessMessage = getCheckoutReadinessMessage();
-  const isCheckoutCartLoading = isCartLoading;
+  const isCheckoutCartLoading = isCartLoading || isCartSyncing;
   const isCheckoutCartEmpty = !isCartLoading && !isLoading && !isReferenceLoading && currentItems.length === 0;
 
   const renderPaymentBadge = (badge: string, isAvailable: boolean) => (
@@ -918,7 +934,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[linear-gradient(180deg,#F7FCF9_0%,#FFFFFF_44%,#FFFDF7_100%)]">
       {/* Header - Same style as track order with white background */}
       <div className="bg-white border-b border-gray-200">
         <div className="flex justify-center items-center relative mt-16 py-4">
@@ -932,7 +948,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         </div>
       </div>
 
-      <div className="max-w-sm mx-auto bg-white min-h-screen">
+      <div className="max-w-sm mx-auto min-h-screen bg-white/95 shadow-sm shadow-gray-900/5">
         {/* Error Messages */}
         {Object.keys(errors).length > 0 && (
           <div className="px-4 py-3 bg-red-50 border-l-4 border-red-400">
