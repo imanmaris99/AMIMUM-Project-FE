@@ -15,6 +15,3 @@ export { default as FAQSection } from "./homepage/Article_Section";
 export { default as HeaderRegister } from "./headers/HeaderRegister";
 export { default as RegisterForm } from "./forms/RegisterForm";
 export { default as HeaderLogin } from "./headers/HeaderLogin";
-
-// Feature-based Exports (New Structure)
-export * from "./features";
