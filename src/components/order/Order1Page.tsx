@@ -127,6 +127,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const [showAddressSelector, setShowAddressSelector] = useState(false);
   
   const [additionalNotes, setAdditionalNotes] = useState<string>('');
+  const [whatsappConsent, setWhatsappConsent] = useState(false);
   
   const [addresses, setAddresses] = useState<AddressInfo[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo | null>(null);
@@ -501,7 +502,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     currentItems.length > 0 &&
     activeSubtotal > 0 &&
     hasValidDeliverySelection &&
-    Boolean(selectedPaymentMethod);
+    Boolean(selectedPaymentMethod) &&
+    whatsappConsent;
   
   
   
@@ -594,6 +596,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
     if (!selectedPaymentMethod) {
       newErrors.payment = 'Metode pembayaran harus dipilih';
+    }
+
+    if (!whatsappConsent) {
+      newErrors.whatsappConsent = 'Setujui penggunaan nomor WhatsApp aktif untuk update pesanan.';
     }
     
     setErrors(newErrors);
@@ -906,6 +912,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
     if (!selectedPaymentMethod) {
       return 'Pilih metode pembayaran terlebih dahulu.';
+    }
+
+    if (!whatsappConsent) {
+      return 'Centang persetujuan WhatsApp agar admin bisa mengirim update pesanan ke nomor aktif Anda.';
     }
 
     if (isManualQrisPaymentMethod(selectedPaymentMethod)) {
@@ -1408,6 +1418,28 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
           </div>
           {errors.payment && (
             <p className="text-red-500 text-xs mt-2">{errors.payment}</p>
+          )}
+        </div>
+
+        {/* WhatsApp Consent */}
+        <div className="px-4 py-4 border-b border-gray-200">
+          <label className="flex items-start gap-3 rounded-2xl border border-[#CFE7DD] bg-[#F4FBF7] p-4">
+            <input
+              type="checkbox"
+              checked={whatsappConsent}
+              onChange={(event) => {
+                setWhatsappConsent(event.target.checked);
+                clearError('whatsappConsent');
+              }}
+              className="mt-1 h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
+            />
+            <span className="text-sm leading-relaxed text-gray-700">
+              <strong className="block text-gray-900">Nomor WhatsApp aktif untuk update pesanan</strong>
+              Saya memastikan nomor pada alamat/pesanan ini aktif, bisa dihubungi, dan terdaftar WhatsApp. Toko Herbal Amimum boleh menghubungi saya melalui WhatsApp untuk konfirmasi pembayaran, packing, pengiriman, resi, dan update pesanan.
+            </span>
+          </label>
+          {errors.whatsappConsent && (
+            <p className="text-red-500 text-xs mt-2">{errors.whatsappConsent}</p>
           )}
         </div>
 
