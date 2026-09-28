@@ -5,6 +5,12 @@ import { ReceiverFormData } from "@/types/shipment";
 import { getMyShipmentAddresses } from "@/services/api/shipment-address";
 import RajaOngkirLocationFields from "@/components/profile/molecules/RajaOngkirLocationFields";
 import { toast } from "react-hot-toast";
+import {
+  isLikelyIndonesianWhatsAppNumber,
+  normalizeIndonesianWhatsAppNumber,
+  WHATSAPP_PHONE_ERROR,
+  WHATSAPP_PHONE_HINT,
+} from "@/lib/phone";
 
 interface ReceiverFormProps {
   onSubmit: (data: ReceiverFormData) => void;
@@ -69,9 +75,9 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
     }
 
     if (!formData.phoneNumber.trim()) {
-      newErrors.phoneNumber = "Nomor handphone harus diisi";
-    } else if (!/^\+62\d{10,11}$/.test(formData.phoneNumber)) {
-      newErrors.phoneNumber = "Format nomor handphone tidak valid (contoh: +6281234567890)";
+      newErrors.phoneNumber = "Nomor WhatsApp aktif harus diisi";
+    } else if (!isLikelyIndonesianWhatsAppNumber(formData.phoneNumber)) {
+      newErrors.phoneNumber = WHATSAPP_PHONE_ERROR;
     }
 
     if (!formData.country.trim()) {
@@ -129,8 +135,11 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
     }
 
     setIsLoading(true);
-    
-    onSubmit(formData);
+
+    onSubmit({
+      ...formData,
+      phoneNumber: normalizeIndonesianWhatsAppNumber(formData.phoneNumber),
+    });
     setIsLoading(false);
   };
 
@@ -156,10 +165,12 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
       </div>
 
       <div className="flex flex-col gap-2 relative">
-        <label htmlFor="phoneNumber" className="text-[14px] font-semibold">Nomor Handphone</label>
+        <label htmlFor="phoneNumber" className="text-[14px] font-semibold">Nomor WhatsApp Aktif</label>
         <LuPhone className="text-xl absolute left-2 top-9 stroke-1" />
-        <input 
-          type="text" 
+        <input
+          type="tel"
+          inputMode="tel"
+          autoComplete="tel"
           id="phoneNumber" 
           name="phoneNumber" 
           value={formData.phoneNumber}
@@ -167,8 +178,9 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
           className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
             errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
           }`}
-          placeholder="+6281234567890"
+          placeholder="Contoh: 081234567890"
         />
+        <p className="text-xs leading-relaxed text-gray-500">{WHATSAPP_PHONE_HINT}</p>
         {errors.phoneNumber && (
           <p className="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>
         )}

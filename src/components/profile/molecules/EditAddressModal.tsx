@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { AddressFormData } from "./AddAddressModal";
 import RajaOngkirLocationFields from "./RajaOngkirLocationFields";
+import { WHATSAPP_PHONE_HINT } from "@/lib/phone";
 
 interface EditAddressModalProps {
   isOpen: boolean;
@@ -134,15 +135,18 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
             {/* No. Handphone Field */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-sm text-[#999999]">No. Handphone</label>
+                <label className="text-sm text-[#999999]">Nomor WhatsApp Aktif</label>
               </div>
               <input
                 type="tel"
+                inputMode="tel"
+                autoComplete="tel"
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
                 className="w-full text-sm text-[#0D0E09] bg-transparent border-none outline-none placeholder-[#999999]"
-                placeholder="Masukkan nomor handphone"
+                placeholder="Contoh: 081234567890"
               />
+              <p className="text-xs leading-relaxed text-[#666666]">{WHATSAPP_PHONE_HINT}</p>
               <div className="w-full h-[1.5px] bg-[#F2F2F2]"></div>
             </div>
 

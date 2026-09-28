@@ -17,6 +17,11 @@ import {
   ShipmentAddress,
   updateShipmentAddress,
 } from "@/services/api/shipment-address";
+import {
+  isLikelyIndonesianWhatsAppNumber,
+  normalizeIndonesianWhatsAppNumber,
+  WHATSAPP_PHONE_ERROR,
+} from "@/lib/phone";
 
 const SavedAddressesPage: React.FC = () => {
   const router = useRouter();
@@ -89,13 +94,11 @@ const SavedAddressesPage: React.FC = () => {
       throw new Error("Alamat yang akan diperbarui tidak ditemukan.");
     }
 
-    const normalizedPhone = addressData.phone.trim();
+    const normalizedPhone = normalizeIndonesianWhatsAppNumber(addressData.phone);
     const normalizedPostalCode = addressData.postalCode.trim();
 
-    if (!/^\+62\d{10,11}$/.test(normalizedPhone)) {
-      throw new Error(
-        "Nomor telepon harus diawali +62 dan berisi 10-11 digit setelahnya."
-      );
+    if (!isLikelyIndonesianWhatsAppNumber(addressData.phone)) {
+      throw new Error(WHATSAPP_PHONE_ERROR);
     }
 
     if (!addressData.address.trim()) {
@@ -211,13 +214,11 @@ const SavedAddressesPage: React.FC = () => {
   };
 
   const handleSaveNewAddress = async (addressData: AddressFormData) => {
-    const normalizedPhone = addressData.phone.trim();
+    const normalizedPhone = normalizeIndonesianWhatsAppNumber(addressData.phone);
     const normalizedPostalCode = addressData.postalCode.trim();
 
-    if (!/^\+62\d{10,11}$/.test(normalizedPhone)) {
-      throw new Error(
-        "Nomor telepon harus diawali +62 dan berisi 10-11 digit setelahnya."
-      );
+    if (!isLikelyIndonesianWhatsAppNumber(addressData.phone)) {
+      throw new Error(WHATSAPP_PHONE_ERROR);
     }
 
     if (!addressData.address.trim()) {
