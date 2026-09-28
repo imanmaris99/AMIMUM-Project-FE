@@ -9,8 +9,11 @@ import LoginProtection from "@/components/common/LoginProtection";
 import rupiahFormater from "@/utils/rupiahFormater";
 import {
   getPaymentMethodLabel,
+  isManualBankTransferPaymentMethod,
   isManualQrisPaymentMethod,
   QRIS_MANUAL_IMAGE_PATH,
+  STORE_BANK_ACCOUNT,
+  STORE_BANK_ACCOUNT_TEXT,
 } from "@/lib/paymentMethods";
 import { Transaction } from "@/types/transaction";
 import { SessionManager } from "@/lib/auth";
@@ -139,6 +142,12 @@ const TransactionDetailPage: React.FC = () => {
       `Tanggal        : ${transaction.date}`,
       `Status         : ${customerStatus}`,
       `Metode Bayar   : ${getPaymentMethodLabel(transaction.paymentMethod)}`,
+      ...(isManualBankTransferPaymentMethod(transaction.paymentMethod)
+        ? [
+            `Rekening       : ${STORE_BANK_ACCOUNT.bank} ${STORE_BANK_ACCOUNT.number}`,
+            `Atas Nama      : ${STORE_BANK_ACCOUNT.accountName}`,
+          ]
+        : []),
       `Pengiriman     : ${deliveryLabel}`,
       "",
       "Rincian Item",
@@ -345,11 +354,14 @@ const TransactionDetailPage: React.FC = () => {
   const canRetryPayment = isFailedPaymentStatus(transaction.status);
   const isOfflinePayment = isOfflinePaymentMethod(transaction.paymentMethod);
   const isManualQrisPayment = isManualQrisPaymentMethod(transaction.paymentMethod);
+  const isManualBankTransferPayment = isManualBankTransferPaymentMethod(transaction.paymentMethod);
   const shouldShowPaymentActions =
-    !isLocalSimulatedTransaction && !isOfflinePayment && !isManualQrisPayment && (isPendingPayment || canRetryPayment);
+    !isLocalSimulatedTransaction && !isOfflinePayment && !isManualQrisPayment && !isManualBankTransferPayment && (isPendingPayment || canRetryPayment);
   const transactionGuidance = isManualQrisPayment && isPendingPayment
     ? "Pesanan QRIS sudah tercatat. Scan QRIS resmi toko, bayar sesuai nominal total, lalu tunggu admin mengonfirmasi pembayaran."
-    : isPendingPayment
+    : isManualBankTransferPayment && isPendingPayment
+      ? `Pesanan transfer sudah tercatat. Transfer sesuai nominal total ke ${STORE_BANK_ACCOUNT_TEXT}, lalu kirim bukti pembayaran ke admin WhatsApp untuk diverifikasi.`
+      : isPendingPayment
     ? "Pesanan sudah tercatat. Selesaikan pembayaran agar pesanan bisa diproses toko."
     : canRetryPayment
       ? "Pembayaran belum berhasil. Coba bayar lagi atau hubungi admin jika butuh bantuan."
@@ -541,6 +553,37 @@ const TransactionDetailPage: React.FC = () => {
               <p className="mt-2 text-center text-[11px] leading-relaxed text-gray-500">
                 Tombol ini mengirim notifikasi ke admin. Status order berubah setelah admin memverifikasi dana masuk.
               </p>
+            </div>
+          )}
+
+          {isManualBankTransferPayment && isPendingPayment && (
+            <div className="bg-white rounded-lg shadow-sm border border-emerald-200 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                Transfer Bank Manual
+              </p>
+              <h3 className="mt-1 text-lg font-semibold text-gray-900">
+                Transfer ke Rekening Resmi Toko
+              </h3>
+              <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+                <div className="flex justify-between gap-3">
+                  <span>Bank</span>
+                  <strong>{STORE_BANK_ACCOUNT.bank}</strong>
+                </div>
+                <div className="mt-2 flex justify-between gap-3">
+                  <span>No. Rekening</span>
+                  <strong className="text-right">{STORE_BANK_ACCOUNT.number}</strong>
+                </div>
+                <div className="mt-2 flex justify-between gap-3">
+                  <span>Atas Nama</span>
+                  <strong className="text-right">{STORE_BANK_ACCOUNT.accountName}</strong>
+                </div>
+                <div className="mt-3 border-t border-emerald-200 pt-3">
+                  <p className="font-semibold">Total yang dibayar: {rupiahFormater(transaction.total)}</p>
+                  <p className="mt-1 text-xs leading-relaxed">
+                    Transfer sesuai nominal total, simpan bukti pembayaran, lalu kirim bukti ke admin melalui WhatsApp agar pesanan segera diverifikasi.
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 

@@ -23,8 +23,10 @@ import {
   getPaymentMethodGroups,
   requiresPendingPayment,
   isManualQrisPaymentMethod,
+  isManualBankTransferPaymentMethod,
   isMidtransSandboxPaymentMethod,
   PaymentMethodGroup,
+  STORE_BANK_ACCOUNT_TEXT,
 } from '@/lib/paymentMethods';
 import {
   getMyShipmentAddresses,
@@ -1418,6 +1420,20 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
           </div>
           {errors.payment && (
             <p className="text-red-500 text-xs mt-2">{errors.payment}</p>
+          )}
+          {selectedPaymentMethod && (isManualQrisPaymentMethod(selectedPaymentMethod) || isManualBankTransferPaymentMethod(selectedPaymentMethod)) && (
+            <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm text-emerald-800">
+              <p className="font-semibold">Instruksi pembayaran manual</p>
+              {isManualBankTransferPaymentMethod(selectedPaymentMethod) ? (
+                <p className="mt-1 text-xs leading-relaxed">
+                  Transfer ke rekening resmi toko: <strong>{STORE_BANK_ACCOUNT_TEXT}</strong>. Setelah transfer, simpan bukti dan kirim ke admin melalui WhatsApp agar pesanan segera diverifikasi.
+                </p>
+              ) : (
+                <p className="mt-1 text-xs leading-relaxed">
+                  Scan QRIS resmi toko setelah pesanan dibuat, bayar sesuai total, lalu simpan bukti pembayaran dan konfirmasi ke admin.
+                </p>
+              )}
+            </div>
           )}
         </div>
 

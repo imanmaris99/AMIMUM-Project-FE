@@ -21,6 +21,7 @@ export type TransactionPaymentMethod =
   | 'dana'
   | 'qris'
   | 'qris_manual'
+  | 'transfer'
   | 'alfamart'
   | 'indomaret'
   | 'cod'
