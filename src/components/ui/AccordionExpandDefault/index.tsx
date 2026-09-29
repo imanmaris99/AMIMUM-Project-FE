@@ -93,7 +93,8 @@ const ArticleContent = ({ descriptions }: { descriptions?: string[] }) => {
 };
 
 export default function AccordionExpandDefault({ article }: { article: ArticleProps }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const isPinnedImportantArticle = article.display_id < 0;
+  const [isExpanded, setIsExpanded] = useState(isPinnedImportantArticle);
   const panelId = `homepage-article-content-${article.display_id}`;
   const buttonId = `homepage-article-header-${article.display_id}`;
 
