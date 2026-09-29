@@ -65,33 +65,13 @@ const DELIVERY_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
     ],
   },
   {
-    id: "offline",
-    title: "Gerai Offline",
-    methods: [
-      {
-        id: "alfamart",
-        name: "Alfamart / Alfamidi / Lawson / Dan+Dan",
-        description: "Bayar tunai di gerai terdekat",
-        badge: "AL",
-        isAvailable: true,
-      },
-      {
-        id: "indomaret",
-        name: "Indomaret / Ceriamart",
-        description: "Bayar tunai di gerai terdekat",
-        badge: "IN",
-        isAvailable: true,
-      },
-    ],
-  },
-  {
     id: "cod",
-    title: "Bayar di Tempat",
+    title: "Bayar Saat Paket Diterima",
     methods: [
       {
         id: "cod",
         name: "COD",
-        description: "Pesanan langsung diproses",
+        description: "Bayar pesanan kepada kurir saat paket diterima. Ongkir mengikuti layanan jasa kirim yang dipilih saat checkout.",
         badge: "COD",
         isAvailable: true,
       },
@@ -141,12 +121,12 @@ const PICKUP_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
   },
   {
     id: "pickup",
-    title: "Pembayaran Pickup",
+    title: "Bayar Langsung di Toko Amimum",
     methods: [
       {
         id: "pay_at_store",
-        name: "Bayar di Toko",
-        description: "Bayar saat datang ke toko",
+        name: "Bayar di Toko Herbal Amimum",
+        description: "Khusus pickup/ambil di toko. Pembayaran dilakukan langsung di toko offline Toko Herbal Amimum.",
         badge: "TOKO",
         isAvailable: true,
       },

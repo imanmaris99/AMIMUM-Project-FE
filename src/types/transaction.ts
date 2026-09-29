@@ -22,8 +22,6 @@ export type TransactionPaymentMethod =
   | 'qris'
   | 'qris_manual'
   | 'transfer'
-  | 'alfamart'
-  | 'indomaret'
   | 'cod'
   | 'pay_at_store';
 

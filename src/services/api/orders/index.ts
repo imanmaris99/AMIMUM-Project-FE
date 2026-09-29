@@ -247,8 +247,6 @@ const extractPaymentMethodFromNotes = (
     gopay: "gopay",
     ovo: "ovo",
     dana: "dana",
-    alfamart: "alfamart",
-    indomaret: "indomaret",
   };
 
   return aliases[paymentMethod];

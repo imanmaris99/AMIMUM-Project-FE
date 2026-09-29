@@ -1349,7 +1349,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         <div className="px-4 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Metode Pembayaran</h2>
           <div className="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-3 py-3 text-sm text-blue-800">
-            Pilih QRIS resmi toko untuk pembayaran praktis via e-wallet/mobile banking, atau Midtrans Sandbox hanya untuk testing internal.
+            Untuk pengiriman jarak jauh, ongkir mengikuti jasa kirim/kurir yang dipilih di checkout. Pembayaran di gerai offline hanya tersedia saat pickup langsung di Toko Herbal Amimum.
           </div>
           <div className="space-y-4">
             {paymentMethodGroups.map((group: PaymentMethodGroup) => (
