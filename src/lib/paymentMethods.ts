@@ -64,19 +64,6 @@ const DELIVERY_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
       },
     ],
   },
-  {
-    id: "cod",
-    title: "Bayar Saat Paket Diterima",
-    methods: [
-      {
-        id: "cod",
-        name: "COD",
-        description: "Bayar pesanan kepada kurir saat paket diterima. Ongkir mengikuti layanan jasa kirim yang dipilih saat checkout.",
-        badge: "COD",
-        isAvailable: true,
-      },
-    ],
-  },
 ];
 
 const PICKUP_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
@@ -144,6 +131,8 @@ export const getPaymentMethodGroups = (
 export const getPaymentMethodLabel = (
   method?: TransactionPaymentMethod
 ): string => {
+  if (method === "cod") return "COD ongkir/jasa kirim";
+
   const allMethods = [
     ...DELIVERY_PAYMENT_METHOD_GROUPS.flatMap((group) => group.methods),
     ...PICKUP_PAYMENT_METHOD_GROUPS.flatMap((group) => group.methods),

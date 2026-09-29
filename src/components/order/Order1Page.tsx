@@ -1349,7 +1349,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         <div className="px-4 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Metode Pembayaran</h2>
           <div className="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-3 py-3 text-sm text-blue-800">
-            Untuk pengiriman jarak jauh, ongkir mengikuti jasa kirim/kurir yang dipilih di checkout. Pembayaran di gerai offline hanya tersedia saat pickup langsung di Toko Herbal Amimum.
+            Pembayaran produk dilakukan melalui QRIS resmi toko atau Transfer BRI manual. Untuk pengiriman jarak jauh, ongkir mengikuti jasa kirim/kurir yang dipilih di checkout; COD hanya terkait mekanisme jasa kirim bila tersedia dari kurir, bukan pembayaran total produk.
           </div>
           <div className="space-y-4">
             {paymentMethodGroups.map((group: PaymentMethodGroup) => (
