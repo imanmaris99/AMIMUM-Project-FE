@@ -20,6 +20,8 @@ interface CheckoutOrderData {
   notes?: string;
   shipment_id?: string;
   shipping_cost?: number;
+  shipping_fee_payment_mode?: "prepaid" | "cod_shipping";
+  shipping_due_on_delivery?: number;
   shipment_address?: TransactionShipmentAddress;
   backend_order_id?: string;
   backend_order_status?: TransactionStatus;
@@ -158,7 +160,10 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
 
       const shippingCost =
         orderData.delivery_type === "delivery" ? orderData.shipping_cost || 0 : 0;
-      const finalAmount = subtotal + shippingCost;
+      const shippingDueOnDelivery =
+        orderData.delivery_type === "delivery" ? orderData.shipping_due_on_delivery || 0 : 0;
+      const payableShippingCost = Math.max(shippingCost - shippingDueOnDelivery, 0);
+      const finalAmount = subtotal + payableShippingCost;
       const initialStatus: TransactionStatus =
         orderData.backend_order_status ||
         getInitialTransactionStatus(orderData.payment_method);
@@ -182,6 +187,8 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         updatedAt: now.toISOString(),
         subtotal,
         shippingCost,
+        shippingFeePaymentMode: orderData.shipping_fee_payment_mode,
+        shippingDueOnDelivery,
         // Additional order data
         deliveryType: orderData.delivery_type,
         paymentMethod: orderData.payment_method,

@@ -67,6 +67,8 @@ interface StoreAddressInfo {
   cityId?: number;
 }
 
+type ShippingFeePaymentMode = 'prepaid' | 'cod_shipping';
+
 const normalizeAreaName = (value: string) =>
   value
     .toUpperCase()
@@ -123,6 +125,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   // Courier state - using hierarchical selection
   const [selectedCourierCompany, setSelectedCourierCompany] = useState<string>('');
   const [selectedCourierService, setSelectedCourierService] = useState<string>('');
+  const [shippingFeePaymentMode, setShippingFeePaymentMode] =
+    useState<ShippingFeePaymentMode>('prepaid');
   const [isLoading, setIsLoading] = useState(false);
   const isSubmittingRef = React.useRef(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
@@ -357,6 +361,12 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   }, [deliveryMethod, paymentMethodGroups, selectedPaymentMethod]);
 
   useEffect(() => {
+    if (deliveryMethod !== 'delivery') {
+      setShippingFeePaymentMode('prepaid');
+    }
+  }, [deliveryMethod]);
+
+  useEffect(() => {
     setExpandedPaymentGroups(
       paymentMethodGroups.reduce<Record<string, boolean>>((accumulator, group) => {
         accumulator[group.id] = group.id === 'online_payment';
@@ -514,12 +524,15 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     const subtotal = activeSubtotal;
     const discount = 0;
     const shippingCost = deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0;
+    const payableShipping = shippingFeePaymentMode === 'prepaid' ? shippingCost : 0;
 
     return {
       subtotal,
       discount,
       shipping: shippingCost,
-      total: subtotal + shippingCost,
+      payableShipping,
+      shippingDueOnDelivery: shippingFeePaymentMode === 'cod_shipping' ? shippingCost : 0,
+      total: subtotal + payableShipping,
     };
   };
 
@@ -663,9 +676,18 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
       const checkoutSubtotal = freshCheckoutCart.subtotal;
       const checkoutShipping = deliveryMethod === 'delivery' ? (selectedCourierData?.cost || 0) : 0;
-      const checkoutTotal = freshCheckoutCart.total + checkoutShipping;
+      const checkoutPayableShipping = shippingFeePaymentMode === 'prepaid' ? checkoutShipping : 0;
+      const checkoutShippingDueOnDelivery = shippingFeePaymentMode === 'cod_shipping' ? checkoutShipping : 0;
+      const checkoutTotal = freshCheckoutCart.total + checkoutPayableShipping;
+      const shippingFeeNote = deliveryMethod === 'delivery'
+        ? `[SHIPPING_FEE_PAYMENT: ${shippingFeePaymentMode}]`
+        : undefined;
       const backendCheckoutNotes = [
         `[PAYMENT: ${selectedPayment}]`,
+        shippingFeeNote,
+        checkoutShippingDueOnDelivery > 0
+          ? `[SHIPPING_DUE_ON_DELIVERY: ${Math.round(checkoutShippingDueOnDelivery)}]`
+          : undefined,
         additionalNotes || (deliveryMethod === 'pickup' ? 'Ambil di toko' : undefined),
       ]
         .filter(Boolean)
@@ -675,9 +697,11 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       const orderData = {
         delivery_type: deliveryMethod,
         payment_method: selectedPayment,
-        notes: additionalNotes || (deliveryMethod === 'pickup' ? 'Ambil di toko' : undefined),
+        notes: backendCheckoutNotes,
         shipment_id: deliveryMethod === 'delivery' ? selectedCourierService : undefined,
         shipping_cost: checkoutShipping,
+        shipping_fee_payment_mode: deliveryMethod === 'delivery' ? shippingFeePaymentMode : 'prepaid',
+        shipping_due_on_delivery: checkoutShippingDueOnDelivery,
         shipment_address:
           deliveryMethod === 'delivery' && selectedAddress && selectedCourierData
             ? {
@@ -1263,6 +1287,56 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                 {courierNotice}
               </p>
             )}
+            {selectedCourierData && (
+              <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-4">
+                <h3 className="text-sm font-semibold text-gray-900">Cara Bayar Biaya Kirim</h3>
+                <p className="mt-1 text-xs leading-relaxed text-gray-600">
+                  Pilihan ini hanya untuk ongkir/jasa kirim. Pembayaran produk tetap melalui metode resmi toko.
+                </p>
+                <div className="mt-3 space-y-2">
+                  {[
+                    {
+                      id: 'prepaid' as ShippingFeePaymentMode,
+                      title: 'Gabungkan ongkir dengan total produk',
+                      description: 'Customer membayar produk + ongkir sekaligus melalui QRIS/Transfer/metode toko.',
+                    },
+                    {
+                      id: 'cod_shipping' as ShippingFeePaymentMode,
+                      title: 'Bayar ongkir saat paket tiba',
+                      description: 'Customer membayar produk sekarang; biaya kirim dibayar saat paket tiba jika didukung kurir.',
+                    },
+                  ].map((option) => {
+                    const isSelected = shippingFeePaymentMode === option.id;
+
+                    return (
+                      <label
+                        key={option.id}
+                        className={`flex cursor-pointer items-start gap-3 rounded-xl border px-3 py-3 transition-all ${
+                          isSelected
+                            ? 'border-primary bg-primary/5'
+                            : 'border-gray-200 hover:border-primary/40'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="shippingFeePaymentMode"
+                          value={option.id}
+                          checked={isSelected}
+                          onChange={(event) => {
+                            setShippingFeePaymentMode(event.target.value as ShippingFeePaymentMode);
+                          }}
+                          className="mt-1 h-4 w-4 accent-primary"
+                        />
+                        <span>
+                          <span className="block text-sm font-semibold text-gray-900">{option.title}</span>
+                          <span className="mt-1 block text-xs leading-relaxed text-gray-600">{option.description}</span>
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1325,10 +1399,19 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
               </div>
             )}
             {deliveryMethod === 'delivery' && totals.shipping > 0 && (
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Ongkir</span>
-                <span className="font-medium">{rupiahFormater(totals.shipping)}</span>
-              </div>
+              <>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">
+                    Ongkir {shippingFeePaymentMode === 'prepaid' ? '(digabung total)' : '(bayar saat paket tiba)'}
+                  </span>
+                  <span className="font-medium">{rupiahFormater(totals.shipping)}</span>
+                </div>
+                {totals.shippingDueOnDelivery > 0 && (
+                  <div className="rounded-lg bg-orange-50 px-3 py-2 text-xs font-medium text-orange-800">
+                    Ongkir {rupiahFormater(totals.shippingDueOnDelivery)} tidak masuk total pembayaran produk; dibayar saat paket tiba sesuai kebijakan/dukungan kurir.
+                  </div>
+                )}
+              </>
             )}
             {deliveryMethod === 'pickup' && (
               <div className="flex justify-between items-center">
@@ -1338,7 +1421,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             )}
             <div className="border-t border-gray-200 pt-3">
               <div className="flex justify-between items-center text-lg font-semibold">
-                <span>Total</span>
+                <span>{shippingFeePaymentMode === 'cod_shipping' ? 'Total bayar produk sekarang' : 'Total'}</span>
                 <span className="text-primary">{rupiahFormater(totals.total)}</span>
               </div>
             </div>
@@ -1349,7 +1432,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         <div className="px-4 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Metode Pembayaran</h2>
           <div className="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-3 py-3 text-sm text-blue-800">
-            Pembayaran produk dilakukan melalui QRIS resmi toko atau Transfer BRI manual. Untuk pengiriman jarak jauh, ongkir mengikuti jasa kirim/kurir yang dipilih di checkout; COD hanya terkait mekanisme jasa kirim bila tersedia dari kurir, bukan pembayaran total produk.
+            Pembayaran produk dilakukan melalui QRIS resmi toko atau Transfer BRI manual. Biaya kirim dapat digabung ke total produk, atau dibayar saat paket tiba jika kurir mendukung COD ongkir. COD tidak berlaku untuk pembayaran produk.
           </div>
           <div className="space-y-4">
             {paymentMethodGroups.map((group: PaymentMethodGroup) => (

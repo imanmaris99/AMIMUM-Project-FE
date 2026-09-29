@@ -37,7 +37,7 @@ const BACKEND_ORDER_ID_PATTERN =
 
 const getCustomerSafeNote = (notes?: string) => {
   const sanitized = notes
-    ?.replace(/\[(?:PAYMENT|POS_SUBTOTAL|POS_DISCOUNT|POS_TOTAL):[^\]]*\]/gi, "")
+    ?.replace(/\[(?:PAYMENT|SHIPPING_FEE_PAYMENT|SHIPPING_DUE_ON_DELIVERY|POS_SUBTOTAL|POS_DISCOUNT|POS_TOTAL):[^\]]*\]/gi, "")
     .split("|")
     .map((part) => part.trim())
     .filter(Boolean)
@@ -132,6 +132,11 @@ const TransactionDetailPage: React.FC = () => {
       transaction.deliveryType === "delivery" ? "Kirim ke tujuan" : "Ambil di toko";
     const shipment = transaction.shipmentAddress;
     const customerSafeNote = getCustomerSafeNote(transaction.notes);
+    const shippingFeeModeLabel = transaction.shippingDueOnDelivery && transaction.shippingDueOnDelivery > 0
+      ? "Bayar ongkir saat paket tiba"
+      : transaction.deliveryType === "delivery"
+        ? "Ongkir digabung ke total produk"
+        : "-";
     const invoiceLines = [
       "TOKO HERBAL AMIMUM",
       "Bukti Transaksi Customer",
@@ -161,6 +166,10 @@ const TransactionDetailPage: React.FC = () => {
       "----------------------------------------",
       `Subtotal       : ${rupiahFormater(transaction.subtotal)}`,
       `Ongkir         : ${rupiahFormater(transaction.shippingCost)}`,
+      `Cara Bayar Ongkir: ${shippingFeeModeLabel}`,
+      ...(transaction.shippingDueOnDelivery && transaction.shippingDueOnDelivery > 0
+        ? [`Ongkir Bayar Tiba: ${rupiahFormater(transaction.shippingDueOnDelivery)}`]
+        : []),
       `Total          : ${rupiahFormater(transaction.total)}`,
       "",
       "Detail Pengiriman",
@@ -459,6 +468,13 @@ const TransactionDetailPage: React.FC = () => {
                   {rupiahFormater(transaction.shippingCost)}
                 </span>
               </div>
+              {transaction.deliveryType === "delivery" && (
+                <div className="rounded-lg bg-orange-50 px-3 py-2 text-xs font-medium text-orange-800">
+                  {transaction.shippingDueOnDelivery && transaction.shippingDueOnDelivery > 0
+                    ? `Ongkir ${rupiahFormater(transaction.shippingDueOnDelivery)} dibayar saat paket tiba. Total di bawah hanya pembayaran produk/metode toko.`
+                    : "Ongkir digabung ke total pembayaran produk."}
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Total:</span>
                 <span className="text-sm font-medium text-gray-900">

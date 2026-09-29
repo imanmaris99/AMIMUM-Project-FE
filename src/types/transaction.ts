@@ -49,6 +49,8 @@ export interface Transaction {
   updatedAt: string;
   subtotal: number;
   shippingCost: number;
+  shippingFeePaymentMode?: 'prepaid' | 'cod_shipping';
+  shippingDueOnDelivery?: number;
   // Additional order data
   deliveryType?: string;
   paymentMethod?: TransactionPaymentMethod;

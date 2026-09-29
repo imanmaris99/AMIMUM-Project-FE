@@ -30,7 +30,7 @@ interface OrderConfirmationProps {
 
 const getCustomerSafeNote = (notes?: string) => {
   const sanitized = notes
-    ?.replace(/\[(?:PAYMENT|POS_SUBTOTAL|POS_DISCOUNT|POS_TOTAL):[^\]]*\]/gi, '')
+    ?.replace(/\[(?:PAYMENT|SHIPPING_FEE_PAYMENT|SHIPPING_DUE_ON_DELIVERY|POS_SUBTOTAL|POS_DISCOUNT|POS_TOTAL):[^\]]*\]/gi, '')
     .split('|')
     .map((part) => part.trim())
     .filter(Boolean)

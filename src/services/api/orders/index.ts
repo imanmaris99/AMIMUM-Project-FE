@@ -252,6 +252,25 @@ const extractPaymentMethodFromNotes = (
   return aliases[paymentMethod];
 };
 
+const extractShippingFeePaymentModeFromNotes = (
+  notes?: string | null
+): Transaction["shippingFeePaymentMode"] => {
+  const match = notes?.match(/\[SHIPPING_FEE_PAYMENT:\s*([^\]]+)\]/i);
+  const mode = match?.[1]?.trim().toLowerCase();
+
+  if (mode === "cod_shipping") return "cod_shipping";
+  if (mode === "prepaid") return "prepaid";
+
+  return undefined;
+};
+
+const extractShippingDueOnDeliveryFromNotes = (notes?: string | null): number => {
+  const match = notes?.match(/\[SHIPPING_DUE_ON_DELIVERY:\s*([^\]]+)\]/i);
+  const value = Number(match?.[1]);
+
+  return Number.isFinite(value) && value > 0 ? value : 0;
+};
+
 const inferPaymentMethod = (order: Pick<OrderListItemDto, "notes" | "status">) => {
   const fromNotes = extractPaymentMethodFromNotes(order.notes);
   if (fromNotes) return fromNotes;
@@ -266,7 +285,7 @@ const inferPaymentMethod = (order: Pick<OrderListItemDto, "notes" | "status">) =
 
 const sanitizeCustomerNotes = (notes?: string | null): string | undefined => {
   const sanitized = notes
-    ?.replace(/\[(?:PAYMENT|POS_SUBTOTAL|POS_DISCOUNT|POS_TOTAL):[^\]]*\]/gi, "")
+    ?.replace(/\[(?:PAYMENT|SHIPPING_FEE_PAYMENT|SHIPPING_DUE_ON_DELIVERY|POS_SUBTOTAL|POS_DISCOUNT|POS_TOTAL):[^\]]*\]/gi, "")
     .split("|")
     .map((part) => part.trim())
     .filter(Boolean)
@@ -294,7 +313,13 @@ export const mapOrderSummaryToTransaction = (
   const subtotal =
     order.order_item_lists.reduce((total, item) => total + item.total_price, 0) ||
     Math.max(order.total_price - order.shipping_cost, 0);
-  const total = subtotal + (order.shipping_cost || 0);
+  const shippingFeePaymentMode = extractShippingFeePaymentModeFromNotes(order.notes);
+  const shippingDueOnDelivery =
+    shippingFeePaymentMode === "cod_shipping"
+      ? extractShippingDueOnDeliveryFromNotes(order.notes) || order.shipping_cost || 0
+      : 0;
+  const payableShipping = Math.max((order.shipping_cost || 0) - shippingDueOnDelivery, 0);
+  const total = subtotal + payableShipping;
 
   return {
     id: order.id,
@@ -308,6 +333,8 @@ export const mapOrderSummaryToTransaction = (
     updatedAt: order.created_at,
     subtotal,
     shippingCost: order.shipping_cost || 0,
+    shippingFeePaymentMode,
+    shippingDueOnDelivery,
     deliveryType: order.delivery_type,
     paymentMethod: inferPaymentMethod(order),
     notes: sanitizeCustomerNotes(order.notes),
