@@ -130,8 +130,8 @@ export const ERROR_MESSAGES = {
     action: 'Periksa Kembali'
   },
   [ErrorType.UNKNOWN]: {
-    title: 'Terjadi Kesalahan',
-    message: 'Terjadi kesalahan yang tidak terduga.',
+    title: 'Proses Belum Berhasil',
+    message: 'Sebagian data belum bisa diproses. Silakan muat ulang atau coba lagi beberapa saat lagi.',
     action: 'Coba Lagi'
   }
 };
