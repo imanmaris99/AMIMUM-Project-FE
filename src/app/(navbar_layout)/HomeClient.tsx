@@ -3,7 +3,6 @@ import { useState } from "react";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 import dynamic from "next/dynamic";
 import { validateProductionData } from "@/utils/dataValidation";
-import { ErrorHandler } from "@/lib/errorHandler";
 
 const Promo = dynamic(() => import("@/components/homepage/Promo_Section"), { ssr: false });
 const Category = dynamic(() => import("@/components/homepage/Category_Section"), { ssr: false });
@@ -39,22 +38,6 @@ export default function HomeClient({
   const productionsData = Array.isArray(productions) ? productions : [];
   const promoData = Array.isArray(promo) ? promo : [];
   const articlesData = Array.isArray(articles) ? articles : [];
-  
-  // Validate data arrays
-  if (!Array.isArray(categoriesData)) {
-    ErrorHandler.handleError(new Error('Categories data is not an array'), 'HomepageData');
-  }
-  if (!Array.isArray(productionsData)) {
-    ErrorHandler.handleError(new Error('Productions data is not an array'), 'HomepageData');
-  }
-  if (!Array.isArray(promoData)) {
-    ErrorHandler.handleError(new Error('Promo data is not an array'), 'HomepageData');
-  }
-  if (!Array.isArray(articlesData)) {
-    ErrorHandler.handleError(new Error('Articles data is not an array'), 'HomepageData');
-  }
-  
-  
   
   // Validate category selection
   const selectedCategoryName = selectedCategory 

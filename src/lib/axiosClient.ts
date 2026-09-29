@@ -73,15 +73,27 @@ axiosClient.interceptors.response.use(
     !urlPath.includes('/product/detail/') &&
     !urlPath.includes('/product/discount/');
     const expectedHandledEndpoints: string[] = [
+      API_ENDPOINTS.CATEGORIES_ALL,
+      API_ENDPOINTS.PRODUCTION_ALL,
+      API_ENDPOINTS.PRODUCTION_PROMO,
+      API_ENDPOINTS.BRAND_ALL,
+      API_ENDPOINTS.BRAND_PROMO,
+      API_ENDPOINTS.BRAND_LOADER,
+      API_ENDPOINTS.ARTICLES_ALL,
       API_ENDPOINTS.ORDERS_CHECKOUT,
       API_ENDPOINTS.PAYMENTS_CREATE,
       API_ENDPOINTS.CART_MY_CART,
       API_ENDPOINTS.CART_TOTAL_ITEMS,
+      API_ENDPOINTS.WISHLIST_MY_PRODUCTS,
+      API_ENDPOINTS.WISHLIST_TOTAL_ITEMS,
     ];
     const isExpectedHandledEndpoint =
       expectedHandledEndpoints.includes(urlPath) ||
       /^\/orders\/(my-orders|detail|complete-details)(?:\/|$)/.test(urlPath) ||
       /^\/cart\/(product|update-quantity|update-activate|delete)(?:\/|$)/.test(urlPath) ||
+      /^\/wishlist\/(product|delete)(?:\/|$)/.test(urlPath) ||
+      /^\/brand\/(detail|loader\/categories)(?:\/|$)/.test(urlPath) ||
+      /^\/product\/(detail|discount\/production|production)(?:\/|$)/.test(urlPath) ||
       urlPath === API_ENDPOINTS.CART_UPDATE_ACTIVATE_ALL;
     
     if (error.response) {

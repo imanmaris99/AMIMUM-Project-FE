@@ -3,7 +3,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { WishlistItem } from '@/types/wishlist';
 import { validateWishlistItemData } from '@/utils/dataValidation';
-import { ErrorHandler } from '@/lib/errorHandler';
 import { SessionManager } from '@/lib/auth';
 import {
   addWishlistProduct,
@@ -87,8 +86,9 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       const response = await getMyWishlistProducts();
       const mappedItems = response.data.map(mapApiWishlistToItem);
       setWishlistItems(mappedItems.filter((item) => validateWishlistItemData(item)));
-    } catch (error) {
-      ErrorHandler.handleError(error, 'WishlistLoad');
+    } catch {
+      // Wishlist is loaded in the global app shell. Keep background sync
+      // failures silent so homepage customers do not see unclear red popups.
       setWishlistItems([]);
     } finally {
       setIsLoading(false);
@@ -102,8 +102,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   const addToWishlist = async (product: WishlistItem) => {
     try {
       if (!product || !product.productId) {
-        ErrorHandler.handleError(new Error('Product ID is required'), 'WishlistAdd');
-        return;
+        throw new Error('Produk belum valid untuk ditambahkan ke wishlist.');
       }
 
       if (!SessionManager.isAuthenticated()) {
@@ -111,8 +110,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       }
 
       if (!validateWishlistItemData(product)) {
-        ErrorHandler.handleError(new Error('Invalid wishlist item data structure'), 'WishlistAdd');
-        return;
+        throw new Error('Data produk belum lengkap untuk wishlist.');
       }
 
       const response = await addWishlistProduct(product.productId);
@@ -126,15 +124,13 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
       await refreshWishlist();
     } catch (error) {
-      ErrorHandler.handleError(error, 'WishlistAdd');
       throw error;
     }
   };
 
   const removeFromWishlist = async (wishlistIdOrProductId: string) => {
     if (!wishlistIdOrProductId || typeof wishlistIdOrProductId !== 'string') {
-      ErrorHandler.handleError(new Error('Invalid wishlist identifier'), 'WishlistRemove');
-      return;
+      throw new Error('Data wishlist belum valid.');
     }
 
     try {
@@ -160,7 +156,6 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       saveProductIdCache(cache);
       await refreshWishlist();
     } catch (error) {
-      ErrorHandler.handleError(error, 'WishlistRemove');
       throw error;
     }
   };
@@ -199,8 +194,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
   const toggleWishlist = async (product: WishlistItem) => {
     if (!product || !product.productId) {
-      ErrorHandler.handleError(new Error('Invalid product for wishlist toggle'), 'WishlistToggle');
-      return;
+      throw new Error('Produk belum valid untuk wishlist.');
     }
     
     if (isInWishlist(product.productId)) {

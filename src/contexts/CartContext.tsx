@@ -9,7 +9,6 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import { toast } from "react-hot-toast";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 import { CartItemType, CartTotalPricesType } from "@/types/apiTypes";
 import { SessionManager } from "@/lib/auth";
@@ -208,10 +207,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         total: cartResponse.total_prices.total_all_active_prices,
         promo_total: cartResponse.total_prices.all_promo_active_prices,
       });
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Gagal mengambil keranjang."
-      );
+    } catch {
+      // Refresh runs globally in the app shell. Do not show a red popup on
+      // public pages if a background cart sync fails; action-specific cart
+      // buttons still surface their own clear errors.
       setCartItems([]);
       setTotalItems(0);
       setTotalPrices({
