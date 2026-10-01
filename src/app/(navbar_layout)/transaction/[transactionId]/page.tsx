@@ -38,6 +38,7 @@ const BACKEND_ORDER_ID_PATTERN =
 const getCustomerSafeNote = (notes?: string) => {
   const sanitized = notes
     ?.replace(/\[(?:PAYMENT|SHIPPING_FEE_PAYMENT|SHIPPING_DUE_ON_DELIVERY|POS_SUBTOTAL|POS_DISCOUNT|POS_TOTAL):[^\]]*\]/gi, "")
+    .replace(/\[(?:PAYMENT|SHIPPING_FEE_PAYMENT|SHIPPING_DUE_ON_DELIVERY|POS_[A-Z_]*)[^\]|]*/gi, "")
     .split("|")
     .map((part) => part.trim())
     .filter(Boolean)

@@ -286,12 +286,30 @@ const inferPaymentMethod = (order: Pick<OrderListItemDto, "notes" | "status">) =
 const sanitizeCustomerNotes = (notes?: string | null): string | undefined => {
   const sanitized = notes
     ?.replace(/\[(?:PAYMENT|SHIPPING_FEE_PAYMENT|SHIPPING_DUE_ON_DELIVERY|POS_SUBTOTAL|POS_DISCOUNT|POS_TOTAL):[^\]]*\]/gi, "")
+    .replace(/\[(?:PAYMENT|SHIPPING_FEE_PAYMENT|SHIPPING_DUE_ON_DELIVERY|POS_[A-Z_]*)[^\]|]*/gi, "")
     .split("|")
     .map((part) => part.trim())
     .filter(Boolean)
     .join(" | ");
 
   return sanitized || undefined;
+};
+
+const normalizeTrackingNumber = (trackingNumber?: string | null): string | undefined => {
+  const normalized = trackingNumber?.trim();
+
+  if (!normalized) return undefined;
+
+  const placeholderValues = new Set([
+    "in process",
+    "process",
+    "processing",
+    "pending",
+    "belum tersedia",
+    "-",
+  ]);
+
+  return placeholderValues.has(normalized.toLowerCase()) ? undefined : normalized;
 };
 
 const mapOrderItems = (
@@ -361,7 +379,7 @@ export const mapOrderDetailToTransaction = (
             courier: order.my_shipping.my_courier?.courier_name || "-",
             service: order.my_shipping.my_courier?.service_type || "-",
             estimatedDelivery: order.my_shipping.my_courier?.estimated_delivery || "-",
-            trackingNumber: order.my_shipping.code_tracking || undefined,
+            trackingNumber: normalizeTrackingNumber(order.my_shipping.code_tracking),
           }
         : undefined,
   };

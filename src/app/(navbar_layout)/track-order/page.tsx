@@ -28,8 +28,24 @@ import { useTransaction } from "@/contexts/TransactionContext";
 const BACKEND_ORDER_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-const getTrackingDisplay = (trackingNumber?: string) =>
-  trackingNumber?.trim() || "Belum tersedia";
+const getTrackingDisplay = (trackingNumber?: string) => {
+  const normalized = trackingNumber?.trim();
+
+  if (!normalized) return "Belum tersedia";
+
+  const placeholderValues = new Set([
+    "in process",
+    "process",
+    "processing",
+    "pending",
+    "belum tersedia",
+    "-",
+  ]);
+
+  return placeholderValues.has(normalized.toLowerCase())
+    ? "Belum tersedia"
+    : normalized;
+};
 
 const TrackOrderPage: React.FC = () => {
   const searchParams = useSearchParams();
