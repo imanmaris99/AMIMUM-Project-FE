@@ -24,6 +24,21 @@ export const STORE_BANK_ACCOUNT = {
 
 export const STORE_BANK_ACCOUNT_TEXT = `${STORE_BANK_ACCOUNT.bank} ${STORE_BANK_ACCOUNT.number} a.n. ${STORE_BANK_ACCOUNT.accountName}`;
 
+const MIDTRANS_ENV = (process.env.NEXT_PUBLIC_MIDTRANS_ENV || "sandbox").toLowerCase();
+const IS_MIDTRANS_PRODUCTION = MIDTRANS_ENV === "production" || MIDTRANS_ENV === "prod";
+
+export const MIDTRANS_PAYMENT_LABEL = IS_MIDTRANS_PRODUCTION
+  ? "Midtrans"
+  : "Midtrans Sandbox";
+
+export const MIDTRANS_PAYMENT_METHOD_NAME = IS_MIDTRANS_PRODUCTION
+  ? "Pembayaran Online Midtrans"
+  : "Midtrans Sandbox (Testing)";
+
+export const MIDTRANS_PAYMENT_DESCRIPTION = IS_MIDTRANS_PRODUCTION
+  ? "Bayar aman melalui Midtrans: VA, QRIS, GoPay, kartu, atau metode pembayaran lain yang tersedia."
+  : "Mode uji coba: VA, QRIS, GoPay, atau kartu di halaman Midtrans sandbox";
+
 const DELIVERY_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
   {
     id: "qris_manual",
@@ -53,12 +68,12 @@ const DELIVERY_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
   },
   {
     id: "online_payment",
-    title: "Midtrans Sandbox",
+    title: MIDTRANS_PAYMENT_LABEL,
     methods: [
       {
         id: "qris",
-        name: "Midtrans Sandbox (Testing)",
-        description: "Mode uji coba: VA, QRIS, GoPay, atau kartu di halaman Midtrans sandbox",
+        name: MIDTRANS_PAYMENT_METHOD_NAME,
+        description: MIDTRANS_PAYMENT_DESCRIPTION,
         badge: "MT",
         isAvailable: true,
       },
@@ -95,12 +110,12 @@ const PICKUP_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
   },
   {
     id: "online_payment",
-    title: "Midtrans Sandbox",
+    title: MIDTRANS_PAYMENT_LABEL,
     methods: [
       {
         id: "qris",
-        name: "Midtrans Sandbox (Testing)",
-        description: "Mode uji coba: VA, QRIS, GoPay, atau kartu di halaman Midtrans sandbox",
+        name: MIDTRANS_PAYMENT_METHOD_NAME,
+        description: MIDTRANS_PAYMENT_DESCRIPTION,
         badge: "MT",
         isAvailable: true,
       },
