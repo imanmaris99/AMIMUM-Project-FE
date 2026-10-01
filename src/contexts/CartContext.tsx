@@ -24,13 +24,21 @@ import {
   updateCartQuantity as updateCartQuantityApi,
 } from "@/services/api/cart";
 
+interface AddToCartOptions {
+  skipRefresh?: boolean;
+}
+
 interface CartContextType {
   cartItems: CartItemType[];
   totalItems: number;
   totalPrices: CartTotalPricesType;
   isLoading: boolean;
   isSyncing: boolean;
-  addToCart: (product: DetailProductType, variant: VariantProductType) => Promise<CartMutationResponse>;
+  addToCart: (
+    product: DetailProductType,
+    variant: VariantProductType,
+    options?: AddToCartOptions
+  ) => Promise<CartMutationResponse>;
   removeFromCart: (cartId: string) => Promise<void>;
   updateQuantity: (cartId: string, quantity: number) => Promise<void>;
   updateActiveStatus: (cartId: string, isActive: boolean) => Promise<void>;
@@ -241,7 +249,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   );
 
   const addToCart = useCallback(
-    async (product: DetailProductType, variant: VariantProductType) => {
+    async (
+      product: DetailProductType,
+      variant: VariantProductType,
+      options?: AddToCartOptions
+    ) => {
       if (!product?.id || !variant?.id) {
         throw new Error("Produk atau varian tidak valid.");
       }
@@ -262,10 +274,43 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       };
       writeCartMetadata(metadataMap);
 
+      if (options?.skipRefresh) {
+        const cartId = response.data?.cart_id;
+        const now = new Date().toISOString();
+        const optimisticItem: CartItemType = {
+          id: cartId?.toString() || `pending-${product.id}-${variant.id}`,
+          product_id: product.id,
+          variant_id: variant.id,
+          quantity: Math.max(1, Number(response.data?.quantity || 1)),
+          price:
+            typeof variant.discounted_price === "number" && variant.discounted_price > 0
+              ? variant.discounted_price
+              : product.price,
+          product_name: product.name,
+          variant_name: variant.variant || variant.name || "",
+          image: variant.img || product.primary_image_url || "/default-image.jpg",
+          created_at: response.data?.added_at || now,
+          updated_at: variant.updated_at || now,
+          is_active: true,
+        };
+
+        commitCartItems((previousItems) => {
+          const withoutTarget = previousItems.filter(
+            (item) =>
+              item.product_id !== optimisticItem.product_id ||
+              item.variant_id !== optimisticItem.variant_id
+          );
+
+          return [...withoutTarget, optimisticItem];
+        });
+
+        return response;
+      }
+
       await refreshCart();
       return response;
     },
-    [refreshCart]
+    [commitCartItems, refreshCart]
   );
 
   const removeFromCart = useCallback(

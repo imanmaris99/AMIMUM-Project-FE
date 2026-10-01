@@ -131,8 +131,7 @@ const ProductPrice = ({
       }
 
       localStorage.removeItem("directCheckoutItem");
-      const addResponse = await addToCart(data, datavariant);
-      await ensureTargetCartItemActive(addResponse.data?.cart_id);
+      await addToCart(data, datavariant, { skipRefresh: true });
       toast.success("Produk siap checkout. Membuka halaman checkout...");
       router.push("/order-1");
     } catch (error) {
