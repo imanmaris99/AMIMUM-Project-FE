@@ -13,7 +13,7 @@ import LoginProtection from "@/components/common/LoginProtection";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 
 export default function CartPage() {
-  const { totalItems, clearAll, cartItems, isLoading, isSyncing } = useCart();
+  const { totalItems, clearAll, cartItems, isLoading, isSyncing, refreshCart } = useCart();
   const { resetNotification } = useNotification();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isClearingCart, setIsClearingCart] = useState(false);
@@ -58,10 +58,24 @@ export default function CartPage() {
     };
   }, [showConfirmDialog]);
 
-  // Reset cart notification when user visits cart page
+  // Reset cart notification when user visits cart page, and force a server
+  // refresh so the cart never shows stale in-memory items after checkout/payment.
   useEffect(() => {
     resetNotification("cart");
-  }, [resetNotification]);
+    void refreshCart();
+
+    const handleFocus = () => {
+      void refreshCart();
+    };
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleFocus);
+    };
+  }, [refreshCart, resetNotification]);
 
   const handleClearAll = () => {
     if (cartItems.length === 0) {
