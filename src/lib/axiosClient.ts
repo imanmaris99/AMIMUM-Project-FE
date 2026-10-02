@@ -136,32 +136,38 @@ axiosClient.interceptors.response.use(
           break;
 
         case 422:
-          await ErrorHandler.handleError(
-            new Error(errorMessage || 'Validation failed'),
-            'API_422',
-            false
-          );
+          if (!isExpectedHandledEndpoint) {
+            await ErrorHandler.handleError(
+              new Error(errorMessage || 'Validation failed'),
+              'API_422',
+              false
+            );
+          }
           break;
 
         case 429:
-          await ErrorHandler.handleError(
-            new Error('Rate limit exceeded'),
-            'API_429',
-            true,
-            () => axiosClient(originalRequest)
-          );
+          if (!isExpectedHandledEndpoint) {
+            await ErrorHandler.handleError(
+              new Error('Rate limit exceeded'),
+              'API_429',
+              true,
+              () => axiosClient(originalRequest)
+            );
+          }
           break;
 
         case 500:
         case 502:
         case 503:
         case 504:
-          await ErrorHandler.handleError(
-            new Error('Server error'),
-            'API_5xx',
-            true,
-            () => axiosClient(originalRequest)
-          );
+          if (!isExpectedHandledEndpoint) {
+            await ErrorHandler.handleError(
+              new Error('Server error'),
+              'API_5xx',
+              true,
+              () => axiosClient(originalRequest)
+            );
+          }
           break;
 
         default:
