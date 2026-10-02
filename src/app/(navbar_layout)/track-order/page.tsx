@@ -225,6 +225,7 @@ const TrackOrderPage: React.FC = () => {
     currentTransaction?.deliveryType === "delivery"
       ? "Kirim ke tujuan"
       : "Ambil di toko";
+  const isPickupOrder = currentTransaction?.deliveryType === "pickup";
 
   return (
     <LoginProtection useModal={true} feature="tracking">
@@ -385,40 +386,65 @@ const TrackOrderPage: React.FC = () => {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-                        Ringkasan Pelacakan
+                        {isPickupOrder ? "Ringkasan Pengambilan" : "Ringkasan Pelacakan"}
                       </p>
                       <h3 className="mt-1 text-lg font-semibold text-gray-900">
-                        Status dan Resi Pesanan
+                        {isPickupOrder ? "Status Pengambilan Pesanan" : "Status dan Resi Pesanan"}
                       </h3>
                     </div>
                     <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                      Tracking
+                      {isPickupOrder ? "Pickup" : "Tracking"}
                     </span>
                   </div>
                   <div className="mt-4 space-y-2 text-sm">
-                    <div className="flex justify-between gap-4">
-                      <span className="text-gray-600">No. Resi</span>
-                      <span className="text-right font-semibold text-gray-900">
-                        {trackingDisplay}
-                      </span>
-                    </div>
-                    <div className="flex justify-between gap-4">
-                      <span className="text-gray-600">Kurir</span>
-                      <span className="text-right font-semibold text-gray-900">
-                        {[currentTransaction.shipmentAddress?.courier, currentTransaction.shipmentAddress?.service]
-                          .filter(Boolean)
-                          .join(" - ") || "Belum tersedia"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between gap-4">
-                      <span className="text-gray-600">Estimasi</span>
-                      <span className="text-right font-semibold text-gray-900">
-                        {currentTransaction.shipmentAddress?.estimatedDelivery || "Belum tersedia"}
-                      </span>
-                    </div>
+                    {isPickupOrder ? (
+                      <>
+                        <div className="flex justify-between gap-4">
+                          <span className="text-gray-600">Metode</span>
+                          <span className="text-right font-semibold text-gray-900">
+                            Ambil langsung di toko
+                          </span>
+                        </div>
+                        <div className="flex justify-between gap-4">
+                          <span className="text-gray-600">Status ambil</span>
+                          <span className="text-right font-semibold text-gray-900">
+                            {getStatusConfig(currentTransaction.status).text}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex justify-between gap-4">
+                          <span className="text-gray-600">No. Resi</span>
+                          <span className="text-right font-semibold text-gray-900">
+                            {trackingDisplay}
+                          </span>
+                        </div>
+                        <div className="flex justify-between gap-4">
+                          <span className="text-gray-600">Kurir</span>
+                          <span className="text-right font-semibold text-gray-900">
+                            {[currentTransaction.shipmentAddress?.courier, currentTransaction.shipmentAddress?.service]
+                              .filter(Boolean)
+                              .join(" - ") || "Belum tersedia"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between gap-4">
+                          <span className="text-gray-600">Estimasi</span>
+                          <span className="text-right font-semibold text-gray-900">
+                            {currentTransaction.shipmentAddress?.estimatedDelivery || "Belum tersedia"}
+                          </span>
+                        </div>
+                      </>
+                    )}
                   </div>
-                  <p className="mt-3 rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
-                    No. resi hanya ditampilkan jika admin sudah memasukkan kode tracking resmi dari kurir.
+                  <p className={`mt-3 rounded-lg px-3 py-2 text-xs font-medium ${
+                    isPickupOrder
+                      ? "bg-emerald-50 text-emerald-800"
+                      : "bg-yellow-50 text-yellow-800"
+                  }`}>
+                    {isPickupOrder
+                      ? "Pesanan ini dipilih untuk pickup/ambil di toko, jadi tidak memakai nomor resi kurir. Datang ke toko setelah status siap diambil."
+                      : "No. resi hanya ditampilkan jika admin sudah memasukkan kode tracking resmi dari kurir."}
                   </p>
                 </div>
               )}
@@ -456,6 +482,7 @@ const TrackOrderPage: React.FC = () => {
                   estimatedDelivery={
                     currentTransaction.shipmentAddress?.estimatedDelivery
                   }
+                  deliveryType={currentTransaction.deliveryType}
                 />
               </div>
 

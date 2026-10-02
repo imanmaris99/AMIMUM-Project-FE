@@ -13,6 +13,7 @@ interface DeliveryAddressProps {
   courier?: string;
   service?: string;
   estimatedDelivery?: string;
+  deliveryType?: string;
 }
 
 const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
@@ -25,16 +26,18 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
   city,
   courier,
   service,
-  estimatedDelivery
+  estimatedDelivery,
+  deliveryType = "delivery"
 }) => {
   const trackingDisplay = trackingNumber?.trim() || "Belum tersedia";
+  const isPickup = deliveryType === "pickup";
 
   return (
     <div className="bg-white rounded-2xl p-4 w-full max-w-sm">
       <div className="space-y-4">
         {/* Title */}
         <h3 className="text-lg font-semibold text-[#313131]">
-          Detail Pelacakan
+          {isPickup ? "Detail Pengambilan" : "Detail Pelacakan"}
         </h3>
         
         {/* Order Details */}
@@ -59,18 +62,26 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
             </span>
           </div>
           
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-[#A2A2A2]">
-              No. Resi
-            </span>
-            <span className="text-sm font-medium text-[#0D0E09] text-right">
-              {trackingDisplay}
-            </span>
-          </div>
-          {!trackingNumber && (
-            <div className="rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
-              No. resi belum tersedia. Resi akan muncul setelah admin mengirim paket dan memasukkan kode tracking resmi dari kurir.
+          {isPickup ? (
+            <div className="rounded-lg bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-800">
+              Pesanan dipilih untuk ambil langsung di Toko Herbal Amimum. Tidak ada nomor resi karena pesanan tidak dikirim melalui kurir.
             </div>
+          ) : (
+            <>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-[#A2A2A2]">
+                  No. Resi
+                </span>
+                <span className="text-sm font-medium text-[#0D0E09] text-right">
+                  {trackingDisplay}
+                </span>
+              </div>
+              {!trackingNumber && (
+                <div className="rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
+                  No. resi belum tersedia. Resi akan muncul setelah admin mengirim paket dan memasukkan kode tracking resmi dari kurir.
+                </div>
+              )}
+            </>
           )}
           {recipientName && (
             <div className="flex justify-between items-start gap-4">
@@ -102,7 +113,7 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
               </span>
             </div>
           )}
-          {courier && (
+          {!isPickup && courier && (
             <div className="flex justify-between items-start gap-4">
               <span className="text-sm text-[#A2A2A2]">
                 Kurir
@@ -112,7 +123,7 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
               </span>
             </div>
           )}
-          {estimatedDelivery && (
+          {!isPickup && estimatedDelivery && (
             <div className="flex justify-between items-start gap-4">
               <span className="text-sm text-[#A2A2A2]">
                 Estimasi

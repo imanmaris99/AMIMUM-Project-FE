@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "react-hot-toast";
@@ -11,6 +11,7 @@ import {
   getPaymentMethodLabel,
   isManualBankTransferPaymentMethod,
   isManualQrisPaymentMethod,
+  isMidtransOnlinePaymentMethod,
   QRIS_MANUAL_IMAGE_PATH,
   STORE_BANK_ACCOUNT,
   STORE_BANK_ACCOUNT_TEXT,
@@ -59,7 +60,9 @@ const TransactionDetailPage: React.FC = () => {
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPaymentActionLoading, setIsPaymentActionLoading] = useState(false);
+  const [isAutoSyncingPaymentStatus, setIsAutoSyncingPaymentStatus] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const autoSyncedOrderIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const loadOrderDetail = async () => {
@@ -214,6 +217,41 @@ const TransactionDetailPage: React.FC = () => {
     const response = await getOrderDetail(transaction.id);
     setTransaction(mapOrderDetailToTransaction(response.data));
   };
+
+  useEffect(() => {
+    const autoSyncMidtransPayment = async () => {
+      if (
+        !transaction ||
+        isLocalSimulatedTransaction ||
+        !BACKEND_ORDER_ID_PATTERN.test(transaction.id) ||
+        transaction.status !== "pending" ||
+        !isMidtransOnlinePaymentMethod(transaction.paymentMethod) ||
+        autoSyncedOrderIdsRef.current.has(transaction.id)
+      ) {
+        return;
+      }
+
+      autoSyncedOrderIdsRef.current.add(transaction.id);
+      setIsAutoSyncingPaymentStatus(true);
+
+      try {
+        await syncPaymentStatus({ order_id: transaction.id });
+        const response = await getOrderDetail(transaction.id);
+        const updatedTransaction = mapOrderDetailToTransaction(response.data);
+        setTransaction(updatedTransaction);
+
+        if (updatedTransaction.status !== "pending") {
+          toast.success("Status pembayaran diperbarui.");
+        }
+      } catch {
+        // Fail quietly so customer can still use the manual refresh/payment action.
+      } finally {
+        setIsAutoSyncingPaymentStatus(false);
+      }
+    };
+
+    void autoSyncMidtransPayment();
+  }, [transaction, isLocalSimulatedTransaction]);
 
   const handlePayNow = async () => {
     if (!transaction) {
@@ -486,6 +524,11 @@ const TransactionDetailPage: React.FC = () => {
             <div className="mt-4 rounded-lg bg-primary/5 px-3 py-2 text-xs font-medium text-primary">
               {transactionGuidance}
             </div>
+            {isAutoSyncingPaymentStatus && (
+              <div className="mt-2 rounded-lg bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700">
+                Sedang mengecek status pembayaran terbaru dari Midtrans...
+              </div>
+            )}
           </div>
 
           <div className="bg-white rounded-lg shadow-sm border p-4">
