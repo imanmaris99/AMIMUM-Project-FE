@@ -51,7 +51,7 @@ const TrackOrderPage: React.FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const transactionId = searchParams?.get("transactionId");
-  const { transactions: localTransactions } = useTransaction();
+  const { transactions: localTransactions, clearTransactions } = useTransaction();
 
   const [apiOrders, setApiOrders] = useState<Transaction[]>([]);
   const [currentTransaction, setCurrentTransaction] = useState<Transaction | null>(
@@ -85,25 +85,14 @@ const TrackOrderPage: React.FC = () => {
             return;
           }
 
-          const localTransaction = localTransactions.find(
-            (transaction) => transaction.id === transactionId
-          );
-
-          if (localTransaction) {
-            setCurrentTransaction(localTransaction);
-            setApiOrders([]);
-            return;
-          }
-          throw new Error("Data tracking belum tersimpan di server. Silakan cek transaksi terbaru.");
+          throw new Error("Data tracking ini tidak ditemukan di server. Jika ini pesanan lama sebelum reset, silakan bersihkan data lokal lalu cek transaksi terbaru.");
         }
 
         const listResponse = await getMyOrders();
         const mappedOrders = listResponse.data.map(mapOrderSummaryToTransaction);
         setApiOrders(mappedOrders);
 
-        if (localTransactions.length > 0) {
-          setCurrentTransaction(localTransactions[0]);
-        } else if (mappedOrders.length > 0) {
+        if (mappedOrders.length > 0) {
           const latestOrderDetail = await getOrderDetail(mappedOrders[0].id);
           setCurrentTransaction(mapOrderDetailToTransaction(latestOrderDetail.data));
         } else {
@@ -124,9 +113,10 @@ const TrackOrderPage: React.FC = () => {
   }, [transactionId, localTransactions]);
 
   const orders = useMemo(
-    () => [...localTransactions, ...apiOrders],
-    [localTransactions, apiOrders]
+    () => [...apiOrders],
+    [apiOrders]
   );
+  const hasLocalLegacyTransactions = localTransactions.length > 0;
 
   const handleBack = () => {
     router.back();
@@ -248,6 +238,21 @@ const TrackOrderPage: React.FC = () => {
         />
 
         <div className="flex flex-col justify-center items-center gap-4 py-8 px-4">
+          {hasLocalLegacyTransactions && (
+            <div className="w-full max-w-sm rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-900">
+              <p className="font-semibold">Data lokal lama terdeteksi</p>
+              <p className="mt-1 text-xs leading-relaxed">
+                Data ini tersimpan di perangkat sebelum reset database. Bersihkan agar halaman tracking hanya membaca pesanan dari server toko.
+              </p>
+              <button
+                type="button"
+                onClick={clearTransactions}
+                className="mt-3 rounded-xl bg-yellow-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-yellow-700"
+              >
+                Bersihkan Data Lokal Lama
+              </button>
+            </div>
+          )}
           {isLoading ? (
             <div className="w-full max-w-sm bg-white rounded-lg shadow-sm border p-6 text-center">
               <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
