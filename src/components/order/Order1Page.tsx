@@ -24,7 +24,7 @@ import {
   requiresPendingPayment,
   isManualQrisPaymentMethod,
   isManualBankTransferPaymentMethod,
-  isMidtransSandboxPaymentMethod,
+  isMidtransOnlinePaymentMethod,
   PaymentMethodGroup,
   STORE_BANK_ACCOUNT_TEXT,
 } from '@/lib/paymentMethods';
@@ -657,7 +657,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     try {
       const selectedPayment = selectedPaymentMethod as TransactionPaymentMethod;
       const isPendingPaymentMethod = requiresPendingPayment(selectedPayment);
-      const shouldOpenMidtrans = isMidtransSandboxPaymentMethod(selectedPayment);
+      const shouldOpenMidtrans = isMidtransOnlinePaymentMethod(selectedPayment);
       const freshCheckoutCart = await buildCheckoutCartItems();
 
       if (freshCheckoutCart.items.length === 0) {
@@ -949,7 +949,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     }
 
     return requiresPendingPayment(selectedPaymentMethod)
-      ? 'Siap membuat pesanan. Setelah itu Anda akan diarahkan ke Midtrans sandbox untuk uji coba pembayaran.'
+      ? 'Siap membuat pesanan. Setelah itu Anda akan diarahkan ke halaman pembayaran resmi Midtrans.'
       : 'Siap mengonfirmasi pesanan. Pesanan akan langsung masuk untuk diproses toko.';
   };
 

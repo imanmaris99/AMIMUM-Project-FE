@@ -29,15 +29,15 @@ const IS_MIDTRANS_PRODUCTION = MIDTRANS_ENV === "production" || MIDTRANS_ENV ===
 
 export const MIDTRANS_PAYMENT_LABEL = IS_MIDTRANS_PRODUCTION
   ? "Midtrans"
-  : "Midtrans Sandbox";
+  : "Midtrans Mode Uji Coba";
 
 export const MIDTRANS_PAYMENT_METHOD_NAME = IS_MIDTRANS_PRODUCTION
   ? "Pembayaran Online Midtrans"
-  : "Midtrans Sandbox (Testing)";
+  : "Pembayaran Online Midtrans (Uji Coba)";
 
 export const MIDTRANS_PAYMENT_DESCRIPTION = IS_MIDTRANS_PRODUCTION
   ? "Bayar aman melalui Midtrans: VA, QRIS, GoPay, kartu, atau metode pembayaran lain yang tersedia."
-  : "Mode uji coba: VA, QRIS, GoPay, atau kartu di halaman Midtrans sandbox";
+  : "Mode uji coba: VA, QRIS, GoPay, kartu, atau metode pembayaran lain yang tersedia di halaman Midtrans.";
 
 const DELIVERY_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
   {
@@ -164,7 +164,7 @@ export const isManualBankTransferPaymentMethod = (
   method?: TransactionPaymentMethod
 ): boolean => method === "transfer";
 
-export const isMidtransSandboxPaymentMethod = (
+export const isMidtransOnlinePaymentMethod = (
   method?: TransactionPaymentMethod
 ): boolean => method === "qris";
 

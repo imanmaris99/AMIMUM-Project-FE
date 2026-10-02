@@ -221,7 +221,7 @@ const TransactionDetailPage: React.FC = () => {
     }
 
     if (isLocalSimulatedTransaction) {
-      toast.error("Data transaksi lokal lama tidak bisa dibayar ulang. Gunakan transaksi backend dan Midtrans sandbox untuk testing pembayaran.");
+      toast.error("Data transaksi lokal lama tidak bisa dibayar ulang. Gunakan transaksi backend baru untuk melanjutkan pembayaran resmi Midtrans.");
       return;
     }
 
@@ -732,7 +732,7 @@ const TransactionDetailPage: React.FC = () => {
             <div className="space-y-3">
               {isLocalSimulatedTransaction && isPendingPayment && (
                 <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-800">
-                  Data transaksi lokal lama tidak bisa disimulasikan sebagai pembayaran berhasil. Gunakan transaksi backend dan Midtrans sandbox untuk testing pembayaran.
+                  Data transaksi lokal lama tidak bisa dipakai sebagai pembayaran resmi. Gunakan transaksi backend baru untuk melanjutkan pembayaran Midtrans.
                 </div>
               )}
               {shouldShowPaymentActions && (
