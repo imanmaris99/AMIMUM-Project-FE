@@ -199,9 +199,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       const cartResponse = await getMyCartProducts();
 
       const metadataMap = readCartMetadata();
-      const normalizedItems = cartResponse.data
-        .map((item) => normalizeCartItem(item, metadataMap))
-        .filter((item) => item.is_active !== false);
+      const normalizedItems = cartResponse.data.map((item) =>
+        normalizeCartItem(item, metadataMap)
+      );
 
       setCartItems(normalizedItems);
       setTotalItems(countActiveCartItems(normalizedItems));
