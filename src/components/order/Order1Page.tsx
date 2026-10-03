@@ -400,6 +400,15 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         quantity: Math.max(1, Number(parsedItem.quantity || 1)),
         is_active: true,
       });
+      setErrors((previousErrors) => {
+        if (!previousErrors.cart) {
+          return previousErrors;
+        }
+
+        const remainingErrors = { ...previousErrors };
+        delete remainingErrors.cart;
+        return remainingErrors;
+      });
     } catch {
       localStorage.removeItem('directCheckoutItem');
       toast.error('Data beli langsung belum bisa dibaca. Silakan pilih produk lagi.');
@@ -633,7 +642,9 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     }
     
     if (currentItems.length === 0) {
-      newErrors.cart = 'Keranjang aktif kosong. Pilih minimal satu produk dari keranjang.';
+      newErrors.cart = isDirectCheckout
+        ? 'Produk Beli Langsung belum siap. Kembali ke produk lalu tekan Beli Langsung sekali lagi.'
+        : 'Keranjang aktif kosong. Pilih minimal satu produk dari keranjang.';
     }
 
     if (currentItems.length > 0 && activeSubtotal <= 0) {
@@ -960,6 +971,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       return 'Memuat layanan ongkir. Mohon tunggu sebentar.';
     }
 
+    if (isDirectCheckout && !directCheckoutItem) {
+      return 'Memuat produk Beli Langsung...';
+    }
+
     if (currentItems.length === 0) {
       return 'Keranjang aktif kosong. Pilih minimal satu produk dari keranjang.';
     }
@@ -1011,7 +1026,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
   const checkoutReadinessMessage = getCheckoutReadinessMessage();
   const isCheckoutCartLoading = !isDirectCheckout && (isCartLoading || isCartSyncing);
-  const isCheckoutCartEmpty = !isCartLoading && !isLoading && !isReferenceLoading && currentItems.length === 0;
+  const isCheckoutCartEmpty = !isDirectCheckout && !isCartLoading && !isLoading && !isReferenceLoading && currentItems.length === 0;
 
   const renderPaymentBadge = (badge: string, isAvailable: boolean) => (
     <div
