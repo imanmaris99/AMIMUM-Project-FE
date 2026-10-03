@@ -149,8 +149,9 @@ export const getCustomerOrderAlert = (
     case "settlement":
       return {
         title: "Pembayaran berhasil",
-        message:
-          "Pembayaran sudah diterima. Pesanan sekarang menunggu admin memproses dan menyiapkan pengiriman.",
+        message: isPickupOrder
+          ? "Pembayaran sudah diterima. Pesanan ambil di toko menunggu admin menyiapkan barang. Datang ke toko setelah status siap diambil."
+          : "Pembayaran sudah diterima. Pesanan sekarang menunggu admin memproses dan menyiapkan pengiriman.",
         bgColor: "bg-blue-50",
         borderColor: "border-blue-200",
         textColor: "text-blue-800",
@@ -169,6 +170,16 @@ export const getCustomerOrderAlert = (
         icon: "📦",
       };
     case "shipped":
+      if (isPickupOrder) {
+        return {
+          title: "Pesanan siap diambil",
+          message: "Pesanan pickup sudah siap diambil di toko dan tidak memakai nomor resi kurir.",
+          bgColor: "bg-emerald-50",
+          borderColor: "border-emerald-200",
+          textColor: "text-emerald-800",
+          icon: "🏬",
+        };
+      }
       return {
         title: "Pesanan sedang dikirim",
         message: hasTrackingNumber
