@@ -100,6 +100,12 @@ export interface CheckoutOrderRequest {
   final_total?: number;
 }
 
+export interface DirectCheckoutOrderRequest extends CheckoutOrderRequest {
+  product_id: string;
+  variant_id: number;
+  quantity?: number;
+}
+
 export interface CheckoutOrderResponse {
   status_code: number;
   message: string;
@@ -418,6 +424,42 @@ export const checkoutOrder = async (
     }
 
     throw new Error("Pesanan belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
+  }
+};
+
+export const directCheckoutOrder = async (
+  payload: DirectCheckoutOrderRequest
+): Promise<CheckoutOrderResponse> => {
+  try {
+    const response = await apiClient.post<CheckoutOrderResponse>(
+      API_ENDPOINTS.ORDERS_DIRECT_CHECKOUT,
+      payload,
+      { timeout: ORDER_REQUEST_TIMEOUT_MS }
+    );
+
+    if (
+      (response?.status_code === 200 || response?.status_code === 201) &&
+      response.data?.id
+    ) {
+      return response;
+    }
+
+    throw new Error(response?.message || "Gagal membuat pesanan langsung.");
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response) {
+      const errorData = error.response.data as OrderErrorResponse;
+      throw new Error(
+        getOrderErrorMessage(errorData, "Gagal membuat pesanan langsung.")
+      );
+    }
+
+    if (error instanceof Error) {
+      throw new Error(
+        getOrderErrorMessage({ message: error.message }, "Gagal membuat pesanan langsung.")
+      );
+    }
+
+    throw new Error("Pesanan langsung belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
 };
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { GoChevronLeft, GoLocation, GoPackage, GoPlus } from 'react-icons/go';
 import { IoCheckmarkCircle, IoWarning } from 'react-icons/io5';
 import { toast } from 'react-hot-toast';
@@ -11,7 +11,7 @@ import ButtonSpinner from '@/components/ui/ButtonSpinner';
 import { useCart } from '@/contexts/CartContext';
 import { CartItemType } from '@/types/apiTypes';
 import { useTransaction } from '@/contexts/TransactionContext';
-import { checkoutOrder, getMyOrders } from '@/services/api/orders';
+import { checkoutOrder, directCheckoutOrder, getMyOrders } from '@/services/api/orders';
 import { createPayment } from '@/services/api/payments';
 import { CartApiItem, extractVariantInfo, getMyCartProducts } from '@/services/api/cart';
 import { createShipment, activateShipment, getMyShipments } from '@/services/api/shipment';
@@ -109,6 +109,7 @@ const getCourierUnavailableNotice = () =>
 
 const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     cartItems,
     isLoading: isCartLoading,
@@ -146,6 +147,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     Record<string, boolean>
   >({});
   const [isRecoveringCreatedOrder, setIsRecoveringCreatedOrder] = useState(false);
+  const [directCheckoutItem, setDirectCheckoutItem] = useState<CartItemType | null>(null);
+  const isDirectCheckout = searchParams?.get('direct') === 'true';
   const fallbackCourierNoticeRef = React.useRef<string | null>(null);
   const fallbackCourierNoticeTextRef = React.useRef('');
 
@@ -375,17 +378,35 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     );
   }, [paymentMethodGroups]);
 
-  // Guard old direct-checkout links/localStorage so they cannot create local-only orders.
+  // Direct buy uses a temporary browser payload and never writes to cart_products.
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isDirect = urlParams.get('direct') === 'true';
+    if (!isDirectCheckout) {
+      setDirectCheckoutItem(null);
+      return;
+    }
 
-    if (isDirect) {
+    try {
+      const rawItem = localStorage.getItem('directCheckoutItem');
+      const parsedItem = rawItem ? JSON.parse(rawItem) as CartItemType : null;
+
+      if (!parsedItem?.product_id || !parsedItem?.variant_id || !parsedItem?.price) {
+        localStorage.removeItem('directCheckoutItem');
+        toast.error('Data beli langsung belum ditemukan. Silakan pilih produk lagi.');
+        router.replace('/cart');
+        return;
+      }
+
+      setDirectCheckoutItem({
+        ...parsedItem,
+        quantity: Math.max(1, Number(parsedItem.quantity || 1)),
+        is_active: true,
+      });
+    } catch {
       localStorage.removeItem('directCheckoutItem');
-      toast.error('Beli langsung diperbarui. Silakan pilih produk dari keranjang untuk checkout.');
+      toast.error('Data beli langsung belum bisa dibaca. Silakan pilih produk lagi.');
       router.replace('/cart');
     }
-  }, [router]);
+  }, [isDirectCheckout, router]);
 
   // Get selected courier service data for calculations
   const selectedCourierData = courierCompanies
@@ -403,13 +424,24 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         selectedCourierData.cost > 0
     );
 
-  const currentItems = cartItems.filter((item) => item.is_active !== false);
+  const currentItems = isDirectCheckout && directCheckoutItem
+    ? [directCheckoutItem]
+    : cartItems.filter((item) => item.is_active !== false);
   const activeSubtotal = currentItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
   const buildCheckoutCartItems = async () => {
+    if (isDirectCheckout && directCheckoutItem) {
+      const subtotal = directCheckoutItem.price * directCheckoutItem.quantity;
+      return {
+        items: [directCheckoutItem] as CartItemType[],
+        subtotal,
+        total: subtotal,
+      };
+    }
+
     const freshCart = await getMyCartProducts();
     const freshActiveItems = freshCart.data.filter((item: CartApiItem) => item.is_active !== false);
 
@@ -507,8 +539,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   const canSubmitOrder =
     !isLoading &&
     !isRecoveringCreatedOrder &&
-    !isCartLoading &&
-    !isCartSyncing &&
+    (isDirectCheckout || !isCartLoading) &&
+    (isDirectCheckout || !isCartSyncing) &&
     !isReferenceLoading &&
     !isCourierLoading &&
     currentItems.length > 0 &&
@@ -756,21 +788,37 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         );
       }
 
-      const checkoutResponse = await checkoutOrder({
-        notes: backendCheckoutNotes,
-        payment_method: selectedPayment,
-        subtotal: checkoutSubtotal,
-        discount_total: totals.discount,
-        final_total: checkoutTotal,
-      });
+      const checkoutResponse = isDirectCheckout && directCheckoutItem
+        ? await directCheckoutOrder({
+            product_id: directCheckoutItem.product_id,
+            variant_id: directCheckoutItem.variant_id,
+            quantity: directCheckoutItem.quantity,
+            notes: backendCheckoutNotes,
+            payment_method: selectedPayment,
+            subtotal: checkoutSubtotal,
+            discount_total: totals.discount,
+            final_total: checkoutTotal,
+          })
+        : await checkoutOrder({
+            notes: backendCheckoutNotes,
+            payment_method: selectedPayment,
+            subtotal: checkoutSubtotal,
+            discount_total: totals.discount,
+            final_total: checkoutTotal,
+          });
 
       const backendOrder = checkoutResponse.data;
 
-      try {
-        await removeActiveItems();
-      } catch (cartCleanupError) {
-        console.warn('Failed to clean checked-out cart items', cartCleanupError);
-        await refreshCart();
+      if (isDirectCheckout) {
+        localStorage.removeItem('directCheckoutItem');
+        setDirectCheckoutItem(null);
+      } else {
+        try {
+          await removeActiveItems();
+        } catch (cartCleanupError) {
+          console.warn('Failed to clean checked-out cart items', cartCleanupError);
+          await refreshCart();
+        }
       }
 
       const newTransaction = addTransaction(
@@ -884,11 +932,11 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   };
 
   const getCheckoutReadinessMessage = () => {
-    if (isCartLoading) {
+    if (!isDirectCheckout && isCartLoading) {
       return 'Memuat produk checkout dari keranjang...';
     }
 
-    if (isCartSyncing) {
+    if (!isDirectCheckout && isCartSyncing) {
       return 'Menyimpan pilihan keranjang ke server sebelum checkout dibuka.';
     }
 
@@ -954,7 +1002,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   };
 
   const checkoutReadinessMessage = getCheckoutReadinessMessage();
-  const isCheckoutCartLoading = isCartLoading || isCartSyncing;
+  const isCheckoutCartLoading = !isDirectCheckout && (isCartLoading || isCartSyncing);
   const isCheckoutCartEmpty = !isCartLoading && !isLoading && !isReferenceLoading && currentItems.length === 0;
 
   const renderPaymentBadge = (badge: string, isAvailable: boolean) => (

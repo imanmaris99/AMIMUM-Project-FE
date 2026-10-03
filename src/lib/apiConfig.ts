@@ -100,6 +100,7 @@ export const API_ENDPOINTS = {
 
   // Orders
   ORDERS_CHECKOUT: '/orders/checkout',
+  ORDERS_DIRECT_CHECKOUT: '/orders/checkout/direct',
   ORDERS_MY_ORDERS: '/orders/my-orders',
   ORDERS_DETAIL: (orderId: string) => `/orders/detail/${orderId}`,
   ORDERS_QRIS_PAYMENT_CONFIRMATION: (orderId: string) => `/orders/${orderId}/qris-payment-confirmation`,
