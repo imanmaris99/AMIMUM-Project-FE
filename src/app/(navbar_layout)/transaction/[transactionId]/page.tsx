@@ -141,6 +141,26 @@ const TransactionDetailPage: React.FC = () => {
       : transaction.deliveryType === "delivery"
         ? "Ongkir digabung ke total produk"
         : "-";
+    const invoiceFulfillmentLines = transaction.deliveryType === "delivery"
+      ? [
+          "Detail Pengiriman",
+          "----------------------------------------",
+          `Penerima       : ${shipment?.recipientName || "-"}`,
+          `Telepon        : ${shipment?.phone || "-"}`,
+          `Alamat         : ${shipment?.address || "-"}`,
+          `Kota/Kode Pos  : ${[shipment?.city, shipment?.postalCode].filter(Boolean).join(" ") || "-"}`,
+          `Kurir          : ${[shipment?.courier, shipment?.service].filter(Boolean).join(" - ") || "-"}`,
+          `Estimasi       : ${shipment?.estimatedDelivery || "-"}`,
+          `No. Resi       : ${shipment?.trackingNumber || "Belum tersedia"}`,
+        ]
+      : [
+          "Detail Pengambilan",
+          "----------------------------------------",
+          "Metode         : Ambil langsung di toko",
+          "Status         : Tidak memakai kurir atau nomor resi",
+          "Catatan        : Datang ke toko setelah status pesanan siap diambil.",
+        ];
+
     const invoiceLines = [
       "TOKO HERBAL AMIMUM",
       "Bukti Transaksi Customer",
@@ -176,15 +196,7 @@ const TransactionDetailPage: React.FC = () => {
         : []),
       `Total          : ${rupiahFormater(transaction.total)}`,
       "",
-      "Detail Pengiriman",
-      "----------------------------------------",
-      `Penerima       : ${shipment?.recipientName || "-"}`,
-      `Telepon        : ${shipment?.phone || "-"}`,
-      `Alamat         : ${shipment?.address || "-"}`,
-      `Kota/Kode Pos  : ${[shipment?.city, shipment?.postalCode].filter(Boolean).join(" ") || "-"}`,
-      `Kurir          : ${[shipment?.courier, shipment?.service].filter(Boolean).join(" - ") || "-"}`,
-      `Estimasi       : ${shipment?.estimatedDelivery || "-"}`,
-      `No. Resi       : ${shipment?.trackingNumber || "Belum tersedia"}`,
+      ...invoiceFulfillmentLines,
       "",
       "Catatan",
       "----------------------------------------",
@@ -405,6 +417,7 @@ const TransactionDetailPage: React.FC = () => {
   const isManualBankTransferPayment = isManualBankTransferPaymentMethod(transaction.paymentMethod);
   const shouldShowPaymentActions =
     !isLocalSimulatedTransaction && !isOfflinePayment && !isManualQrisPayment && !isManualBankTransferPayment && (isPendingPayment || canRetryPayment);
+  const normalizedStatus = String(transaction.status || '').toLowerCase();
   const transactionGuidance = isManualQrisPayment && isPendingPayment
     ? "Pesanan QRIS sudah tercatat. Scan QRIS resmi toko, bayar sesuai nominal total, lalu tunggu admin mengonfirmasi pembayaran."
     : isManualBankTransferPayment && isPendingPayment
@@ -413,8 +426,10 @@ const TransactionDetailPage: React.FC = () => {
     ? "Pesanan sudah tercatat. Selesaikan pembayaran agar pesanan bisa diproses toko."
     : canRetryPayment
       ? "Pembayaran belum berhasil. Coba bayar lagi atau hubungi admin jika butuh bantuan."
-      : transaction.status === "paid"
-        ? "Pembayaran sudah diterima. Pesanan menunggu admin memproses dan menyiapkan pengiriman."
+      : ['paid', 'capture', 'settlement'].includes(normalizedStatus)
+      ? transaction.deliveryType === "pickup"
+        ? "Pembayaran sudah diterima. Pesanan ambil di toko menunggu admin menyiapkan barang. Datang ke toko setelah status siap diambil."
+        : "Pembayaran sudah diterima. Pesanan menunggu admin memproses dan menyiapkan pengiriman."
         : transaction.deliveryType === "delivery"
         ? transaction.status === "shipped"
           ? "Pesanan sedang dikirim. Gunakan nomor resi di halaman tracking untuk memantau pengiriman."
