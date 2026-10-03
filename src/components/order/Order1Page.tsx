@@ -13,7 +13,7 @@ import { CartItemType } from '@/types/apiTypes';
 import { useTransaction } from '@/contexts/TransactionContext';
 import { checkoutOrder, directCheckoutOrder, getMyOrders } from '@/services/api/orders';
 import { createPayment } from '@/services/api/payments';
-import { CartApiItem, extractVariantInfo, getMyCartProducts } from '@/services/api/cart';
+import { CartApiItem, deleteCartProduct, extractVariantInfo, getMyCartProducts } from '@/services/api/cart';
 import { createShipment, activateShipment, getMyShipments } from '@/services/api/shipment';
 import CourierSelector from './CourierSelector';
 import AddressSelector from './AddressSelector';
@@ -115,7 +115,6 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     isLoading: isCartLoading,
     isSyncing: isCartSyncing,
     refreshCart,
-    removeActiveItems,
   } = useCart();
   const { addTransaction } = useTransaction();
   
@@ -814,7 +813,16 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         setDirectCheckoutItem(null);
       } else {
         try {
-          await removeActiveItems();
+          const cartIdsToDelete = Array.from(
+            new Set(
+              freshCheckoutCart.items
+                .map((item) => item.id?.toString())
+                .filter((id): id is string => Boolean(id) && !id.startsWith('pending-'))
+            )
+          );
+
+          await Promise.all(cartIdsToDelete.map((cartId) => deleteCartProduct(cartId)));
+          await refreshCart();
         } catch (cartCleanupError) {
           console.warn('Failed to clean checked-out cart items', cartCleanupError);
           await refreshCart();
