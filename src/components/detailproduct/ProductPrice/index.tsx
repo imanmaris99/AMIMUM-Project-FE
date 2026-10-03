@@ -30,7 +30,7 @@ const ProductPrice = ({
   const [isAdding, setIsAdding] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const { addToCart, isInCart, updateActiveStatus, refreshCart } = useCart();
+  const { addToCart, isInCart, updateActiveStatus, updateAllActiveStatus, refreshCart } = useCart();
   const router = useRouter();
 
 
@@ -122,26 +122,35 @@ const ProductPrice = ({
     setIsBuying(true);
 
     try {
-      const directPrice = Number(datavariant.discounted_price || data.price || 0);
-      const directCheckoutItem = {
-        id: `direct-${data.id}-${datavariant.id}`,
-        product_id: data.id,
-        variant_id: datavariant.id,
-        quantity: 1,
-        price: directPrice,
-        product_name: data.name,
-        variant_name: datavariant.variant || datavariant.name || "",
-        image: datavariant.img || data.primary_image_url || "/default-image.jpg",
-        created_at: new Date().toISOString(),
-        updated_at: datavariant.updated_at || new Date().toISOString(),
-        is_active: true,
-      };
+      // Temporary production-safe path while backend direct checkout deployment is pending.
+      // Use the existing live checkout contract so payment creation does not hit a 404 route.
+      try {
+        await updateAllActiveStatus(false);
+      } catch {
+        // If cart is empty or sync is slow, continue with target item insertion.
+      }
 
-      localStorage.setItem("directCheckoutItem", JSON.stringify(directCheckoutItem));
-      toast.success("Produk siap checkout langsung. Membuka halaman checkout...");
-      router.push("/order-1?direct=true");
-    } catch {
+      localStorage.removeItem("directCheckoutItem");
+      await addToCart(data, datavariant, { skipRefresh: true });
+      toast.success("Produk siap checkout. Membuka halaman checkout...");
+      router.push("/order-1");
+    } catch (error) {
       setShowFeedback(false);
+
+      if (isSlowCartProcessingError(error)) {
+        try {
+          toast.loading("Koneksi lambat. Mengecek ulang produk checkout...", { id: "buy-now-recovery" });
+          await waitForCartRecovery();
+          await ensureTargetCartItemActive();
+          toast.success("Produk siap checkout. Membuka halaman checkout...", { id: "buy-now-recovery" });
+          router.push("/order-1");
+          return;
+        } catch {
+          toast.dismiss("buy-now-recovery");
+          // Fall through to the safe customer message below.
+        }
+      }
+
       toast.error("Checkout langsung belum bisa disiapkan. Silakan coba lagi beberapa saat lagi.");
     } finally {
       setIsBuying(false);
