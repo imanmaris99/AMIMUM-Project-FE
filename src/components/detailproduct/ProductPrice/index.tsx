@@ -196,7 +196,7 @@ const ProductPrice = ({
             {isSticky && (
               <p className="text-gray-600 text-xs mb-1">Harga Terpilih</p>
             )}
-            
+
             {/* Show price only when variant is selected */}
             {datavariant ? (
               !hasValidPrice ? (
@@ -238,56 +238,61 @@ const ProductPrice = ({
               </div>
             )}
           </div>
-          
+
           <div className={`relative ${isSticky ? '' : 'ml-4'}`}>
             {isSticky ? (
               // Sticky mode - Show both buttons (only when variant is selected)
               <div className="space-y-2">
-                <Button 
-                  variant="default" 
-                  onClick={handleAddToCart}
-                  disabled={isAdding || isBuying || !hasValidPrice}
-                  className={`${
-                    isItemInCart 
-                      ? "bg-green-600 hover:bg-green-700" 
-                      : "bg-[#006A47] hover:bg-[#005A3C]"
-                  } text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 px-4 py-2 text-sm w-full`}
-                >
-                  {isAdding ? (
-                    <ButtonSpinner size="sm" color="white" text="Menambah..." />
-                  ) : !hasValidPrice ? (
-                    "Harga Belum Tersedia"
-                  ) : isItemInCart ? (
-                    "✓ Di Keranjang"
-                  ) : (
-                    "Simpan Keranjang"
-                  )}
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  onClick={handleBuyNow}
-                  disabled={isBuying || isAdding || !hasValidPrice}
-                  className="w-full px-4 py-2 text-sm border-primary text-primary hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                >
-                  {isBuying ? (
-                    <ButtonSpinner size="sm" color="primary" text="Memproses..." />
-                  ) : !hasValidPrice ? (
-                    "Harga Belum Tersedia"
-                  ) : (
-                    "🚀 Beli Langsung"
-                  )}
-                </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant="default"
+                    onClick={handleAddToCart}
+                    disabled={isAdding || isBuying || !hasValidPrice}
+                    className={`${
+                      isItemInCart
+                        ? "bg-green-600 hover:bg-green-700"
+                        : "bg-[#006A47] hover:bg-[#005A3C]"
+                    } text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 px-3 py-2 text-xs w-full`}
+                  >
+                    {isAdding ? (
+                      <ButtonSpinner size="sm" color="white" text="Menyimpan..." />
+                    ) : !hasValidPrice ? (
+                      "Harga kosong"
+                    ) : isItemInCart ? (
+                      "✓ Keranjang"
+                    ) : (
+                      "Keranjang"
+                    )}
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    onClick={handleBuyNow}
+                    disabled={isBuying || isAdding || !hasValidPrice}
+                    className="w-full px-3 py-2 text-xs border-primary text-primary hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                  >
+                    {isBuying ? (
+                      <ButtonSpinner size="sm" color="primary" text="Memproses..." />
+                    ) : !hasValidPrice ? (
+                      "Harga kosong"
+                    ) : (
+                      "Beli Langsung"
+                    )}
+                  </Button>
+                </div>
+                <p className="text-center text-[11px] leading-4 text-gray-500">
+                  Keranjang untuk simpan dulu, Beli Langsung untuk langsung checkout.
+                </p>
               </div>
             ) : (
               // Non-sticky mode - Show single button
-              <Button 
-                variant="default" 
+              <Button
+                variant="default"
                 onClick={handleAddToCart}
                 disabled={isAdding || isBuying || !datavariant || !hasValidPrice}
                 className={`${
-                  isItemInCart 
-                    ? "bg-green-600 hover:bg-green-700" 
+                  isItemInCart
+                    ? "bg-green-600 hover:bg-green-700"
                     : !datavariant || !hasValidPrice
                     ? "bg-gray-400 hover:bg-gray-400"
                     : "bg-[#006A47] hover:bg-[#005A3C]"
@@ -309,7 +314,7 @@ const ProductPrice = ({
                 )}
               </Button>
             )}
-            
+
             {/* User Feedback Toast */}
             {showFeedback && (
               <div className="fixed top-7 left-[49%] transform -translate-x-1/2 bg-primary text-white px-4 py-2 rounded-lg shadow-lg z-50 max-w-[280px] mx-4">

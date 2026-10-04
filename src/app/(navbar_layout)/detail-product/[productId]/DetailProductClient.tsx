@@ -17,6 +17,17 @@ interface DetailProductClientProps {
   errorMessage: string | null;
 }
 
+const DetailShoppingInfo = () => (
+  <section className="rounded-2xl border border-emerald-100 bg-emerald-50/80 p-4 text-xs leading-5 text-emerald-900 shadow-sm" aria-label="Info belanja aman">
+    <p className="font-bold">Belanja aman di Toko Herbal Amimum</p>
+    <div className="mt-2 grid gap-2">
+      <p>• Pilih varian dan cek harga sebelum menekan tombol beli.</p>
+      <p>• Pembayaran mengikuti metode resmi yang tampil saat checkout.</p>
+      <p>• Pickup tidak memakai resi; jasa kirim menampilkan resi setelah admin input.</p>
+    </div>
+  </section>
+);
+
 export default function DetailProductClient({ detailProduct, errorMessage }: DetailProductClientProps) {
   const router = useRouter();
   const [selectedVariant, setSelectedVariant] = useState<VariantProductType | undefined>(undefined);
@@ -85,6 +96,7 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
             selectedVariantImg={selectedVariant?.img}
           />
           <TitleProduct isLoading={false} isError={isError} data={detailProduct || undefined} />
+          <DetailShoppingInfo />
           
           {/* Variants Selection */}
           <ProductVariants 
@@ -97,9 +109,12 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
           
           {/* Variant Selection Prompt */}
           {!selectedVariant && detailProduct?.variants_list && detailProduct.variants_list.length > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-              <p className="text-blue-700 text-sm font-medium">
-                📦 Pilih varian produk untuk melihat harga dan menambahkan ke keranjang
+            <div className="rounded-2xl border border-blue-100 bg-blue-50 p-3 text-center shadow-sm">
+              <p className="text-sm font-semibold text-blue-800">
+                Pilih varian untuk melihat harga dan melanjutkan pembelian.
+              </p>
+              <p className="mt-1 text-xs leading-5 text-blue-700">
+                Tombol Keranjang/Beli Langsung muncul setelah varian dipilih.
               </p>
             </div>
           )}
