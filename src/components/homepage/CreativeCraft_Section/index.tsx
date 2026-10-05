@@ -61,7 +61,7 @@ const CreativeCraftSection = () => {
           aria-controls="creative-craft-detail"
           className="mt-4 flex w-full items-center justify-between rounded-2xl bg-[#F7FBF8] px-3 py-2.5 text-left text-sm font-bold text-primary transition-colors hover:bg-emerald-50"
         >
-          <span>{isExpanded ? "Sembunyikan detail kategori" : "Lihat detail kategori"}</span>
+          <span>Detail kategori</span>
           <span className={`text-base transition-transform ${isExpanded ? "rotate-180" : ""}`} aria-hidden="true">
             ⌄
           </span>
