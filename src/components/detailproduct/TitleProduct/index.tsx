@@ -30,10 +30,10 @@ const TitleProduct = ({ isError, isLoading, data }: TitleProductProps) => {
   const hasRating = Number.isFinite(rating) && rating > 0;
 
   return (
-    <div className="bg-white shadow-sm rounded-lg">
+    <div className="rounded-3xl border border-emerald-100 bg-white/95 shadow-[0_12px_32px_rgba(0,106,71,0.08)] backdrop-blur">
       <div className="p-4 flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm text-green-700">Brand: {brandName}</p>
+          <p className="text-sm font-medium text-emerald-700">Brand: {brandName}</p>
           <h1 className="text-lg font-semibold text-gray-900">{productName}</h1>
         </div>
         {hasRating ? (
@@ -44,7 +44,7 @@ const TitleProduct = ({ isError, isLoading, data }: TitleProductProps) => {
             </span>
           </div>
         ) : (
-          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full shrink-0">
+          <span className="text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full shrink-0">
             Belum ada rating
           </span>
         )}

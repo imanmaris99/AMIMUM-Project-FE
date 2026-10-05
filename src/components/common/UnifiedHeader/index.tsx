@@ -389,16 +389,16 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   // Secondary Header (Track Order, Detail Product, etc.)
   if (type === 'secondary') {
     return (
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+      <header className="sticky top-0 z-40 border-b border-emerald-100 bg-white/90 shadow-[0_8px_24px_rgba(0,106,71,0.06)] backdrop-blur">
         <div className="px-3 sm:px-4 py-2 sm:py-3">
           <div className="flex items-center justify-between" suppressHydrationWarning={true}>
             {/* Left: Back Button */}
             {showBackButton && (
               <button
                 onClick={handleBack}
-                className="p-1 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                className="p-1 sm:p-2 hover:bg-emerald-50 rounded-lg transition-colors flex-shrink-0"
               >
-                <GoChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                <GoChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-900" />
               </button>
             )}
 
@@ -406,7 +406,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
             <div className="flex-1 text-center min-w-0 px-2">
               <h1 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{title}</h1>
               {subtitle && (
-                <p className="text-xs sm:text-sm text-gray-500 mt-1 truncate">{subtitle}</p>
+                <p className="text-xs sm:text-sm text-emerald-700/80 mt-1 truncate">{subtitle}</p>
               )}
             </div>
 

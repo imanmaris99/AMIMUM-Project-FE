@@ -34,7 +34,7 @@ const ProductImage = ({ detailProduct, selectedVariantImg }: ProductImageProps) 
   }, [imageUrl, imageError]);
 
   return (
-    <div className="w-full h-48 relative bg-gray-50 rounded-lg overflow-hidden shadow-sm">
+    <div className="relative h-48 w-full overflow-hidden rounded-3xl border border-emerald-100 bg-white/90 shadow-[0_12px_32px_rgba(0,106,71,0.08)] backdrop-blur">
       {!imageUrl ? null : !isExternalUrl ? (
         <Image 
           src={imageUrl} 

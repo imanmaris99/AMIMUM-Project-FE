@@ -28,8 +28,8 @@ const ProductInformation = ({
 
   if (!datavariant) {
     return (
-      <div className="bg-white rounded-lg shadow-sm">
-        <div className="p-4 text-center text-gray-500 text-sm">
+      <div className="rounded-3xl border border-emerald-100 bg-white/90 shadow-[0_12px_32px_rgba(0,106,71,0.08)] backdrop-blur">
+        <div className="p-4 text-center text-emerald-700 text-sm">
           <p>Pilih varian produk untuk melihat stok dan masa berlaku dari data katalog.</p>
         </div>
       </div>
@@ -37,18 +37,18 @@ const ProductInformation = ({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
-      <div className="p-4 space-y-2 text-gray-500 text-sm">
+    <div className="rounded-3xl border border-emerald-100 bg-white/95 shadow-[0_12px_32px_rgba(0,106,71,0.08)] backdrop-blur">
+      <div className="p-4 space-y-2 text-emerald-800 text-sm">
         <div className="flex items-center space-x-2">
-          <FiTag className="text-gray-500" />
+          <FiTag className="text-emerald-600" />
           <span>Varian: {datavariant.variant || datavariant.name || "Belum tersedia"}</span>
         </div>
         <div className="flex items-center space-x-2">
-          <FiLayers className="text-gray-500" />
+          <FiLayers className="text-emerald-600" />
           <span>Stok katalog: {typeof datavariant.stock === "number" ? datavariant.stock : "Belum tersedia"}</span>
         </div>
         <div className="flex items-center space-x-2">
-          <FiAlertCircle className="text-gray-500" />
+          <FiAlertCircle className="text-emerald-600" />
           <span>
             Masa berlaku: {datavariant.expiration || "Belum tersedia"}
           </span>

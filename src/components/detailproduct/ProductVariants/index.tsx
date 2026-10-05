@@ -25,9 +25,9 @@ const ProductVariants = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
+    <div className="rounded-3xl border border-emerald-100 bg-white/95 shadow-[0_12px_32px_rgba(0,106,71,0.08)] backdrop-blur">
       <div className="p-4">
-        <p className="text-gray-500 text-sm font-medium mb-3">Varian produk :</p>
+        <p className="text-emerald-900 text-sm font-semibold mb-3">Varian produk :</p>
         {productVariants.length === 0 ? (
           <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
             Varian produk belum tersedia di katalog. Silakan hubungi admin toko sebelum membeli.
@@ -47,10 +47,10 @@ const ProductVariants = ({
               return (
                 <label
                   key={variant.id}
-                  className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                  className={`flex items-center space-x-3 rounded-2xl border-2 p-4 cursor-pointer transition-all duration-200 ${
                     isSelected
-                      ? "border-primary bg-primary/5"
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "border-primary bg-emerald-50"
+                      : "border-emerald-100 bg-white/80 hover:border-emerald-200 hover:bg-emerald-50/50"
                   }`}
                 >
                   <input
@@ -104,7 +104,7 @@ const ProductVariants = ({
             })}
           </div>
         )}
-        <hr className="mt-4" />
+        <hr className="mt-4 border-emerald-100" />
       </div>
     </div>
   );

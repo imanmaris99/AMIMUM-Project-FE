@@ -42,16 +42,16 @@ const ProductDescription = ({
   }
 
   return (
-    <div className="border border-gray-300 rounded-lg shadow-sm">
+    <div className="rounded-3xl border border-emerald-100 bg-white/95 shadow-[0_12px_32px_rgba(0,106,71,0.08)] backdrop-blur">
       <div className="p-4">
-        <h2 className="text-lg font-semibold mb-2">Deskripsi Produk</h2>
+        <h2 className="text-lg font-semibold mb-2 text-gray-900">Deskripsi Produk</h2>
         {fullDescription ? (
           <p className="text-gray-500 text-sm whitespace-pre-line">
             {visibleDescription}{isLongDescription && !showFullDescription ? "..." : ""}
             {isLongDescription && (
               <button
                 type="button"
-                className="text-green-600 flex items-center hover:underline cursor-pointer mt-2"
+                className="text-emerald-700 flex items-center hover:underline cursor-pointer mt-2 font-semibold"
                 onClick={handleReadMore}
               >
                 {showFullDescription ? "Tampilkan lebih sedikit" : "Baca selengkapnya"}
