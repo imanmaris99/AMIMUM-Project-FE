@@ -16,24 +16,24 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   
   if (!brandId || typeof brandId !== 'string') {
     return (
-      <main className="pb-20">
+      <div className="bg-transparent pb-8">
         <UnifiedHeader type="main" title="Brand tidak ditemukan" />
         <div className="p-4 text-center">
           <p className="text-red-500">Brand yang dibuka tidak valid.</p>
         </div>
-      </main>
+      </div>
     );
   }
 
   const productionId = parseInt(brandId, 10);
   if (isNaN(productionId)) {
     return (
-      <main className="pb-20">
+      <div className="bg-transparent pb-8">
         <UnifiedHeader type="main" title="Brand tidak ditemukan" />
         <div className="p-4 text-center">
           <p className="text-red-500">Format brand tidak valid.</p>
         </div>
-      </main>
+      </div>
     );
   }
   
@@ -57,7 +57,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   }
   
   return (
-    <main className="pb-20">
+    <div className="bg-transparent pb-8">
       <UnifiedHeader 
         type="main"
         showCart={true}
@@ -83,6 +83,6 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
         title={`Daftar Produk ${brandData?.name || "Brand produk"}`}
         emptyMessage="Produk brand ini belum tersedia di katalog toko."
       />
-    </main>
+    </div>
   );
 }

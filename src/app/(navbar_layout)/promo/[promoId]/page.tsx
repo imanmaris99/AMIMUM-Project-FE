@@ -14,24 +14,24 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
   
   if (!promoId || typeof promoId !== 'string') {
     return (
-      <main className="pb-20">
+      <div className="bg-transparent pb-8">
         <UnifiedHeader type="main" title="Promo tidak ditemukan" />
         <div className="p-4 text-center">
           <p className="text-red-500">Promo yang dibuka tidak valid.</p>
         </div>
-      </main>
+      </div>
     );
   }
 
   const productionId = parseInt(promoId, 10);
   if (isNaN(productionId)) {
     return (
-      <main className="pb-20">
+      <div className="bg-transparent pb-8">
         <UnifiedHeader type="main" title="Promo tidak ditemukan" />
         <div className="p-4 text-center">
           <p className="text-red-500">Format promo tidak valid.</p>
         </div>
-      </main>
+      </div>
     );
   }
   
@@ -54,7 +54,7 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
   }
   
   return (
-    <main className="pb-20">
+    <div className="bg-transparent pb-8">
       <UnifiedHeader 
         type="main"
         showCart={true}
@@ -70,6 +70,6 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
         title={`Produk Promo ${brandData?.name || "Brand produk"}`}
         emptyMessage="Produk promo belum tersedia di katalog toko. Harga final tetap mengikuti data toko saat checkout."
       />
-    </main>
+    </div>
   );
 }
