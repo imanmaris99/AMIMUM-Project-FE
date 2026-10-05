@@ -27,9 +27,6 @@ const Footer = () => {
           Marketplace Tokopedia: herbalamimum
         </a>
       </div>
-      <p className="text-sm text-gray-700">
-        <span className="font-bold text-primary">Toko Herbal AmImUm</span>
-      </p>
     </footer>
   );
 };
