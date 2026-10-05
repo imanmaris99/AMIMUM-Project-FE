@@ -577,6 +577,48 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
   };
 
   const totals = calculateTotals();
+  const selectedPaymentOption = paymentMethodGroups
+    .flatMap((group) => group.methods)
+    .find((method) => method.id === selectedPaymentMethod);
+  const checkoutReceiveSummary = deliveryMethod === 'pickup'
+    ? 'Ambil langsung di toko — tidak memakai nomor resi.'
+    : selectedCourierData
+      ? `${getCourierName(selectedCourierCompany)} ${selectedCourierData.serviceType} — resi diinput admin setelah paket dikirim.`
+      : 'Pilih alamat dan layanan kurir untuk menghitung ongkir.';
+  const checkoutShippingSummary = deliveryMethod === 'pickup'
+    ? 'Gratis ongkir karena pesanan diambil di toko.'
+    : shippingFeePaymentMode === 'cod_shipping'
+      ? 'Produk dibayar sekarang; ongkir dibayar saat paket tiba jika kurir mendukung.'
+      : 'Produk dan ongkir digabung dalam total pembayaran.';
+  const checkoutPaymentSummary = selectedPaymentOption
+    ? selectedPaymentOption.name
+    : 'Pilih QRIS resmi, Transfer BRI manual, atau pembayaran online yang tersedia.';
+  const checkoutConfidenceItems = [
+    {
+      label: 'Produk',
+      value: currentItems.length > 0
+        ? `${currentItems.length} item siap checkout.`
+        : 'Produk belum siap checkout.',
+      isReady: currentItems.length > 0 && activeSubtotal > 0,
+    },
+    {
+      label: deliveryMethod === 'pickup' ? 'Ambil toko' : 'Pengiriman',
+      value: checkoutReceiveSummary,
+      isReady: deliveryMethod === 'pickup' || hasValidDeliverySelection,
+    },
+    {
+      label: 'Pembayaran resmi',
+      value: checkoutPaymentSummary,
+      isReady: Boolean(selectedPaymentMethod),
+    },
+    {
+      label: 'Update pesanan',
+      value: whatsappConsent
+        ? 'Nomor WhatsApp aktif sudah dikonfirmasi.'
+        : 'Centang persetujuan agar admin bisa follow-up manual bila perlu.',
+      isReady: whatsappConsent,
+    },
+  ];
 
   const normalizeBackendOrderStatus = (status?: string): TransactionStatus => {
     switch ((status || '').toLowerCase()) {
@@ -1118,6 +1160,40 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         ) : (
           <>
 
+        {/* Checkout Confidence Layer */}
+        <div className="px-4 pt-4">
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50/80 p-4 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-bold text-emerald-900">Checkout Aman</p>
+                <p className="mt-1 text-xs leading-relaxed text-emerald-800">
+                  Cek produk, cara terima pesanan, pembayaran resmi, dan kontak update sebelum membuat pesanan.
+                </p>
+              </div>
+              <span className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ${
+                canSubmitOrder
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-white text-emerald-700 ring-1 ring-emerald-200'
+              }`}>
+                {canSubmitOrder ? 'Siap checkout' : 'Lengkapi dulu'}
+              </span>
+            </div>
+            <div className="mt-3 grid gap-2">
+              {checkoutConfidenceItems.map((item) => (
+                <div key={item.label} className="flex items-start gap-2 rounded-xl bg-white/80 px-3 py-2">
+                  <IoCheckmarkCircle
+                    className={`mt-0.5 h-4 w-4 shrink-0 ${item.isReady ? 'text-emerald-600' : 'text-gray-300'}`}
+                  />
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-gray-900">{item.label}</p>
+                    <p className="text-[11px] leading-4 text-gray-600">{item.value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Delivery Method Selection */}
         <div className="px-4 py-4">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Metode Penerima Pesanan</h2>
@@ -1495,6 +1571,9 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                 <span>{shippingFeePaymentMode === 'cod_shipping' ? 'Total bayar produk sekarang' : 'Total'}</span>
                 <span className="text-primary">{rupiahFormater(totals.total)}</span>
               </div>
+              <p className="mt-2 rounded-xl bg-[#F7FCF9] px-3 py-2 text-xs leading-relaxed text-gray-600">
+                {checkoutShippingSummary}
+              </p>
             </div>
           </div>
         </div>
