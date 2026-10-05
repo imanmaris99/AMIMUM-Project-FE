@@ -32,11 +32,11 @@ const CreativeCraftSection = () => {
             Aksesoris & Custom Craft
           </h2>
           <p className="mt-2 text-xs leading-5 text-[#6B7C73]">
-            Lini produk kreatif buatan sendiri: sticker vinyl, keychain akrilik laser cut, produk 3D print, dan pesanan custom design.
+            Detail kategori untuk produk kreatif buatan sendiri: sticker vinyl, keychain akrilik laser cut, produk 3D print, produk ready stock, dan pesanan custom design.
           </p>
         </div>
         <span className="shrink-0 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold text-primary">
-          Baru
+          Kategori Baru
         </span>
       </div>
 

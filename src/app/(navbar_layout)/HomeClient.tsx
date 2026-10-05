@@ -12,6 +12,11 @@ const ShoppingGuideSection = dynamic(() => import("@/components/homepage/Shoppin
 const CreativeCraftSection = dynamic(() => import("@/components/homepage/CreativeCraft_Section"), { ssr: false });
 const Search = dynamic(() => import("@/components/common/Search"), { ssr: false });
 
+const CREATIVE_CRAFT_CATEGORY = {
+  id: -9001,
+  name: "Aksesoris & Custom Craft",
+};
+
 interface HomeClientProps {
   categories: unknown;
   productions: unknown;
@@ -34,23 +39,27 @@ export default function HomeClient({
   articleError
 }: HomeClientProps) {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const normalize = (value: string) => value.toLowerCase().trim().replace(/\s+/g, ' ');
   
   // Extract data from API response structure with comprehensive validation
   const categoriesData = Array.isArray(categories) ? categories : [];
+  const categoriesWithCreative = categoriesData.some((cat: unknown) => {
+    const category = cat as { name?: string };
+    return typeof category?.name === "string" && normalize(category.name) === normalize(CREATIVE_CRAFT_CATEGORY.name);
+  })
+    ? categoriesData
+    : [...categoriesData, CREATIVE_CRAFT_CATEGORY];
   const productionsData = Array.isArray(productions) ? productions : [];
   const promoData = Array.isArray(promo) ? promo : [];
   const articlesData = Array.isArray(articles) ? articles : [];
   
   // Validate category selection
   const selectedCategoryName = selectedCategory 
-    ? categoriesData.find((cat: unknown) => {
+    ? categoriesWithCreative.find((cat: unknown) => {
         const category = cat as { id: number; name: string };
         return category && typeof category.id === 'number' && typeof category.name === 'string' && category.id === selectedCategory;
       })?.name
     : null;
-    
-  const normalize = (value: string) => value.toLowerCase().trim().replace(/\s+/g, ' ');
-
   const filteredProductions = selectedCategory && selectedCategoryName
     ? productionsData.filter((prod: unknown) => {
         const production = prod as { category: string };
@@ -70,6 +79,8 @@ export default function HomeClient({
   // Validate productions data with comprehensive error handling
   const validProductions = filteredProductions.filter(validateProductionData);
   const finalProductions = validProductions.length > 0 ? validProductions : [];
+  const isCreativeCraftSelected =
+    selectedCategoryName ? normalize(selectedCategoryName) === normalize(CREATIVE_CRAFT_CATEGORY.name) : false;
   
   
     
@@ -91,13 +102,13 @@ export default function HomeClient({
         <Search />
         <Promo promo={promoData} errorMessage={promoError} />
         <ShoppingGuideSection />
-        <CreativeCraftSection />
         <Category
-          categories={categoriesData}
+          categories={categoriesWithCreative}
           errorMessage={categoryError}
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
         />
+        {isCreativeCraftSelected && <CreativeCraftSection />}
         <Production
           productions={finalProductions}
           errorMessage={productionError}
