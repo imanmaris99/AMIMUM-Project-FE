@@ -581,10 +581,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     .flatMap((group) => group.methods)
     .find((method) => method.id === selectedPaymentMethod);
   const checkoutReceiveSummary = deliveryMethod === 'pickup'
-    ? 'Ambil langsung di toko — tidak memakai nomor resi.'
+    ? 'Ambil langsung di toko. Pesanan pickup tidak memakai nomor resi.'
     : selectedCourierData
       ? `${getCourierName(selectedCourierCompany)} ${selectedCourierData.serviceType} — resi diinput admin setelah paket dikirim.`
-      : 'Pilih alamat dan layanan kurir untuk menghitung ongkir.';
+      : 'Pilih alamat tujuan dan layanan kurir bila pesanan ingin dikirim.';
   const checkoutShippingSummary = deliveryMethod === 'pickup'
     ? 'Gratis ongkir karena pesanan diambil di toko.'
     : shippingFeePaymentMode === 'cod_shipping'
@@ -602,7 +602,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       isReady: currentItems.length > 0 && activeSubtotal > 0,
     },
     {
-      label: deliveryMethod === 'pickup' ? 'Ambil toko' : 'Pengiriman',
+      label: 'Penerimaan',
       value: checkoutReceiveSummary,
       isReady: deliveryMethod === 'pickup' || hasValidDeliverySelection,
     },
@@ -1084,15 +1084,15 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#F7FCF9_0%,#FFFFFF_44%,#FFFDF7_100%)]">
-      {/* Header - Same style as track order with white background */}
+      {/* Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="flex justify-center items-center relative mt-16 py-4">
-          <div className="absolute left-10">
+        <div className="relative flex items-center justify-center px-4 py-3">
+          <div className="absolute left-4">
             <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
           </div>
           <div className="text-center">
             <h1 className="text-[16px] font-semibold">Checkout</h1>
-            <p className="text-xs text-gray-500 mt-1">Lengkapi data pesanan Anda</p>
+            <p className="mt-1 text-xs text-gray-500">Pilih cara terima dan pembayaran</p>
           </div>
         </div>
       </div>
@@ -1167,7 +1167,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
               <div>
                 <p className="text-sm font-bold text-emerald-900">Checkout Aman</p>
                 <p className="mt-1 text-xs leading-relaxed text-emerald-800">
-                  Cek produk, cara terima pesanan, pembayaran resmi, dan kontak update sebelum membuat pesanan.
+                  Cek produk, cara menerima pesanan, pembayaran resmi, dan kontak update sebelum membuat pesanan.
                 </p>
               </div>
               <span className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ${
@@ -1196,7 +1196,12 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
         {/* Delivery Method Selection */}
         <div className="px-4 py-4">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Metode Penerima Pesanan</h2>
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Metode Penerimaan Pesanan</h2>
+            <p className="mt-1 text-xs leading-relaxed text-gray-500">
+              Pilih kirim ke alamat tujuan atau ambil langsung di toko. Alur ongkir dan resi hanya berlaku untuk pesanan yang dikirim.
+            </p>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <label className={`flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
               deliveryMethod === 'delivery' 
