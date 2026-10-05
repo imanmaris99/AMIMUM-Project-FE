@@ -9,6 +9,7 @@ const Category = dynamic(() => import("@/components/homepage/Category_Section"),
 const Production = dynamic(() => import("@/components/homepage/Production_Section"), { ssr: false });
 const ArticleSection = dynamic(() => import("@/components/homepage/Article_Section"), { ssr: false });
 const ShoppingGuideSection = dynamic(() => import("@/components/homepage/ShoppingGuide_Section"), { ssr: false });
+const CreativeCraftSection = dynamic(() => import("@/components/homepage/CreativeCraft_Section"), { ssr: false });
 const Search = dynamic(() => import("@/components/common/Search"), { ssr: false });
 
 interface HomeClientProps {
@@ -90,6 +91,7 @@ export default function HomeClient({
         <Search />
         <Promo promo={promoData} errorMessage={promoError} />
         <ShoppingGuideSection />
+        <CreativeCraftSection />
         <Category
           categories={categoriesData}
           errorMessage={categoryError}
