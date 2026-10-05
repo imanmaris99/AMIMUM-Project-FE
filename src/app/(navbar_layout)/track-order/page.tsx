@@ -255,14 +255,14 @@ const TrackOrderPage: React.FC = () => {
             </div>
           )}
           {isLoading ? (
-            <div className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white/95 p-6 text-center shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
+            <div className="w-full max-w-sm rounded-3xl bg-white/95 p-6 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
               <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
               <p className="text-sm text-gray-500">
                 Memuat data pelacakan...
               </p>
             </div>
           ) : errorMessage ? (
-            <div className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white/95 p-6 text-center shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
+            <div className="w-full max-w-sm rounded-3xl bg-white/95 p-6 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
               <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg
                   className="w-8 h-8 text-red-400"
@@ -284,7 +284,7 @@ const TrackOrderPage: React.FC = () => {
               <p className="text-sm text-gray-500">{errorMessage}</p>
             </div>
           ) : orders.length === 0 ? (
-            <div className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white/95 p-6 text-center shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
+            <div className="w-full max-w-sm rounded-3xl bg-white/95 p-6 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
               <div className="flex flex-col items-center gap-4">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50">
                   <svg
@@ -341,7 +341,7 @@ const TrackOrderPage: React.FC = () => {
               )}
 
               {transactionId && currentTransaction && (
-                <div className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white/95 p-4 shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
+                <div className="w-full max-w-sm rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
                     Informasi Transaksi
                   </h3>
@@ -375,14 +375,14 @@ const TrackOrderPage: React.FC = () => {
                       </span>
                     </div>
                   </div>
-                  <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/80 px-3 py-2 text-xs font-medium leading-relaxed text-primary">
+                  <div className="mt-4 rounded-2xl bg-emerald-50/80 px-3 py-2 text-xs font-medium leading-relaxed text-primary">
                     {getTrackingHelpText(currentTransaction)}
                   </div>
                 </div>
               )}
 
               {currentTransaction && (
-                <div className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white/95 p-4 shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
+                <div className="w-full max-w-sm rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-wide text-primary">
@@ -392,7 +392,7 @@ const TrackOrderPage: React.FC = () => {
                         {isPickupOrder ? "Status Pengambilan Pesanan" : "Status dan Resi Pesanan"}
                       </h3>
                     </div>
-                    <span className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-semibold text-primary">
+                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-primary">
                       {isPickupOrder ? "Pickup" : "Tracking"}
                     </span>
                   </div>

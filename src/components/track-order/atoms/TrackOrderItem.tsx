@@ -13,7 +13,7 @@ const TrackOrderItem: React.FC<TrackOrderItemProps> = ({
   item
 }) => {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-emerald-100 bg-white/95 p-3 shadow-sm transition-colors hover:bg-emerald-50/60">
+    <div className="flex items-center gap-3 rounded-2xl bg-white/95 p-3 shadow-[0_8px_18px_rgba(15,23,42,0.06)] transition-colors hover:bg-emerald-50/60">
       {/* Product Image */}
       <div className="flex-shrink-0">
         <div className="h-20 w-20 overflow-hidden rounded-2xl bg-emerald-50 ring-1 ring-emerald-100">

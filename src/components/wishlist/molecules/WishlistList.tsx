@@ -33,7 +33,7 @@ const WishlistList: React.FC<WishlistListProps> = ({ items, onRemoveItem }) => {
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-emerald-200 bg-white/95 px-5 py-14 text-center shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
+      <div className="flex flex-col items-center justify-center rounded-3xl bg-white/95 px-5 py-14 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
         <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 shadow-sm ring-1 ring-emerald-100">
           <svg
             className="h-8 w-8 text-primary/60"
@@ -65,7 +65,7 @@ const WishlistList: React.FC<WishlistListProps> = ({ items, onRemoveItem }) => {
   return (
     <div className="space-y-3">
       {items.map((item) => (
-        <div key={item.id} className="overflow-hidden rounded-3xl border border-emerald-100 bg-white/95 shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
+        <div key={item.id} className="overflow-hidden rounded-3xl bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
           <WishlistItem
             item={item}
             onRemove={handleRemoveItem}

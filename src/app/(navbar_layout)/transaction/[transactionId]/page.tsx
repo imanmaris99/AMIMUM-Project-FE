@@ -478,7 +478,7 @@ const TransactionDetailPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border p-4">
+          <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-semibold text-gray-900">
                 Status Transaksi
@@ -546,7 +546,7 @@ const TransactionDetailPage: React.FC = () => {
             )}
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border p-4">
+          <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-primary">
@@ -589,7 +589,7 @@ const TransactionDetailPage: React.FC = () => {
 
 
           {isManualQrisPayment && isPendingPayment && (
-            <div className="bg-white rounded-lg shadow-sm border border-emerald-200 p-4">
+            <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
               <div className="mb-3">
                 <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
                   QRIS Resmi Toko Herbal Amimum
@@ -632,14 +632,14 @@ const TransactionDetailPage: React.FC = () => {
           )}
 
           {isManualBankTransferPayment && isPendingPayment && (
-            <div className="bg-white rounded-lg shadow-sm border border-emerald-200 p-4">
+            <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
               <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
                 Transfer Bank Manual
               </p>
               <h3 className="mt-1 text-lg font-semibold text-gray-900">
                 Transfer ke Rekening Resmi Toko
               </h3>
-              <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+              <div className="mt-3 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">
                 <div className="flex justify-between gap-3">
                   <span>Bank</span>
                   <strong>{STORE_BANK_ACCOUNT.bank}</strong>
@@ -652,7 +652,7 @@ const TransactionDetailPage: React.FC = () => {
                   <span>Atas Nama</span>
                   <strong className="text-right">{STORE_BANK_ACCOUNT.accountName}</strong>
                 </div>
-                <div className="mt-3 border-t border-emerald-200 pt-3">
+                <div className="mt-3 border-t border-gray-100 pt-3">
                   <p className="font-semibold">Total yang dibayar: {rupiahFormater(transaction.total)}</p>
                   <p className="mt-1 text-xs leading-relaxed">
                     Transfer sesuai nominal total, simpan bukti pembayaran, lalu kirim bukti ke admin melalui WhatsApp agar pesanan segera diverifikasi.
@@ -662,7 +662,7 @@ const TransactionDetailPage: React.FC = () => {
             </div>
           )}
 
-          <div className="bg-white rounded-lg shadow-sm border p-4">
+          <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">
               Ringkasan Pesanan
             </h3>
@@ -710,7 +710,7 @@ const TransactionDetailPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border p-4">
+          <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">
               Informasi Pengiriman
             </h3>
@@ -776,7 +776,7 @@ const TransactionDetailPage: React.FC = () => {
           </div>
 
           {customerSafeNote && (
-            <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 Catatan Tambahan
               </h3>
@@ -786,7 +786,7 @@ const TransactionDetailPage: React.FC = () => {
             </div>
           )}
 
-          <div className="bg-white rounded-lg shadow-sm border p-4">
+          <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
             <div className="space-y-3">
               {isLocalSimulatedTransaction && isPendingPayment && (
                 <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-800">

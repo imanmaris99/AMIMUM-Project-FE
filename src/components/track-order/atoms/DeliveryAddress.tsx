@@ -33,7 +33,7 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
   const isPickup = deliveryType === "pickup";
 
   return (
-    <div className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white/95 p-4 shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
+    <div className="w-full max-w-sm rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
       <div className="space-y-4">
         {/* Title */}
         <h3 className="text-lg font-semibold text-[#313131]">
@@ -63,7 +63,7 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
           </div>
           
           {isPickup ? (
-            <div className="rounded-2xl border border-emerald-100 bg-emerald-50/90 px-3 py-2 text-xs font-medium leading-relaxed text-emerald-800">
+            <div className="rounded-2xl bg-emerald-50/90 px-3 py-2 text-xs font-medium leading-relaxed text-emerald-800">
               Pesanan dipilih untuk ambil langsung di Toko Herbal Amimum. Tidak ada nomor resi karena pesanan tidak dikirim melalui kurir.
             </div>
           ) : (

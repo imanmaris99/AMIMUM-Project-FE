@@ -52,7 +52,7 @@ const ProfileSettings: React.FC = () => {
   };
 
   return (
-    <div className="rounded-3xl border border-emerald-100 bg-white/95 p-4 shadow-[0_12px_32px_rgba(0,106,71,0.08)] backdrop-blur sm:p-6">
+    <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] backdrop-blur sm:p-6">
       {/* Settings List */}
       <div className="space-y-2">
         {/* Location */}

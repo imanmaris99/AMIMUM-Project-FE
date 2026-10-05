@@ -58,7 +58,7 @@ const Wishlist = () => {
         />
 
         <div className="px-4 py-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
-          <div className="mb-4 rounded-3xl border border-emerald-100 bg-white/95 p-4 shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
+          <div className="mb-4 rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
             <h1 className="mb-2 text-lg font-semibold text-[#0D0E09]">
               Produk Idamanku
             </h1>
@@ -66,7 +66,7 @@ const Wishlist = () => {
               Daftar ini hanya berisi produk yang tersimpan dari akun Anda.
             </p>
 
-            <div className="mb-1 flex items-center justify-between gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/70 px-3 py-3">
+            <div className="mb-1 flex items-center justify-between gap-3 rounded-2xl bg-emerald-50/70 px-3 py-3">
               <div className="flex items-center gap-3">
                 <span className="text-sm text-[#6B7C73]">Total Produk:</span>
                 <span className="text-sm font-bold text-[#0D0E09]">
@@ -89,7 +89,7 @@ const Wishlist = () => {
           </div>
 
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center rounded-3xl border border-emerald-100 bg-white/95 py-16 text-center shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
+            <div className="flex flex-col items-center justify-center rounded-3xl bg-white/95 py-16 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
               <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
               <p className="text-sm text-[#6B7C73]">Memuat wishlist Anda...</p>
             </div>

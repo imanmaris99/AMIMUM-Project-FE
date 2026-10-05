@@ -84,7 +84,7 @@ const StatusOrder: React.FC<StatusOrderProps> = ({ currentStatus = 0, deliveryTy
   };
 
   return (
-    <div className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white/95 p-5 shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
+    <div className="w-full max-w-sm rounded-3xl bg-white/95 p-5 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
       <div className="space-y-6">
         {/* Title */}
         <h3 className="text-lg font-semibold text-[#0D0E09]">

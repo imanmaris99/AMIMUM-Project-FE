@@ -46,7 +46,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
   return (
     <div className="space-y-3">
       {transactions.map((transaction) => (
-        <div key={transaction.id} className="bg-white rounded-lg shadow-md border-0 overflow-hidden">
+        <div key={transaction.id} className="bg-white/95 rounded-3xl shadow-[0_8px_22px_rgba(15,23,42,0.08)] overflow-hidden">
           <TransactionItem
             transaction={transaction}
             onViewDetails={onViewDetails}

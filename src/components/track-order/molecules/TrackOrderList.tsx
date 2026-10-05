@@ -13,7 +13,7 @@ const TrackOrderList: React.FC<TrackOrderListProps> = ({
 }) => {
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-3xl border border-emerald-100 bg-white/90 py-10 shadow-sm">
+      <div className="flex flex-col items-center justify-center rounded-3xl bg-white/90 py-10 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
         <p className="text-center text-sm text-[#7D8B84]">
           Belum ada item untuk dilacak
         </p>
