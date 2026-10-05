@@ -25,7 +25,7 @@ export default function NotFound() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-transparent flex flex-col items-center justify-center px-4">
       <div className="text-center max-w-md mx-auto">
         {/* 404 Illustration */}
         <div className="mb-8">

@@ -5,7 +5,7 @@ export default function AuthLayout({
 }>) {
   return (
     <main>
-      <div className="bg-[url('/bg-image.png')] bg-cover w-full h-full">
+      <div className="min-h-screen w-full bg-transparent">
         {children}
       </div>
     </main>

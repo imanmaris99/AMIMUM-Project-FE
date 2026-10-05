@@ -12,7 +12,7 @@ const ProfilePage: React.FC = () => {
 
   return (
     <LoginProtection useModal={true} feature="profile">
-      <div className="min-h-screen bg-[#FAFAFA]">
+      <div className="min-h-screen bg-transparent">
         {/* Unified Header */}
         <UnifiedHeader 
           type="main"

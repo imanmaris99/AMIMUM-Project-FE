@@ -45,6 +45,15 @@ main {
   box-shadow: 0 0 40px rgba(0, 31, 20, 0.08);
 }
 
+/* Keep every route's full-page root on the same marketplace surface.
+   Cards, modals, inputs, and section panels can stay white for readability. */
+main > .min-h-screen,
+main > div > .min-h-screen,
+main > .min-h-dvh,
+main > div > .min-h-dvh {
+  background-color: transparent !important;
+}
+
 /* Enhanced responsive breakpoints */
 @media (max-width: 480px) {
   main {

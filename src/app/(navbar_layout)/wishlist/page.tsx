@@ -49,7 +49,7 @@ const Wishlist = () => {
 
   return (
     <LoginProtection useModal={true} feature="wishlist">
-      <div className="min-h-screen bg-white pb-24">
+      <div className="min-h-screen bg-transparent pb-24">
         <UnifiedHeader
           type="main"
           showSearch={false}

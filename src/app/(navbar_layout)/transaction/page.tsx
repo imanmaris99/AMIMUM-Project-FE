@@ -117,7 +117,7 @@ const TransactionPage = () => {
 
   return (
     <LoginProtection useModal={true} feature="transaction">
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-transparent">
         <UnifiedHeader
           type="main"
           showSearch={false}

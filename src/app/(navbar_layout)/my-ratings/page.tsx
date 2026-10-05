@@ -166,7 +166,7 @@ export default function MyRatingsPage() {
 
   return (
     <LoginProtection useModal={true} feature="general">
-      <div className="min-h-screen bg-[#FAFAFA] pb-24">
+      <div className="min-h-screen bg-transparent pb-24">
         <UnifiedHeader
           type="main"
           showSearch={false}

@@ -229,7 +229,7 @@ const TrackOrderPage: React.FC = () => {
 
   return (
     <LoginProtection useModal={true} feature="tracking">
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-transparent">
         <UnifiedHeader
           type="secondary"
           title="Lacak Pesanan"

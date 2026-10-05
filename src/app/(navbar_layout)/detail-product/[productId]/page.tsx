@@ -8,7 +8,7 @@ export default async function DetailProduct({ params }: { params: Promise<{ prod
 
   if (!productId || typeof productId !== 'string') {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-transparent">
         <UnifiedHeader 
           type="secondary"
           title="Detail Item"

@@ -45,7 +45,7 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
 
   if (errorMessage && !detailProduct) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-transparent">
         <UnifiedHeader 
           type="secondary"
           title="Detail Item"
@@ -62,7 +62,7 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
 
   if (detailProduct && !isValidProduct) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-transparent">
         <UnifiedHeader 
           type="secondary"
           title="Detail Item"
@@ -78,7 +78,7 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-transparent">
       {/* Unified Header */}
       <UnifiedHeader 
         type="secondary"

@@ -357,7 +357,7 @@ const TransactionDetailPage: React.FC = () => {
   if (!transaction || errorMessage) {
     return (
       <LoginProtection useModal={true} feature="transaction">
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-transparent">
           <UnifiedHeader
             type="secondary"
             title="Detail Transaksi"
@@ -449,7 +449,7 @@ const TransactionDetailPage: React.FC = () => {
 
   return (
     <LoginProtection useModal={true} feature="transaction">
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-transparent">
       <UnifiedHeader
         type="secondary"
         title="Detail Transaksi"

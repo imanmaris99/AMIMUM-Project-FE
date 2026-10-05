@@ -273,7 +273,7 @@ const SavedAddressesPage: React.FC = () => {
 
   return (
     <LoginProtection useModal={true} feature="general">
-      <div className="flex flex-col justify-between min-h-screen bg-gray-100">
+      <div className="flex flex-col justify-between min-h-screen bg-transparent">
       {/* Header - Same style as track order with white background */}
       <div className="bg-white border-b border-gray-200">
         <div className="flex justify-center items-center relative mt-16 py-4">
