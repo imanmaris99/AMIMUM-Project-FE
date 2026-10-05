@@ -4,16 +4,16 @@ import React, { useState } from "react";
 
 const creativeProducts = [
   {
-    title: "Sticker Vinyl",
-    description: "Logo, label, quote, event, komunitas, dan kebutuhan UMKM.",
+    title: "Custom Sticker",
+    description: "Sticker vinyl, label, quote, event, komunitas, dan kebutuhan UMKM.",
   },
   {
-    title: "Laser Cut & Grafir CO2",
-    description: "Craft akrilik, PVC, tripleks, kulit sintetis, dan material sesuai uji bahan.",
+    title: "Cutting Akrilik & Craft Souvenir",
+    description: "Keychain, papan penghargaan, rak akrilik, grafir, PVC, tripleks, kulit sintetis, dan craft lain sesuai uji bahan.",
   },
   {
-    title: "3D Print Custom",
-    description: "Fidget clicker, mini tools, dekorasi, model custom, dan produk kreatif lain.",
+    title: "Custom 3D Print",
+    description: "Fidget clicker, mini tools, dekorasi, prototype, model custom, dan produk kreatif lain.",
   },
 ];
 
@@ -46,7 +46,7 @@ const CreativeCraftSection = () => {
               Aksesoris & Custom Craft
             </h2>
             <p className="mt-2 text-xs leading-5 text-[#6B7C73]">
-              Sticker vinyl, laser cut/grafir CO2, 3D print, ready stock, dan custom design.
+              Custom bisa mulai dari sticker, cutting/grafir akrilik & craft souvenir, sampai 3D print.
             </p>
           </div>
           <span className="shrink-0 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold text-primary">
