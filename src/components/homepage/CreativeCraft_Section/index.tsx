@@ -81,7 +81,7 @@ const CreativeCraftSection = () => {
             <div className="mt-4 rounded-2xl bg-amber-50/80 px-3 py-3 text-xs leading-5 text-amber-900">
               <p className="font-bold">Custom order perlu konsultasi dulu</p>
               <p className="mt-1">
-                Mesin laser CO2 40 watt dengan area kerja 30×20 cm dapat digunakan untuk grafir dan potong material tertentu. Harga dan estimasi produksi menyesuaikan desain, bahan, ukuran, jumlah, serta tingkat kerumitan.
+                Layanan custom berlaku untuk sticker, cutting/grafir akrilik dan craft souvenir, serta 3D print. Untuk laser CO2, area kerja 30×20 cm dengan daya 40 watt; bahan dan hasil produksi menyesuaikan desain, ukuran, jumlah, material, serta tingkat kerumitan.
               </p>
             </div>
 
