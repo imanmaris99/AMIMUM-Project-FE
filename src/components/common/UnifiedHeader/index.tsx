@@ -389,7 +389,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   // Secondary Header (Track Order, Detail Product, etc.)
   if (type === 'secondary') {
     return (
-      <header className="sticky top-0 z-40 border-b border-emerald-100 bg-white/90 shadow-[0_8px_24px_rgba(0,106,71,0.06)] backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/90 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur">
         <div className="px-3 sm:px-4 py-2 sm:py-3">
           <div className="flex items-center justify-between" suppressHydrationWarning={true}>
             {/* Left: Back Button */}

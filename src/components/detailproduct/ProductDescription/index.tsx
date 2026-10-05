@@ -42,7 +42,7 @@ const ProductDescription = ({
   }
 
   return (
-    <div className="rounded-3xl border border-emerald-100 bg-white/95 shadow-[0_12px_32px_rgba(0,106,71,0.08)] backdrop-blur">
+    <div className="rounded-3xl bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.08)] backdrop-blur">
       <div className="p-4">
         <h2 className="text-lg font-semibold mb-2 text-gray-900">Deskripsi Produk</h2>
         {fullDescription ? (

@@ -30,7 +30,7 @@ const TitleProduct = ({ isError, isLoading, data }: TitleProductProps) => {
   const hasRating = Number.isFinite(rating) && rating > 0;
 
   return (
-    <div className="rounded-3xl border border-emerald-100 bg-white/95 shadow-[0_12px_32px_rgba(0,106,71,0.08)] backdrop-blur">
+    <div className="rounded-3xl bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.08)] backdrop-blur">
       <div className="p-4 flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm font-medium text-emerald-700">Brand: {brandName}</p>

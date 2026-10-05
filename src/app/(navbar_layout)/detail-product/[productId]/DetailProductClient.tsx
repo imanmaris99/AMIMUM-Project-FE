@@ -18,7 +18,7 @@ interface DetailProductClientProps {
 }
 
 const DetailShoppingInfo = () => (
-  <section className="rounded-3xl border border-emerald-100 bg-emerald-50/80 p-4 text-xs leading-5 text-emerald-900 shadow-[0_12px_32px_rgba(0,106,71,0.08)]" aria-label="Info belanja aman">
+  <section className="rounded-3xl bg-emerald-50/80 p-4 text-xs leading-5 text-emerald-900 shadow-[0_8px_22px_rgba(15,23,42,0.08)]" aria-label="Info belanja aman">
     <p className="font-bold">Belanja aman di Toko Herbal Amimum</p>
     <div className="mt-2 grid gap-2">
       <p>• Pilih varian dan cek harga sebelum menekan tombol beli.</p>
@@ -107,26 +107,28 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
             showQuickAdd={false}
           />
           
-          {/* Variant Selection Prompt */}
+          {/* Variant Guidance */}
           {!selectedVariant && detailProduct?.variants_list && detailProduct.variants_list.length > 0 && (
-            <div className="rounded-3xl border border-emerald-100 bg-white/90 p-3 text-center shadow-[0_12px_32px_rgba(0,106,71,0.08)] backdrop-blur">
-              <p className="text-sm font-semibold text-emerald-900">
-                Pilih varian untuk melihat harga dan melanjutkan pembelian.
+            <div className="rounded-3xl bg-white/90 p-4 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)] backdrop-blur">
+              <p className="text-sm font-semibold leading-6 text-emerald-900">
+                Pilih varian untuk melihat harga, stok, dan masa berlaku produk.
               </p>
-              <p className="mt-1 text-xs leading-5 text-emerald-700">
-                Tombol Keranjang/Beli Langsung muncul setelah varian dipilih.
+              <p className="mt-1 text-xs leading-5 text-emerald-700/90">
+                Tombol Keranjang/Beli Langsung akan muncul setelah varian dipilih.
               </p>
             </div>
           )}
           
-          <ProductInformation isLoading={false} isError={isError} datavariant={selectedVariant} />
+          {selectedVariant && (
+            <ProductInformation isLoading={false} isError={isError} datavariant={selectedVariant} />
+          )}
           <ProductDescription isLoading={false} isError={isError} data={detailProduct || undefined} />
         </div>
       </div>
 
       {/* Sticky Cart Section - Only show when variant is selected */}
       {selectedVariant && detailProduct && (
-        <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] left-0 right-0 z-30 border-t border-emerald-100 bg-white/95 shadow-[0_-12px_32px_rgba(0,106,71,0.10)] backdrop-blur" style={{ maxWidth: '440px', margin: '0 auto' }}>
+        <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] left-0 right-0 z-30 border-t border-gray-100 bg-white/95 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur" style={{ maxWidth: '440px', margin: '0 auto' }}>
           <div className="px-4 py-3">
             <ProductPrice 
               isLoading={false} 

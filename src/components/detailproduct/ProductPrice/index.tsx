@@ -172,7 +172,7 @@ const ProductPrice = ({
   const savings = hasDiscount && hasValidPrice ? Math.max(0, originalPrice - discountedPrice) : 0;
 
   return (
-    <div className={isSticky ? 'bg-transparent' : 'rounded-3xl border border-emerald-100 bg-white/95 shadow-[0_12px_32px_rgba(0,106,71,0.08)] backdrop-blur'}>
+    <div className={isSticky ? 'bg-transparent' : 'rounded-3xl bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.08)] backdrop-blur'}>
       <div className={isSticky ? 'p-3' : 'p-4'}>
         {/* Rating Section - Only show in non-sticky mode */}
         {!isSticky && data?.id && (
