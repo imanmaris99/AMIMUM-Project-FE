@@ -74,12 +74,12 @@ export default function HomeClient({
     
   return (
     <div
-      className="relative overflow-hidden bg-[linear-gradient(180deg,#F1FAF5_0%,#FFFFFF_34%,#FFFBF1_72%,#F4FBF7_100%)] pb-20"
+      className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,#F1FAF5_0%,#FFFFFF_34%,#FFFBF1_72%,#F4FBF7_100%)] pb-[calc(7rem+env(safe-area-inset-bottom))]"
       suppressHydrationWarning
     >
       <div className="pointer-events-none absolute -right-16 top-24 h-44 w-44 rounded-full bg-primary/10 blur-3xl" />
       <div className="pointer-events-none absolute -left-20 top-[42rem] h-56 w-56 rounded-full bg-[#D9A441]/10 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-20 right-0 h-48 w-48 rounded-full bg-primary/5 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-8 right-0 h-48 w-48 rounded-full bg-primary/5 blur-3xl" />
 
       <div className="relative z-10">
         <UnifiedHeader
