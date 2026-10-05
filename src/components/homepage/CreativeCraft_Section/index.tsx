@@ -8,8 +8,8 @@ const creativeProducts = [
     description: "Logo, label, quote, event, komunitas, dan kebutuhan UMKM.",
   },
   {
-    title: "Keychain Akrilik",
-    description: "Akrilik laser cut CO2 untuk nama, logo, karakter, dan souvenir.",
+    title: "Laser Cut & Grafir CO2",
+    description: "Craft akrilik, PVC, tripleks, kulit sintetis, dan material sesuai uji bahan.",
   },
   {
     title: "3D Print Custom",
@@ -46,7 +46,7 @@ const CreativeCraftSection = () => {
               Aksesoris & Custom Craft
             </h2>
             <p className="mt-2 text-xs leading-5 text-[#6B7C73]">
-              Sticker vinyl, keychain akrilik, 3D print, ready stock, dan custom design.
+              Sticker vinyl, laser cut/grafir CO2, 3D print, ready stock, dan custom design.
             </p>
           </div>
           <span className="shrink-0 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold text-primary">
@@ -81,7 +81,7 @@ const CreativeCraftSection = () => {
             <div className="mt-4 rounded-2xl bg-amber-50/80 px-3 py-3 text-xs leading-5 text-amber-900">
               <p className="font-bold">Custom order perlu konsultasi dulu</p>
               <p className="mt-1">
-                Harga dan estimasi produksi menyesuaikan desain, ukuran, bahan, warna, jumlah, dan tingkat kerumitan.
+                Mesin laser CO2 40 watt dengan area kerja 30×20 cm dapat digunakan untuk grafir dan potong material tertentu. Harga dan estimasi produksi menyesuaikan desain, bahan, ukuran, jumlah, serta tingkat kerumitan.
               </p>
             </div>
 
