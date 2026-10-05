@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { X, LogIn, UserPlus, ShoppingBag, Heart, FileText, Truck } from 'lucide-react';
@@ -23,6 +24,11 @@ const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
   redirectAfterLogin
 }) => {
   const router = useRouter();
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) {
@@ -60,7 +66,7 @@ const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !isMounted) return null;
 
   const getFeatureInfo = () => {
     switch (feature) {
@@ -135,20 +141,25 @@ const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
     // This could be used for features that don't strictly require login
   };
 
-  return (
+  const modalContent = (
     <div 
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]"
+      className="fixed inset-0 z-[120] flex items-center justify-center bg-black/50 px-4 py-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur-[1px]"
       onClick={onClose}
     >
       <div 
-        className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-2xl bg-white shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200"
+        className="flex max-h-[calc(100dvh-2rem)] w-full max-w-sm flex-col overflow-hidden rounded-3xl bg-white shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="login-required-title"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            {featureInfo.icon}
-            <h3 className="text-lg font-semibold text-gray-900">
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-gray-100 p-5">
+          <div className="flex min-w-0 items-start gap-3">
+            <div className="shrink-0">
+              {featureInfo.icon}
+            </div>
+            <h3 id="login-required-title" className="text-lg font-semibold leading-6 text-gray-900">
               {featureInfo.title}
             </h3>
           </div>
@@ -157,21 +168,22 @@ const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
               e.stopPropagation();
               onClose();
             }}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="shrink-0 rounded-full p-2 transition-colors hover:bg-gray-100"
+            aria-label="Tutup popup login"
           >
             <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6">
-          <p className="text-gray-600 text-sm leading-relaxed mb-6">
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+          <p className="mb-4 text-sm leading-relaxed text-gray-600">
             {featureInfo.description}
           </p>
 
           {/* Benefits of logging in */}
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h4 className="text-sm font-medium text-gray-900 mb-2">
+          <div className="mb-4 rounded-2xl bg-gray-50 p-4">
+            <h4 className="mb-2 text-sm font-medium text-gray-900">
               Manfaat login:
             </h4>
             <ul className="text-xs text-gray-600 space-y-1">
@@ -182,16 +194,19 @@ const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
             </ul>
           </div>
 
-          {/* Action Buttons */}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="shrink-0 border-t border-gray-100 bg-white px-5 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4">
           <div className="space-y-3">
             <Button
               onClick={(e) => {
                 e.stopPropagation();
                 handleLogin();
               }}
-              className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 rounded-lg transition-colors"
+              className="w-full rounded-2xl bg-primary py-3 font-medium text-white transition-colors hover:bg-primary/90"
             >
-              <LogIn className="w-4 h-4 mr-2" />
+              <LogIn className="mr-2 h-4 w-4" />
               Masuk ke Akun
             </Button>
             
@@ -201,9 +216,9 @@ const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
                 handleRegister();
               }}
               variant="outline"
-              className="w-full border-primary text-primary hover:bg-primary hover:text-white font-medium py-3 rounded-lg transition-colors"
+              className="w-full rounded-2xl border-primary py-3 font-medium text-primary transition-colors hover:bg-primary hover:text-white"
             >
-              <UserPlus className="w-4 h-4 mr-2" />
+              <UserPlus className="mr-2 h-4 w-4" />
               Buat Akun Baru
             </Button>
 
@@ -213,23 +228,21 @@ const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
                   e.stopPropagation();
                   handleContinue();
                 }}
-                className="w-full text-gray-500 hover:text-gray-700 text-sm py-2 transition-colors"
+                className="w-full py-2 text-sm text-gray-500 transition-colors hover:text-gray-700"
               >
                 Lanjutkan tanpa login
               </button>
             )}
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="px-6 py-4 bg-gray-50 rounded-b-2xl">
-          <p className="text-xs text-gray-500 text-center">
+          <p className="mt-3 text-center text-xs text-gray-500">
             Dengan login, Anda akan mendapatkan pengalaman berbelanja yang lebih baik
           </p>
         </div>
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default LoginRequiredModal;
