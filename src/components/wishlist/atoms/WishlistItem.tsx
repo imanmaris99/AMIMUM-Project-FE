@@ -34,8 +34,8 @@ const WishlistItem: React.FC<WishlistItemProps> = ({
 
   return (
     <div
-      className={`flex items-center gap-4 p-4 bg-white border-b border-gray-200 transition-colors ${
-        canOpenDetail ? "hover:bg-gray-50 cursor-pointer" : "cursor-default"
+      className={`flex items-center gap-3 p-3 transition-colors ${
+        canOpenDetail ? "cursor-pointer hover:bg-emerald-50/60" : "cursor-default"
       }`}
       onClick={handleItemClick}
       role={canOpenDetail ? "button" : undefined}
@@ -48,13 +48,13 @@ const WishlistItem: React.FC<WishlistItemProps> = ({
       }}
     >
       <div className="flex-shrink-0">
-        <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden">
+        <div className="h-20 w-20 overflow-hidden rounded-2xl bg-emerald-50 ring-1 ring-emerald-100">
           <Image
             src={imageUrl}
             alt={item.name}
             width={80}
             height={80}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
             onError={(event) => {
               const target = event.currentTarget as HTMLImageElement;
               if (!target.src.endsWith("/default-image.jpg")) {
@@ -65,13 +65,13 @@ const WishlistItem: React.FC<WishlistItemProps> = ({
         </div>
       </div>
 
-      <div className="flex-1 min-w-0">
-        <h3 className="text-sm font-semibold text-[#0D0E09] truncate -mb-1">
+      <div className="min-w-0 flex-1">
+        <h3 className="truncate text-sm font-semibold text-[#0D0E09]">
           {item.name || "Produk wishlist"}
         </h3>
 
-        <div className="mb-2">
-          <span className="text-xs text-[#7A7A7A]">
+        <div className="mt-1 mb-2">
+          <span className="text-xs text-[#6B7C73]">
             {item.variant || "Varian tidak tersedia"}
           </span>
         </div>
@@ -84,7 +84,7 @@ const WishlistItem: React.FC<WishlistItemProps> = ({
                   <p className="text-sm font-bold text-red-500">
                     {rupiahFormater(item.price)}
                   </p>
-                  <span className="bg-red-100 text-red-600 px-1.5 py-0.5 rounded text-[10px] font-bold">
+                  <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-600">
                     -{item.discount}%
                   </span>
                 </div>
@@ -98,13 +98,13 @@ const WishlistItem: React.FC<WishlistItemProps> = ({
               </p>
             )
           ) : (
-            <p className="text-xs font-medium text-gray-500">
+            <p className="text-xs font-medium text-[#6B7C73]">
               Harga belum tersedia
             </p>
           )}
 
           {!canOpenDetail && (
-            <p className="text-[11px] text-yellow-700">
+            <p className="mt-1 rounded-xl bg-amber-50 px-2 py-1 text-[11px] text-amber-700">
               Detail produk belum tersedia dari data wishlist.
             </p>
           )}
@@ -120,13 +120,13 @@ const WishlistItem: React.FC<WishlistItemProps> = ({
             onRemove(item.id);
           }}
           disabled={isRemoving}
-          className="p-3 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-full p-3 text-red-500 transition-colors hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isRemoving ? (
-            <div className="w-6 h-6 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-red-500 border-t-transparent" />
           ) : (
             <svg
-              className="w-6 h-6"
+              className="h-6 w-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
