@@ -52,12 +52,12 @@ const ProfileSettings: React.FC = () => {
   };
 
   return (
-    <div className="mx-4 mt-4 rounded-2xl bg-white p-4 sm:p-6">
+    <div className="rounded-3xl border border-emerald-100 bg-white/95 p-4 shadow-[0_12px_32px_rgba(0,106,71,0.08)] backdrop-blur sm:p-6">
       {/* Settings List */}
       <div className="space-y-2">
         {/* Location */}
         <div 
-          className="-mx-2 flex cursor-pointer items-center justify-between rounded-lg px-2 py-3 transition-colors hover:bg-gray-50"
+          className="-mx-2 flex cursor-pointer items-center justify-between rounded-2xl px-2 py-3 transition-colors hover:bg-emerald-50/70"
           onClick={handleLocationClick}
         >
           <div className="flex min-w-0 items-center gap-3">
@@ -88,7 +88,7 @@ const ProfileSettings: React.FC = () => {
 
         {/* Admin Contact */}
         <div 
-          className="-mx-2 flex cursor-pointer items-center justify-between rounded-lg px-2 py-3 transition-colors hover:bg-gray-50"
+          className="-mx-2 flex cursor-pointer items-center justify-between rounded-2xl px-2 py-3 transition-colors hover:bg-emerald-50/70"
           onClick={handleAdminClick}
         >
           <div className="flex min-w-0 items-center gap-3">
@@ -119,7 +119,7 @@ const ProfileSettings: React.FC = () => {
 
         {/* Logout */}
         <div 
-          className="-mx-2 flex cursor-pointer items-center justify-between rounded-lg px-2 py-3 transition-colors hover:bg-gray-50"
+          className="-mx-2 flex cursor-pointer items-center justify-between rounded-2xl px-2 py-3 transition-colors hover:bg-emerald-50/70"
           onClick={handleLogoutClick}
         >
           <div className="flex min-w-0 items-center gap-3">

@@ -22,12 +22,12 @@ const ProfilePage: React.FC = () => {
         />
 
         {/* Content */}
-        <div className="py-3 pb-6">
+        <div className="px-4 py-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
           {/* Profile Info Section */}
           <ProfileInfo />
 
           {/* Divider Line */}
-          <div className="w-full h-1 bg-[#E6F2F0]"></div>
+          <div className="h-3" aria-hidden="true"></div>
 
           {/* Settings Section */}
           <ProfileSettings />
