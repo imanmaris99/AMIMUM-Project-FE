@@ -33,7 +33,7 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
   const isPickup = deliveryType === "pickup";
 
   return (
-    <div className="bg-white rounded-2xl p-4 w-full max-w-sm">
+    <div className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white/95 p-4 shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
       <div className="space-y-4">
         {/* Title */}
         <h3 className="text-lg font-semibold text-[#313131]">
@@ -63,7 +63,7 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
           </div>
           
           {isPickup ? (
-            <div className="rounded-lg bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-800">
+            <div className="rounded-2xl border border-emerald-100 bg-emerald-50/90 px-3 py-2 text-xs font-medium leading-relaxed text-emerald-800">
               Pesanan dipilih untuk ambil langsung di Toko Herbal Amimum. Tidak ada nomor resi karena pesanan tidak dikirim melalui kurir.
             </div>
           ) : (
@@ -77,7 +77,7 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({
                 </span>
               </div>
               {!trackingNumber && (
-                <div className="rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
+                <div className="rounded-2xl border border-amber-100 bg-amber-50/90 px-3 py-2 text-xs font-medium leading-relaxed text-amber-800">
                   No. resi belum tersedia. Resi akan muncul setelah admin mengirim paket dan memasukkan kode tracking resmi dari kurir.
                 </div>
               )}

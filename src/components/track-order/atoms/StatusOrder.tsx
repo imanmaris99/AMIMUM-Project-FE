@@ -84,28 +84,28 @@ const StatusOrder: React.FC<StatusOrderProps> = ({ currentStatus = 0, deliveryTy
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
+    <div className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white/95 p-5 shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
       <div className="space-y-6">
         {/* Title */}
         <h3 className="text-lg font-semibold text-[#0D0E09]">
           Status Pesanan
         </h3>
         {currentStatus < 0 && (
-          <div className="rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
+          <div className="rounded-2xl border border-amber-100 bg-amber-50/90 px-3 py-2 text-xs font-medium leading-relaxed text-amber-800">
             Pesanan belum masuk proses pengiriman. Jika pembayaran belum selesai, lanjutkan pembayaran dari halaman transaksi.
           </div>
         )}
         
         {/* Status List */}
-        <div className="space-y-5">
+        <div className="space-y-3">
           {statusItems.map((item) => (
-            <div key={item.id} className="flex items-center justify-between">
+            <div key={item.id} className="flex items-center justify-between rounded-2xl bg-emerald-50/50 px-3 py-3">
               {/* Left side - Icon and Text */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <div className="flex-shrink-0">
                   {getIconComponent(item.icon)}
                 </div>
-                <span className="text-sm font-medium text-[#242424]">
+                <span className="text-sm font-semibold text-[#242424]">
                   {item.title}
                 </span>
               </div>

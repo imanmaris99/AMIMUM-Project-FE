@@ -238,9 +238,9 @@ const TrackOrderPage: React.FC = () => {
           onBack={handleBack}
         />
 
-        <div className="flex flex-col justify-center items-center gap-4 py-8 px-4">
+        <div className="flex flex-col items-center gap-4 px-4 py-5 pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
           {hasLocalLegacyTransactions && (
-            <div className="w-full max-w-sm rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-900">
+            <div className="w-full max-w-sm rounded-2xl border border-amber-200 bg-amber-50/95 p-4 text-sm text-amber-900 shadow-sm">
               <p className="font-semibold">Data lokal lama terdeteksi</p>
               <p className="mt-1 text-xs leading-relaxed">
                 Data ini tersimpan di perangkat sebelum reset database. Bersihkan agar halaman tracking hanya membaca pesanan dari server toko.
@@ -248,21 +248,21 @@ const TrackOrderPage: React.FC = () => {
               <button
                 type="button"
                 onClick={clearTransactions}
-                className="mt-3 rounded-xl bg-yellow-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-yellow-700"
+                className="mt-3 rounded-2xl bg-amber-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-amber-700"
               >
                 Bersihkan Data Lokal Lama
               </button>
             </div>
           )}
           {isLoading ? (
-            <div className="w-full max-w-sm bg-white rounded-lg shadow-sm border p-6 text-center">
+            <div className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white/95 p-6 text-center shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
               <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
               <p className="text-sm text-gray-500">
                 Memuat data pelacakan...
               </p>
             </div>
           ) : errorMessage ? (
-            <div className="w-full max-w-sm bg-white rounded-lg shadow-sm border p-6 text-center">
+            <div className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white/95 p-6 text-center shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
               <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg
                   className="w-8 h-8 text-red-400"
@@ -284,11 +284,11 @@ const TrackOrderPage: React.FC = () => {
               <p className="text-sm text-gray-500">{errorMessage}</p>
             </div>
           ) : orders.length === 0 ? (
-            <div className="w-full max-w-sm bg-white rounded-lg shadow-sm border p-6 text-center">
+            <div className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white/95 p-6 text-center shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
               <div className="flex flex-col items-center gap-4">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50">
                   <svg
-                    className="w-8 h-8 text-gray-400"
+                    className="h-8 w-8 text-primary/60"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -311,7 +311,7 @@ const TrackOrderPage: React.FC = () => {
                   </p>
                   <button
                     onClick={() => router.push("/")}
-                    className="bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                    className="rounded-2xl bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
                   >
                     Mulai Belanja
                   </button>
@@ -322,7 +322,7 @@ const TrackOrderPage: React.FC = () => {
             <>
               {currentOrderAlert && (
                 <div
-                  className={`w-full max-w-sm rounded-lg border ${currentOrderAlert.borderColor} ${currentOrderAlert.bgColor} p-4`}
+                  className={`w-full max-w-sm rounded-2xl border ${currentOrderAlert.borderColor} ${currentOrderAlert.bgColor} p-4 shadow-sm`}
                 >
                   <div className="flex items-start gap-3">
                     <span className="text-xl" aria-hidden="true">
@@ -341,7 +341,7 @@ const TrackOrderPage: React.FC = () => {
               )}
 
               {transactionId && currentTransaction && (
-                <div className="w-full max-w-sm bg-white rounded-lg shadow-sm border p-4">
+                <div className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white/95 p-4 shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
                     Informasi Transaksi
                   </h3>
@@ -375,14 +375,14 @@ const TrackOrderPage: React.FC = () => {
                       </span>
                     </div>
                   </div>
-                  <div className="mt-4 rounded-lg bg-primary/5 px-3 py-2 text-xs font-medium text-primary">
+                  <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/80 px-3 py-2 text-xs font-medium leading-relaxed text-primary">
                     {getTrackingHelpText(currentTransaction)}
                   </div>
                 </div>
               )}
 
               {currentTransaction && (
-                <div className="w-full max-w-sm rounded-lg border border-primary/10 bg-white p-4 shadow-sm">
+                <div className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white/95 p-4 shadow-[0_12px_32px_rgba(0,106,71,0.08)]">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-wide text-primary">
@@ -392,7 +392,7 @@ const TrackOrderPage: React.FC = () => {
                         {isPickupOrder ? "Status Pengambilan Pesanan" : "Status dan Resi Pesanan"}
                       </h3>
                     </div>
-                    <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                    <span className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-semibold text-primary">
                       {isPickupOrder ? "Pickup" : "Tracking"}
                     </span>
                   </div>
@@ -437,7 +437,7 @@ const TrackOrderPage: React.FC = () => {
                       </>
                     )}
                   </div>
-                  <p className={`mt-3 rounded-lg px-3 py-2 text-xs font-medium ${
+                  <p className={`mt-3 rounded-2xl px-3 py-2 text-xs font-medium leading-relaxed ${
                     isPickupOrder
                       ? "bg-emerald-50 text-emerald-800"
                       : "bg-yellow-50 text-yellow-800"
@@ -457,7 +457,7 @@ const TrackOrderPage: React.FC = () => {
 
           {orders.length > 0 && currentTransaction && !isLoading && !errorMessage && (
             <>
-              <div className="w-full max-w-sm py-2 border-b-2 border-gray-300" />
+              <div className="h-2 w-full max-w-sm" />
 
               <div className="w-full max-w-sm">
                 <DeliveryAddress
@@ -486,7 +486,7 @@ const TrackOrderPage: React.FC = () => {
                 />
               </div>
 
-              <div className="w-full max-w-sm py-2 border-b-2 border-gray-300" />
+              <div className="h-2 w-full max-w-sm" />
 
               <div className="w-full max-w-sm">
                 <StatusOrder
@@ -501,9 +501,9 @@ const TrackOrderPage: React.FC = () => {
           )}
         </div>
 
-        <div className="flex justify-center items-center mt-auto mb-10">
+        <div className="flex items-center justify-center px-4 pb-[calc(6rem+env(safe-area-inset-bottom))]">
           <div className="flex justify-center items-center gap-1">
-            <span className="text-xs font-bold text-primary">Toko Herbal AmImUm</span>
+            <span className="rounded-full border border-emerald-100 bg-white/80 px-3 py-1 text-xs font-bold text-primary shadow-sm">Toko Herbal AmImUm</span>
           </div>
         </div>
       </div>
