@@ -442,12 +442,6 @@ const SavedAddressesPage: React.FC = () => {
         </div>
       </div>
 
-              {/* Footer */}
-              <div className="flex justify-center items-center mt-auto mb-10">
-                <div className="flex justify-center items-center gap-1">
-                  <span className="text-xs font-bold text-primary">Toko Herbal AmImUm</span>
-                </div>
-              </div>
 
               {/* Edit Address Modal */}
               <EditAddressModal

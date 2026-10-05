@@ -500,12 +500,6 @@ const TrackOrderPage: React.FC = () => {
             </>
           )}
         </div>
-
-        <div className="flex items-center justify-center px-4 pb-[calc(6rem+env(safe-area-inset-bottom))]">
-          <div className="flex justify-center items-center gap-1">
-            <span className="rounded-full border border-emerald-100 bg-white/80 px-3 py-1 text-xs font-bold text-primary shadow-sm">Toko Herbal AmImUm</span>
-          </div>
-        </div>
       </div>
     </LoginProtection>
   );
