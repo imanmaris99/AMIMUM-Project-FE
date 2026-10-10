@@ -156,7 +156,7 @@ const Register = () => {
   // Show success message if registration was successful
   if (isSuccess) {
     return (
-      <div className="mx-auto min-h-screen w-full min-w-0 max-w-[440px] relative flex flex-col overflow-x-hidden bg-[linear-gradient(180deg,#F7FBF6_0%,#F7FBF6_58%,#FBFAF2_100%)]">
+      <div className="mx-auto min-h-screen w-full min-w-0 max-w-[440px] relative flex flex-col overflow-x-hidden bg-[#F7FBF6]">
         <HeaderRegister />
         <main className="px-6 pb-8 pt-4 flex-1 relative z-10">
           <div className="w-full max-w-sm mx-auto">
@@ -186,7 +186,7 @@ const Register = () => {
   }
 
   return (
-    <div className="mx-auto min-h-screen w-full min-w-0 max-w-[440px] relative flex flex-col overflow-x-hidden bg-[linear-gradient(180deg,#F7FBF6_0%,#F7FBF6_58%,#FBFAF2_100%)]">
+    <div className="mx-auto min-h-screen w-full min-w-0 max-w-[440px] relative flex flex-col overflow-x-hidden bg-[#F7FBF6]">
       <HeaderRegister />
       <main className="px-6 pb-8 pt-4 flex-1 relative z-10">
         <div className="w-full max-w-sm mx-auto">
