@@ -406,7 +406,9 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
             <div className="flex-1 text-center min-w-0 px-2">
               <h1 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{title}</h1>
               {subtitle && (
-                <p className="text-xs sm:text-sm text-emerald-700/80 mt-1 truncate">{subtitle}</p>
+                <p className="mx-auto mt-1 max-w-[16rem] whitespace-normal text-xs leading-snug text-emerald-700/80 sm:max-w-md sm:text-sm">
+                  {subtitle}
+                </p>
               )}
             </div>
 
