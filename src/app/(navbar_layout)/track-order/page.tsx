@@ -7,7 +7,6 @@ import {
   DeliveryAddress,
   StatusOrder,
 } from "@/components/track-order";
-import { TrackOrderItem } from "@/types/trackOrder";
 import { Transaction } from "@/types/transaction";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 import LoginProtection from "@/components/common/LoginProtection";
@@ -122,45 +121,34 @@ const TrackOrderPage: React.FC = () => {
     router.back();
   };
 
-  const trackOrderItems = useMemo<TrackOrderItem[]>(() => {
-    if (transactionId && currentTransaction) {
-      return currentTransaction.items.map((item) => ({
-        id: `${currentTransaction.id}-${item.id}`,
-        name: item.name,
-        variant: item.variantName || "Varian tidak tersedia",
-        size:
-          currentTransaction.deliveryType === "delivery" ? "Dikirim" : "Pickup",
-        quantity: item.quantity,
-        price: item.price,
-        image: item.image,
-      }));
-    }
-
-    return orders.flatMap((transaction) =>
-      transaction.items.map((item) => ({
-        id: `${transaction.id}-${item.id}`,
-        name: item.name,
-        variant: item.variantName || "Varian tidak tersedia",
-        size: transaction.deliveryType === "delivery" ? "Dikirim" : "Pickup",
-        quantity: item.quantity,
-        price: item.price,
-        image: item.image,
-      }))
-    );
-  }, [currentTransaction, orders, transactionId]);
-
-  const getStatusConfig = (status: string) => {
+  const getStatusConfig = (transaction: Transaction) => {
     const config = getCustomerStatusConfig(
-      status,
-      currentTransaction?.paymentMethod,
-      currentTransaction?.deliveryType || "delivery"
+      transaction.status,
+      transaction.paymentMethod,
+      transaction.deliveryType || "delivery"
     );
 
     return {
       text: config.text,
       color: config.textColor,
       bgColor: config.bgColor,
+      borderColor: config.borderColor,
     };
+  };
+
+  const getTrackOrderItems = (transaction: Transaction) => {
+    const statusConfig = getStatusConfig(transaction);
+
+    return transaction.items.map((item) => ({
+      id: `${transaction.id}-${item.id}`,
+      name: item.name,
+      variant: item.variantName || "Varian tidak tersedia",
+      size: transaction.deliveryType === "delivery" ? "Dikirim" : "Pickup",
+      quantity: item.quantity,
+      price: item.price,
+      image: item.image,
+      status: statusConfig.text,
+    }));
   };
 
   const getCurrentStatusIndex = (status: string, deliveryType: string) => {
@@ -190,34 +178,6 @@ const TrackOrderPage: React.FC = () => {
     }
   };
 
-  const getTrackingHelpText = (transaction: Transaction) => {
-    if (transaction.status === "pending") {
-      return "Pesanan sudah tercatat dan sedang menunggu pembayaran. Selesaikan pembayaran dari halaman transaksi agar pesanan bisa diproses.";
-    }
-
-    if (transaction.deliveryType !== "delivery") {
-      if (["processing", "shipped"].includes(transaction.status)) {
-        return "Pesanan pickup sudah siap diambil di toko dan tidak memakai nomor resi kurir.";
-      }
-      if (["completed", "delivered"].includes(transaction.status)) {
-        return "Pesanan pickup sudah diambil. Terima kasih sudah berbelanja di Toko Herbal Amimum.";
-      }
-      return "Pesanan pickup mengikuti status transaksi. Datang ke toko setelah status siap diambil.";
-    }
-
-    if (["paid", "processing"].includes(transaction.status)) {
-      return transaction.status === "paid"
-        ? "Pembayaran sudah diterima. Pesanan menunggu admin memproses dan menyiapkan pengiriman."
-        : "Pesanan sedang diproses toko. Resi akan muncul setelah admin menyerahkan paket ke kurir.";
-    }
-
-    if (transaction.status === "shipped") {
-      return "Pesanan sedang dalam pengiriman. Gunakan nomor resi dari admin untuk cek detail di website kurir.";
-    }
-
-    return "Pesanan sedang diproses toko. Nomor resi akan muncul setelah admin mengirim pesanan.";
-  };
-
   const currentOrderAlert = currentTransaction
     ? getCustomerOrderAlert(
         currentTransaction.status,
@@ -225,14 +185,8 @@ const TrackOrderPage: React.FC = () => {
         currentTransaction.deliveryType || "delivery"
       )
     : null;
-  const trackingDisplay = getTrackingDisplay(
-    currentTransaction?.shipmentAddress?.trackingNumber
-  );
-  const deliveryLabel =
-    currentTransaction?.deliveryType === "delivery"
-      ? "Kirim ke tujuan"
-      : "Ambil di toko";
-  const isPickupOrder = currentTransaction?.deliveryType === "pickup";
+  const displayedTransactions = transactionId && currentTransaction ? [currentTransaction] : orders;
+  const showGlobalAlert = Boolean(transactionId && currentOrderAlert);
 
   return (
     <LoginProtection useModal={true} feature="tracking">
@@ -326,7 +280,7 @@ const TrackOrderPage: React.FC = () => {
             </div>
           ) : (
             <>
-              {currentOrderAlert && (
+              {showGlobalAlert && currentOrderAlert && (
                 <div
                   className={`w-full max-w-sm rounded-3xl border ${currentOrderAlert.borderColor} ${currentOrderAlert.bgColor} p-4 shadow-[0_8px_22px_rgba(15,23,42,0.06)]`}
                 >
@@ -346,163 +300,132 @@ const TrackOrderPage: React.FC = () => {
                 </div>
               )}
 
-              {transactionId && currentTransaction && (
-                <div className="w-full max-w-sm rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Pesanan customer</p>
-                  <h3 className="mt-1 text-lg font-bold text-[#0D0E09]">
-                    Informasi Transaksi
-                  </h3>
-                  <div className="mt-4 space-y-2">
-                    <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
-                      <span className="text-sm text-[#6B7C73]">ID Transaksi:</span>
-                      <span className="break-all text-right text-sm font-semibold text-[#0D0E09]">
-                        {currentTransaction.transactionId}
-                      </span>
-                    </div>
-                    <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
-                      <span className="text-sm text-[#6B7C73]">Status:</span>
-                      <span
-                        className={`text-sm font-medium px-2 py-1 rounded-full ${
-                          getStatusConfig(currentTransaction.status).bgColor
-                        } ${getStatusConfig(currentTransaction.status).color}`}
-                      >
-                        {getStatusConfig(currentTransaction.status).text}
-                      </span>
-                    </div>
-                    <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
-                      <span className="text-sm text-[#6B7C73]">Metode:</span>
-                      <span className="text-right text-sm font-semibold text-[#0D0E09]">
-                        {deliveryLabel}
-                      </span>
-                    </div>
-                    <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
-                      <span className="text-sm text-[#6B7C73]">Metode bayar:</span>
-                      <span className="text-right text-sm font-semibold text-[#0D0E09]">
-                        {getPaymentMethodLabel(currentTransaction.paymentMethod)}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="mt-4 rounded-2xl bg-emerald-50/80 px-3 py-2 text-xs font-medium leading-relaxed text-primary">
-                    {getTrackingHelpText(currentTransaction)}
-                  </div>
-                </div>
-              )}
-
-              {currentTransaction && (
-                <div className="w-full max-w-sm rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-                        {isPickupOrder ? "Ringkasan Pengambilan" : "Ringkasan Pelacakan"}
-                      </p>
-                      <h3 className="mt-1 text-lg font-bold text-[#0D0E09]">
-                        {isPickupOrder ? "Status Pengambilan Pesanan" : "Status dan Resi Pesanan"}
-                      </h3>
-                    </div>
-                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-primary">
-                      {isPickupOrder ? "Pickup" : "Tracking"}
-                    </span>
-                  </div>
-                  <div className="mt-4 space-y-2 text-sm">
-                    {isPickupOrder ? (
-                      <>
-                        <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
-                          <span className="text-sm text-[#6B7C73]">Metode</span>
-                          <span className="text-right text-sm font-semibold text-[#0D0E09]">
-                            Ambil langsung di toko
-                          </span>
-                        </div>
-                        <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
-                          <span className="text-sm text-[#6B7C73]">Status ambil</span>
-                          <span className="text-right text-sm font-semibold text-[#0D0E09]">
-                            {getStatusConfig(currentTransaction.status).text}
-                          </span>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
-                          <span className="text-sm text-[#6B7C73]">No. Resi</span>
-                          <span className="text-right text-sm font-semibold text-[#0D0E09]">
-                            {trackingDisplay}
-                          </span>
-                        </div>
-                        <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
-                          <span className="text-sm text-[#6B7C73]">Kurir</span>
-                          <span className="text-right text-sm font-semibold text-[#0D0E09]">
-                            {[currentTransaction.shipmentAddress?.courier, currentTransaction.shipmentAddress?.service]
-                              .filter(Boolean)
-                              .join(" - ") || "Belum tersedia"}
-                          </span>
-                        </div>
-                        <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
-                          <span className="text-sm text-[#6B7C73]">Estimasi</span>
-                          <span className="text-right text-sm font-semibold text-[#0D0E09]">
-                            {currentTransaction.shipmentAddress?.estimatedDelivery || "Belum tersedia"}
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  <p className={`mt-3 rounded-2xl px-3 py-2 text-xs font-medium leading-relaxed ${
-                    isPickupOrder
-                      ? "bg-emerald-50 text-emerald-800"
-                      : "bg-yellow-50 text-yellow-800"
-                  }`}>
-                    {isPickupOrder
-                      ? "Pesanan ini dipilih untuk pickup/ambil di toko, jadi tidak memakai nomor resi kurir. Datang ke toko setelah status siap diambil."
-                      : "No. resi hanya ditampilkan jika admin sudah memasukkan kode tracking resmi dari kurir. Jangan gunakan nomor internal/order ID sebagai resi."}
+              {!transactionId && displayedTransactions.length > 1 && (
+                <div className="w-full max-w-sm rounded-3xl border border-emerald-100 bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                    Daftar Pesanan
+                  </p>
+                  <h2 className="mt-1 text-lg font-bold text-[#0D0E09]">
+                    Status ditampilkan per pesanan
+                  </h2>
+                  <p className="mt-2 text-xs leading-relaxed text-[#6B7C73]">
+                    Setiap kartu di bawah punya status sendiri, jadi bro bisa lihat pesanan mana yang belum dibayar, diproses toko, siap diambil, dikirim, atau selesai.
                   </p>
                 </div>
               )}
 
-              <div className="w-full max-w-sm">
-                <TrackOrderList items={trackOrderItems} />
-              </div>
-            </>
-          )}
+              <div className="w-full max-w-sm space-y-4">
+                {displayedTransactions.map((transaction, index) => {
+                  const statusConfig = getStatusConfig(transaction);
+                  const isPickup = transaction.deliveryType === "pickup";
+                  const orderTrackingDisplay = getTrackingDisplay(transaction.shipmentAddress?.trackingNumber);
+                  const statusAlert = getCustomerOrderAlert(
+                    transaction.status,
+                    transaction.shipmentAddress?.trackingNumber,
+                    transaction.deliveryType || "delivery"
+                  );
 
-          {orders.length > 0 && currentTransaction && !isLoading && !errorMessage && (
-            <>
-              <div className="h-2 w-full max-w-sm" />
+                  return (
+                    <article
+                      key={transaction.id}
+                      className="overflow-hidden rounded-3xl bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50"
+                    >
+                      <div className="border-b border-emerald-50 bg-gradient-to-br from-white to-emerald-50/70 p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                              Pesanan {index + 1}
+                            </p>
+                            <h3 className="mt-1 break-all text-base font-bold text-[#0D0E09]">
+                              {transaction.transactionId}
+                            </h3>
+                            <p className="mt-1 text-xs text-[#6B7C73]">
+                              {transaction.date} • {isPickup ? "Pickup toko" : "Dikirim ke alamat"} • {getPaymentMethodLabel(transaction.paymentMethod)}
+                            </p>
+                          </div>
+                          <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${statusConfig.bgColor} ${statusConfig.color}`}>
+                            {statusConfig.text}
+                          </span>
+                        </div>
+                        <div className={`mt-3 rounded-2xl border ${statusAlert.borderColor} ${statusAlert.bgColor} px-3 py-2`}>
+                          <p className={`text-xs font-semibold ${statusAlert.textColor}`}>
+                            {statusAlert.title}
+                          </p>
+                          <p className={`mt-1 text-xs leading-relaxed ${statusAlert.textColor}`}>
+                            {statusAlert.message}
+                          </p>
+                        </div>
+                      </div>
 
-              <div className="w-full max-w-sm">
-                <DeliveryAddress
-                  orderDate={currentTransaction.date}
-                  paymentStatus={getStatusConfig(currentTransaction.status).text}
-                  trackingNumber={currentTransaction.shipmentAddress?.trackingNumber}
-                  recipientName={currentTransaction.shipmentAddress?.recipientName}
-                  phone={currentTransaction.shipmentAddress?.phone}
-                  address={currentTransaction.shipmentAddress?.address}
-                  city={
-                    currentTransaction.shipmentAddress
-                      ? [
-                          currentTransaction.shipmentAddress.city,
-                          currentTransaction.shipmentAddress.postalCode,
-                        ]
-                          .filter(Boolean)
-                          .join(" ")
-                      : undefined
-                  }
-                  courier={currentTransaction.shipmentAddress?.courier}
-                  service={currentTransaction.shipmentAddress?.service}
-                  estimatedDelivery={
-                    currentTransaction.shipmentAddress?.estimatedDelivery
-                  }
-                  deliveryType={currentTransaction.deliveryType}
-                />
-              </div>
+                      <div className="space-y-3 p-4">
+                        <div className="space-y-2 rounded-2xl bg-emerald-50/50 p-3 text-sm">
+                          {isPickup ? (
+                            <>
+                              <div className="flex items-start justify-between gap-4">
+                                <span className="text-[#6B7C73]">Metode</span>
+                                <span className="text-right font-semibold text-[#0D0E09]">Ambil langsung di toko</span>
+                              </div>
+                              <div className="rounded-2xl bg-white/80 px-3 py-2 text-xs font-medium leading-relaxed text-emerald-800">
+                                Pesanan pickup tidak memakai nomor resi kurir. Datang ke toko setelah status pesanan ini siap diambil.
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="flex items-start justify-between gap-4">
+                                <span className="text-[#6B7C73]">No. Resi</span>
+                                <span className="text-right font-semibold text-[#0D0E09]">{orderTrackingDisplay}</span>
+                              </div>
+                              <div className="flex items-start justify-between gap-4">
+                                <span className="text-[#6B7C73]">Kurir</span>
+                                <span className="text-right font-semibold text-[#0D0E09]">
+                                  {[transaction.shipmentAddress?.courier, transaction.shipmentAddress?.service]
+                                    .filter(Boolean)
+                                    .join(" - ") || "Belum tersedia"}
+                                </span>
+                              </div>
+                              <p className="rounded-2xl bg-yellow-50 px-3 py-2 text-xs font-medium leading-relaxed text-yellow-800">
+                                Resi muncul setelah admin memasukkan kode tracking resmi kurir untuk pesanan ini.
+                              </p>
+                            </>
+                          )}
+                        </div>
 
-              <div className="h-2 w-full max-w-sm" />
+                        <TrackOrderList items={getTrackOrderItems(transaction)} />
 
-              <div className="w-full max-w-sm">
-                <StatusOrder
-                  currentStatus={getCurrentStatusIndex(
-                    currentTransaction.status,
-                    currentTransaction.deliveryType || "delivery"
-                  )}
-                  deliveryType={currentTransaction.deliveryType}
-                />
+                        {transactionId && (
+                          <>
+                            <DeliveryAddress
+                              orderDate={transaction.date}
+                              paymentStatus={statusConfig.text}
+                              trackingNumber={transaction.shipmentAddress?.trackingNumber}
+                              recipientName={transaction.shipmentAddress?.recipientName}
+                              phone={transaction.shipmentAddress?.phone}
+                              address={transaction.shipmentAddress?.address}
+                              city={
+                                transaction.shipmentAddress
+                                  ? [transaction.shipmentAddress.city, transaction.shipmentAddress.postalCode]
+                                      .filter(Boolean)
+                                      .join(" ")
+                                  : undefined
+                              }
+                              courier={transaction.shipmentAddress?.courier}
+                              service={transaction.shipmentAddress?.service}
+                              estimatedDelivery={transaction.shipmentAddress?.estimatedDelivery}
+                              deliveryType={transaction.deliveryType}
+                            />
+                            <StatusOrder
+                              currentStatus={getCurrentStatusIndex(
+                                transaction.status,
+                                transaction.deliveryType || "delivery"
+                              )}
+                              deliveryType={transaction.deliveryType}
+                            />
+                          </>
+                        )}
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             </>
           )}

@@ -49,10 +49,16 @@ const TrackOrderItem: React.FC<TrackOrderItemProps> = ({
           </span>
         </div>
         
-        {/* Price */}
-        <p className="mt-2 text-sm font-bold text-[#001F14]">
-          {rupiahFormater(item.price)}
-        </p>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm font-bold text-[#001F14]">
+            {rupiahFormater(item.price)}
+          </p>
+          {item.status && (
+            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-primary ring-1 ring-emerald-100">
+              {item.status}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
