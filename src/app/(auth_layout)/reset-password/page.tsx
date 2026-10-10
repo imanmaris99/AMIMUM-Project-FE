@@ -6,7 +6,10 @@ import Image from "next/image";
 const ResetPassword = () => {
   return (
     <div className="mx-auto min-h-screen w-full min-w-0 max-w-[440px] relative flex flex-col overflow-x-hidden bg-[linear-gradient(180deg,#EEF8F2_0%,#F6FBF8_22%,#FFFFFF_50%,#FFFCF5_78%,#F4FBF7_100%)]">
-      <HeaderLogin />
+      <HeaderLogin
+        eyebrow="Password Baru"
+        description="Masukkan kode email dan buat password baru."
+      />
 
       {/* Konten utama */}
       <main className="px-6 pb-8 pt-4 flex-1 relative z-10">

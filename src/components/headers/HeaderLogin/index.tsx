@@ -1,7 +1,17 @@
 import Image from "next/image";
 import React from "react";
 
-const HeaderLogin = () => {
+type HeaderLoginProps = {
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+};
+
+const HeaderLogin = ({
+  eyebrow = "Toko Herbal",
+  title = "AmImUm",
+  description = "Masuk untuk checkout dan pantau pesanan.",
+}: HeaderLoginProps) => {
   return (
     <header className="shrink-0 px-7 pb-2 pt-8">
       <div className="flex items-center gap-4">
@@ -17,13 +27,13 @@ const HeaderLogin = () => {
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-emerald-800">
-            Toko Herbal
+            {eyebrow}
           </p>
           <p className="text-[2.25rem] font-extrabold leading-none tracking-[-0.04em] text-[#0D0E09]">
-            AmImUm
+            {title}
           </p>
           <p className="mt-1.5 text-sm leading-5 text-[#6B7C73]">
-            Masuk untuk checkout dan pantau pesanan.
+            {description}
           </p>
         </div>
       </div>
