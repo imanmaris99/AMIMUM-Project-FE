@@ -202,7 +202,7 @@ const TrackOrderPage: React.FC = () => {
       if (["completed", "delivered"].includes(transaction.status)) {
         return "Pesanan pickup sudah diambil. Terima kasih sudah berbelanja di Toko Herbal Amimum.";
       }
-      return "Pesanan pickup akan disiapkan toko. Datang ke toko setelah status siap diambil.";
+      return "Pesanan pickup mengikuti status transaksi. Datang ke toko setelah status siap diambil.";
     }
 
     if (["paid", "processing"].includes(transaction.status)) {

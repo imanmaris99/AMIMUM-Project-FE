@@ -145,7 +145,8 @@ const getOrderErrorMessage = (
       }
     }
 
-    if (message.includes("timeout") || message.includes("ECONNABORTED")) {
+    const normalizedMessage = message.toLowerCase();
+    if (normalizedMessage.includes("timeout") || normalizedMessage.includes("econnaborted")) {
       return "Server membutuhkan waktu lebih lama dari biasanya. Silakan coba lagi beberapa saat lagi.";
     }
     if (message.includes("Order tidak ditemukan")) {
@@ -157,7 +158,7 @@ const getOrderErrorMessage = (
     if (message.includes("Konfirmasi QRIS hanya tersedia")) {
       return "Konfirmasi QRIS hanya tersedia untuk pesanan QRIS resmi toko.";
     }
-    if (message.includes("Internal Server Error") || message.includes("Traceback") || message.includes("{\"")) {
+    if (normalizedMessage.includes("internal server error") || normalizedMessage.includes("traceback") || message.includes("{\"")) {
       return fallbackMessage;
     }
     return message;

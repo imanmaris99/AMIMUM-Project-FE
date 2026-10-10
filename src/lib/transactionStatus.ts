@@ -72,7 +72,7 @@ export const getCustomerStatusConfig = (
       };
     case "processing":
       return {
-        text: isPickupOrder ? "Siap Diambil" : "Pesanan Diproses",
+        text: isPickupOrder ? "Siap Diambil" : "Diproses Toko",
         bgColor: isPickupOrder ? "bg-emerald-100" : "bg-blue-100",
         textColor: isPickupOrder ? "text-emerald-700" : "text-blue-600",
         borderColor: isPickupOrder ? "border-emerald-200" : "border-blue-200",

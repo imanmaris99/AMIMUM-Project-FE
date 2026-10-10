@@ -13,7 +13,7 @@ const IMPORTANT_CUSTOMER_ARTICLE: ArticleProps = {
     "Pesanan dibuat melalui website terlebih dahulu agar produk, jumlah, alamat, ongkir, dan total tercatat jelas.",
     "💳 Pembayaran produk",
     "Pembayaran produk dilakukan melalui QRIS resmi toko, Transfer BRI manual, atau bayar langsung di Toko Herbal Amimum khusus pickup.",
-    "COD tidak berlaku untuk pembayaran produk.",
+    "Pembayaran produk tidak dilakukan dengan bayar di tempat untuk pesanan kirim.",
     "🚚 Biaya kirim / ongkir",
     "Customer bisa memilih ongkir digabung dengan total pembayaran atau ongkir dibayar saat paket tiba jika kurir mendukung.",
     "Transfer manual hanya dilakukan setelah order dibuat. Detail rekening resmi toko ditampilkan di checkout/detail transaksi khusus metode transfer.",

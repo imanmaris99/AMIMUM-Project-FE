@@ -27,14 +27,14 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
+    return res.status(405).json({ message: 'Metode tidak diizinkan' });
   }
 
   try {
     const { errors }: ErrorRequest = req.body;
 
     if (!errors || !Array.isArray(errors)) {
-      return res.status(400).json({ message: 'Invalid error data' });
+      return res.status(400).json({ message: 'Data laporan error tidak valid' });
     }
 
     // Log errors to console in development
@@ -64,14 +64,14 @@ export default async function handler(
     // await logErrorsToFile(errors);
 
     res.status(200).json({ 
-      message: 'Errors received successfully',
+      message: 'Laporan error diterima',
       count: errors.length,
       criticalCount: criticalErrors.length
     });
 
   } catch {
     // Error processing error reports
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Laporan error belum bisa diproses' });
   }
 }
 

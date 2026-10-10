@@ -22,14 +22,14 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
+    return res.status(405).json({ message: 'Metode tidak diizinkan' });
   }
 
   try {
     const { performance }: PerformanceRequest = req.body;
 
     if (!performance || !Array.isArray(performance)) {
-      return res.status(400).json({ message: 'Invalid performance data' });
+      return res.status(400).json({ message: 'Data performa tidak valid' });
     }
 
     // Log performance to console in development
@@ -61,14 +61,14 @@ export default async function handler(
     }
 
     res.status(200).json({ 
-      message: 'Performance data received successfully',
+      message: 'Data performa diterima',
       count: performance.length,
       slowTaskCount: slowMetrics.length
     });
 
   } catch {
     // Error processing performance reports
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Data performa belum bisa diproses' });
   }
 }
 

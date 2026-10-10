@@ -1583,7 +1583,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         <div className="px-4 py-4">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Metode Pembayaran</h2>
           <div className="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-3 py-3 text-sm text-blue-800">
-            Pembayaran produk dilakukan melalui QRIS resmi toko atau Transfer BRI manual. Biaya kirim dapat digabung ke total produk, atau dibayar saat paket tiba jika kurir mendukung. Pembayaran produk tidak memakai COD.
+            Pembayaran produk dilakukan melalui QRIS resmi toko atau Transfer BRI manual. Biaya kirim dapat digabung ke total produk, atau dibayar saat paket tiba jika kurir mendukung. Pembayaran produk untuk pesanan kirim tidak dilakukan dengan bayar di tempat.
           </div>
           <div className="space-y-4">
             {paymentMethodGroups.map((group: PaymentMethodGroup) => (

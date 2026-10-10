@@ -38,18 +38,19 @@ const EMAIL_SERVICE_ERROR_MESSAGE =
 const sanitizeForgotPasswordError = (message?: string): string | undefined => {
   if (!message) return undefined;
 
+  const normalizedMessage = message.toLowerCase();
   const technicalMarkers = [
-    "Brevo",
-    "unrecognised IP",
+    "brevo",
+    "unrecognised ip",
     "unauthorized",
-    "Bad Gateway",
-    "Internal Server Error",
-    "Unexpected error occurred",
-    "SMTP",
+    "bad gateway",
+    "internal server error",
+    "unexpected error occurred",
+    "smtp",
     "502",
   ];
 
-  if (technicalMarkers.some((marker) => message.includes(marker))) {
+  if (technicalMarkers.some((marker) => normalizedMessage.includes(marker))) {
     return EMAIL_SERVICE_ERROR_MESSAGE;
   }
 
@@ -81,10 +82,10 @@ export const postForgotPassword = async (data: ForgotPasswordRequest): Promise<F
     throw new Error(response.data.message || "Gagal mengirim email reset password. Silakan coba lagi.");
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && !error.response) {
-      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-        throw new Error("Request timeout. Silakan coba lagi.");
+      if (error.code === 'ECONNABORTED' || error.message.toLowerCase().includes('timeout')) {
+        throw new Error("Permintaan terlalu lama diproses. Silakan coba lagi.");
       }
-      if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
+      if (error.code === 'ERR_NETWORK' || error.message.toLowerCase().includes('network error')) {
         throw new Error("Tidak dapat terhubung ke server. Periksa koneksi internet Anda.");
       }
       throw new Error("Terjadi kesalahan jaringan. Silakan coba lagi.");

@@ -331,7 +331,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                   <GoPackage className="h-4 w-4 text-orange-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-[#0D0E09]">Pesanan Diproses</p>
+                  <p className="font-semibold text-[#0D0E09]">Pesanan Menunggu Proses Admin</p>
                   <p className="text-sm leading-6 text-[#6B7C73]">
                     {latestTransaction?.shipmentAddress
                       ? `${latestTransaction.shipmentAddress.courier} ${latestTransaction.shipmentAddress.service} akan digunakan untuk pengiriman setelah admin memproses pesanan.`
@@ -349,7 +349,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                 <div>
                   <p className="font-semibold text-[#0D0E09]">Siap Diambil</p>
                   <p className="text-sm leading-6 text-[#6B7C73]">
-                    Pesanan pickup akan disiapkan toko. Datang ke toko setelah status transaksi menyatakan siap diambil.
+                    Pesanan pickup mengikuti status transaksi. Jika status sudah Siap Diambil, silakan datang ke toko saat jam operasional.
                   </p>
                 </div>
               </div>

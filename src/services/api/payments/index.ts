@@ -68,18 +68,19 @@ const sanitizePaymentError = (message?: string): string | undefined => {
     return "Pembayaran membutuhkan waktu lebih lama dari biasanya. Silakan tekan Lanjutkan Pembayaran lagi beberapa saat lagi.";
   }
 
+  const normalizedMessage = message.toLowerCase();
   const technicalMarkers = [
-    "Midtrans",
+    "midtrans",
     "snap",
-    "Konfigurasi",
-    "Bad Gateway",
-    "Internal Server Error",
-    "Unexpected error",
+    "konfigurasi",
+    "bad gateway",
+    "internal server error",
+    "unexpected error",
     "502",
     "503",
   ];
 
-  if (technicalMarkers.some((marker) => message.includes(marker))) {
+  if (technicalMarkers.some((marker) => normalizedMessage.includes(marker))) {
     return PAYMENT_SERVICE_ERROR_MESSAGE;
   }
 

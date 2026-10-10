@@ -39,10 +39,10 @@ export const postResendVerification = async (data: ResendVerificationRequest): P
     throw new Error(response.data.message || "Gagal mengirim ulang email verifikasi. Silakan coba lagi.");
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && !error.response) {
-      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-        throw new Error("Request timeout. Silakan coba lagi.");
+      if (error.code === 'ECONNABORTED' || error.message.toLowerCase().includes('timeout')) {
+        throw new Error("Permintaan terlalu lama diproses. Silakan coba lagi.");
       }
-      if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
+      if (error.code === 'ERR_NETWORK' || error.message.toLowerCase().includes('network error')) {
         throw new Error("Tidak dapat terhubung ke server. Periksa koneksi internet Anda.");
       }
       throw new Error("Terjadi kesalahan jaringan. Silakan coba lagi.");
