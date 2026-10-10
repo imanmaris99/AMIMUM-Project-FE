@@ -84,15 +84,17 @@ const StatusOrder: React.FC<StatusOrderProps> = ({ currentStatus = 0, deliveryTy
   };
 
   return (
-    <div className="w-full max-w-sm rounded-3xl bg-white/95 p-5 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
+    <div className="w-full max-w-sm rounded-3xl bg-white/95 p-5 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50">
       <div className="space-y-6">
-        {/* Title */}
-        <h3 className="text-lg font-semibold text-[#0D0E09]">
-          Status Pesanan
-        </h3>
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Alur status</p>
+          <h3 className="mt-1 text-lg font-bold text-[#0D0E09]">
+            Status Pesanan
+          </h3>
+        </div>
         {currentStatus < 0 && (
           <div className="rounded-2xl border border-amber-100 bg-amber-50/90 px-3 py-2 text-xs font-medium leading-relaxed text-amber-800">
-            Pesanan belum masuk proses pengiriman. Jika pembayaran belum selesai, lanjutkan pembayaran dari halaman transaksi.
+            Pesanan belum masuk proses pengiriman/pickup. Jika pembayaran belum selesai, lanjutkan pembayaran dari halaman transaksi.
           </div>
         )}
         

@@ -233,14 +233,14 @@ const TrackOrderPage: React.FC = () => {
         <UnifiedHeader
           type="secondary"
           title="Lacak Pesanan"
-          subtitle="Lacak status pesanan Anda"
+          subtitle="Pantau status pembayaran, pickup, pengiriman, dan resi resmi"
           showBackButton={true}
           onBack={handleBack}
         />
 
         <div className="flex flex-col items-center gap-4 px-4 py-5 pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
           {hasLocalLegacyTransactions && (
-            <div className="w-full max-w-sm rounded-2xl border border-amber-200 bg-amber-50/95 p-4 text-sm text-amber-900 shadow-sm">
+            <div className="w-full max-w-sm rounded-3xl border border-amber-200 bg-amber-50/95 p-4 text-sm text-amber-900 shadow-[0_8px_22px_rgba(15,23,42,0.06)]">
               <p className="font-semibold">Data lokal lama terdeteksi</p>
               <p className="mt-1 text-xs leading-relaxed">
                 Data ini tersimpan di perangkat sebelum reset database. Bersihkan agar halaman tracking hanya membaca pesanan dari server toko.
@@ -256,16 +256,16 @@ const TrackOrderPage: React.FC = () => {
           )}
           {isLoading ? (
             <div className="w-full max-w-sm rounded-3xl bg-white/95 p-6 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
-              <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-sm text-gray-500">
+              <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+              <p className="text-sm text-[#6B7C73]">
                 Memuat data pelacakan...
               </p>
             </div>
           ) : errorMessage ? (
             <div className="w-full max-w-sm rounded-3xl bg-white/95 p-6 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
-              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50 ring-8 ring-red-50/60">
                 <svg
-                  className="w-8 h-8 text-red-400"
+                  className="h-8 w-8 text-red-500"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -278,17 +278,17 @@ const TrackOrderPage: React.FC = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="mb-2 text-lg font-bold text-[#0D0E09]">
                 Gagal Memuat Pelacakan
               </h3>
-              <p className="text-sm text-gray-500">{errorMessage}</p>
+              <p className="text-sm text-[#6B7C73]">{errorMessage}</p>
             </div>
           ) : orders.length === 0 ? (
             <div className="w-full max-w-sm rounded-3xl bg-white/95 p-6 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
               <div className="flex flex-col items-center gap-4">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50">
                   <svg
-                    className="h-8 w-8 text-primary/60"
+                    className="h-8 w-8 text-primary"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -302,12 +302,11 @@ const TrackOrderPage: React.FC = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="mb-2 text-lg font-bold text-[#0D0E09]">
                     Belum Ada Pesanan
                   </h3>
-                  <p className="text-sm text-gray-500 mb-4">
-                    Data pelacakan akan muncul setelah Anda memiliki pesanan di
-                    sistem.
+                  <p className="mb-4 text-sm leading-6 text-[#6B7C73]">
+                    Data pelacakan akan muncul setelah bro memiliki pesanan yang tercatat di server toko.
                   </p>
                   <button
                     onClick={() => router.push("/")}
@@ -322,7 +321,7 @@ const TrackOrderPage: React.FC = () => {
             <>
               {currentOrderAlert && (
                 <div
-                  className={`w-full max-w-sm rounded-2xl border ${currentOrderAlert.borderColor} ${currentOrderAlert.bgColor} p-4 shadow-sm`}
+                  className={`w-full max-w-sm rounded-3xl border ${currentOrderAlert.borderColor} ${currentOrderAlert.bgColor} p-4 shadow-[0_8px_22px_rgba(15,23,42,0.06)]`}
                 >
                   <div className="flex items-start gap-3">
                     <span className="text-xl" aria-hidden="true">
@@ -342,18 +341,18 @@ const TrackOrderPage: React.FC = () => {
 
               {transactionId && currentTransaction && (
                 <div className="w-full max-w-sm rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="mb-2 text-lg font-bold text-[#0D0E09]">
                     Informasi Transaksi
                   </h3>
                   <div className="space-y-2">
-                    <div className="flex justify-between gap-4">
-                      <span className="text-sm text-gray-600">ID Transaksi:</span>
-                      <span className="break-words text-right text-sm font-medium text-gray-900">
+                    <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
+                      <span className="text-sm text-[#6B7C73]">ID Transaksi:</span>
+                      <span className="break-all text-right text-sm font-semibold text-[#0D0E09]">
                         {currentTransaction.transactionId}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Status:</span>
+                    <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
+                      <span className="text-sm text-[#6B7C73]">Status:</span>
                       <span
                         className={`text-sm font-medium px-2 py-1 rounded-full ${
                           getStatusConfig(currentTransaction.status).bgColor
@@ -362,15 +361,15 @@ const TrackOrderPage: React.FC = () => {
                         {getStatusConfig(currentTransaction.status).text}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Metode:</span>
-                      <span className="text-sm font-medium text-gray-900">
+                    <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
+                      <span className="text-sm text-[#6B7C73]">Metode:</span>
+                      <span className="text-right text-sm font-semibold text-[#0D0E09]">
                         {deliveryLabel}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Metode bayar:</span>
-                      <span className="text-sm font-medium text-gray-900">
+                    <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
+                      <span className="text-sm text-[#6B7C73]">Metode bayar:</span>
+                      <span className="text-right text-sm font-semibold text-[#0D0E09]">
                         {getPaymentMethodLabel(currentTransaction.paymentMethod)}
                       </span>
                     </div>
@@ -388,7 +387,7 @@ const TrackOrderPage: React.FC = () => {
                       <p className="text-xs font-semibold uppercase tracking-wide text-primary">
                         {isPickupOrder ? "Ringkasan Pengambilan" : "Ringkasan Pelacakan"}
                       </p>
-                      <h3 className="mt-1 text-lg font-semibold text-gray-900">
+                      <h3 className="mt-1 text-lg font-bold text-[#0D0E09]">
                         {isPickupOrder ? "Status Pengambilan Pesanan" : "Status dan Resi Pesanan"}
                       </h3>
                     </div>
@@ -399,38 +398,38 @@ const TrackOrderPage: React.FC = () => {
                   <div className="mt-4 space-y-2 text-sm">
                     {isPickupOrder ? (
                       <>
-                        <div className="flex justify-between gap-4">
-                          <span className="text-gray-600">Metode</span>
-                          <span className="text-right font-semibold text-gray-900">
+                        <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
+                          <span className="text-sm text-[#6B7C73]">Metode</span>
+                          <span className="text-right text-sm font-semibold text-[#0D0E09]">
                             Ambil langsung di toko
                           </span>
                         </div>
-                        <div className="flex justify-between gap-4">
-                          <span className="text-gray-600">Status ambil</span>
-                          <span className="text-right font-semibold text-gray-900">
+                        <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
+                          <span className="text-sm text-[#6B7C73]">Status ambil</span>
+                          <span className="text-right text-sm font-semibold text-[#0D0E09]">
                             {getStatusConfig(currentTransaction.status).text}
                           </span>
                         </div>
                       </>
                     ) : (
                       <>
-                        <div className="flex justify-between gap-4">
-                          <span className="text-gray-600">No. Resi</span>
-                          <span className="text-right font-semibold text-gray-900">
+                        <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
+                          <span className="text-sm text-[#6B7C73]">No. Resi</span>
+                          <span className="text-right text-sm font-semibold text-[#0D0E09]">
                             {trackingDisplay}
                           </span>
                         </div>
-                        <div className="flex justify-between gap-4">
-                          <span className="text-gray-600">Kurir</span>
-                          <span className="text-right font-semibold text-gray-900">
+                        <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
+                          <span className="text-sm text-[#6B7C73]">Kurir</span>
+                          <span className="text-right text-sm font-semibold text-[#0D0E09]">
                             {[currentTransaction.shipmentAddress?.courier, currentTransaction.shipmentAddress?.service]
                               .filter(Boolean)
                               .join(" - ") || "Belum tersedia"}
                           </span>
                         </div>
-                        <div className="flex justify-between gap-4">
-                          <span className="text-gray-600">Estimasi</span>
-                          <span className="text-right font-semibold text-gray-900">
+                        <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
+                          <span className="text-sm text-[#6B7C73]">Estimasi</span>
+                          <span className="text-right text-sm font-semibold text-[#0D0E09]">
                             {currentTransaction.shipmentAddress?.estimatedDelivery || "Belum tersedia"}
                           </span>
                         </div>
@@ -444,7 +443,7 @@ const TrackOrderPage: React.FC = () => {
                   }`}>
                     {isPickupOrder
                       ? "Pesanan ini dipilih untuk pickup/ambil di toko, jadi tidak memakai nomor resi kurir. Datang ke toko setelah status siap diambil."
-                      : "No. resi hanya ditampilkan jika admin sudah memasukkan kode tracking resmi dari kurir."}
+                      : "No. resi hanya ditampilkan jika admin sudah memasukkan kode tracking resmi dari kurir. Jangan gunakan nomor internal/order ID sebagai resi."}
                   </p>
                 </div>
               )}
