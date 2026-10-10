@@ -45,12 +45,8 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
     setIsSelectingAll(true);
     try {
       await updateAllActiveStatus(newStatus);
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Gagal menyimpan pilihan keranjang. Coba lagi sebentar.'
-      );
+    } catch {
+      toast.error('Pilihan keranjang belum tersimpan. Coba lagi sebentar sebelum checkout.');
     } finally {
       setIsSelectingAll(false);
     }
@@ -84,7 +80,7 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
   };
 
   return (
-    <div className="fixed bottom-0 left-1/2 z-50 -translate-x-1/2 border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom)]" style={{ maxWidth: '440px', width: '100%' }}>
+    <div className="fixed bottom-0 left-1/2 z-50 -translate-x-1/2 border-t border-emerald-50 bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur" style={{ maxWidth: '440px', width: '100%' }}>
       <div className="px-4 py-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center space-x-2">
@@ -107,7 +103,7 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
                 </svg>
               )}
             </button>
-            <span className="text-gray-600 text-sm">
+            <span className="text-sm font-medium text-[#6B7C73]">
               {isSavingSelection
                 ? 'Menyimpan pilihan...'
                 : selectedItemCount > 0
@@ -120,7 +116,7 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
             onClick={handleCheckout}
             disabled={!canCheckout}
             aria-disabled={!canCheckout}
-            className="bg-primary text-white px-6 py-3 rounded-full font-medium text-sm disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            className="rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
           >
             {isLoading
               ? 'Memuat...'
@@ -132,24 +128,24 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
           </button>
         </div>
         {!hasSelectedItems && cartItems.length > 0 && !isLoading && (
-          <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
+          <p className="mt-2 rounded-2xl bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
             Pilih minimal satu produk untuk melanjutkan checkout.
           </p>
         )}
         {hasSyncMismatch && (
-          <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
+          <p className="mt-2 rounded-2xl bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
             Data keranjang sedang disinkronkan. Coba pilih ulang produk atau refresh halaman.
           </p>
         )}
         {isSyncing && hasSelectedItems && (
-          <p className="mt-2 rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-800">
+          <p className="mt-2 rounded-2xl bg-blue-50 px-3 py-2 text-xs text-blue-800">
             Harga sudah diperbarui. Menyimpan pilihan ke server sebelum checkout dibuka.
           </p>
         )}
       </div>
 
       <div className="flex justify-center pb-2">
-        <div className="w-32 h-1 bg-gray-800 rounded-full"></div>
+        <div className="h-1 w-32 rounded-full bg-gray-800/70"></div>
       </div>
 
       <LoginRequiredModal

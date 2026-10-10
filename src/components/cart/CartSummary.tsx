@@ -21,10 +21,10 @@ export default function CartSummary() {
   return (
     <div className="px-1 py-3 mt-4">
       <div className="max-w-sm mx-auto">
-        <div className="bg-white/95 rounded-2xl border border-gray-100 shadow-lg shadow-gray-900/5 p-4">
+        <div className="rounded-3xl border border-emerald-100 bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
           <div className="space-y-6">
             {hasCartItems && !hasSelectedItems && (
-              <div className="rounded-lg bg-yellow-50 border border-yellow-200 px-3 py-2">
+              <div className="rounded-2xl border border-yellow-200 bg-yellow-50 px-3 py-2">
                 <p className="text-xs text-yellow-700">
                   Pilih minimal satu produk untuk melanjutkan checkout.
                 </p>
@@ -32,7 +32,7 @@ export default function CartSummary() {
             )}
 
             {hasSelectedItems && (
-              <div className="rounded-lg bg-[#E6F2F0] px-3 py-2">
+              <div className="rounded-2xl bg-[#E6F2F0] px-3 py-2">
                 <p className="text-xs font-semibold text-primary">
                   {selectedQuantity} item dipilih untuk checkout.
                 </p>
@@ -45,9 +45,9 @@ export default function CartSummary() {
             )}
 
             <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-sm">Subtotal dipilih</span>
-                <span className="text-black font-medium text-sm">
+              <div className="flex items-start justify-between gap-4">
+                <span className="text-sm text-[#6B7C73]">Subtotal dipilih</span>
+                <span className="text-sm font-semibold text-[#0D0E09]">
                   {rupiahFormater(subtotal)}
                 </span>
               </div>
@@ -56,9 +56,9 @@ export default function CartSummary() {
 
             {totalDiscount > 0 && (
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600 text-sm">Diskon</span>
-                  <span className="text-red-500 font-medium text-sm">
+                <div className="flex items-start justify-between gap-4">
+                  <span className="text-sm text-[#6B7C73]">Diskon</span>
+                  <span className="text-sm font-semibold text-red-500">
                     -{rupiahFormater(totalDiscount)}
                   </span>
                 </div>
@@ -66,9 +66,9 @@ export default function CartSummary() {
               </div>
             )}
 
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600 text-sm font-medium">Total dipilih</span>
-              <span className="text-primary font-bold text-base">
+            <div className="flex items-start justify-between gap-4">
+              <span className="text-sm text-[#6B7C73] font-medium">Total dipilih</span>
+              <span className="text-base font-bold text-primary">
                 {rupiahFormater(total)}
               </span>
             </div>

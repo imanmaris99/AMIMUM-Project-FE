@@ -42,9 +42,9 @@ const CartItem: React.FC<CartItemProps> = ({
     setIsMutating(true);
     try {
       await onQuantityChange?.(item.id, newQuantity);
-    } catch (error) {
+    } catch {
       setQuantity(previousQuantity);
-      toast.error(error instanceof Error ? error.message : 'Gagal mengubah jumlah produk.');
+      toast.error('Jumlah produk belum tersimpan. Coba lagi sebentar.');
     } finally {
       setIsMutating(false);
     }
@@ -58,9 +58,9 @@ const CartItem: React.FC<CartItemProps> = ({
     setIsMutating(true);
     try {
       await onQuantityChange?.(item.id, newQuantity);
-    } catch (error) {
+    } catch {
       setQuantity(previousQuantity);
-      toast.error(error instanceof Error ? error.message : 'Gagal mengubah jumlah produk.');
+      toast.error('Jumlah produk belum tersimpan. Coba lagi sebentar.');
     } finally {
       setIsMutating(false);
     }
@@ -74,9 +74,9 @@ const CartItem: React.FC<CartItemProps> = ({
     setIsMutating(true);
     try {
       await onQuantityChange?.(item.id, newQuantity);
-    } catch (error) {
+    } catch {
       setQuantity(previousQuantity);
-      toast.error(error instanceof Error ? error.message : 'Gagal mengubah jumlah produk.');
+      toast.error('Jumlah produk belum tersimpan. Coba lagi sebentar.');
     } finally {
       setIsMutating(false);
     }
@@ -90,9 +90,9 @@ const CartItem: React.FC<CartItemProps> = ({
     setIsMutating(true);
     try {
       await onCheckChange?.(item.id, checked);
-    } catch (error) {
+    } catch {
       setIsChecked(previousChecked);
-      toast.error(error instanceof Error ? error.message : 'Gagal memilih produk. Coba lagi sebentar.');
+      toast.error('Pilihan produk belum tersimpan. Coba lagi sebentar.');
     } finally {
       setIsMutating(false);
     }
@@ -103,8 +103,8 @@ const CartItem: React.FC<CartItemProps> = ({
     setIsMutating(true);
     try {
       await onDelete?.(item.id);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Gagal menghapus produk.');
+    } catch {
+      toast.error('Produk belum bisa dihapus dari keranjang. Coba lagi sebentar.');
       setIsMutating(false);
     }
   };
@@ -132,37 +132,37 @@ const CartItem: React.FC<CartItemProps> = ({
     if (!imageUrl || imageError || imageUrl.startsWith('/')) {
       return false; // Use Next.js Image for local images
     }
-    
+
     // Simple check: if URL starts with http:// or https://, it's external
     const url = imageUrl.trim();
     return url.startsWith('http://') || url.startsWith('https://');
   }, [imageUrl, imageError]);
 
   return (
-    <article className={`flex items-center gap-3 p-4 border border-gray-200 rounded-xl max-w-full mx-auto will-change-auto ${isControlDisabled ? 'opacity-75' : ''}`}>
+    <article className={`mx-auto flex max-w-full items-start gap-3 rounded-3xl border border-emerald-100 bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.06)] will-change-auto ${isControlDisabled ? 'opacity-75' : ''}`}>
       {/* Checkbox */}
       <label className={`w-7 h-7 border-2 rounded-lg grid place-items-center cursor-pointer flex-shrink-0 transition-all duration-150 will-change-transform ${
-        isChecked 
-          ? 'border-primary bg-primary' 
+        isChecked
+          ? 'border-primary bg-primary'
           : 'border-gray-300 hover:border-gray-400'
       }`} aria-label="Pilih produk">
-        <input 
-          type="checkbox" 
+        <input
+          type="checkbox"
           checked={isChecked}
           disabled={isControlDisabled}
           onChange={handleCheckChange}
           className="appearance-none m-0 w-0 h-0 absolute"
         />
         {/* Check icon */}
-        <svg 
-          viewBox="0 0 24 24" 
-          width="18" 
-          height="18" 
-          fill="none" 
-          stroke="white" 
-          strokeWidth="3" 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
+        <svg
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+          fill="none"
+          stroke="white"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           aria-hidden="true"
           className={`transition-all duration-150 ${isChecked ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}
         >
@@ -173,17 +173,17 @@ const CartItem: React.FC<CartItemProps> = ({
       {/* Clickable Area - Image and Text */}
       <div
         onClick={handleItemClick}
-        className={`flex items-center gap-3 flex-1 min-w-0 rounded-lg p-2 -m-2 transition-colors ${
-          item.product_id ? 'cursor-pointer hover:bg-gray-50' : 'cursor-default'
+        className={`-m-2 flex min-w-0 flex-1 items-start gap-3 rounded-2xl p-2 transition-colors ${
+          item.product_id ? 'cursor-pointer hover:bg-emerald-50/60' : 'cursor-default'
         }`}
       >
         {/* Image */}
-        <div className="w-[70px] h-[70px] rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 bg-gray-50 grid place-items-center">
+        <div className="grid h-[70px] w-[70px] flex-shrink-0 place-items-center overflow-hidden rounded-2xl border border-emerald-100 bg-emerald-50">
           {!isExternalUrl ? (
             // Use Next.js Image ONLY for local images (no server-side fetch issues)
-            <Image 
-              src={imageUrl} 
-              alt={item.product_name} 
+            <Image
+              src={imageUrl}
+              alt={item.product_name}
               width={70}
               height={70}
               className="w-full h-full object-cover"
@@ -208,52 +208,52 @@ const CartItem: React.FC<CartItemProps> = ({
 
         {/* Text */}
         <div className="flex-1 min-w-0">
-          <h2 className="font-bold text-sm mb-1 line-clamp-2 leading-tight">
+          <h2 className="mb-1 break-words text-sm font-bold leading-tight text-[#0D0E09]">
             {item.product_name}
           </h2>
-          <p className="text-gray-500 text-xs m-0 truncate">
+          <p className="m-0 break-words text-xs leading-relaxed text-[#6B7C73]">
             {item.variant_name}
           </p>
-          <div className="mt-2 text-sm font-bold text-green-800" data-unit={displayPrice}>
+          <div className="mt-2 text-sm font-bold text-primary" data-unit={displayPrice}>
             Rp {displayPrice.toLocaleString('id-ID')}
           </div>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="flex flex-col items-end gap-2 flex-shrink-0">
-        <button 
-          className="w-6 h-6 border-none bg-transparent cursor-pointer opacity-80 hover:opacity-100 p-1" 
-          title="Hapus" 
+      <div className="flex flex-shrink-0 flex-col items-end gap-2">
+        <button
+          className="w-6 h-6 border-none bg-transparent cursor-pointer opacity-80 hover:opacity-100 p-1"
+          title="Hapus"
           onClick={handleDelete}
           disabled={isControlDisabled}
         >
           <Image src="/Trush_Icon_UIA.svg" alt="Hapus" width={16} height={16} />
         </button>
 
-        <div className="flex items-center border border-gray-200 rounded-md h-7 overflow-hidden" role="group" aria-label="Pengatur jumlah">
-          <button 
-            type="button" 
-            className="w-7 h-7 border-0 bg-gray-100 cursor-pointer text-sm hover:bg-gray-200" 
-            aria-label="Kurangi" 
+        <div className="flex h-8 items-center overflow-hidden rounded-2xl border border-emerald-100" role="group" aria-label="Pengatur jumlah">
+          <button
+            type="button"
+            className="h-8 w-8 cursor-pointer border-0 bg-emerald-50 text-sm hover:bg-emerald-100"
+            aria-label="Kurangi"
             onClick={handleMinus}
             disabled={isControlDisabled || quantity <= 1}
           >
             −
           </button>
-          <input 
-            type="number" 
-            className="w-8 h-7 border-0 text-center text-xs outline-none" 
-            value={quantity} 
-            min="1" 
-            inputMode="numeric" 
+          <input
+            type="number"
+            className="h-8 w-9 border-0 text-center text-xs outline-none"
+            value={quantity}
+            min="1"
+            inputMode="numeric"
             aria-label="Jumlah"
             onChange={handleQuantityInput}
             disabled={isControlDisabled}
           />
-          <button 
-            type="button" 
-            className="w-7 h-7 border-0 bg-gray-100 cursor-pointer text-sm hover:bg-gray-200" 
+          <button
+            type="button"
+            className="h-8 w-8 cursor-pointer border-0 bg-emerald-50 text-sm hover:bg-emerald-100"
             aria-label="Tambah"
             onClick={handlePlus}
             disabled={isControlDisabled}

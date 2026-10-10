@@ -532,12 +532,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         window.location.href = paymentResponse.data.redirect_url;
         return true;
       }
-    } catch (paymentError) {
-      toast.error(
-        paymentError instanceof Error
-          ? `Pesanan sudah dibuat, tetapi pembayaran belum terbuka: ${paymentError.message}`
-          : 'Pesanan sudah dibuat, tetapi pembayaran belum terbuka.'
-      );
+    } catch {
+      toast.error('Pesanan sudah dibuat, tetapi halaman pembayaran belum terbuka. Saya arahkan ke detail transaksi untuk cek pembayaran.');
     }
 
     router.push(`/transaction/${recentPendingOnlineOrder.id}`);
@@ -905,12 +901,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             window.location.href = paymentResponse.data.redirect_url;
             return;
           }
-        } catch (paymentError) {
-          toast.error(
-            paymentError instanceof Error
-              ? `Pesanan sudah dibuat, tetapi halaman pembayaran belum terbuka: ${paymentError.message}`
-              : 'Pesanan sudah dibuat, tetapi halaman pembayaran belum terbuka.'
-          );
+        } catch {
+          toast.error('Pesanan sudah dibuat, tetapi halaman pembayaran belum terbuka. Buka detail transaksi untuk melanjutkan pembayaran.');
           router.push(`/transaction/${backendOrder.id}`);
           return;
         }
@@ -933,12 +925,12 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       }, 500);
       
     } catch (error) {
-      const rawMessage = error instanceof Error ? error.message : 'Kesalahan tidak dikenal';
+      const rawMessage = error instanceof Error ? error.message : '';
       const isActiveCartError = rawMessage.includes('Active cart items') || rawMessage.includes('Keranjang aktif tidak ditemukan');
       const customerMessage = isActiveCartError
         ? 'Keranjang aktif tidak ditemukan. Jika pesanan baru saja dibuat, saya coba arahkan ke pembayaran atau detail transaksi.'
-        : rawMessage;
-      toast.error(`Terjadi kesalahan saat memproses pesanan: ${customerMessage}`);
+        : 'Checkout belum bisa diproses. Silakan cek produk, alamat, ongkir, dan metode bayar lalu coba lagi.';
+      toast.error(customerMessage);
       if (isActiveCartError) {
         setIsRecoveringCreatedOrder(true);
         const selectedPayment = selectedPaymentMethod as TransactionPaymentMethod | null;
@@ -1091,23 +1083,24 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
           </div>
           <div className="text-center">
-            <h1 className="text-[16px] font-semibold">Checkout</h1>
-            <p className="mt-1 text-xs text-gray-500">Pilih cara terima dan pembayaran</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Checkout resmi</p>
+            <h1 className="mt-0.5 text-[16px] font-bold text-[#0D0E09]">Buat Pesanan</h1>
+            <p className="mt-1 text-xs leading-snug text-[#6B7C73]">Pilih cara terima dan pembayaran</p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-sm mx-auto min-h-screen bg-white/95 shadow-sm shadow-gray-900/5">
+      <div className="mx-auto max-w-md bg-white/80 pb-2 shadow-sm shadow-gray-900/5">
         {/* Error Messages */}
         {Object.keys(errors).length > 0 && (
-          <div className="px-4 py-3 bg-red-50 border-l-4 border-red-400">
-            <div className="flex">
-              <IoWarning className="w-5 h-5 text-red-400 mt-0.5 mr-2" />
-              <div>
+          <div className="mx-4 mt-4 rounded-3xl border border-red-100 bg-red-50 p-4">
+            <div className="flex items-start gap-2">
+              <IoWarning className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
+              <div className="min-w-0">
                 <p className="text-sm text-red-700 font-medium">Perhatian:</p>
-                <ul className="text-sm text-red-600 mt-1">
+                <ul className="mt-1 space-y-1 text-sm leading-relaxed text-red-600">
                   {Object.values(errors).map((error, index) => (
-                    <li key={index}>• {error}</li>
+                    <li key={index} className="break-words">• {error}</li>
                   ))}
                 </ul>
               </div>
@@ -1117,7 +1110,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
         {isCheckoutCartLoading ? (
           <div className="px-4 py-8">
-            <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5 text-center">
+            <div className="rounded-3xl border border-blue-100 bg-blue-50 p-5 text-center shadow-[0_8px_22px_rgba(15,23,42,0.06)]">
               <ButtonSpinner size="md" color="primary" text="Memuat produk checkout..." />
               <p className="mt-3 text-sm text-blue-800">
                 Sistem sedang memastikan produk aktif dari keranjang sebelum checkout ditampilkan.
@@ -1126,7 +1119,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
           </div>
         ) : isCheckoutCartEmpty ? (
           <div className="px-4 py-8">
-            <div className="rounded-2xl border border-yellow-200 bg-yellow-50 p-5 text-center">
+            <div className="rounded-3xl border border-yellow-200 bg-yellow-50 p-5 text-center shadow-[0_8px_22px_rgba(15,23,42,0.06)]">
               <GoPackage className="mx-auto mb-3 h-12 w-12 text-yellow-600" />
               <h2 className="text-lg font-semibold text-gray-900">
                 Produk checkout belum siap
@@ -1140,14 +1133,14 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                 <button
                   type="button"
                   onClick={() => router.push('/cart')}
-                  className="w-full rounded-xl bg-primary px-4 py-3 font-semibold text-white transition hover:bg-primary/90"
+                  className="w-full rounded-2xl bg-primary px-4 py-3 font-semibold text-white transition hover:bg-primary/90"
                 >
                   Cek Keranjang
                 </button>
                 <button
                   type="button"
                   onClick={() => router.push('/')}
-                  className="w-full rounded-xl border border-primary px-4 py-3 font-semibold text-primary transition hover:bg-primary/5"
+                  className="w-full rounded-2xl border border-primary px-4 py-3 font-semibold text-primary transition hover:bg-primary/5"
                 >
                   Mulai Belanja
                 </button>
@@ -1162,7 +1155,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
         {/* Checkout Confidence Layer */}
         <div className="px-4 pt-4">
-          <div className="rounded-2xl border border-emerald-100 bg-emerald-50/80 p-4 shadow-sm">
+          <div className="rounded-3xl border border-emerald-100 bg-emerald-50/80 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.06)]">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-bold text-emerald-900">Checkout Aman</p>
@@ -1185,8 +1178,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                     className={`mt-0.5 h-4 w-4 shrink-0 ${item.isReady ? 'text-emerald-600' : 'text-gray-300'}`}
                   />
                   <div className="min-w-0">
-                    <p className="text-xs font-semibold text-gray-900">{item.label}</p>
-                    <p className="text-[11px] leading-4 text-gray-600">{item.value}</p>
+                    <p className="text-xs font-semibold text-[#0D0E09]">{item.label}</p>
+                    <p className="break-words text-[11px] leading-4 text-[#6B7C73]">{item.value}</p>
                   </div>
                 </div>
               ))}
@@ -1203,10 +1196,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <label className={`flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+            <label className={`flex min-h-[92px] cursor-pointer items-center justify-center rounded-3xl border-2 p-4 transition-all ${
               deliveryMethod === 'delivery' 
                 ? 'border-primary bg-primary/5' 
-                : 'border-gray-200 hover:border-primary/50'
+                : 'border-emerald-100 bg-white hover:border-primary/50'
             }`}>
               <input
                 type="radio"
@@ -1217,14 +1210,14 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                 className="sr-only"
               />
               <div className="text-center">
-                <GoPackage className="w-6 h-6 text-gray-600 mx-auto mb-2" />
-                <span className="text-sm font-medium text-gray-700">Kirim ke tujuan</span>
+                <GoPackage className="w-6 h-6 mx-auto mb-2 text-[#6B7C73]" />
+                <span className="text-sm font-semibold text-[#0D0E09]">Kirim ke tujuan</span>
               </div>
             </label>
-            <label className={`flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+            <label className={`flex min-h-[92px] cursor-pointer items-center justify-center rounded-3xl border-2 p-4 transition-all ${
               deliveryMethod === 'pickup' 
                 ? 'border-primary bg-primary/5' 
-                : 'border-gray-200 hover:border-primary/50'
+                : 'border-emerald-100 bg-white hover:border-primary/50'
             }`}>
               <input
                 type="radio"
@@ -1235,18 +1228,21 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                 className="sr-only"
               />
               <div className="text-center">
-                <GoLocation className="w-6 h-6 text-gray-600 mx-auto mb-2" />
-                <span className="text-sm font-medium text-gray-700">Ambil di toko</span>
+                <GoLocation className="w-6 h-6 mx-auto mb-2 text-[#6B7C73]" />
+                <span className="text-sm font-semibold text-[#0D0E09]">Ambil di toko</span>
               </div>
             </label>
           </div>
         </div>
 
         {/* Cart Items */}
-        <div className="px-4 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Produk Pesanan
-          </h2>
+        <div className="px-4 py-4">
+          <div className="mb-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Item checkout</p>
+            <h2 className="mt-1 text-lg font-bold text-[#0D0E09]">
+              Produk Pesanan
+            </h2>
+          </div>
           {currentItems.length === 0 ? (
             <div className="text-center py-8">
               <GoPackage className="w-12 h-12 text-gray-300 mx-auto mb-3" />
@@ -1261,14 +1257,14 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
           ) : (
             <div className="space-y-4">
               {currentItems.map((item: CartItemType) => (
-                <div key={item.id} className="flex items-center space-x-3">
-                  <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                <div key={item.id} className="flex items-start gap-3 rounded-3xl bg-white/95 p-3 shadow-[0_8px_22px_rgba(15,23,42,0.06)] ring-1 ring-emerald-50">
+                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-emerald-50">
                     <Image
                       src={item.image || "/default-image.jpg"}
                       alt={item.product_name}
                       width={64}
                       height={64}
-                      className="w-full h-full object-cover rounded-lg"
+                      className="h-full w-full object-cover"
                       unoptimized={false}
                       onError={(e) => {
                         const target = e.currentTarget as HTMLImageElement;
@@ -1278,18 +1274,18 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                       }}
                     />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900 text-sm">{item.product_name}</h3>
-                    <p className="text-xs text-gray-600">{item.variant_name}</p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="break-words text-sm font-semibold leading-snug text-[#0D0E09]">{item.product_name}</h3>
+                    <p className="mt-1 break-words text-xs text-[#6B7C73]">{item.variant_name}</p>
                     <div className="flex items-center space-x-2 mt-1">
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm font-semibold text-[#0D0E09]">
                         {rupiahFormater(item.price)}
                       </span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-600">Qty: {item.quantity}</p>
-                    <p className="font-medium text-gray-900 text-sm">
+                  <div className="shrink-0 text-right">
+                    <p className="text-xs text-[#6B7C73]">Qty: {item.quantity}</p>
+                    <p className="text-sm font-semibold text-[#0D0E09]">
                       {rupiahFormater(item.price * item.quantity)}
                     </p>
                   </div>
@@ -1301,7 +1297,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
         {/* Address Section */}
         {deliveryMethod === 'delivery' && (
-          <div className="px-4 py-4 border-b border-gray-200">
+          <div className="px-4 py-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Alamat Pengiriman</h2>
               <button
@@ -1314,20 +1310,20 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             </div>
             
             {/* Store Address */}
-            <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+            <div className="mb-4 rounded-3xl bg-emerald-50/60 p-3">
               <p className="text-sm text-gray-800 font-medium mb-2">Alamat pengirim</p>
               <div className="flex items-start space-x-3">
                 <GoLocation className="w-5 h-5 text-gray-400 mt-1 flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900">
+                  <p className="break-words font-semibold text-[#0D0E09]">
                     {storeAddress?.name || 'Alamat toko belum tersedia'}
                   </p>
-                  <p className="text-sm text-gray-600">{storeAddress?.phone || '-'}</p>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="break-words text-sm text-[#6B7C73]">{storeAddress?.phone || '-'}</p>
+                  <p className="mt-1 break-words text-sm text-[#6B7C73]">
                     {storeAddress?.address || 'Alamat toko belum tersedia'}
                   </p>
                   {!storeAddress?.cityId && (
-                    <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
+                    <p className="mt-2 rounded-2xl bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
                       Kota RajaOngkir alamat toko belum valid. Checkout delivery belum bisa dilanjutkan.
                     </p>
                   )}
@@ -1336,15 +1332,15 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             </div>
 
             {/* Delivery Address */}
-            <div className="p-3 border-2 border-dashed border-gray-200 rounded-lg">
+            <div className="rounded-3xl border-2 border-dashed border-emerald-100 bg-white/80 p-3">
               <p className="text-sm text-gray-800 font-medium mb-2">Alamat tujuan</p>
               {selectedAddress ? (
                 <div className="flex items-start space-x-3">
                   <GoLocation className="w-5 h-5 text-gray-400 mt-1 flex-shrink-0" />
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900">{selectedAddress.name}</p>
-                    <p className="text-sm text-gray-600">{selectedAddress.phone}</p>
-                    <p className="text-sm text-gray-600 mt-1">
+                  <div className="min-w-0 flex-1">
+                    <p className="break-words font-semibold text-[#0D0E09]">{selectedAddress.name}</p>
+                    <p className="break-words text-sm text-[#6B7C73]">{selectedAddress.phone}</p>
+                    <p className="mt-1 break-words text-sm text-[#6B7C73]">
                       {selectedAddress.address}, {selectedAddress.city} {selectedAddress.postal_code}
                     </p>
                     {hasValidRajaOngkirCityId(selectedAddress.city_id) ? (
@@ -1352,7 +1348,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                         Alamat RajaOngkir valid untuk hitung ongkir.
                       </p>
                     ) : (
-                      <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
+                      <p className="mt-2 rounded-2xl bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
                         Alamat ini perlu update kota RajaOngkir sebelum checkout delivery.
                       </p>
                     )}
@@ -1390,17 +1386,17 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
         {/* Pickup Information */}
         {deliveryMethod === 'pickup' && (
-          <div className="px-4 py-4 border-b border-gray-200">
+          <div className="px-4 py-4">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Informasi Pengambilan</h2>
-            <div className="p-4 bg-blue-50 rounded-lg">
+            <div className="rounded-3xl bg-blue-50 p-4">
               <div className="flex items-start space-x-3">
                   <GoLocation className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
                   <div className="flex-1">
-                  <p className="font-medium text-gray-900">
+                  <p className="break-words font-semibold text-[#0D0E09]">
                     {storeAddress?.name || 'Alamat toko belum tersedia'}
                   </p>
-                  <p className="text-sm text-gray-600">{storeAddress?.phone || '-'}</p>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="break-words text-sm text-[#6B7C73]">{storeAddress?.phone || '-'}</p>
+                  <p className="mt-1 break-words text-sm text-[#6B7C73]">
                     {storeAddress?.address || 'Alamat toko belum tersedia'}
                   </p>
                   <p className="text-sm text-blue-600 font-medium mt-2">
@@ -1414,7 +1410,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
         {/* Courier Selection */}
         {deliveryMethod === 'delivery' && (
-          <div className="px-4 py-4 border-b border-gray-200">
+          <div className="px-4 py-4">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Pilih Kurir</h2>
             <CourierSelector
               courierCompanies={courierCompanies}
@@ -1435,7 +1431,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
               <p className="text-red-500 text-xs mt-2">{errors.courier}</p>
             )}
             {courierNotice && (
-              <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
+              <p className="mt-2 rounded-2xl bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
                 {courierNotice}
               </p>
             )}
@@ -1493,11 +1489,11 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         )}
 
         {/* Additional Notes Section */}
-        <div className="px-4 py-4 border-b border-gray-200">
+        <div className="px-4 py-4">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Catatan Tambahan</h2>
           <div className="space-y-3">
             <div>
-              <label htmlFor="additionalNotes" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="additionalNotes" className="block text-sm font-semibold text-[#0D0E09] mb-2">
                 Pesan untuk penjual (opsional)
               </label>
               <textarea
@@ -1508,7 +1504,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                   clearError('notes');
                 }}
                 placeholder="Contoh: Ambil jam 3 sore, tolong bungkus rapi, dll."
-                className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none transition-colors"
+                className="w-full resize-none rounded-2xl border border-emerald-100 px-3 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 rows={3}
                 maxLength={500}
               />
@@ -1522,7 +1518,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
               </div>
             </div>
             
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div className="rounded-3xl border border-blue-200 bg-blue-50 p-3">
               <p className="text-sm text-blue-800 font-medium mb-2">
                 💡 Catatan berguna untuk toko:
               </p>
@@ -1537,42 +1533,42 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         </div>
 
         {/* Payment Summary */}
-        <div className="px-4 py-4 border-b border-gray-200">
+        <div className="px-4 py-4">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Ringkasan Pembayaran</h2>
           <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Subtotal ({currentItems.length} item)</span>
+            <div className="flex items-start justify-between gap-4">
+              <span className="text-[#6B7C73]">Subtotal ({currentItems.length} item)</span>
               <span className="font-medium">{rupiahFormater(totals.subtotal)}</span>
             </div>
             {totals.discount > 0 && (
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Diskon</span>
+              <div className="flex items-start justify-between gap-4">
+                <span className="text-[#6B7C73]">Diskon</span>
                 <span className="font-medium text-red-500">-{rupiahFormater(totals.discount)}</span>
               </div>
             )}
             {deliveryMethod === 'delivery' && totals.shipping > 0 && (
               <>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">
+                <div className="flex items-start justify-between gap-4">
+                  <span className="text-[#6B7C73]">
                     Ongkir {shippingFeePaymentMode === 'prepaid' ? '(digabung total)' : '(bayar saat paket tiba)'}
                   </span>
                   <span className="font-medium">{rupiahFormater(totals.shipping)}</span>
                 </div>
                 {totals.shippingDueOnDelivery > 0 && (
-                  <div className="rounded-lg bg-orange-50 px-3 py-2 text-xs font-medium text-orange-800">
+                  <div className="rounded-2xl bg-orange-50 px-3 py-2 text-xs font-medium text-orange-800">
                     Ongkir {rupiahFormater(totals.shippingDueOnDelivery)} tidak masuk total pembayaran produk; dibayar saat paket tiba sesuai kebijakan/dukungan kurir.
                   </div>
                 )}
               </>
             )}
             {deliveryMethod === 'pickup' && (
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Pengambilan</span>
+              <div className="flex items-start justify-between gap-4">
+                <span className="text-[#6B7C73]">Pengambilan</span>
                 <span className="font-medium text-green-600">Gratis</span>
               </div>
             )}
             <div className="border-t border-gray-200 pt-3">
-              <div className="flex justify-between items-center text-lg font-semibold">
+              <div className="flex items-start justify-between gap-4 text-lg font-semibold">
                 <span>{shippingFeePaymentMode === 'cod_shipping' ? 'Total bayar produk sekarang' : 'Total'}</span>
                 <span className="text-primary">{rupiahFormater(totals.total)}</span>
               </div>
@@ -1584,14 +1580,14 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         </div>
 
         {/* Payment Method */}
-        <div className="px-4 py-4 border-b border-gray-200">
+        <div className="px-4 py-4">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Metode Pembayaran</h2>
           <div className="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-3 py-3 text-sm text-blue-800">
-            Pembayaran produk dilakukan melalui QRIS resmi toko atau Transfer BRI manual. Biaya kirim dapat digabung ke total produk, atau dibayar saat paket tiba jika kurir mendukung COD ongkir. COD tidak berlaku untuk pembayaran produk.
+            Pembayaran produk dilakukan melalui QRIS resmi toko atau Transfer BRI manual. Biaya kirim dapat digabung ke total produk, atau dibayar saat paket tiba jika kurir mendukung. Pembayaran produk tidak memakai COD.
           </div>
           <div className="space-y-4">
             {paymentMethodGroups.map((group: PaymentMethodGroup) => (
-              <div key={group.id} className="overflow-hidden rounded-2xl border border-gray-200">
+              <div key={group.id} className="overflow-hidden rounded-3xl border border-emerald-100 bg-white/95">
                 <button
                   type="button"
                   onClick={() => togglePaymentGroup(group.id)}
@@ -1614,7 +1610,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                           key={method.id}
                           className={`flex items-center gap-3 px-4 py-4 transition-all ${
                             method.isAvailable
-                              ? 'cursor-pointer hover:bg-gray-50'
+                              ? 'cursor-pointer hover:bg-emerald-50/60'
                               : 'cursor-not-allowed opacity-60'
                           } ${isSelected ? 'bg-primary/5' : ''}`}
                         >
@@ -1634,8 +1630,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                           />
                           {renderPaymentBadge(method.badge, method.isAvailable)}
                           <div className="min-w-0 flex-1">
-                            <p className="font-medium text-gray-900">{method.name}</p>
-                            <p className="text-sm text-gray-500">{method.description}</p>
+                            <p className="break-words font-semibold text-[#0D0E09]">{method.name}</p>
+                            <p className="break-words text-sm leading-relaxed text-[#6B7C73]">{method.description}</p>
                           </div>
                           <div
                             className={`h-6 w-6 rounded-full border-2 ${
@@ -1660,7 +1656,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             <p className="text-red-500 text-xs mt-2">{errors.payment}</p>
           )}
           {selectedPaymentMethod && (isManualQrisPaymentMethod(selectedPaymentMethod) || isManualBankTransferPaymentMethod(selectedPaymentMethod)) && (
-            <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm text-emerald-800">
+            <div className="mt-4 rounded-3xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm text-emerald-800">
               <p className="font-semibold">Instruksi pembayaran manual</p>
               {isManualBankTransferPaymentMethod(selectedPaymentMethod) ? (
                 <p className="mt-1 text-xs leading-relaxed">
@@ -1676,7 +1672,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         </div>
 
         {/* WhatsApp Consent */}
-        <div className="px-4 py-4 border-b border-gray-200">
+        <div className="px-4 py-4">
           <label className="flex items-start gap-3 rounded-2xl border border-[#CFE7DD] bg-[#F4FBF7] p-4">
             <input
               type="checkbox"
@@ -1698,13 +1694,13 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
         </div>
 
         {/* Payment Button */}
-        <div className="sticky bottom-0 bg-white px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-6">
+        <div className="sticky bottom-0 bg-white/95 px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-4 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur">
           <button
             onClick={handlePayment}
             disabled={!canSubmitOrder}
-            className={`w-full py-4 rounded-lg font-semibold text-lg transition-all ${
+            className={`w-full rounded-2xl py-4 text-base font-bold leading-tight transition-all ${
               !canSubmitOrder
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                ? 'cursor-not-allowed bg-gray-200 text-gray-500'
                 : 'bg-primary text-white hover:bg-primary/90 active:scale-95'
             }`}
           >
@@ -1721,7 +1717,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             )}
           </button>
           
-          <p className={`mt-2 text-center text-sm ${canSubmitOrder ? 'text-primary' : 'text-gray-500'}`}>
+          <p className={`mt-2 text-center text-xs leading-relaxed ${canSubmitOrder ? 'text-primary' : 'text-[#6B7C73]'}`}>
             {checkoutReadinessMessage}
           </p>
         </div>
