@@ -174,46 +174,45 @@ export default function MyRatingsPage() {
           showNotifications={true}
         />
 
-        <div className="px-6 py-5">
-          <div className="mb-6">
-            <h1 className="text-xl font-bold text-gray-900 mb-2">Rating Saya</h1>
-            <p className="text-sm text-gray-600">
-              Kelola rating dan ulasan yang benar-benar pernah Anda berikan melalui akun ini.
+        <div className="px-4 py-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
+          <section className="mb-4 rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-100">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Akun customer</p>
+            <h1 className="mt-1 text-lg font-bold text-[#0D0E09]">Rating & Ulasan Saya</h1>
+            <p className="mt-1 text-xs leading-5 text-[#6B7C73]">
+              Kelola ulasan produk yang pernah Anda berikan melalui akun ini.
             </p>
-          </div>
+          </section>
 
           {isLoading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="text-center">
-                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                <p className="text-gray-600 text-sm">Memuat rating Anda...</p>
-              </div>
+            <div className="rounded-3xl bg-white/95 p-8 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50">
+              <div className="mx-auto mb-4 h-9 w-9 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+              <p className="text-sm text-[#6B7C73]">Memuat rating dan ulasan Anda...</p>
             </div>
           ) : ratings.length === 0 ? (
-            <div className="text-center py-14 rounded-2xl border border-dashed border-gray-200 bg-white px-5">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="rounded-3xl border border-dashed border-emerald-100 bg-white/95 px-5 py-12 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50">
+                <svg className="h-8 w-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.364 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Belum Ada Rating</h3>
-              <p className="text-gray-600 text-sm mb-5 max-w-xs mx-auto">
+              <h3 className="mb-2 text-lg font-bold text-[#0D0E09]">Belum Ada Rating</h3>
+              <p className="mx-auto mb-5 max-w-xs text-sm leading-6 text-[#6B7C73]">
                 Belum ada rating produk dari akun Anda. Rating akan muncul setelah Anda memberi ulasan pada produk yang pernah dibeli.
               </p>
-              <Button asChild className="bg-primary hover:bg-primary/90 text-white">
+              <Button asChild className="rounded-2xl bg-primary px-5 py-3 text-white hover:bg-primary/90">
                 <Link href="/transaction">Lihat Riwayat Pesanan</Link>
               </Button>
             </div>
           ) : (
             <div className="space-y-4">
               {ratings.map((rating) => (
-                <div key={rating.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-                  <div className="flex justify-between items-start gap-3">
+                <div key={rating.id} className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-semibold text-gray-900 mb-2 truncate">
+                      <h3 className="mb-2 break-words text-base font-bold text-[#0D0E09]">
                         {rating.product_name || 'Produk tidak tersedia'}
                       </h3>
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="mb-3 flex flex-wrap items-center gap-2">
                         <div className="flex items-center" aria-label={rating.rate > 0 ? `${rating.rate} dari 5 bintang` : "Rating belum valid"}>
                           {[1, 2, 3, 4, 5].map((star) => (
                             <svg
@@ -226,22 +225,23 @@ export default function MyRatingsPage() {
                             </svg>
                           ))}
                         </div>
-                        <span className="text-sm text-gray-600">{rating.rate > 0 ? `${rating.rate} bintang` : "Rating belum valid"}</span>
+                        <span className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">{rating.rate > 0 ? `${rating.rate} bintang` : "Rating belum valid"}</span>
                       </div>
                       {rating.review ? (
-                        <p className="text-sm text-gray-700 mb-2 whitespace-pre-line">{rating.review}</p>
+                        <p className="mb-3 whitespace-pre-line rounded-2xl bg-emerald-50/60 px-3 py-2 text-sm leading-6 text-[#4B5C54]">{rating.review}</p>
                       ) : (
-                        <p className="text-sm text-gray-500 mb-2 italic">Tanpa ulasan tertulis.</p>
+                        <p className="mb-3 rounded-2xl bg-gray-50 px-3 py-2 text-sm italic text-gray-500">Tanpa ulasan tertulis.</p>
                       )}
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-[#6B7C73]">
                         Diberikan pada {formatRatingDate(rating.created_at)}
                       </p>
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex shrink-0 flex-col gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleEditRating(rating)}
+                        className="rounded-2xl border-emerald-200 text-primary hover:bg-emerald-50"
                       >
                         Edit
                       </Button>
@@ -250,7 +250,7 @@ export default function MyRatingsPage() {
                         size="sm"
                         disabled={deletingRatingId === rating.id}
                         onClick={() => requestDeleteRating(rating)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 disabled:opacity-60"
+                        className="rounded-2xl border-red-100 text-red-600 hover:bg-red-50 hover:text-red-700 disabled:opacity-60"
                       >
                         {deletingRatingId === rating.id ? "Hapus..." : "Hapus"}
                       </Button>
@@ -263,16 +263,19 @@ export default function MyRatingsPage() {
         </div>
 
         {selectedRating && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[80]">
-            <div className="bg-white rounded-2xl max-w-md w-full max-h-[calc(100dvh-2rem)] overflow-y-auto pb-[calc(1rem+env(safe-area-inset-bottom))]">
-              <div className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Edit Rating</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Rating untuk: {selectedRating.product_name || 'Produk tidak tersedia'}
-                </p>
+          <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+            <div className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-3xl bg-white pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl">
+              <div className="p-5">
+                <div className="mb-4 rounded-3xl bg-white p-4 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Ulasan produk</p>
+                  <h3 className="mt-1 text-lg font-bold text-[#0D0E09]">Edit Rating</h3>
+                  <p className="mt-2 text-sm leading-6 text-[#6B7C73]">
+                    {selectedRating.product_name || 'Produk tidak tersedia'}
+                  </p>
+                </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="mb-2 block text-sm font-semibold text-[#0D0E09]">
                       Pilih Rating
                     </label>
                     <div className="flex items-center">
@@ -292,22 +295,22 @@ export default function MyRatingsPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="mb-2 block text-sm font-semibold text-[#0D0E09]">
                       Ulasan
                     </label>
                     <textarea
                       value={editableReview}
                       onChange={(event) => setEditableReview(event.target.value)}
                       rows={4}
-                      className="w-full rounded border border-gray-300 p-3 text-sm text-gray-700"
+                      className="min-h-[120px] w-full resize-none rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3 text-sm leading-6 text-[#0D0E09] outline-none"
                       maxLength={500}
                       placeholder="Bagikan pengalaman Anda terhadap produk ini"
                     />
                   </div>
-                  <div className="flex gap-3 pt-4">
+                  <div className="sticky bottom-0 -mx-5 flex gap-3 bg-white/95 px-5 pt-4 backdrop-blur">
                     <Button
                       onClick={() => setSelectedRating(null)}
-                      className="flex-1"
+                      className="flex-1 rounded-2xl"
                       variant="outline"
                       disabled={isSubmitting}
                     >
@@ -316,7 +319,7 @@ export default function MyRatingsPage() {
                     <Button
                       onClick={() => void handleSubmitEdit()}
                       disabled={isSubmitting || editableRate < 1}
-                      className="flex-1 bg-primary hover:bg-primary/90 text-white disabled:opacity-60"
+                      className="flex-1 rounded-2xl bg-primary text-white hover:bg-primary/90 disabled:opacity-60"
                     >
                       {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
                     </Button>
@@ -328,20 +331,21 @@ export default function MyRatingsPage() {
         )}
 
         {pendingDeleteRating && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[80]">
-            <div className="bg-white rounded-2xl max-w-sm w-full max-h-[calc(100dvh-2rem)] overflow-y-auto pb-[calc(1rem+env(safe-area-inset-bottom))]">
-              <div className="p-5 space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Hapus Rating?</h3>
-                  <p className="text-sm text-gray-600 mt-2">
-                    Rating untuk <span className="font-medium">{pendingDeleteRating.product_name || 'Produk katalog'}</span> akan dihapus dari akun Anda.
+          <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+            <div className="max-h-[calc(100dvh-2rem)] w-full max-w-sm overflow-y-auto rounded-3xl bg-white pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl">
+              <div className="space-y-4 p-5">
+                <div className="rounded-3xl bg-white p-4 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-red-100">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-red-600">Konfirmasi</p>
+                  <h3 className="mt-1 text-lg font-bold text-gray-900">Hapus Rating?</h3>
+                  <p className="mt-2 text-sm leading-6 text-gray-600">
+                    Rating untuk <span className="font-semibold">{pendingDeleteRating.product_name || 'Produk katalog'}</span> akan dihapus dari akun Anda.
                   </p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <Button
                     type="button"
                     variant="outline"
-                    className="flex-1"
+                    className="flex-1 rounded-2xl"
                     disabled={deletingRatingId === pendingDeleteRating.id}
                     onClick={() => setPendingDeleteRating(null)}
                   >
@@ -349,7 +353,7 @@ export default function MyRatingsPage() {
                   </Button>
                   <Button
                     type="button"
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white disabled:opacity-60"
+                    className="flex-1 rounded-2xl bg-red-600 text-white hover:bg-red-700 disabled:opacity-60"
                     disabled={deletingRatingId === pendingDeleteRating.id}
                     onClick={() => void handleDeleteRating()}
                   >
