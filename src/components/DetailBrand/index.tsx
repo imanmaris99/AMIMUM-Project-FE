@@ -30,7 +30,7 @@ const DetailBrand = ({ brandDetail, errorMessage, promoProductCount, totalProduc
 
   if (!brandDetail && errorMessage) {
     return (
-      <div className="mt-4 mx-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+      <div className="mx-4 mt-4 rounded-3xl border border-amber-100 bg-amber-50 p-4 text-sm leading-5 text-amber-800 shadow-[0_8px_22px_rgba(15,23,42,0.06)] sm:mx-6">
         {errorMessage}
       </div>
     );
@@ -38,9 +38,9 @@ const DetailBrand = ({ brandDetail, errorMessage, promoProductCount, totalProduc
 
   if (!brandDetail) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[200px]">
+      <div className="mx-4 mt-4 flex min-h-[200px] flex-col items-center justify-center rounded-3xl bg-white/95 p-6 shadow-[0_8px_22px_rgba(15,23,42,0.08)] sm:mx-6">
         <Spinner className="mb-2" size={40} label="Memuat detail brand..." />
-        <p className="text-gray-600 text-base">Memuat detail brand...</p>
+        <p className="text-base text-[#6B7C73]">Memuat detail brand...</p>
       </div>
     );
   }
@@ -57,61 +57,62 @@ const DetailBrand = ({ brandDetail, errorMessage, promoProductCount, totalProduc
   const brandCategory = brandDetail.category?.trim() || "Kategori brand belum tersedia";
 
   return (
-    <div className="mt-4 mx-6">
+    <section className="mx-4 mt-4 space-y-3 sm:mx-6">
       {errorMessage && (
-        <div className="mb-3 rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-xs text-yellow-800">
+        <div className="rounded-3xl border border-amber-100 bg-amber-50 p-3 text-xs leading-5 text-amber-800 shadow-[0_8px_22px_rgba(15,23,42,0.06)]">
           {errorMessage}
         </div>
       )}
-      <div>
-        <h6 className="font-semibold font-jakarta">Produksi Oleh</h6>
-      </div>
-      <div className="bg-customGreen4 p-4 rounded-lg mt-4 min-h-24 flex items-center">
-        <div className="flex items-center gap-4">
-          {!isExternalUrl ? (
-            <Image
-              src="/default-image.jpg"
-              alt={brandName}
-              width={70}
-              height={70}
-              style={{ width: "70px", height: "70px", objectFit: "contain" }}
-              unoptimized
-            />
-          ) : (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={brandDetail.photo_url || "/default-image.jpg"}
-              alt={brandName}
-              width={70}
-              height={70}
-              style={{ width: "70px", height: "70px", objectFit: "contain" }}
-              className="object-contain"
-              onError={handleImageError}
-              loading="lazy"
-            />
-          )}
-          <div>
-            <h1 className="font-bold">{brandName}</h1>
-            <p className="text-xs text-gray-500">{brandCategory}</p>
+
+      <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Produksi oleh</p>
+        <div className="mt-3 flex items-center gap-4">
+          <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-3xl bg-emerald-50 ring-1 ring-emerald-100">
+            {!isExternalUrl ? (
+              <Image
+                src="/default-image.jpg"
+                alt={brandName}
+                width={80}
+                height={80}
+                className="h-full w-full object-contain p-2"
+                unoptimized
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={brandDetail.photo_url || "/default-image.jpg"}
+                alt={brandName}
+                width={80}
+                height={80}
+                className="h-full w-full object-contain p-2"
+                onError={handleImageError}
+                loading="lazy"
+              />
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <h1 className="break-words text-xl font-bold leading-tight text-[#0D0E09]">{brandName}</h1>
+            <p className="mt-1 text-sm text-[#6B7C73]">{brandCategory}</p>
+            <div className="mt-3 inline-flex rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100">
+              {productCount} produk katalog
+            </div>
           </div>
         </div>
       </div>
-      <div className="mt-4">
-        {descriptionArr.length > 0 ? (
-          descriptionArr.map((desc: string, idx: number) => (
-            <p key={idx} className="text-xs px-2 mb-2">{desc}</p>
-          ))
-        ) : (
-          <p className="text-xs px-2">Deskripsi brand belum tersedia di katalog toko.</p>
-        )}
-      </div>
-      <div className="mt-4 pb-4 pt-4 flex flex-col gap-2">
-        <div className="flex justify-between border-b border-t border-gray-300 py-3">
-          <p className="text-gray-500">Jumlah produk katalog</p>
-          <p>{productCount} produk</p>
+
+      <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Detail brand</p>
+        <div className="mt-3 space-y-2 text-sm leading-6 text-[#4B5F55]">
+          {descriptionArr.length > 0 ? (
+            descriptionArr.map((desc: string, idx: number) => (
+              <p key={idx} className="break-words">{desc}</p>
+            ))
+          ) : (
+            <p>Deskripsi brand belum tersedia di katalog toko.</p>
+          )}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

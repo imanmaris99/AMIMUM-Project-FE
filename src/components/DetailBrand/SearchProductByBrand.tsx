@@ -79,30 +79,36 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
   };
 
   return (
-    <div className="flex flex-col gap-3 mt-2 mx-6">
+    <section className="mx-4 mt-4 flex flex-col gap-3 rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] sm:mx-6">
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Cari di brand ini</p>
+        <p className="mt-1 text-sm leading-5 text-[#6B7C73]">Temukan produk khusus dari {safeBrandName} tanpa keluar dari halaman brand.</p>
+      </div>
       <div className="relative">
         <input
-          type="text"
+          type="search"
+          inputMode="search"
           placeholder={`Cari produk dari ${safeBrandName}`}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={handleKeyPress}
           disabled={isSearching}
-          className="w-full border border-gray-300 rounded-lg p-3 pl-6 outline-none placeholder:text-sm focus:border-[#006A47] focus:ring-1 focus:ring-[#006A47] disabled:bg-gray-50 disabled:cursor-not-allowed"
+          className="w-full rounded-2xl border border-emerald-100 bg-emerald-50/50 p-3 pr-12 text-sm font-semibold text-gray-900 outline-none placeholder:text-sm placeholder:font-normal placeholder:text-gray-400 focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-gray-50"
         />
-        <CiSearch
-          className={`absolute w-6 h-6 right-4 top-1/2 -translate-y-1/2 cursor-pointer transition-colors ${
-            isSearching
-              ? 'text-gray-400 cursor-not-allowed'
-              : 'text-gray-500 hover:text-[#006A47]'
-          }`}
-          onClick={!isSearching ? () => void handleSearch() : undefined}
-        />
+        <button
+          type="button"
+          aria-label="Cari produk dari brand ini"
+          disabled={isSearching || !searchQuery.trim()}
+          onClick={() => void handleSearch()}
+          className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-xl bg-[#00764F] text-white transition-colors hover:bg-[#005A3C] disabled:cursor-not-allowed disabled:bg-gray-300"
+        >
+          <CiSearch className="h-5 w-5" />
+        </button>
       </div>
 
       {isSearching && (
-        <div className="flex items-center gap-2 text-sm text-[#00764F]">
-          <div className="w-4 h-4 border-2 border-[#00764F] border-t-transparent rounded-full animate-spin"></div>
+        <div className="flex items-center gap-2 rounded-2xl bg-emerald-50 px-3 py-2 text-sm text-[#00764F]">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#00764F] border-t-transparent"></div>
           <span>Mencari produk katalog dari {safeBrandName}...</span>
         </div>
       )}
@@ -110,8 +116,8 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
       {hasSearched && !isSearching && (
         <div className="mt-2">
           {searchError ? (
-            <div className="text-center py-8 bg-yellow-50 border border-yellow-200 rounded-lg px-4">
-              <p className="text-yellow-800 text-sm">{searchError}</p>
+            <div className="rounded-3xl border border-amber-100 bg-amber-50 px-4 py-8 text-center shadow-[0_8px_22px_rgba(15,23,42,0.06)]">
+              <p className="text-sm text-amber-800">{searchError}</p>
               <button
                 onClick={handleClearSearch}
                 className="mt-3 text-sm text-[#00764F] hover:underline"
@@ -121,8 +127,8 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
             </div>
           ) : searchResults.length > 0 ? (
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm text-gray-600">
+              <div className="mb-3 flex flex-col gap-2 rounded-2xl bg-emerald-50 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-[#6B7C73]">
                   Ditemukan <span className="font-semibold text-[#00764F]">{searchResults.length}</span> produk katalog
                 </p>
                 <button
@@ -135,9 +141,9 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
               <ListProductSection products={searchResults} />
             </div>
           ) : (
-            <div className="text-center py-8 bg-gray-50 rounded-lg px-4">
-              <p className="text-gray-600 text-sm mb-1">Belum ada produk katalog yang cocok.</p>
-              <p className="text-gray-500 text-xs">
+            <div className="rounded-3xl bg-gray-50 px-4 py-8 text-center">
+              <p className="mb-1 text-sm text-gray-700">Belum ada produk katalog yang cocok.</p>
+              <p className="text-xs text-gray-500">
                 Belum ada produk yang cocok dengan &ldquo;{searchQuery.trim()}&rdquo; dari {safeBrandName}.
               </p>
               <button
@@ -152,21 +158,21 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
       )}
 
       {!hasSearched && (
-        <div className="flex justify-center items-center gap-2 mt-2">
-          <p className="text-gray-500 text-sm font-jakarta font-semibold">
+        <div className="mt-1 flex flex-col gap-2 rounded-2xl bg-red-50 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm font-semibold text-red-700">
             Lihat produk yang sedang promo?
           </p>
           <Button
             variant="destructive"
             type="button"
             onClick={handleCheckPromo}
-            className="bg-red-500 hover:bg-red-600 text-white transition-colors"
+            className="rounded-xl bg-red-500 text-white transition-colors hover:bg-red-600"
           >
             Cek Promo
           </Button>
         </div>
       )}
-    </div>
+    </section>
   );
 };
 
