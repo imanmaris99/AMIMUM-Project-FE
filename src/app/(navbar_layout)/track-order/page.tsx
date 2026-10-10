@@ -340,11 +340,12 @@ const TrackOrderPage: React.FC = () => {
               )}
 
               {transactionId && currentTransaction && (
-                <div className="w-full max-w-sm rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
-                  <h3 className="mb-2 text-lg font-bold text-[#0D0E09]">
+                <div className="w-full max-w-sm rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Pesanan customer</p>
+                  <h3 className="mt-1 text-lg font-bold text-[#0D0E09]">
                     Informasi Transaksi
                   </h3>
-                  <div className="space-y-2">
+                  <div className="mt-4 space-y-2">
                     <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
                       <span className="text-sm text-[#6B7C73]">ID Transaksi:</span>
                       <span className="break-all text-right text-sm font-semibold text-[#0D0E09]">
