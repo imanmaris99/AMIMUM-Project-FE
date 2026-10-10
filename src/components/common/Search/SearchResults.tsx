@@ -49,18 +49,18 @@ const SearchResults = ({
   };
 
   return (
-    <div className="px-6 py-4 mt-5">
+    <div className="px-4 py-4 sm:px-6">
       {/* Search Header */}
-      <div className="mb-6">
+      <div className="mb-4 rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
         <div className="flex items-center gap-2 mb-2">
-          <CiSearch className="w-5 h-5 text-gray-500" />
-          <h1 className="text-lg font-semibold text-gray-900">
+          <CiSearch className="w-5 h-5 text-emerald-700" />
+          <h2 className="text-base font-bold text-gray-900">
             Hasil Pencarian
-          </h1>
+          </h2>
         </div>
         
         {/* Search Query Display */}
-        <div className="text-sm text-gray-600">
+        <div className="text-sm leading-5 text-[#6B7C73]">
           {isSearching ? (
             <span>
               Menampilkan hasil katalog untuk: <span className="font-semibold text-[#00764F]">&ldquo;{sanitizedSearchQuery}&rdquo;</span>
@@ -76,7 +76,7 @@ const SearchResults = ({
 
       {/* Error Message */}
       {errorMessage && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+        <div className="mb-4 rounded-3xl border border-red-100 bg-red-50 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.06)]">
           <div className="flex items-center gap-2">
             <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
@@ -91,7 +91,7 @@ const SearchResults = ({
 
       {/* Loading State */}
       {isLoading && (
-        <div className="text-center py-12">
+        <div className="rounded-3xl bg-white/95 px-5 py-12 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
           <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
             <svg className="animate-spin h-8 w-8 text-[#00764F]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -104,22 +104,28 @@ const SearchResults = ({
 
       {/* No Query State */}
       {!isLoading && !isSearching && !errorMessage && (
-        <div className="text-center py-12 rounded-2xl border border-dashed border-gray-200 bg-white px-5">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-            <CiSearch className="w-8 h-8 text-gray-400" />
+        <div className="rounded-3xl bg-white/95 px-5 py-8 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 ring-1 ring-emerald-100">
+            <CiSearch className="h-8 w-8 text-emerald-700" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Cari Produk Toko</h3>
-          <p className="text-gray-500 text-sm mb-4">
-            Ketik nama produk, brand, atau kategori di kolom pencarian. Hasil yang tampil berasal dari katalog toko.
+          <h3 className="mb-2 text-lg font-bold text-gray-900">Mulai cari produk toko</h3>
+          <p className="mx-auto mb-4 max-w-[300px] text-sm leading-5 text-[#6B7C73]">
+            Gunakan kolom pencarian di atas untuk mencari produk herbal, brand, kategori, atau layanan custom craft.
           </p>
+          <div className="mx-auto grid max-w-[300px] grid-cols-2 gap-2 text-xs text-[#6B7C73]">
+            <span className="rounded-2xl bg-emerald-50 px-3 py-2">Herbal</span>
+            <span className="rounded-2xl bg-emerald-50 px-3 py-2">Jamu</span>
+            <span className="rounded-2xl bg-emerald-50 px-3 py-2">Madu</span>
+            <span className="rounded-2xl bg-emerald-50 px-3 py-2">Custom Craft</span>
+          </div>
         </div>
       )}
 
       {/* No Results Message */}
       {!isLoading && isSearching && !hasResults && !errorMessage && (
-        <div className="text-center py-12">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-            <CiSearch className="w-8 h-8 text-gray-400" />
+        <div className="rounded-3xl bg-white/95 px-5 py-10 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
+          <div className="w-16 h-16 mx-auto mb-4 bg-amber-50 rounded-full flex items-center justify-center ring-1 ring-amber-100">
+            <CiSearch className="w-8 h-8 text-amber-600" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">Belum ada produk katalog</h3>
           <p className="text-gray-500 text-sm mb-4">
@@ -139,8 +145,8 @@ const SearchResults = ({
 
       {/* Results Count */}
       {hasResults && (
-        <div className="mb-4">
-          <p className="text-sm text-gray-600">
+        <div className="mb-4 rounded-2xl bg-white/80 px-4 py-3 shadow-[0_8px_18px_rgba(15,23,42,0.05)]">
+          <p className="text-sm text-[#6B7C73]">
             Ditemukan <span className="font-semibold text-[#00764F]">{displayTotalAvailable}</span> produk
             {sanitizedBrandFilter && (
               <span> dari merek <span className="font-semibold text-[#00764F]">&ldquo;{sanitizedBrandFilter}&rdquo;</span></span>
