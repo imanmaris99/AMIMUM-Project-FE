@@ -13,26 +13,26 @@ const HeaderLogin = ({
   description = "Masuk untuk checkout dan pantau pesanan.",
 }: HeaderLoginProps) => {
   return (
-    <header className="shrink-0 px-7 pb-2 pt-8">
+    <header className="shrink-0 px-6 pb-4 pt-9">
       <div className="flex items-center gap-4">
-        <div className="flex h-20 w-20 shrink-0 items-center justify-center">
+        <div className="flex h-24 w-24 shrink-0 items-center justify-center">
           <Image
             src="/logo_toko.svg"
-            height={84}
-            width={84}
+            height={100}
+            width={100}
             alt="Logo Toko Herbal AmImUm"
-            className="h-20 w-20 object-contain"
+            className="h-24 w-24 object-contain"
             priority
           />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-bold uppercase tracking-[0.22em] text-emerald-800">
+          <p className="text-[13px] font-bold uppercase tracking-[0.22em] text-[#2F6F57]">
             {eyebrow}
           </p>
-          <p className="text-[2.25rem] font-extrabold leading-none tracking-[-0.04em] text-[#0D0E09]">
+          <p className="text-[2.625rem] font-extrabold leading-none tracking-[-0.045em] text-[#0D0E09]">
             {title}
           </p>
-          <p className="mt-1.5 text-sm leading-5 text-[#6B7C73]">
+          <p className="mt-2 text-[15px] leading-6 text-[#5F6F67]">
             {description}
           </p>
         </div>

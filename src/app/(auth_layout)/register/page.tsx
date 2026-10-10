@@ -156,7 +156,7 @@ const Register = () => {
   // Show success message if registration was successful
   if (isSuccess) {
     return (
-      <div className="mx-auto min-h-screen w-full min-w-0 max-w-[440px] relative flex flex-col overflow-x-hidden bg-[linear-gradient(180deg,#EEF8F2_0%,#F6FBF8_22%,#FFFFFF_50%,#FFFCF5_78%,#F4FBF7_100%)]">
+      <div className="mx-auto min-h-screen w-full min-w-0 max-w-[440px] relative flex flex-col overflow-x-hidden bg-[linear-gradient(180deg,#F5FBF7_0%,#F7FBF8_42%,#FBFAF3_100%)]">
         <HeaderRegister />
         <main className="px-6 pb-8 pt-4 flex-1 relative z-10">
           <div className="w-full max-w-sm mx-auto">
@@ -186,11 +186,11 @@ const Register = () => {
   }
 
   return (
-    <div className="mx-auto min-h-screen w-full min-w-0 max-w-[440px] relative flex flex-col overflow-x-hidden bg-[linear-gradient(180deg,#EEF8F2_0%,#F6FBF8_22%,#FFFFFF_50%,#FFFCF5_78%,#F4FBF7_100%)]">
+    <div className="mx-auto min-h-screen w-full min-w-0 max-w-[440px] relative flex flex-col overflow-x-hidden bg-[linear-gradient(180deg,#F5FBF7_0%,#F7FBF8_42%,#FBFAF3_100%)]">
       <HeaderRegister />
       <main className="px-6 pb-8 pt-4 flex-1 relative z-10">
         <div className="w-full max-w-sm mx-auto">
-          <h1 className="text-2xl font-bold text-primary text-center mb-4">
+          <h1 className="text-[2rem] font-bold text-primary text-center mb-5">
             Registrasi
           </h1>
 
