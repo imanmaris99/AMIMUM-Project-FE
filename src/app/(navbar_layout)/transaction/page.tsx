@@ -37,12 +37,8 @@ const TransactionPage = () => {
       try {
         const response = await getMyOrders();
         setApiTransactions(response.data.map(mapOrderSummaryToTransaction));
-      } catch (error) {
-        setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "Gagal mengambil riwayat transaksi."
-        );
+      } catch {
+        setErrorMessage("Riwayat transaksi belum bisa dimuat. Silakan coba refresh atau buka kembali beberapa saat lagi.");
       } finally {
         setIsLoading(false);
       }
@@ -125,48 +121,54 @@ const TransactionPage = () => {
           showNotifications={true}
         />
 
-        <div className="px-6 py-4">
-          <div className="mb-6">
-            <div className="flex justify-between items-center">
-              <h1 className="text-[#0D0E09] text-lg font-semibold">
-                Riwayat Transaksi
-              </h1>
+        <div className="mx-auto max-w-md px-4 py-5 pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
+          <div className="mb-5 rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Akun customer</p>
+                <h1 className="mt-1 text-lg font-bold text-[#0D0E09]">
+                  Riwayat Transaksi
+                </h1>
+                <p className="mt-1 text-xs leading-relaxed text-[#6B7C73]">
+                  Cek pembayaran, detail pesanan, invoice, dan tracking dari server toko.
+                </p>
+              </div>
               {hasLocalLegacyTransactions && (
                 <button
                   onClick={handleClearSimulatedTransactions}
-                  className="text-primary text-sm font-medium hover:text-primary/80 transition-colors"
+                  className="shrink-0 rounded-2xl bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 transition-colors hover:bg-amber-100"
                 >
                   Bersihkan Lokal
                 </button>
               )}
             </div>
             {!isLoading && !errorMessage && transactions.length > 0 && (
-              <div className="mt-2 rounded-xl bg-primary/5 px-3 py-2">
-                <p className="text-sm font-medium text-primary">
-                  {transactions.length} transaksi backend ditemukan
+              <div className="mt-3 rounded-2xl bg-emerald-50/80 px-3 py-2">
+                <p className="text-sm font-semibold text-primary">
+                  {transactions.length} transaksi server ditemukan
                 </p>
-                <p className="mt-1 text-xs text-gray-600">
-                  Riwayat ini mengambil data pesanan dari server toko agar status, pembayaran, dan tracking tetap akurat.
+                <p className="mt-1 text-xs leading-relaxed text-[#6B7C73]">
+                  Status, pembayaran, invoice, dan tracking dibaca dari server toko agar tidak tertukar data lokal lama.
                 </p>
               </div>
             )}
             {!isLoading && !errorMessage && hasLocalLegacyTransactions && (
-              <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
-                Data transaksi lokal lama disembunyikan dari daftar customer agar tidak tertukar dengan pesanan backend.
+              <p className="mt-3 rounded-2xl bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-800">
+                Data transaksi lokal lama disembunyikan dari daftar customer agar tidak tertukar dengan pesanan server toko.
               </p>
             )}
           </div>
 
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
-              <p className="text-gray-500 text-sm">
+            <div className="rounded-3xl bg-white/95 p-6 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
+              <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+              <p className="text-sm font-medium text-[#6B7C73]">
                 Memuat riwayat transaksi...
               </p>
             </div>
           ) : errorMessage ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
+            <div className="rounded-3xl bg-white/95 p-6 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50 ring-8 ring-red-50/60">
                 <svg
                   className="w-8 h-8 text-red-400"
                   fill="none"
@@ -181,10 +183,10 @@ const TransactionPage = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="mb-2 text-lg font-bold text-[#0D0E09]">
                 Gagal Memuat Transaksi
               </h3>
-              <p className="text-gray-500 text-sm">{errorMessage}</p>
+              <p className="text-sm leading-relaxed text-[#6B7C73]">{errorMessage}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -199,7 +201,7 @@ const TransactionPage = () => {
 
         {showClearConfirmDialog && (
           <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-            <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl">
+            <div className="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl">
               <h2 className="text-lg font-semibold text-gray-900">
                 Bersihkan Data Lokal Lama?
               </h2>

@@ -95,12 +95,8 @@ const TransactionDetailPage: React.FC = () => {
         }
 
         throw new Error("Transaksi belum tersimpan di server. Silakan cek halaman transaksi terbaru atau ulangi checkout dari keranjang.");
-      } catch (error) {
-        setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "Gagal mengambil detail transaksi."
-        );
+      } catch {
+        setErrorMessage("Detail transaksi belum bisa dimuat. Silakan cek riwayat transaksi terbaru atau coba lagi beberapa saat lagi.");
       } finally {
         setIsLoading(false);
       }
@@ -284,12 +280,8 @@ const TransactionDetailPage: React.FC = () => {
       }
       toast.success("Pembayaran dibuat. Silakan cek status pesanan.");
       await refreshOrderDetail();
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Gagal membuka pembayaran. Silakan coba lagi."
-      );
+    } catch {
+      toast.error("Pembayaran belum bisa dibuka. Silakan coba lagi atau hubungi admin bila tetap gagal.");
     } finally {
       setIsPaymentActionLoading(false);
     }
@@ -305,12 +297,8 @@ const TransactionDetailPage: React.FC = () => {
       await syncPaymentStatus({ order_id: transaction.id });
       await refreshOrderDetail();
       toast.success("Status pembayaran diperbarui.");
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Gagal memperbarui status pembayaran."
-      );
+    } catch {
+      toast.error("Status pembayaran belum bisa diperbarui. Silakan coba lagi beberapa saat lagi.");
     } finally {
       setIsPaymentActionLoading(false);
     }
@@ -331,12 +319,8 @@ const TransactionDetailPage: React.FC = () => {
         toast.success("Konfirmasi QRIS tercatat. Jika belum ada notifikasi admin, simpan bukti pembayaran dan hubungi admin.");
       }
       await refreshOrderDetail();
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Konfirmasi QRIS belum bisa dikirim."
-      );
+    } catch {
+      toast.error("Konfirmasi QRIS belum bisa dikirim. Simpan bukti pembayaran dan coba lagi beberapa saat lagi.");
     } finally {
       setIsPaymentActionLoading(false);
     }
@@ -347,7 +331,7 @@ const TransactionDetailPage: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <span className="loader mb-4" aria-label="Memuat..." />
-        <p className="text-gray-600 text-lg font-medium">
+        <p className="text-[#6B7C73] text-lg font-medium">
           Memuat halaman, mohon tunggu sebentar...
         </p>
       </div>
@@ -365,9 +349,9 @@ const TransactionDetailPage: React.FC = () => {
             onBack={handleBack}
           />
           <div className="flex flex-col items-center justify-center min-h-[420px] px-4">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mb-4">
               <svg
-                className="w-8 h-8 text-gray-400"
+                className="w-8 h-8 text-emerald-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -380,22 +364,22 @@ const TransactionDetailPage: React.FC = () => {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-[#0D0E09] mb-2">
               Transaksi Tidak Ditemukan
             </h3>
-            <p className="text-gray-500 text-sm text-center max-w-xs">
-              {errorMessage || `Transaksi dengan ID ${transactionId} tidak ditemukan`}
+            <p className="max-w-xs break-words text-center text-sm leading-relaxed text-[#6B7C73]">
+              {errorMessage || "Transaksi tidak ditemukan. Silakan cek riwayat transaksi terbaru."}
             </p>
             <div className="mt-5 grid w-full max-w-xs gap-3">
               <button
                 onClick={() => router.push("/transaction")}
-                className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                className="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
               >
                 Cek Transaksi Terbaru
               </button>
               <button
                 onClick={() => router.push("/cart")}
-                className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                className="w-full rounded-2xl border border-emerald-100 px-4 py-3 text-sm font-semibold text-[#0D0E09] transition-colors hover:bg-emerald-50"
               >
                 Kembali ke Keranjang
               </button>
@@ -458,17 +442,17 @@ const TransactionDetailPage: React.FC = () => {
         onBack={handleBack}
       />
 
-      <div className="px-4 py-6">
-        <div className="max-w-sm mx-auto space-y-4">
+      <div className="px-4 py-5 pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
+        <div className="mx-auto max-w-md space-y-4">
           <div
-            className={`rounded-lg border ${orderAlert.borderColor} ${orderAlert.bgColor} p-4`}
+            className={`rounded-3xl border ${orderAlert.borderColor} ${orderAlert.bgColor} p-4 shadow-[0_8px_22px_rgba(15,23,42,0.06)]`}
           >
             <div className="flex items-start gap-3">
               <span className="text-xl" aria-hidden="true">
                 {orderAlert.icon}
               </span>
-              <div>
-                <h2 className={`text-sm font-semibold ${orderAlert.textColor}`}>
+              <div className="min-w-0">
+                <h2 className={`break-words text-sm font-semibold ${orderAlert.textColor}`}>
                   {orderAlert.title}
                 </h2>
                 <p className={`mt-1 text-xs leading-relaxed ${orderAlert.textColor}`}>
@@ -478,11 +462,14 @@ const TransactionDetailPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Status Transaksi
-              </h2>
+          <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50">
+            <div className="mb-3 flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Status order</p>
+                <h2 className="mt-1 text-lg font-bold text-[#0D0E09]">
+                  Detail Transaksi
+                </h2>
+              </div>
               <div
                 className={`px-3 py-1 rounded-full ${statusConfig.bgColor} ${statusConfig.borderColor} border`}
               >
@@ -492,55 +479,57 @@ const TransactionDetailPage: React.FC = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">ID Transaksi:</span>
-                <span className="text-sm font-medium text-gray-900">
+              <div className="rounded-2xl bg-emerald-50/50 px-3 py-2">
+                <p className="text-xs text-[#6B7C73]">ID Transaksi</p>
+                <p className="mt-1 break-all text-sm font-semibold text-[#0D0E09]">
                   {transaction.transactionId}
-                </span>
+                </p>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Tanggal:</span>
-                <span className="text-sm font-medium text-gray-900">
-                  {transaction.date}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Metode Bayar:</span>
-                <span className="text-sm font-medium text-gray-900">
-                  {getPaymentMethodLabel(transaction.paymentMethod)}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Subtotal:</span>
-                <span className="text-sm font-medium text-gray-900">
-                  {rupiahFormater(transaction.subtotal)}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Ongkir:</span>
-                <span className="text-sm font-medium text-gray-900">
-                  {rupiahFormater(transaction.shippingCost)}
-                </span>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="rounded-2xl bg-emerald-50/50 px-3 py-2">
+                  <p className="text-xs text-[#6B7C73]">Tanggal</p>
+                  <p className="mt-1 break-words text-sm font-semibold text-[#0D0E09]">
+                    {transaction.date}
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-emerald-50/50 px-3 py-2">
+                  <p className="text-xs text-[#6B7C73]">Metode bayar</p>
+                  <p className="mt-1 break-words text-sm font-semibold text-[#0D0E09]">
+                    {getPaymentMethodLabel(transaction.paymentMethod)}
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-emerald-50/50 px-3 py-2">
+                  <p className="text-xs text-[#6B7C73]">Subtotal</p>
+                  <p className="mt-1 text-sm font-semibold text-[#0D0E09]">
+                    {rupiahFormater(transaction.subtotal)}
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-emerald-50/50 px-3 py-2">
+                  <p className="text-xs text-[#6B7C73]">Ongkir</p>
+                  <p className="mt-1 text-sm font-semibold text-[#0D0E09]">
+                    {rupiahFormater(transaction.shippingCost)}
+                  </p>
+                </div>
               </div>
               {transaction.deliveryType === "delivery" && (
-                <div className="rounded-lg bg-orange-50 px-3 py-2 text-xs font-medium text-orange-800">
+                <div className="rounded-2xl bg-orange-50 px-3 py-2 text-xs font-medium text-orange-800">
                   {transaction.shippingDueOnDelivery && transaction.shippingDueOnDelivery > 0
                     ? `Ongkir ${rupiahFormater(transaction.shippingDueOnDelivery)} dibayar saat paket tiba. Total di bawah hanya pembayaran produk/metode toko.`
                     : "Ongkir digabung ke total pembayaran produk."}
                 </div>
               )}
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Total:</span>
-                <span className="text-sm font-medium text-gray-900">
+              <div className="rounded-2xl bg-primary/10 px-3 py-2">
+                <p className="text-xs text-primary/80">Total pembayaran toko</p>
+                <p className="mt-1 text-base font-bold text-primary">
                   {rupiahFormater(transaction.total)}
-                </span>
+                </p>
               </div>
             </div>
-            <div className="mt-4 rounded-lg bg-primary/5 px-3 py-2 text-xs font-medium text-primary">
+            <div className="mt-4 rounded-2xl bg-primary/5 px-3 py-2 text-xs font-medium text-primary">
               {transactionGuidance}
             </div>
             {isAutoSyncingPaymentStatus && (
-              <div className="mt-2 rounded-lg bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700">
+              <div className="mt-2 rounded-2xl bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700">
                 Sedang mengecek status pembayaran terbaru dari Midtrans...
               </div>
             )}
@@ -552,10 +541,10 @@ const TransactionDetailPage: React.FC = () => {
                 <p className="text-xs font-semibold uppercase tracking-wide text-primary">
                   TOKO HERBAL AMIMUM
                 </p>
-                <h3 className="mt-1 text-lg font-semibold text-gray-900">
+                <h3 className="mt-1 text-lg font-semibold text-[#0D0E09]">
                   Bukti Transaksi Customer
                 </h3>
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-[#6B7C73]">
                   Simpan bukti ini untuk arsip pembelian, komplain, atau retur sesuai kebijakan toko.
                 </p>
               </div>
@@ -564,25 +553,25 @@ const TransactionDetailPage: React.FC = () => {
               </span>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
-              <div className="rounded-lg bg-gray-50 p-3">
-                <p className="text-gray-500">Invoice ID</p>
-                <p className="mt-1 break-words font-semibold text-gray-900">
+              <div className="rounded-2xl bg-emerald-50/50 p-3">
+                <p className="text-[#6B7C73]">Invoice ID</p>
+                <p className="mt-1 break-words font-semibold text-[#0D0E09]">
                   {transaction.transactionId}
                 </p>
               </div>
-              <div className="rounded-lg bg-gray-50 p-3">
-                <p className="text-gray-500">Status</p>
-                <p className="mt-1 font-semibold text-gray-900">{statusConfig.text}</p>
+              <div className="rounded-2xl bg-emerald-50/50 p-3">
+                <p className="text-[#6B7C73]">Status</p>
+                <p className="mt-1 font-semibold text-[#0D0E09]">{statusConfig.text}</p>
               </div>
-              <div className="rounded-lg bg-gray-50 p-3">
-                <p className="text-gray-500">Metode bayar</p>
-                <p className="mt-1 font-semibold text-gray-900">
+              <div className="rounded-2xl bg-emerald-50/50 p-3">
+                <p className="text-[#6B7C73]">Metode bayar</p>
+                <p className="mt-1 font-semibold text-[#0D0E09]">
                   {getPaymentMethodLabel(transaction.paymentMethod)}
                 </p>
               </div>
-              <div className="rounded-lg bg-gray-50 p-3">
-                <p className="text-gray-500">Pengiriman</p>
-                <p className="mt-1 font-semibold text-gray-900">{deliveryLabel}</p>
+              <div className="rounded-2xl bg-emerald-50/50 p-3">
+                <p className="text-[#6B7C73]">Pengiriman</p>
+                <p className="mt-1 font-semibold text-[#0D0E09]">{deliveryLabel}</p>
               </div>
             </div>
           </div>
@@ -594,10 +583,10 @@ const TransactionDetailPage: React.FC = () => {
                 <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
                   QRIS Resmi Toko Herbal Amimum
                 </p>
-                <h3 className="mt-1 text-lg font-semibold text-gray-900">
+                <h3 className="mt-1 text-lg font-semibold text-[#0D0E09]">
                   Scan QRIS untuk Membayar
                 </h3>
-                <p className="mt-1 text-xs leading-relaxed text-gray-600">
+                <p className="mt-1 text-xs leading-relaxed text-[#6B7C73]">
                   Bayar sesuai nominal total pesanan. QRIS bisa digunakan melalui OVO, GoPay, DANA, ShopeePay, LinkAja, mobile banking, dan aplikasi QRIS lain.
                 </p>
               </div>
@@ -607,11 +596,11 @@ const TransactionDetailPage: React.FC = () => {
                   alt="QRIS resmi Toko Herbal Amimum"
                   width={360}
                   height={360}
-                  className="mx-auto h-auto w-full max-w-[260px] rounded-lg"
+                  className="mx-auto h-auto w-full max-w-[260px] rounded-2xl"
                   priority={false}
                 />
               </div>
-              <div className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+              <div className="mt-3 rounded-2xl bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
                 <p className="font-semibold">Total yang dibayar: {rupiahFormater(transaction.total)}</p>
                 <p className="mt-1 text-xs leading-relaxed">
                   Setelah transfer/scan berhasil, simpan bukti pembayaran. Admin akan memverifikasi pembayaran dan mengubah status pesanan sebelum diproses.
@@ -621,11 +610,11 @@ const TransactionDetailPage: React.FC = () => {
                 type="button"
                 onClick={handleConfirmManualQrisPayment}
                 disabled={isPaymentActionLoading || isLocalSimulatedTransaction}
-                className="mt-3 w-full rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-3 w-full rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isPaymentActionLoading ? "Mengirim Konfirmasi..." : "Saya Sudah Bayar QRIS"}
               </button>
-              <p className="mt-2 text-center text-[11px] leading-relaxed text-gray-500">
+              <p className="mt-2 text-center text-[11px] leading-relaxed text-[#6B7C73]">
                 Tombol ini mengirim notifikasi ke admin. Status order berubah setelah admin memverifikasi dana masuk.
               </p>
             </div>
@@ -636,21 +625,21 @@ const TransactionDetailPage: React.FC = () => {
               <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
                 Transfer Bank Manual
               </p>
-              <h3 className="mt-1 text-lg font-semibold text-gray-900">
+              <h3 className="mt-1 text-lg font-semibold text-[#0D0E09]">
                 Transfer ke Rekening Resmi Toko
               </h3>
               <div className="mt-3 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">
-                <div className="flex justify-between gap-3">
-                  <span>Bank</span>
-                  <strong>{STORE_BANK_ACCOUNT.bank}</strong>
+                <div className="flex items-start justify-between gap-3">
+                  <span className="shrink-0">Bank</span>
+                  <strong className="break-words text-right">{STORE_BANK_ACCOUNT.bank}</strong>
                 </div>
-                <div className="mt-2 flex justify-between gap-3">
-                  <span>No. Rekening</span>
-                  <strong className="text-right">{STORE_BANK_ACCOUNT.number}</strong>
+                <div className="mt-2 flex items-start justify-between gap-3">
+                  <span className="shrink-0">No. Rekening</span>
+                  <strong className="break-all text-right">{STORE_BANK_ACCOUNT.number}</strong>
                 </div>
-                <div className="mt-2 flex justify-between gap-3">
-                  <span>Atas Nama</span>
-                  <strong className="text-right">{STORE_BANK_ACCOUNT.accountName}</strong>
+                <div className="mt-2 flex items-start justify-between gap-3">
+                  <span className="shrink-0">Atas Nama</span>
+                  <strong className="break-words text-right">{STORE_BANK_ACCOUNT.accountName}</strong>
                 </div>
                 <div className="mt-3 border-t border-gray-100 pt-3">
                   <p className="font-semibold">Total yang dibayar: {rupiahFormater(transaction.total)}</p>
@@ -663,7 +652,7 @@ const TransactionDetailPage: React.FC = () => {
           )}
 
           <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+            <h3 className="text-lg font-semibold text-[#0D0E09] mb-3">
               Ringkasan Pesanan
             </h3>
             <div className="space-y-3">
@@ -673,9 +662,9 @@ const TransactionDetailPage: React.FC = () => {
                 return (
                 <div
                   key={item.id}
-                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                  className="flex items-start gap-3 rounded-2xl bg-emerald-50/50 p-3"
                 >
-                  <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+                  <div className="h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-emerald-100">
                     <Image
                       src={item.image || "/default-image.jpg"}
                       alt={item.name}
@@ -690,14 +679,14 @@ const TransactionDetailPage: React.FC = () => {
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-medium text-gray-900 truncate">
+                    <h4 className="break-words text-sm font-semibold leading-snug text-[#0D0E09]">
                       {item.name}
                     </h4>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[#6B7C73]">
                       {item.variantName ? `${item.variantName} • ` : ""}Qty:{" "}
                       {item.quantity}
                     </p>
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="mt-1 text-sm font-semibold text-[#0D0E09]">
                       {rupiahFormater(item.price)} / item
                     </p>
                     <p className="text-xs font-semibold text-primary">
@@ -711,13 +700,13 @@ const TransactionDetailPage: React.FC = () => {
           </div>
 
           <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+            <h3 className="text-lg font-semibold text-[#0D0E09] mb-3">
               Informasi Pengiriman
             </h3>
             <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Metode:</span>
-                <span className="text-sm font-medium text-gray-900">
+              <div className="flex items-start justify-between gap-4">
+                <span className="text-sm text-[#6B7C73]">Metode:</span>
+                <span className="break-words text-right text-sm font-semibold text-[#0D0E09]">
                   {transaction.deliveryType === "delivery"
                     ? "Dikirim"
                     : "Ambil di Toko"}
@@ -725,49 +714,49 @@ const TransactionDetailPage: React.FC = () => {
               </div>
               {transaction.deliveryType === "delivery" && (
                 <>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Alamat:</span>
-                    <span className="text-sm font-medium text-gray-900 text-right">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="text-sm text-[#6B7C73]">Alamat:</span>
+                    <span className="break-words text-right text-sm font-semibold text-[#0D0E09]">
                       {transaction.shipmentAddress?.address || "Alamat tidak tersedia"}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Penerima:</span>
-                    <span className="text-sm font-medium text-gray-900 text-right">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="text-sm text-[#6B7C73]">Penerima:</span>
+                    <span className="break-words text-right text-sm font-semibold text-[#0D0E09]">
                       {transaction.shipmentAddress?.recipientName || "-"}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Telepon:</span>
-                    <span className="text-sm font-medium text-gray-900 text-right">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="text-sm text-[#6B7C73]">Telepon:</span>
+                    <span className="break-words text-right text-sm font-semibold text-[#0D0E09]">
                       {transaction.shipmentAddress?.phone || "-"}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Kurir:</span>
-                    <span className="text-sm font-medium text-gray-900">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="text-sm text-[#6B7C73]">Kurir:</span>
+                    <span className="break-words text-right text-sm font-semibold text-[#0D0E09]">
                       {transaction.shipmentAddress?.courier || "-"}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Layanan:</span>
-                    <span className="text-sm font-medium text-gray-900">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="text-sm text-[#6B7C73]">Layanan:</span>
+                    <span className="break-words text-right text-sm font-semibold text-[#0D0E09]">
                       {transaction.shipmentAddress?.service || "-"}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Estimasi:</span>
-                    <span className="text-sm font-medium text-gray-900">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="text-sm text-[#6B7C73]">Estimasi:</span>
+                    <span className="break-words text-right text-sm font-semibold text-[#0D0E09]">
                       {transaction.shipmentAddress?.estimatedDelivery || "-"}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">No. Resi:</span>
-                    <span className="text-sm font-medium text-gray-900 text-right">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="text-sm text-[#6B7C73]">No. Resi:</span>
+                    <span className="break-words text-right text-sm font-semibold text-[#0D0E09]">
                       {trackingDisplay}
                     </span>
                   </div>
-                  <p className="rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600">
+                  <p className="rounded-2xl bg-emerald-50/70 px-3 py-2 text-xs text-[#6B7C73]">
                     Resi tampil setelah admin mengirim paket dan memasukkan nomor resi dari kurir.
                   </p>
                 </>
@@ -777,10 +766,10 @@ const TransactionDetailPage: React.FC = () => {
 
           {customerSafeNote && (
             <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+              <h3 className="text-lg font-semibold text-[#0D0E09] mb-3">
                 Catatan Tambahan
               </h3>
-              <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
+              <p className="break-words rounded-2xl bg-emerald-50/70 p-3 text-sm leading-relaxed text-[#0D0E09]">
                 &ldquo;{customerSafeNote}&rdquo;
               </p>
             </div>
@@ -789,7 +778,7 @@ const TransactionDetailPage: React.FC = () => {
           <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
             <div className="space-y-3">
               {isLocalSimulatedTransaction && isPendingPayment && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-800">
+                <div className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-800">
                   Data transaksi lokal lama tidak bisa dipakai sebagai pembayaran resmi. Gunakan transaksi backend baru untuk melanjutkan pembayaran Midtrans.
                 </div>
               )}
@@ -798,14 +787,14 @@ const TransactionDetailPage: React.FC = () => {
                   <button
                     onClick={handlePayNow}
                     disabled={isPaymentActionLoading}
-                    className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                    className="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {canRetryPayment ? "Coba Bayar Lagi" : "Lanjutkan Pembayaran"}
                   </button>
                   <button
                     onClick={handleSyncPaymentStatus}
                     disabled={isPaymentActionLoading}
-                    className="w-full border border-primary text-primary py-3 px-4 rounded-lg font-medium hover:bg-primary/5 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                    className="w-full rounded-2xl border border-primary px-4 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/5 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Saya Sudah Bayar, Perbarui Status
                   </button>
@@ -814,14 +803,14 @@ const TransactionDetailPage: React.FC = () => {
               {transaction.deliveryType === "delivery" && (
                 <button
                   onClick={handleTrackShipment}
-                  className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                  className="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
                 >
                   Lacak Pengiriman
                 </button>
               )}
               <button
                 onClick={handleDownloadInvoice}
-                className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                className="w-full rounded-2xl border border-emerald-100 px-4 py-3 text-sm font-semibold text-[#0D0E09] transition-colors hover:bg-emerald-50"
               >
                 Download Invoice
               </button>

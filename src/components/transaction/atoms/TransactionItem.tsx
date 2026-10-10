@@ -100,21 +100,21 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
 
   return (
     <article
-      className="px-4 py-4 hover:bg-gray-50 transition-colors cursor-pointer"
+      className="px-4 py-4 transition-colors hover:bg-emerald-50/40 cursor-pointer"
       onClick={handleCardClick}
       aria-label={`Transaksi ${transaction.transactionId}`}
     >
       <div className="space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
               {transaction.date}
             </p>
-            <p className="mt-1 truncate text-sm font-semibold text-gray-900">
+            <p className="mt-1 break-words text-sm font-bold leading-snug text-[#0D0E09]">
               {firstItem?.name || "Pesanan Amimum"}
               {remainingItems > 0 ? ` +${remainingItems} item` : ""}
             </p>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 break-all text-xs leading-relaxed text-[#6B7C73]">
               ID: {transaction.transactionId}
             </p>
           </div>
@@ -128,40 +128,40 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 rounded-lg bg-gray-50 p-3 text-xs">
+        <div className="grid grid-cols-2 gap-3 rounded-2xl bg-emerald-50/50 p-3 text-xs">
           <div>
-            <p className="text-gray-400">Item</p>
-            <p className="mt-1 font-semibold text-gray-900">
+            <p className="text-[#7D8B84]">Item</p>
+            <p className="mt-1 font-semibold text-[#0D0E09]">
               {selectedQuantity} item
             </p>
           </div>
           <div>
-            <p className="text-gray-400">Total</p>
-            <p className="mt-1 font-semibold text-gray-900">
+            <p className="text-[#7D8B84]">Total</p>
+            <p className="mt-1 font-semibold text-[#0D0E09]">
               {formatRupiah(transaction.total)}
             </p>
           </div>
           <div>
-            <p className="text-gray-400">Subtotal</p>
-            <p className="mt-1 font-medium text-gray-800">
+            <p className="text-[#7D8B84]">Subtotal</p>
+            <p className="mt-1 font-medium text-[#0D0E09]">
               {formatRupiah(transaction.subtotal)}
             </p>
           </div>
           <div>
-            <p className="text-gray-400">Ongkir</p>
-            <p className="mt-1 font-medium text-gray-800">
+            <p className="text-[#7D8B84]">Ongkir</p>
+            <p className="mt-1 font-medium text-[#0D0E09]">
               {formatRupiah(transaction.shippingCost)}
             </p>
           </div>
           <div>
-            <p className="text-gray-400">Metode bayar</p>
-            <p className="mt-1 font-medium text-gray-800">
+            <p className="text-[#7D8B84]">Metode bayar</p>
+            <p className="mt-1 font-medium text-[#0D0E09]">
               {getPaymentMethodLabel(transaction.paymentMethod)}
             </p>
           </div>
           <div>
-            <p className="text-gray-400">Pengiriman</p>
-            <p className="mt-1 font-medium text-gray-800">
+            <p className="text-[#7D8B84]">Pengiriman</p>
+            <p className="mt-1 font-medium text-[#0D0E09]">
               {transaction.deliveryType === "delivery"
                 ? `${transaction.shipmentAddress?.courier || "Kurir"} ${transaction.shipmentAddress?.service || ""}`.trim()
                 : "Ambil di toko"}
@@ -169,23 +169,23 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
           </div>
           {transaction.deliveryType === "delivery" && (
           <div>
-            <p className="text-gray-400">No. resi</p>
-            <p className="mt-1 font-medium text-gray-800">
+            <p className="text-[#7D8B84]">No. resi</p>
+            <p className="mt-1 break-all font-medium text-[#0D0E09]">
               {trackingNumber || "Belum tersedia"}
             </p>
           </div>
           )}
         </div>
 
-        <p className="rounded-lg bg-primary/5 px-3 py-2 text-xs font-medium text-primary">
+        <p className="rounded-2xl bg-primary/5 px-3 py-2 text-xs font-medium leading-relaxed text-primary">
           {helperText}
         </p>
 
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <button
             type="button"
             onClick={handlePrimaryAction}
-            className="flex-1 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
+            className="flex-1 rounded-2xl bg-primary px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
           >
             {primaryActionLabel}
           </button>
@@ -195,7 +195,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
               event.stopPropagation();
               onViewDetails(transaction.id);
             }}
-            className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-white"
+            className="rounded-2xl border border-emerald-100 px-3 py-2 text-sm font-semibold text-[#0D0E09] transition-colors hover:bg-white"
           >
             Detail
           </button>
