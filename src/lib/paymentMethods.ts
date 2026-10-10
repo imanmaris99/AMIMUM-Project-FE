@@ -146,7 +146,7 @@ export const getPaymentMethodGroups = (
 export const getPaymentMethodLabel = (
   method?: TransactionPaymentMethod
 ): string => {
-  if (method === "cod") return "COD ongkir/jasa kirim";
+  if (method === "cod") return "Ongkir dibayar saat paket tiba";
 
   const allMethods = [
     ...DELIVERY_PAYMENT_METHOD_GROUPS.flatMap((group) => group.methods),

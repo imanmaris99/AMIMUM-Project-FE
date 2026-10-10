@@ -49,7 +49,7 @@ interface PaymentErrorResponse {
 }
 
 const PAYMENT_SERVICE_ERROR_MESSAGE =
-  "Layanan pembayaran online sementara belum tersedia. Silakan pilih metode COD/bayar di toko atau coba beberapa saat lagi.";
+  "Layanan pembayaran online sementara belum tersedia. Silakan pilih QRIS resmi toko, transfer BRI manual, atau bayar di toko khusus pickup.";
 
 const PAYMENT_REQUEST_TIMEOUT_MS = 60000;
 
