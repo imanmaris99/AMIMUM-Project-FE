@@ -160,7 +160,7 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
       {!hasSearched && (
         <div className="mt-1 flex flex-col gap-2 rounded-2xl bg-red-50 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm font-semibold text-red-700">
-            Lihat produk yang sedang promo?
+            Cek produk promo dari brand ini
           </p>
           <Button
             variant="destructive"
