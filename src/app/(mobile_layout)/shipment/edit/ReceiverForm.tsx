@@ -144,7 +144,7 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full bg-gray-100 px-5 py-4 sm:px-10 flex flex-col gap-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+    <form onSubmit={handleSubmit} className="mx-4 w-full max-w-[420px] rounded-3xl bg-white/95 px-5 py-5 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50 flex flex-col gap-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
       <div className="flex flex-col gap-2 relative">
         <label htmlFor="receiverName" className="text-[14px] font-semibold">Nama Penerima</label>
         <LuContact className="text-xl absolute left-2 top-9 stroke-1" />
@@ -154,7 +154,7 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
           name="receiverName" 
           value={formData.receiverName}
           onChange={handleInputChange}
-          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
+          className={`border rounded-2xl outline-none px-3 py-3 bg-emerald-50/60 pl-10 ${
             errors.receiverName ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="Masukkan nama penerima"
@@ -175,7 +175,7 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
           name="phoneNumber" 
           value={formData.phoneNumber}
           onChange={handleInputChange}
-          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
+          className={`border rounded-2xl outline-none px-3 py-3 bg-emerald-50/60 pl-10 ${
             errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="Contoh: 081234567890"
@@ -195,7 +195,7 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
           name="country" 
           value={formData.country}
           onChange={handleInputChange}
-          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
+          className={`border rounded-2xl outline-none px-3 py-3 bg-emerald-50/60 pl-10 ${
             errors.country ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="Indonesia"
@@ -229,7 +229,7 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
           name="postalCode" 
           value={formData.postalCode}
           onChange={handleInputChange}
-          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 ${
+          className={`border rounded-2xl outline-none px-3 py-3 bg-emerald-50/60 pl-10 ${
             errors.postalCode ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="Terisi otomatis setelah kota dipilih"
@@ -247,7 +247,7 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
           name="fullAddress" 
           value={formData.fullAddress}
           onChange={handleInputChange}
-          className={`border rounded-md outline-none px-2 py-1 bg-gray-200 pl-10 min-h-[100px] resize-none ${
+          className={`border rounded-2xl outline-none px-3 py-3 bg-emerald-50/60 pl-10 min-h-[100px] resize-none ${
             errors.fullAddress ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="Tulis alamat lengkap tujuan pengiriman"
@@ -261,14 +261,14 @@ const ReceiverForm: React.FC<ReceiverFormProps> = ({ onSubmit, onBack, initialDa
         <Button 
           type="button" 
           onClick={onBack} 
-          className="h-12 w-full rounded-lg bg-gray-500 px-4 py-2 text-base text-white sm:h-14 sm:text-lg"
+          className="h-12 w-full rounded-2xl bg-gray-500 px-4 py-2 text-base text-white sm:h-14"
         >
           Kembali
         </Button>
         <Button 
           type="submit" 
           disabled={isLoading || isFetching}
-          className="h-12 w-full rounded-lg bg-primary px-4 py-2 text-base text-white disabled:opacity-50 sm:h-14 sm:text-lg"
+          className="h-12 w-full rounded-2xl bg-primary px-4 py-2 text-base font-semibold text-white disabled:opacity-50 sm:h-14"
         >
           {isLoading || isFetching ? "Memproses..." : "Selanjutnya"}
         </Button>

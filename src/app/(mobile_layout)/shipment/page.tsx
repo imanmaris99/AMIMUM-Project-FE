@@ -47,32 +47,25 @@ const mapShipmentToViewModel = (shipment: ShipmentListItem): ShipmentData => ({
 });
 
 const ShipmentSkeleton = () => (
-  <div className="flex flex-col justify-between min-h-screen animate-pulse">
-    <div className="flex justify-center items-center relative mt-16">
-      <div className="absolute left-10">
-        <div className="h-8 w-8 bg-gray-300 rounded-full" />
-      </div>
-      <div>
-        <div className="h-6 w-40 bg-gray-300 rounded" />
-      </div>
+  <div className="min-h-screen animate-pulse px-4 pt-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
+    <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-100">
+      <div className="mx-auto h-3 w-28 rounded-full bg-emerald-100" />
+      <div className="mx-auto mt-2 h-5 w-44 rounded-full bg-gray-200" />
+      <div className="mx-auto mt-2 h-3 w-56 rounded-full bg-gray-100" />
     </div>
-    <div className="flex flex-col justify-center items-center gap-4 mt-20 mb-8 w-full">
+    <div className="mt-4 space-y-4">
       {[...Array(2)].map((_, index) => (
-        <div key={index} className="flex justify-center items-center gap-4 w-80 border-b border-gray-300 pb-4">
-          <div className="h-6 w-6 bg-gray-300 rounded-full" />
-          <div className="flex flex-col justify-center gap-1 flex-1">
-            <div className="h-4 w-32 bg-gray-300 rounded mb-2" />
-            <div className="h-4 w-64 bg-gray-300 rounded" />
-          </div>
-          <div className="flex flex-col justify-center items-center gap-2">
-            <div className="h-5 w-5 bg-gray-300 rounded-full" />
-            <div className="h-5 w-5 bg-gray-300 rounded-full" />
+        <div key={index} className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50">
+          <div className="flex gap-3">
+            <div className="h-7 w-7 rounded-full bg-emerald-100" />
+            <div className="flex-1 space-y-2">
+              <div className="h-4 w-40 rounded-full bg-gray-200" />
+              <div className="h-4 w-full rounded-full bg-gray-100" />
+              <div className="h-4 w-2/3 rounded-full bg-gray-100" />
+            </div>
           </div>
         </div>
       ))}
-    </div>
-    <div className="flex justify-center items-center mt-auto mb-10">
-      <div className="h-14 w-80 bg-gray-300 rounded-lg" />
     </div>
   </div>
 );
@@ -290,7 +283,7 @@ const Shipment = () => {
 
   return (
     <LoginProtection useModal={true} feature="general">
-    <div className="flex flex-col justify-between min-h-screen pb-[calc(1rem+env(safe-area-inset-bottom))]">
+    <div className="min-h-screen pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
       {/* Success Message */}
       {showSuccessMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
@@ -302,23 +295,32 @@ const Shipment = () => {
           </div>
         </div>
       )}
-      <div className="flex justify-center items-center relative mt-16">
-        <div className="absolute left-10">
-          <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
+      <section className="mx-4 mt-4 rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-100">
+        <div className="relative flex items-center justify-center">
+          <button
+            type="button"
+            onClick={handleBack}
+            aria-label="Kembali"
+            className="absolute left-0 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-2xl text-[#006A47] transition-colors hover:bg-emerald-100"
+          >
+            <GoChevronLeft />
+          </button>
+          <div className="px-12 text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Checkout delivery</p>
+            <h1 className="mt-1 text-lg font-bold text-[#0D0E09]">Alamat Pengiriman</h1>
+            <p className="mt-1 text-xs leading-5 text-[#6B7C73]">Pilih 1 alamat aktif untuk checkout delivery.</p>
+          </div>
         </div>
-        <div className="text-center">
-          <h1 className="text-[16px] font-semibold">Alamat Pengiriman</h1>
-          <p className="text-xs text-gray-500 mt-1">Pilih 1 alamat aktif untuk checkout delivery</p>
-        </div>
-      </div>
+      </section>
 
-      <div className="flex flex-col justify-center items-center gap-4 mt-20 mb-8 px-4">
+      <div className="mt-4 flex flex-col items-center gap-4 px-4">
         {shipments.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10">
-            <p className="text-gray-500 text-sm mb-4">Belum ada alamat pengiriman</p>
+          <div className="w-full max-w-sm rounded-3xl border border-dashed border-emerald-100 bg-white/95 p-6 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
+            <p className="text-base font-semibold text-[#0D0E09]">Belum ada alamat pengiriman</p>
+            <p className="mt-2 text-sm leading-5 text-[#6B7C73]">Tambahkan alamat tujuan dan ongkir untuk dipakai saat checkout delivery.</p>
             <Button 
               onClick={handleAddNew}
-              className="bg-primary text-white px-4 py-2 rounded-lg"
+              className="mt-5 rounded-2xl bg-primary px-4 py-3 text-white"
             >
               Tambah Alamat
             </Button>
@@ -327,8 +329,8 @@ const Shipment = () => {
           shipments.map((shipment, index) => (
             <div 
               key={shipment.id} 
-              className={`flex items-start gap-3 w-full max-w-sm border-b border-gray-300 pb-4 transition-all duration-300 ease-in-out transform ${
-                activeStates[index] ? 'bg-blue-50 rounded-lg p-3 scale-[1.02]' : 'p-1 scale-100'
+              className={`flex w-full max-w-sm transform items-start gap-3 rounded-3xl p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] transition-all duration-300 ease-in-out ${
+                activeStates[index] ? 'bg-emerald-50 ring-2 ring-primary scale-[1.01]' : 'bg-white/95 ring-1 ring-emerald-50 scale-100'
               }`}
               style={{ minHeight: '120px' }}
             >
@@ -384,10 +386,10 @@ const Shipment = () => {
         )}
       </div>
 
-      <div className="flex justify-center items-center mt-auto mb-10 px-4">
+      <div className="mt-5 flex justify-center px-4">
         <Button 
           onClick={handleAddNew}
-          className="bg-primary text-white px-4 py-2 rounded-lg w-full max-w-sm h-14 text-lg"
+          className="h-14 w-full max-w-sm rounded-2xl bg-primary px-4 py-2 text-base font-semibold text-white shadow-sm"
         >
           {shipments.length === 0 ? 'Tambah Alamat' : 'Tambah Alamat Baru'}
         </Button>

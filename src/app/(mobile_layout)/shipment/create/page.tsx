@@ -141,40 +141,42 @@ const CreateShipment = () => {
 
   return (
     <LoginProtection useModal={true} feature="general">
-    <div className="min-h-screen pb-[calc(1rem+env(safe-area-inset-bottom))]">
-      <div className="flex justify-center items-center relative mt-16 px-6">
-        <div className="absolute left-10">
+    <div className="min-h-screen pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
+      <section className="mx-4 mt-4 rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-100">
+        <div className="relative flex items-center justify-center">
           <button 
             onClick={handleBack}
-            className="text-3xl cursor-pointer hover:text-primary transition-colors"
+            className="absolute left-0 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-2xl text-[#006A47] transition-colors hover:bg-emerald-100"
             aria-label="Kembali"
+            type="button"
           >
             ←
           </button>
+          <div className="max-w-[280px] px-10 text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Delivery checkout</p>
+            <h1 className="mt-1 text-lg font-bold text-[#0D0E09]">Tambah Alamat Tujuan</h1>
+            <p className="mt-1 text-xs leading-5 text-[#6B7C73]">
+              Customer hanya mengisi alamat penerima. Alamat toko dikelola admin.
+            </p>
+          </div>
         </div>
-        <div className="text-center max-w-[280px]">
-          <h1 className="text-[16px] font-semibold">Tambah Alamat Tujuan</h1>
-          <p className="text-xs text-gray-500 mt-1">
-            Customer hanya mengisi alamat penerima. Alamat toko dikelola admin.
-          </p>
-        </div>
-      </div>
+      </section>
 
-      <div className="mx-auto mt-6 w-full max-w-[420px] px-6">
-        <div className="rounded-2xl border border-primary/10 bg-primary/5 p-4">
+      <div className="mx-auto mt-4 w-full max-w-[420px] px-4">
+        <div className="rounded-3xl border border-emerald-100 bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
           <div className="flex items-start gap-3">
             <GoLocation className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-sm font-semibold text-gray-900">Alamat toko</p>
-                <span className="rounded-full bg-white px-2 py-1 text-[10px] font-semibold text-primary">
+                <span className="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-primary">
                   Info pengirim
                 </span>
               </div>
               <p className="mt-1 text-xs text-gray-600">
                 Alamat ini dipakai sebagai asal pengiriman dan hanya dapat diedit oleh admin toko.
               </p>
-              <div className="mt-3 rounded-xl bg-white p-3 text-xs text-gray-700">
+              <div className="mt-3 rounded-2xl bg-emerald-50/70 p-3 text-xs text-gray-700">
                 {isStoreAddressLoading ? (
                   <p>Memuat alamat toko...</p>
                 ) : storeAddress ? (
@@ -199,7 +201,7 @@ const CreateShipment = () => {
         </div>
       </div>
 
-      <div className="flex justify-center items-center mt-6 pb-4">
+      <div className="mt-5 flex items-center justify-center pb-4">
         <HorizontalLinearAlternativeLabelStepper
           currentStep={currentStep}
           steps={customerShipmentSteps}

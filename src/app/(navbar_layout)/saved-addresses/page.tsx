@@ -273,32 +273,36 @@ const SavedAddressesPage: React.FC = () => {
 
   return (
     <LoginProtection useModal={true} feature="general">
-      <div className="flex flex-col justify-between min-h-screen bg-transparent">
-      {/* Header - Same style as track order with white background */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="flex justify-center items-center relative mt-16 py-4">
-          <div className="absolute left-10">
-            <GoChevronLeft className="text-3xl cursor-pointer" onClick={handleBack} />
-          </div>
-          <div className="text-center">
-            <h1 className="text-[16px] font-semibold">Alamat Tersimpan</h1>
-            <p className="text-xs text-gray-500 mt-1">Kelola alamat pengiriman Anda</p>
+      <div className="min-h-screen bg-transparent pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
+      <section className="mx-4 mt-4 rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-100">
+        <div className="relative flex items-center justify-center">
+          <button
+            type="button"
+            onClick={handleBack}
+            aria-label="Kembali"
+            className="absolute left-0 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-2xl text-[#006A47] transition-colors hover:bg-emerald-100"
+          >
+            <GoChevronLeft />
+          </button>
+          <div className="px-12 text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Akun customer</p>
+            <h1 className="mt-1 text-lg font-bold text-[#0D0E09]">Alamat Tersimpan</h1>
+            <p className="mt-1 text-xs leading-5 text-[#6B7C73]">Kelola alamat valid untuk checkout dan estimasi ongkir.</p>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Content */}
-      <div className="flex flex-col items-center gap-4 mt-10 mb-8 px-4">
+      <div className="mt-4 flex flex-col items-center gap-4 px-4">
         <div className="w-full max-w-sm space-y-4">
           {isLoading ? (
-            <div className="rounded-2xl bg-white p-6 text-center shadow-sm">
+            <div className="rounded-3xl bg-white/95 p-6 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
               <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-4 border-[#006A47] border-t-transparent" />
               <p className="text-sm text-[#666666]">
                 Mengambil alamat pengiriman dari server...
               </p>
             </div>
           ) : errorMessage ? (
-            <div className="rounded-2xl border border-red-100 bg-red-50 p-6 text-center shadow-sm">
+            <div className="rounded-3xl border border-red-100 bg-red-50 p-6 text-center shadow-[0_8px_22px_rgba(15,23,42,0.06)]">
               <h2 className="mb-2 text-base font-semibold text-red-700">
                 Alamat Belum Bisa Dimuat
               </h2>
@@ -312,7 +316,7 @@ const SavedAddressesPage: React.FC = () => {
               </button>
             </div>
           ) : addresses.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-6 text-center shadow-sm">
+            <div className="rounded-3xl border border-dashed border-emerald-100 bg-white/95 p-6 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#E6F2F0] text-2xl font-bold text-[#006A47]">
                 +
               </div>
@@ -348,8 +352,8 @@ const SavedAddressesPage: React.FC = () => {
               return (
                 <div
                   key={item.id}
-                  className={`bg-white rounded-lg p-4 relative cursor-pointer transition-colors ${
-                    isSelected ? "ring-2 ring-[#006A47]" : ""
+                  className={`relative cursor-pointer rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] transition-all ${
+                    isSelected ? "ring-2 ring-[#006A47]" : "ring-1 ring-emerald-50"
                   }`}
                   onClick={() => handleSelectAddress(addressId)}
                 >
@@ -424,7 +428,6 @@ const SavedAddressesPage: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="w-full h-[1.5px] bg-[#C4C4C4] mt-4"></div>
                 </div>
               );
             })
@@ -435,7 +438,7 @@ const SavedAddressesPage: React.FC = () => {
         <div className="flex justify-center mt-4">
           <button
             onClick={handleAddAddress}
-            className="rounded-2xl bg-[#E6F2F0] px-5 py-3 text-sm font-semibold text-[#0D0E09] hover:bg-[#D4E8E0]"
+            className="rounded-2xl bg-[#006A47] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#005A3C]"
           >
             + Tambah Alamat Pengiriman
           </button>

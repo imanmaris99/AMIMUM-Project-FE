@@ -25,24 +25,24 @@ const DEFAULT_PACKAGE = {
   height: 10,
 };
 
-const CourierSelection = ({ 
-  value, 
-  onChange, 
-  error 
-}: { 
-  value: string; 
+const CourierSelection = ({
+  value,
+  onChange,
+  error
+}: {
+  value: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   error?: string;
 }) => (
   <div className="flex flex-col gap-2 relative">
     <label htmlFor="courier">Jasa Kurir</label>
     <HiOutlineTruck className="text-xl absolute left-2 top-9 stroke-1" />
-    <select 
-      name="courier" 
-      id="courier" 
+    <select
+      name="courier"
+      id="courier"
       value={value}
       onChange={onChange}
-      className={`border rounded-md outline-none px-2 py-1 pl-9 text-sm bg-gray-200 ${
+      className={`border rounded-2xl outline-none px-3 py-3 pl-9 text-sm bg-emerald-50/60 ${
         error ? 'border-red-500' : 'border-gray-300'
       }`}
     >
@@ -59,12 +59,12 @@ const CourierSelection = ({
   </div>
 );
 
-const WeightInput = ({ 
-  value, 
-  onChange, 
-  error 
-}: { 
-  value: number; 
+const WeightInput = ({
+  value,
+  onChange,
+  error
+}: {
+  value: number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
 }) => (
@@ -78,7 +78,7 @@ const WeightInput = ({
       value={value}
       onChange={onChange}
       placeholder="Masukkan berat paket"
-      className={`border rounded-md outline-none px-2 py-1 pl-10 bg-gray-200 text-sm ${
+      className={`border rounded-2xl outline-none px-3 py-3 pl-10 bg-emerald-50/60 text-sm ${
         error ? 'border-red-500' : 'border-gray-300'
       }`}
       min={0}
@@ -90,12 +90,12 @@ const WeightInput = ({
   </div>
 );
 
-const DimensionInputs = ({ 
-  values, 
-  onChange, 
-  errors 
-}: { 
-  values: { length: number; width: number; height: number }; 
+const DimensionInputs = ({
+  values,
+  onChange,
+  errors
+}: {
+  values: { length: number; width: number; height: number };
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   errors?: { length?: string; width?: string; height?: string };
 }) => (
@@ -115,7 +115,7 @@ const DimensionInputs = ({
             value={value}
             onChange={onChange}
             placeholder={placeholder}
-            className={`border rounded-md outline-none px-2 py-1 bg-gray-200 w-full text-sm ${
+            className={`border rounded-2xl outline-none px-3 py-3 bg-emerald-50/60 w-full text-sm ${
               errors?.[key as keyof typeof errors] ? 'border-red-500' : 'border-gray-300'
             }`}
             min={0}
@@ -134,19 +134,19 @@ const DimensionInputs = ({
   </div>
 );
 
-const ShippingCostCalculation = ({ 
-  onCalculate, 
-  isLoading 
-}: { 
+const ShippingCostCalculation = ({
+  onCalculate,
+  isLoading
+}: {
   onCalculate: () => void;
   isLoading: boolean;
 }) => (
-  <div className="flex justify-center items-center mt-6 border-b border-gray-300 pb-6">
-    <Button 
-      type="button" 
+  <div className="mt-5 flex items-center justify-center pb-2">
+    <Button
+      type="button"
       onClick={onCalculate}
       disabled={isLoading}
-      className="w-full font-semibold rounded-lg disabled:opacity-50" 
+      className="h-12 w-full rounded-2xl font-semibold disabled:opacity-50"
       variant="outline"
     >
       {isLoading ? "Mencari layanan tersedia..." : "Hitung Ongkir"}
@@ -163,7 +163,7 @@ const PackageSummary = ({
   onToggleAdvanced: () => void;
   showAdvanced: boolean;
 }) => (
-  <div className="rounded-xl border border-primary/10 bg-primary/5 p-4 text-sm text-gray-700">
+  <div className="rounded-3xl border border-emerald-100 bg-emerald-50/70 p-4 text-sm text-gray-700">
     <div className="flex items-start gap-3">
       <PiPackageThin className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
       <div className="flex-1">
@@ -208,7 +208,7 @@ const ShippingCostDetails = ({
   const cheapestService = sortedCouriers[0]?.service;
 
   return (
-    <div className="bg-white rounded-lg p-4 flex flex-col gap-4">
+    <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50 flex flex-col gap-4">
       <div className="flex flex-col justify-center items-center text-center">
         <h6 className="font-semibold">Pilih Ongkir</h6>
         <p className="text-sm text-gray-500">
@@ -392,8 +392,8 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'weight' || name === 'length' || name === 'width' || name === 'height' 
-        ? Number(value) || 0 
+      [name]: name === 'weight' || name === 'length' || name === 'width' || name === 'height'
+        ? Number(value) || 0
         : value
     }));
 
@@ -408,7 +408,7 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
         estimatedDelivery: "",
       }));
     }
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => {
@@ -424,7 +424,7 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
 
     if (value) {
       const courier = availableServices.find((item) => item.service === value);
-      
+
       if (courier) {
         setFormData(prev => ({
           ...prev,
@@ -520,21 +520,21 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsLoading(true);
-    
+
     onSubmit(formData);
     setIsLoading(false);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full bg-gray-100 px-5 py-4 sm:px-10 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+    <form onSubmit={handleSubmit} className="mx-4 w-full max-w-[420px] rounded-3xl bg-white/95 px-5 py-5 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
       <div className="flex flex-col gap-4">
-        <CourierSelection 
+        <CourierSelection
           value={formData.courier}
           onChange={handleInputChange}
           error={errors.courier}
@@ -550,7 +550,7 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
           onToggleAdvanced={() => setShowAdvancedPackage((value) => !value)}
         />
         {showAdvancedPackage && (
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
+          <div className="rounded-3xl border border-emerald-100 bg-emerald-50/50 p-4">
             <p className="mb-3 text-xs font-medium text-gray-600">
               Ubah hanya jika paket pesanan berbeda dari estimasi otomatis.
             </p>
@@ -576,16 +576,16 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
             </div>
           </div>
         )}
-        <ShippingCostCalculation 
+        <ShippingCostCalculation
           onCalculate={handleCalculate}
           isLoading={isCalculating}
         />
         {shippingNotice && (
-          <div className="rounded-lg bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
+          <div className="rounded-2xl bg-yellow-50 px-3 py-2 text-xs font-medium text-yellow-800">
             {shippingNotice}
           </div>
         )}
-        <ShippingCostDetails 
+        <ShippingCostDetails
           couriers={availableServices}
           selectedService={selectedService}
           onServiceChange={handleServiceChange}
@@ -600,17 +600,17 @@ const PackageSpecificationForm: React.FC<PackageSpecificationFormProps> = ({
         )}
       </div>
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <Button 
-          type="button" 
-          onClick={onBack} 
-          className="h-12 w-full rounded-lg bg-gray-500 px-4 py-2 text-base text-white sm:h-14 sm:text-lg"
+        <Button
+          type="button"
+          onClick={onBack}
+          className="h-12 w-full rounded-2xl bg-gray-500 px-4 py-2 text-base text-white sm:h-14"
         >
           Kembali
         </Button>
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           disabled={isLoading || isCalculating || !selectedService || formData.cost <= 0}
-          className="h-12 w-full rounded-lg bg-primary px-4 py-2 text-base text-white disabled:opacity-50 sm:h-14 sm:text-lg"
+          className="h-12 w-full rounded-2xl bg-primary px-4 py-2 text-base font-semibold text-white disabled:opacity-50 sm:h-14"
         >
           {isLoading ? "Menyimpan..." : "Simpan"}
         </Button>
