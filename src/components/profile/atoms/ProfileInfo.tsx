@@ -180,26 +180,26 @@ const ProfileInfo: React.FC = () => {
   };
 
   return (
-    <div className="rounded-3xl bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.08)] backdrop-blur">
+    <div className="rounded-3xl bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50 backdrop-blur">
       {/* Profile Photo Section */}
       <div className="flex flex-col items-center px-4 pb-6 pt-5 sm:py-8">
         {/* Profile Avatar */}
         <div className="relative mb-4 sm:mb-6">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#E6F2F0] shadow-inner sm:h-20 sm:w-20">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#E6F2F0] shadow-inner ring-4 ring-emerald-50 sm:h-24 sm:w-24">
             {profile?.photo_url ? (
               // Use native img to avoid remote image configuration issues.
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={profile.photo_url}
                 alt={displayName}
-                className="h-16 w-16 rounded-full object-cover sm:h-20 sm:w-20"
+                className="h-20 w-20 rounded-full object-cover sm:h-24 sm:w-24"
               />
             ) : (
               <Image
                 src="/profile-circle.svg"
                 alt="Profile"
-                width={64}
-                height={64}
+                width={80}
+                height={80}
                 className="text-[#292D32]"
               />
             )}
@@ -221,20 +221,18 @@ const ProfileInfo: React.FC = () => {
               </div>
             ) : (
               <>
-                <p className="text-sm font-medium text-[#313131]">
-                  Data Akun Customer
-                </p>
-                <p className="text-xs text-[#A2A2A2]">
-                  Email: {profile?.email ?? "Belum tersedia"}
-                </p>
-                <p className="text-xs text-[#A2A2A2]">
-                  Telepon: {displayPhone}
-                </p>
-                <p className="text-xs leading-relaxed text-[#A2A2A2]">
-                  Alamat profil: {displayAddress}
-                </p>
-                <p className="mx-auto max-w-xs rounded-2xl bg-emerald-50/80 px-3 py-2 text-xs font-medium leading-relaxed text-primary">
-                  Alamat pengiriman dikelola terpisah di menu Alamat Pengiriman Tersimpan agar ongkir checkout tetap akurat.
+                <div className="mx-auto w-full max-w-xs rounded-3xl bg-emerald-50/70 p-3 text-left">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                    Data Akun Customer
+                  </p>
+                  <div className="space-y-2 text-xs leading-relaxed text-[#4B5C54]">
+                    <p className="break-words"><span className="font-semibold text-[#0D0E09]">Email:</span> {profile?.email ?? "Belum tersedia"}</p>
+                    <p><span className="font-semibold text-[#0D0E09]">Telepon:</span> {displayPhone}</p>
+                    <p className="break-words"><span className="font-semibold text-[#0D0E09]">Alamat profil:</span> {displayAddress}</p>
+                  </div>
+                </div>
+                <p className="mx-auto max-w-xs rounded-2xl bg-white px-3 py-2 text-xs font-medium leading-relaxed text-primary ring-1 ring-emerald-100">
+                  Alamat checkout tetap dikelola dari menu Alamat Pengiriman Tersimpan agar ongkir akurat.
                 </p>
               </>
             )}
@@ -242,7 +240,7 @@ const ProfileInfo: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-5 flex w-full max-w-[340px] gap-2 sm:mt-6">
+        <div className="mt-5 flex w-full max-w-[360px] gap-2 sm:mt-6">
           <button 
             onClick={handleEditProfileClick}
             disabled={isLoading || Boolean(errorMessage)}
@@ -255,7 +253,7 @@ const ProfileInfo: React.FC = () => {
               height={14}
               className="text-[#E6F2F0]"
             />
-            Edit Akunku
+            Edit Profil
           </button>
           
           <button 
@@ -270,7 +268,7 @@ const ProfileInfo: React.FC = () => {
               height={14}
               className="text-[#0D0E09]"
             />
-            Ganti Foto
+            Foto Profil
           </button>
         </div>
       </div>

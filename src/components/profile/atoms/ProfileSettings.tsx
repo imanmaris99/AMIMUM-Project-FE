@@ -52,8 +52,12 @@ const ProfileSettings: React.FC = () => {
   };
 
   return (
-    <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] backdrop-blur sm:p-6">
-      {/* Settings List */}
+    <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50 backdrop-blur sm:p-6">
+      <div className="mb-3">
+        <p className="text-sm font-bold text-[#0D0E09]">Menu Akun</p>
+        <p className="mt-1 text-xs leading-5 text-[#6B7C73]">Akses cepat untuk alamat, bantuan admin, dan sesi login.</p>
+      </div>
+
       <div className="space-y-2">
         {/* Location */}
         <div 
@@ -104,7 +108,7 @@ const ProfileSettings: React.FC = () => {
                 Kontak Admin
               </span>
               <p className="text-xs leading-snug text-[#A2A2A2]">
-                Kanal resmi toko, tanpa nomor dummy
+                Bantuan lewat kanal resmi toko
               </p>
             </div>
           </div>
@@ -135,7 +139,7 @@ const ProfileSettings: React.FC = () => {
                 Keluar Akun
               </span>
               <p className="text-xs leading-snug text-[#A2A2A2]">
-                Menghapus sesi login dari perangkat ini
+                Keluar dari sesi login perangkat ini
               </p>
             </div>
           </div>

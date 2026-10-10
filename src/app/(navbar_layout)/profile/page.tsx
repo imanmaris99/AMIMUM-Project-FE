@@ -21,15 +21,19 @@ const ProfilePage: React.FC = () => {
           showNotifications={true}
         />
 
-        {/* Content */}
         <div className="px-4 py-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
-          {/* Profile Info Section */}
+          <section className="mb-4 rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-100">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Akun customer</p>
+            <h1 className="mt-1 text-lg font-bold text-[#0D0E09]">Profil Saya</h1>
+            <p className="mt-1 text-xs leading-5 text-[#6B7C73]">
+              Kelola identitas akun, alamat checkout, dan sesi login toko.
+            </p>
+          </section>
+
           <ProfileInfo />
 
-          {/* Divider Line */}
           <div className="h-3" aria-hidden="true"></div>
 
-          {/* Settings Section */}
           <ProfileSettings />
         </div>
       </div>

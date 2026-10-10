@@ -134,15 +134,19 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({ isOpen, onClose, on
 
   return createPortal(
     <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-      <div className="max-h-[calc(100dvh-2rem)] w-full max-w-[392px] overflow-y-auto rounded-2xl bg-white shadow-2xl">
+      <div className="max-h-[calc(100dvh-2rem)] w-full max-w-[392px] overflow-y-auto rounded-3xl bg-white shadow-2xl">
         {/* Modal Content */}
         <div className="space-y-4 p-4">
           {/* Header Section */}
-          <div className="rounded-2xl bg-white p-4 shadow-lg">
+          <div className="rounded-3xl bg-white p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50">
             <div className="space-y-4">
-              {/* Ganti Foto Title */}
-              <div className="flex items-center justify-center">
-                <h3 className="text-lg font-medium text-[#0D0E09]">Ganti Foto</h3>
+              <div className="text-center">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                  Foto profil
+                </p>
+                <h3 className="mt-1 text-lg font-bold text-[#0D0E09]">
+                  Ganti Foto Profil
+                </h3>
               </div>
               
               {/* Divider Line */}
@@ -155,7 +159,7 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({ isOpen, onClose, on
               )}
               
               {/* Upload Area */}
-              <div className="bg-[#F8F8F8] rounded-lg p-4 relative">
+              <div className="relative rounded-3xl border border-dashed border-emerald-200 bg-emerald-50/60 p-5">
                 <div className="flex flex-col items-center space-y-3">
                   {/* Gallery Icon */}
                   <div className="w-6 h-6 flex items-center justify-center">
@@ -170,7 +174,7 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({ isOpen, onClose, on
                   
                   {/* Upload Text */}
                   <p className="text-sm text-[#999999] text-center">
-                    Klik untuk mengunggah
+                    Klik untuk memilih foto
                   </p>
                 </div>
                 
@@ -190,7 +194,7 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({ isOpen, onClose, on
                   <img
                     src={previewUrl}
                     alt="Preview"
-                    className="h-[100px] w-[100px] rounded-lg object-cover"
+                    className="h-[112px] w-[112px] rounded-3xl object-cover ring-4 ring-emerald-50"
                   />
                 </div>
               )}
@@ -198,7 +202,7 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({ isOpen, onClose, on
           </div>
 
           {/* Action Buttons */}
-          <div className="sticky bottom-0 -mx-4 flex gap-3 bg-white px-4 pb-1 pt-2">
+          <div className="sticky bottom-0 -mx-4 flex gap-3 bg-white/95 px-4 pb-1 pt-2 backdrop-blur">
             <button
               onClick={handleClose}
               disabled={isUploading}

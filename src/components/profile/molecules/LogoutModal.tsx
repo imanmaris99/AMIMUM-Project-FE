@@ -50,16 +50,16 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose, onConfirm })
 
   return createPortal(
     <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-      <div className="max-h-[calc(100dvh-2rem)] w-full max-w-[392px] overflow-y-auto rounded-2xl bg-white shadow-2xl">
+      <div className="max-h-[calc(100dvh-2rem)] w-full max-w-[392px] overflow-y-auto rounded-3xl bg-white shadow-2xl">
         {/* Modal Content */}
         <div className="p-4">
           {/* Header Section */}
-          <div className="mb-4 rounded-2xl bg-white p-4 shadow-lg">
+          <div className="mb-4 rounded-3xl bg-white p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50">
             <div className="space-y-4">
               {/* Log Out Title */}
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-[#0D0E09]">Keluar Akun</h3>
-                <div className="w-4 h-4"></div>
+              <div className="text-center">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Sesi akun</p>
+                <h3 className="mt-1 text-lg font-bold text-[#0D0E09]">Keluar Akun</h3>
               </div>
               
               {/* Divider Line */}
@@ -68,20 +68,20 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose, onConfirm })
               {/* Confirmation Text */}
               <div className="pt-2">
                 <p className="text-sm text-[#999999] leading-6">
-                  Apakah anda yakin ingin keluar?
+                  Yakin ingin keluar dari akun di perangkat ini? Anda tetap bisa melihat katalog toko setelah keluar.
                 </p>
               </div>
             </div>
           </div>
 
           {/* Button Section */}
-          <div className="sticky bottom-0 -mx-4 flex gap-3 bg-white px-4 pb-1 pt-2">
+          <div className="sticky bottom-0 -mx-4 flex gap-3 bg-white/95 px-4 pb-1 pt-2 backdrop-blur">
             {/* Iya Button */}
             <button
               onClick={onConfirm}
               className="flex-1 rounded-2xl bg-[#006A47] px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-[#005A3C]"
             >
-              Iya
+              Keluar
             </button>
             
             {/* Tidak Button */}
@@ -89,7 +89,7 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose, onConfirm })
               onClick={onClose}
               className="flex-1 rounded-2xl border border-[#005A3C] bg-white px-5 py-3 text-sm font-medium text-[#005A3C] transition-colors hover:bg-gray-50"
             >
-              Tidak
+              Batal
             </button>
           </div>
         </div>
