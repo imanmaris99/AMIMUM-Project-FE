@@ -101,8 +101,8 @@ const HeaderWithNotifications = ({
                   </h4>
                   <div className="w-full mt-4">
                     <Link href="/login">
-                      <Button variant="secondary" className="w-1/2 text-primary bg-customGreen4 hover:bg-primary hover:text-white">
-                        Silahkan masuk
+                      <Button variant="secondary" className="rounded-xl bg-emerald-50 px-5 text-primary ring-1 ring-emerald-100 hover:bg-primary hover:text-white">
+                        Masuk
                       </Button>
                     </Link>
                   </div>

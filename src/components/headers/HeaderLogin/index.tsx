@@ -1,27 +1,35 @@
-import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import React from "react";
 
 const HeaderLogin = () => {
   return (
-    <div className="bg-customGreen4 shrink-0">
-      <div className="flex justify-center items-center gap-3 px-5 pb-6 pt-10">
-        <div className="w-24 shrink-0">
-          <Image
-            src="/logo_toko.svg"
-            height={120}
-            width={120}
-            alt="header logo"
-            className="h-auto w-full"
-          />
-        </div>
-        <div className="flex flex-col justify-center min-w-0">
-          <p className="text-lg font-bold leading-tight">Toko Herbal</p>
-          <p className="text-3xl font-bold text-primary leading-tight">AmImUm</p>
+    <header className="shrink-0 px-5 pt-8">
+      <div className="rounded-b-[2rem] rounded-t-[2rem] bg-white/95 px-4 py-5 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-100">
+        <div className="flex items-center gap-3">
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl bg-emerald-50 ring-1 ring-emerald-100">
+            <Image
+              src="/logo_toko.svg"
+              height={88}
+              width={88}
+              alt="Logo Toko Herbal AmImUm"
+              className="h-16 w-16 object-contain"
+              priority
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">
+              Toko Herbal
+            </p>
+            <p className="text-3xl font-extrabold leading-tight text-[#0D0E09]">
+              AmImUm
+            </p>
+            <p className="mt-1 text-xs leading-5 text-[#6B7C73]">
+              Masuk aman untuk belanja, checkout, dan pantau pesanan.
+            </p>
+          </div>
         </div>
       </div>
-      <Separator className="bg-primary h-2 w-2/5 mx-auto rounded-xl"/>
-    </div>
+    </header>
   );
 };
 
