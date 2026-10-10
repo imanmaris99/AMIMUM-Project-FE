@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { GoCheckCircle, GoHome, GoPackage, GoCreditCard, GoLocation } from 'react-icons/go';
+import { GoCheckCircle, GoPackage, GoCreditCard, GoLocation } from 'react-icons/go';
 import { IoCheckmarkCircle } from 'react-icons/io5';
 import { useTransaction } from '@/contexts/TransactionContext';
 import { Transaction } from '@/types/transaction';
@@ -139,13 +139,16 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
   const customerSafeNote = getCustomerSafeNote(
     latestTransaction?.notes || additionalNotes
   );
+  const isPickupOrder = latestTransaction?.deliveryType === 'pickup';
+  const isDeliveryOrder = latestTransaction?.deliveryType === 'delivery';
+  const paymentMethodLabel = getPaymentMethodLabel(latestTransaction?.paymentMethod);
 
   if (isResolvingTransaction) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="text-center">
-          <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-sm text-gray-600">Memuat detail pesanan...</p>
+      <div className="flex min-h-screen items-center justify-center bg-transparent px-4">
+        <div className="rounded-3xl bg-white/95 p-8 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-100">
+          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+          <p className="text-sm text-[#6B7C73]">Memuat detail pesanan...</p>
         </div>
       </div>
     );
@@ -153,102 +156,74 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
 
   if (!latestTransaction) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-10">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={handleBackToHome}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              aria-label="Kembali ke beranda"
-            >
-              <GoHome className="w-6 h-6 text-gray-600" />
-            </button>
-            <h1 className="text-lg font-semibold text-gray-900">Konfirmasi Pesanan</h1>
-            <div className="w-10" />
-          </div>
-        </div>
-
-        <div className="max-w-sm mx-auto bg-white min-h-screen px-4 py-10 text-center">
-          <div className="w-20 h-20 bg-yellow-50 rounded-full mx-auto flex items-center justify-center mb-5">
-            <GoPackage className="w-10 h-10 text-yellow-600" />
-          </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
-            Belum Ada Pesanan Baru
-          </h2>
-          <p className="text-sm text-gray-600 mb-6">
-            Halaman konfirmasi hanya tampil setelah checkout berhasil dan ID pesanan valid tersedia dari server.
-          </p>
-          <button
-            onClick={() => router.push('/cart')}
-            className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-[#005A3C] transition-colors mb-3"
-          >
-            Lihat Keranjang
-          </button>
-          <button
-            onClick={handleViewOrders}
-            className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors mb-3"
-          >
-            Cek Riwayat Transaksi
-          </button>
-          <button
-            onClick={handleBackToHome}
-            className="w-full text-primary py-3 px-4 rounded-lg font-medium hover:bg-primary/5 transition-colors"
-          >
-            Kembali ke Beranda
-          </button>
+      <div className="min-h-screen bg-transparent px-4 py-5 pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
+        <div className="mx-auto max-w-sm">
+          <section className="rounded-3xl bg-white/95 p-5 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-100">
+            <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-yellow-50 ring-8 ring-yellow-50/60">
+              <GoPackage className="h-10 w-10 text-yellow-600" />
+            </div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Checkout</p>
+            <h1 className="mt-2 text-xl font-black text-[#0D0E09]">Belum Ada Pesanan Baru</h1>
+            <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-[#6B7C73]">
+              Halaman konfirmasi hanya tampil setelah checkout berhasil dan ID pesanan valid tersedia dari server toko.
+            </p>
+            <div className="mt-5 grid gap-3">
+              <button
+                onClick={() => router.push('/cart')}
+                className="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#005A3C]"
+              >
+                Lihat Keranjang
+              </button>
+              <button
+                onClick={handleViewOrders}
+                className="w-full rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-primary transition-colors hover:bg-emerald-100"
+              >
+                Cek Riwayat Transaksi
+              </button>
+              <button
+                onClick={handleBackToHome}
+                className="w-full rounded-2xl border border-emerald-200 bg-white px-4 py-3 text-sm font-semibold text-[#0D0E09] transition-colors hover:bg-emerald-50"
+              >
+                Kembali ke Beranda
+              </button>
+            </div>
+          </section>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-10">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={handleBackToHome}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <GoHome className="w-6 h-6 text-gray-600" />
-          </button>
-          <h1 className="text-lg font-semibold text-gray-900">Konfirmasi Pesanan</h1>
-          <div className="w-10" />
-        </div>
-      </div>
-
-      <div className="max-w-sm mx-auto bg-white min-h-screen">
-        {/* Success Animation */}
-        <div className="px-4 py-8 text-center">
-          <div className="relative mb-6">
-            <div className="w-24 h-24 bg-green-100 rounded-full mx-auto flex items-center justify-center">
-              <IoCheckmarkCircle className="w-16 h-16 text-green-500" />
-            </div>
-            <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-              <GoCheckCircle className="w-5 h-5 text-white" />
+    <div className="min-h-screen bg-transparent px-4 py-5 pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
+      <div className="mx-auto max-w-sm space-y-4">
+        <section className="rounded-3xl bg-white/95 p-5 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-100">
+          <div className="relative mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-green-50 ring-8 ring-green-50/70">
+            <IoCheckmarkCircle className="h-16 w-16 text-green-500" />
+            <div className="absolute -right-1 -top-1 flex h-8 w-8 items-center justify-center rounded-full bg-green-500">
+              <GoCheckCircle className="h-5 w-5 text-white" />
             </div>
           </div>
-          
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Checkout berhasil</p>
+          <h1 className="mt-2 text-2xl font-black leading-tight text-[#0D0E09]">
             {isPendingPayment ? 'Pesanan Dibuat, Menunggu Bayar' : 'Pesanan Tercatat di Sistem'}
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Terima kasih telah berbelanja di Toko Herbal Amimum.
+          </h1>
+          <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-[#6B7C73]">
+            Terima kasih telah berbelanja di Toko Herbal Amimum. Detail pesanan tersimpan di server toko.
           </p>
-          
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-green-800 font-medium">
-              ID Pesanan: {latestTransaction?.transactionId || orderId}
+          <div className="mt-5 rounded-3xl border border-green-100 bg-green-50/70 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-green-700">ID Pesanan</p>
+            <p className="mt-1 break-all text-sm font-bold text-green-900">
+              {latestTransaction?.transactionId || orderId}
             </p>
-            <p className="text-xs text-green-600 mt-1">
-              ID ini berasal dari server dan bisa dipakai untuk cek transaksi/tracking.
+            <p className="mt-1 text-xs leading-5 text-green-700">
+              Simpan ID ini untuk cek transaksi, tracking, atau bantuan admin.
             </p>
           </div>
-        </div>
+        </section>
 
         {orderAlert && (
-          <div className="px-4 pb-4">
-            <div className={`${orderAlert.bgColor} ${orderAlert.borderColor} rounded-2xl border p-4`}>
+          <div>
+            <div className={`${orderAlert.bgColor} ${orderAlert.borderColor} rounded-3xl border p-4 shadow-[0_8px_22px_rgba(15,23,42,0.06)]`}>
               <div className="flex items-start gap-3">
                 <span className="text-xl" aria-hidden="true">{orderAlert.icon}</span>
                 <div>
@@ -262,76 +237,72 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
           </div>
         )}
 
-        {/* Order Details */}
-        <div className="px-4 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Detail Pesanan</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Status</span>
+        <section className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Ringkasan</p>
+          <h2 className="mt-1 text-lg font-bold text-[#0D0E09]">Detail Pesanan</h2>
+          <div className="mt-4 space-y-3">
+            <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
+              <span className="text-sm text-[#6B7C73]">Status</span>
               <span className={`${statusConfig.bgColor} ${statusConfig.textColor} px-2 py-1 rounded-full text-xs font-medium text-right`}>
                 {statusConfig.text}
               </span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Metode Pengiriman</span>
-              <span className="text-gray-900">
-                {latestTransaction?.deliveryType === 'delivery' ? 'Kirim ke tujuan' : 'Ambil di toko'}
+            <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
+              <span className="text-sm text-[#6B7C73]">Metode Pengiriman</span>
+              <span className="text-right text-sm font-semibold text-[#0D0E09]">
+                {isDeliveryOrder ? 'Kirim ke tujuan' : 'Ambil di toko'}
               </span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Metode Pembayaran</span>
-              <span className="text-gray-900">
-                {getPaymentMethodLabel(latestTransaction?.paymentMethod)}
+            <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
+              <span className="text-sm text-[#6B7C73]">Metode Pembayaran</span>
+              <span className="text-right text-sm font-semibold text-[#0D0E09]">
+                {paymentMethodLabel}
               </span>
             </div>
-            {latestTransaction?.deliveryType === 'delivery' && (
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Estimasi Pengiriman</span>
-                <span className="text-gray-900">
+            {isDeliveryOrder && (
+              <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
+                <span className="text-sm text-[#6B7C73]">Estimasi Pengiriman</span>
+                <span className="text-right text-sm font-semibold text-[#0D0E09]">
                   {latestTransaction.shipmentAddress?.estimatedDelivery || 'Belum tersedia'}
                 </span>
               </div>
             )}
-            {latestTransaction?.deliveryType === 'pickup' && (
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Pengambilan</span>
-                <span className="text-gray-900">Siap diambil</span>
+            {isPickupOrder && (
+              <div className="flex items-start justify-between gap-4 rounded-2xl bg-emerald-50/50 px-3 py-2">
+                <span className="text-sm text-[#6B7C73]">Pengambilan</span>
+                <span className="text-right text-sm font-semibold text-[#0D0E09]">Siap diambil</span>
               </div>
             )}
             {customerSafeNote && (
-              <div className="pt-3 border-t border-gray-200">
-                <div className="flex items-start space-x-2">
-                  <span className="text-gray-600 text-sm">Catatan:</span>
-                  <p className="text-gray-900 text-sm flex-1">
-                    &ldquo;{customerSafeNote}&rdquo;
-                  </p>
-                </div>
+              <div className="rounded-2xl bg-emerald-50/70 px-3 py-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Catatan customer</p>
+                <p className="mt-1 text-sm leading-6 text-[#0D0E09]">&ldquo;{customerSafeNote}&rdquo;</p>
               </div>
             )}
           </div>
-        </div>
+        </section>
 
-        {/* Next Steps */}
-        <div className="px-4 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Langkah Selanjutnya</h3>
-          <div className="space-y-4">
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <GoCreditCard className="w-4 h-4 text-blue-600" />
+        <section className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Panduan</p>
+          <h2 className="mt-1 text-lg font-bold text-[#0D0E09]">Langkah Selanjutnya</h2>
+          <div className="mt-4 space-y-4">
+            <div className="flex items-start gap-3 rounded-3xl bg-emerald-50/60 p-3">
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-100">
+                <GoCreditCard className="h-4 w-4 text-blue-600" />
               </div>
               <div>
-                <p className="font-medium text-gray-900">
+                <p className="font-semibold text-[#0D0E09]">
                   {isPendingPayment
                     ? 'Menunggu Pembayaran'
                     : isFailedPayment
                       ? 'Pembayaran Perlu Diulang'
                       : 'Pesanan Sudah Masuk Sistem'}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm leading-6 text-[#6B7C73]">
                   {isPendingPayment
                     ? isManualQrisPayment
-                      ? 'Scan QRIS resmi Toko Herbal Amimum di detail transaksi, bayar sesuai nominal, lalu tunggu konfirmasi admin.'
-                      : `Silakan selesaikan pembayaran ${getPaymentMethodLabel(latestTransaction?.paymentMethod).toLowerCase()} untuk melanjutkan pesanan.`
+                      ? 'Buka detail transaksi untuk melihat QRIS resmi Toko Herbal Amimum, bayar sesuai nominal, lalu tunggu konfirmasi admin.'
+                      : `Silakan selesaikan pembayaran ${paymentMethodLabel.toLowerCase()} dari detail transaksi agar pesanan bisa diproses toko.`
                     : isFailedPayment
                       ? 'Silakan cek riwayat transaksi untuk mencoba pembayaran ulang jika tersedia.'
                       : 'Pesanan sudah tercatat dan bisa dipantau dari halaman transaksi.'}
@@ -340,13 +311,13 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
             </div>
             
             {isPendingPayment && (
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <GoPackage className="w-4 h-4 text-orange-600" />
+              <div className="flex items-start gap-3 rounded-3xl bg-emerald-50/60 p-3">
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-orange-100">
+                  <GoPackage className="h-4 w-4 text-orange-600" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Setelah Pembayaran Berhasil</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="font-semibold text-[#0D0E09]">Setelah Pembayaran Berhasil</p>
+                  <p className="text-sm leading-6 text-[#6B7C73]">
                     Setelah pembayaran berhasil, status pesanan akan diperbarui oleh sistem/admin dan bisa dipantau dari halaman transaksi.
                   </p>
                 </div>
@@ -354,59 +325,58 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
             )}
 
             {!isPendingPayment && !isFailedPayment && latestTransaction?.deliveryType === 'delivery' && (
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <GoPackage className="w-4 h-4 text-orange-600" />
+              <div className="flex items-start gap-3 rounded-3xl bg-emerald-50/60 p-3">
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-orange-100">
+                  <GoPackage className="h-4 w-4 text-orange-600" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Pesanan Diproses</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="font-semibold text-[#0D0E09]">Pesanan Diproses</p>
+                  <p className="text-sm leading-6 text-[#6B7C73]">
                     {latestTransaction?.shipmentAddress
                       ? `${latestTransaction.shipmentAddress.courier} ${latestTransaction.shipmentAddress.service} akan digunakan untuk pengiriman setelah admin memproses pesanan.`
-                      : 'Kami akan memproses dan mengirim pesanan Anda'}
+                      : 'Admin akan memproses pesanan dan memasukkan resi resmi setelah paket diserahkan ke kurir.'}
                   </p>
                 </div>
               </div>
             )}
 
             {!isPendingPayment && !isFailedPayment && latestTransaction?.deliveryType === 'pickup' && (
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <GoLocation className="w-4 h-4 text-green-600" />
+              <div className="flex items-start gap-3 rounded-3xl bg-emerald-50/60 p-3">
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-green-100">
+                  <GoLocation className="h-4 w-4 text-green-600" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Siap Diambil</p>
-                  <p className="text-sm text-gray-600">
-                    Pesanan pickup akan disiapkan toko sesuai status transaksi.
+                  <p className="font-semibold text-[#0D0E09]">Siap Diambil</p>
+                  <p className="text-sm leading-6 text-[#6B7C73]">
+                    Pesanan pickup akan disiapkan toko. Datang ke toko setelah status transaksi menyatakan siap diambil.
                   </p>
                 </div>
               </div>
             )}
           </div>
-        </div>
+        </section>
 
-        {/* Action Buttons */}
-        <div className="px-4 py-6 space-y-3">
+        <section className="space-y-3 rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50">
           {isPendingPayment && !isFailedPayment && (
             <button
               onClick={handleContinuePayment}
-              className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-[#005A3C] transition-colors"
+              className="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#005A3C]"
             >
               {isManualQrisPayment ? 'Lihat QRIS Pembayaran' : 'Lanjutkan Pembayaran'}
             </button>
           )}
           <button
             onClick={handleViewOrders}
-            className={`${isPendingPayment ? 'w-full bg-gray-100 text-gray-700 hover:bg-gray-200' : 'w-full bg-primary text-white hover:bg-[#005A3C]'} py-3 px-4 rounded-lg font-medium transition-colors`}
+            className={`${isPendingPayment ? 'w-full bg-emerald-50 text-primary hover:bg-emerald-100' : 'w-full bg-primary text-white hover:bg-[#005A3C]'} rounded-2xl px-4 py-3 text-sm font-semibold transition-colors`}
           >
             Lihat Pesanan Saya
           </button>
           
           {/* Only show "Lacak Pesanan" for delivery orders */}
-          {latestTransaction?.deliveryType === 'delivery' && (
+          {isDeliveryOrder && (
             <button
               onClick={handleTrackOrder}
-              className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+              className="w-full rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-primary transition-colors hover:bg-emerald-100"
             >
               Lacak Pesanan
             </button>
@@ -414,23 +384,18 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
           
           <button
             onClick={handleBackToHome}
-            className="w-full text-primary py-3 px-4 rounded-lg font-medium hover:bg-primary/5 transition-colors"
+            className="w-full rounded-2xl border border-emerald-200 bg-white px-4 py-3 text-sm font-semibold text-primary transition-colors hover:bg-emerald-50"
           >
             Kembali ke Beranda
           </button>
-        </div>
+        </section>
 
-        {/* Help Section */}
-        <div className="px-4 py-4 bg-gray-50">
-          <div className="text-center">
-            <p className="text-sm text-gray-600 mb-2">
-              Butuh bantuan?
-            </p>
-            <p className="text-xs leading-relaxed text-gray-500">
-              Simpan ID pesanan ini. Jika membutuhkan bantuan, sampaikan ID pesanan ke admin melalui kanal resmi toko.
-            </p>
-          </div>
-        </div>
+        <section className="rounded-3xl bg-emerald-50/80 p-4 text-center ring-1 ring-emerald-100">
+          <p className="text-sm font-bold text-[#0D0E09]">Butuh bantuan?</p>
+          <p className="mt-1 text-xs leading-5 text-[#6B7C73]">
+            Simpan ID pesanan ini. Jika membutuhkan bantuan, sampaikan ID pesanan ke admin melalui kanal resmi toko.
+          </p>
+        </section>
       </div>
     </div>
   );
