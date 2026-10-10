@@ -5,7 +5,7 @@ import Image from "next/image";
 
 const VerifyAccount = () => {
   return (
-    <div className="mx-auto min-h-screen w-full min-w-0 max-w-[440px] relative flex flex-col overflow-x-hidden bg-[linear-gradient(180deg,#F5FBF7_0%,#F7FBF8_42%,#FBFAF3_100%)]">
+    <div className="mx-auto min-h-screen w-full min-w-0 max-w-[440px] relative flex flex-col overflow-x-hidden bg-[linear-gradient(180deg,#F7FBF6_0%,#F7FBF6_58%,#FBFAF2_100%)]">
       <HeaderLogin
         eyebrow="Verifikasi Email"
         description="Aktifkan akun dengan kode dari email Anda."
