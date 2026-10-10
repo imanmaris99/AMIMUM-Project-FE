@@ -3,26 +3,26 @@ import React from "react";
 
 const HeaderRegister = () => {
   return (
-    <header className="shrink-0 px-6 pb-1 pt-6">
-      <div className="flex items-center gap-3">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-50/80 ring-1 ring-emerald-100/80">
+    <header className="shrink-0 px-7 pb-2 pt-8">
+      <div className="flex items-center gap-4">
+        <div className="flex h-20 w-20 shrink-0 items-center justify-center">
           <Image
             src="/logo_toko.svg"
-            height={64}
-            width={64}
+            height={84}
+            width={84}
             alt="Logo Toko Herbal AmImUm"
-            className="h-11 w-11 object-contain"
+            className="h-20 w-20 object-contain"
             priority
           />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-emerald-800">
             Akun Customer
           </p>
-          <p className="text-2xl font-extrabold leading-tight text-[#0D0E09]">
+          <p className="text-[2.25rem] font-extrabold leading-none tracking-[-0.04em] text-[#0D0E09]">
             AmImUm
           </p>
-          <p className="mt-0.5 text-[11px] leading-4 text-[#6B7C73]">
+          <p className="mt-1.5 text-sm leading-5 text-[#6B7C73]">
             Daftar untuk checkout lebih cepat.
           </p>
         </div>

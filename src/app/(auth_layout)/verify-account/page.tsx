@@ -5,7 +5,7 @@ import Image from "next/image";
 
 const VerifyAccount = () => {
   return (
-    <div className="mx-auto min-h-screen w-full min-w-0 max-w-[440px] relative flex flex-col overflow-x-hidden bg-[linear-gradient(180deg,#F1FAF5_0%,#FFFFFF_34%,#FFFBF1_72%,#F4FBF7_100%)]">
+    <div className="mx-auto min-h-screen w-full min-w-0 max-w-[440px] relative flex flex-col overflow-x-hidden bg-[linear-gradient(180deg,#EEF8F2_0%,#F6FBF8_22%,#FFFFFF_50%,#FFFCF5_78%,#F4FBF7_100%)]">
       <HeaderLogin />
       
       {/* Konten utama */}
