@@ -9,7 +9,7 @@ const ForgotPassword = () => {
       <HeaderLogin />
       
       {/* Konten utama */}
-      <main className="px-6 pb-6 pt-5 flex-1 flex flex-col relative z-10">
+      <main className="px-6 pb-6 pt-4 flex-1 flex flex-col relative z-10">
         <div className="w-full max-w-sm mx-auto">
           <FormForgotPassword />
         </div>

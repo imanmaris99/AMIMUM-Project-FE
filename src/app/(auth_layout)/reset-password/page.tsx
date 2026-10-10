@@ -9,7 +9,7 @@ const ResetPassword = () => {
       <HeaderLogin />
 
       {/* Konten utama */}
-      <main className="px-6 pb-8 pt-6 flex-1 relative z-10">
+      <main className="px-6 pb-8 pt-4 flex-1 relative z-10">
         <div className="w-full max-w-sm mx-auto">
           <FormResetPassword />
         </div>

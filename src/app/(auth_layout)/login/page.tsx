@@ -360,7 +360,7 @@ const Login = () => {
     return (
       <div className="mx-auto min-h-screen w-full min-w-0 max-w-[440px] relative flex flex-col overflow-x-hidden bg-[linear-gradient(180deg,#F1FAF5_0%,#FFFFFF_34%,#FFFBF1_72%,#F4FBF7_100%)]">
         <HeaderLogin />
-        <main className="px-6 pb-8 pt-6 flex-1 relative z-10">
+        <main className="px-6 pb-8 pt-4 flex-1 relative z-10">
           <div className="w-full max-w-sm mx-auto">
             <div className="text-center">
               <h1 className="text-3xl font-bold text-primary mb-6">Login Berhasil!</h1>
@@ -406,13 +406,13 @@ const Login = () => {
   return (
     <div className="mx-auto min-h-screen w-full min-w-0 max-w-[440px] relative flex flex-col overflow-x-hidden bg-[linear-gradient(180deg,#F1FAF5_0%,#FFFFFF_34%,#FFFBF1_72%,#F4FBF7_100%)]">
       <HeaderLogin />
-      <main className="px-6 pb-8 pt-6 flex-1 relative z-10">
+      <main className="px-6 pb-8 pt-4 flex-1 relative z-10">
         <div className="w-full max-w-sm mx-auto">
-          <h1 className="text-3xl font-bold text-primary text-center mb-6">
+          <h1 className="text-2xl font-bold text-primary text-center mb-4">
             Masuk Akun
           </h1>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-3">
             {isLocked && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
                 <p className="text-red-600 text-sm font-semibold mb-1">
@@ -547,7 +547,7 @@ const Login = () => {
           </form>
 
           {/* Divider */}
-          <div className="flex items-center gap-3 my-5">
+          <div className="flex items-center gap-3 my-4">
             <div className="flex-1 h-px bg-gray-300"></div>
             <span className="text-slate-500 text-sm whitespace-nowrap">atau login dengan</span>
             <div className="flex-1 h-px bg-gray-300"></div>
