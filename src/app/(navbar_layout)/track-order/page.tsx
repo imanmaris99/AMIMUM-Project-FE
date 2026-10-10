@@ -152,7 +152,8 @@ const TrackOrderPage: React.FC = () => {
   const getStatusConfig = (status: string) => {
     const config = getCustomerStatusConfig(
       status,
-      currentTransaction?.paymentMethod
+      currentTransaction?.paymentMethod,
+      currentTransaction?.deliveryType || "delivery"
     );
 
     return {
@@ -195,6 +196,12 @@ const TrackOrderPage: React.FC = () => {
     }
 
     if (transaction.deliveryType !== "delivery") {
+      if (["processing", "shipped"].includes(transaction.status)) {
+        return "Pesanan pickup sudah siap diambil di toko dan tidak memakai nomor resi kurir.";
+      }
+      if (["completed", "delivered"].includes(transaction.status)) {
+        return "Pesanan pickup sudah diambil. Terima kasih sudah berbelanja di Toko Herbal Amimum.";
+      }
       return "Pesanan pickup akan disiapkan toko. Datang ke toko setelah status siap diambil.";
     }
 

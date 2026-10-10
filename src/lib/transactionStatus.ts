@@ -44,8 +44,11 @@ export const isSuccessfulPaymentStatus = (status?: string) =>
 
 export const getCustomerStatusConfig = (
   status: string,
-  paymentMethod?: TransactionPaymentMethod
+  paymentMethod?: TransactionPaymentMethod,
+  deliveryType: string = "delivery"
 ): CustomerStatusConfig => {
+  const isPickupOrder = deliveryType === "pickup";
+
   switch (status) {
     case "pending":
       return {
@@ -69,28 +72,22 @@ export const getCustomerStatusConfig = (
       };
     case "processing":
       return {
-        text: "Pesanan Diproses",
-        bgColor: "bg-blue-100",
-        textColor: "text-blue-600",
-        borderColor: "border-blue-200",
+        text: isPickupOrder ? "Siap Diambil" : "Pesanan Diproses",
+        bgColor: isPickupOrder ? "bg-emerald-100" : "bg-blue-100",
+        textColor: isPickupOrder ? "text-emerald-700" : "text-blue-600",
+        borderColor: isPickupOrder ? "border-emerald-200" : "border-blue-200",
       };
     case "shipped":
       return {
-        text: "Dikirim",
-        bgColor: "bg-indigo-100",
-        textColor: "text-indigo-600",
-        borderColor: "border-indigo-200",
+        text: isPickupOrder ? "Siap Diambil" : "Dikirim",
+        bgColor: isPickupOrder ? "bg-emerald-100" : "bg-indigo-100",
+        textColor: isPickupOrder ? "text-emerald-700" : "text-indigo-600",
+        borderColor: isPickupOrder ? "border-emerald-200" : "border-indigo-200",
       };
     case "delivered":
-      return {
-        text: "Selesai",
-        bgColor: "bg-green-100",
-        textColor: "text-green-600",
-        borderColor: "border-green-200",
-      };
     case "completed":
       return {
-        text: "Pesanan Selesai",
+        text: isPickupOrder ? "Sudah Diambil" : "Pesanan Selesai",
         bgColor: "bg-green-100",
         textColor: "text-green-600",
         borderColor: "border-green-200",
@@ -159,15 +156,15 @@ export const getCustomerOrderAlert = (
       };
     case "processing":
       return {
-        title: isPickupOrder ? "Pesanan sedang disiapkan" : "Pesanan sedang diproses",
+        title: isPickupOrder ? "Pesanan siap diambil" : "Pesanan sedang diproses",
         message:
           isPickupOrder
-            ? "Toko sedang menyiapkan pesanan pickup. Datang ke toko setelah pesanan siap diambil."
+            ? "Pesanan pickup sudah siap diambil di toko dan tidak memakai nomor resi kurir. Silakan datang ke toko saat jam operasional."
             : "Toko sedang menyiapkan pesanan. Nomor resi akan muncul setelah paket diserahkan ke kurir.",
-        bgColor: "bg-blue-50",
-        borderColor: "border-blue-200",
-        textColor: "text-blue-800",
-        icon: "📦",
+        bgColor: isPickupOrder ? "bg-emerald-50" : "bg-blue-50",
+        borderColor: isPickupOrder ? "border-emerald-200" : "border-blue-200",
+        textColor: isPickupOrder ? "text-emerald-800" : "text-blue-800",
+        icon: isPickupOrder ? "🏬" : "📦",
       };
     case "shipped":
       if (isPickupOrder) {
@@ -193,9 +190,10 @@ export const getCustomerOrderAlert = (
     case "delivered":
     case "completed":
       return {
-        title: "Pesanan selesai",
-        message:
-          "Pesanan sudah selesai. Terima kasih sudah berbelanja di Toko Herbal Amimum.",
+        title: isPickupOrder ? "Pesanan sudah diambil" : "Pesanan selesai",
+        message: isPickupOrder
+          ? "Pesanan pickup sudah diterima. Terima kasih sudah berbelanja di Toko Herbal Amimum."
+          : "Pesanan sudah selesai. Terima kasih sudah berbelanja di Toko Herbal Amimum.",
         bgColor: "bg-green-50",
         borderColor: "border-green-200",
         textColor: "text-green-800",

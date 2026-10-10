@@ -124,7 +124,8 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
 
   const statusConfig = getCustomerStatusConfig(
     latestTransaction?.status || '',
-    latestTransaction?.paymentMethod
+    latestTransaction?.paymentMethod,
+    latestTransaction?.deliveryType || 'delivery'
   );
   const isPendingPayment = isPendingPaymentStatus(latestTransaction?.status);
   const isFailedPayment = isFailedPaymentStatus(latestTransaction?.status);

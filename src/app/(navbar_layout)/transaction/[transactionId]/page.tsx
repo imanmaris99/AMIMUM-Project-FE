@@ -125,7 +125,8 @@ const TransactionDetailPage: React.FC = () => {
 
     const customerStatus = getCustomerStatusConfig(
       transaction.status,
-      transaction.paymentMethod
+      transaction.paymentMethod,
+      transaction.deliveryType
     ).text;
 
     const deliveryLabel =
@@ -392,7 +393,8 @@ const TransactionDetailPage: React.FC = () => {
 
   const statusConfig = getCustomerStatusConfig(
     transaction.status,
-    transaction.paymentMethod
+    transaction.paymentMethod,
+    transaction.deliveryType
   );
   const isPendingPayment = isPendingPaymentStatus(transaction.status);
   const canRetryPayment = isFailedPaymentStatus(transaction.status);
@@ -420,7 +422,11 @@ const TransactionDetailPage: React.FC = () => {
           : transaction.status === "completed" || transaction.status === "delivered"
             ? "Pesanan selesai. Terima kasih sudah berbelanja di Toko Herbal Amimum."
             : "Pesanan sedang diproses toko. Resi akan tersedia setelah admin mengirim pesanan."
-        : "Pesanan pickup sedang disiapkan toko. Ambil pesanan setelah status siap diambil.";
+        : ["processing", "shipped"].includes(normalizedStatus)
+          ? "Pesanan pickup sudah siap diambil di toko. Pesanan ini tidak memakai kurir atau nomor resi."
+          : ["completed", "delivered"].includes(normalizedStatus)
+            ? "Pesanan pickup sudah diambil. Terima kasih sudah berbelanja di Toko Herbal Amimum."
+            : "Pesanan pickup sedang menunggu persiapan toko. Ambil pesanan setelah status siap diambil.";
   const orderAlert = getCustomerOrderAlert(
     transaction.status,
     transaction.shipmentAddress?.trackingNumber,

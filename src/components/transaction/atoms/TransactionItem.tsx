@@ -69,7 +69,8 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
 }) => {
   const statusConfig = getCustomerStatusConfig(
     transaction.status,
-    transaction.paymentMethod
+    transaction.paymentMethod,
+    transaction.deliveryType
   );
   const firstItem = transaction.items[0];
   const remainingItems = Math.max(transaction.items.length - 1, 0);
