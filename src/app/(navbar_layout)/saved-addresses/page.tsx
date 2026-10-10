@@ -434,15 +434,17 @@ const SavedAddressesPage: React.FC = () => {
           )}
         </div>
 
-        {/* Add Address Button */}
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={handleAddAddress}
-            className="rounded-2xl bg-[#006A47] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#005A3C]"
-          >
-            + Tambah Alamat Pengiriman
-          </button>
-        </div>
+        {addresses.length > 0 && !isLoading && !errorMessage && (
+          <div className="mt-4 flex justify-center">
+            <button
+              type="button"
+              onClick={handleAddAddress}
+              className="rounded-2xl bg-[#006A47] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#005A3C]"
+            >
+              + Tambah Alamat Pengiriman
+            </button>
+          </div>
+        )}
       </div>
 
 
