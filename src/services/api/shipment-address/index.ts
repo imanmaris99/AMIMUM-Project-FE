@@ -179,9 +179,20 @@ export const getMyShipmentAddresses = async (): Promise<ShipmentAddressListRespo
 
 export const getOwnerShipmentAddress = async (): Promise<ShipmentAddressSingleResponse> => {
   try {
+    const authConfig = getAuthConfig();
     const response = await axiosInstance.get<ShipmentAddressSingleResponse>(
       API_ENDPOINTS.SHIPMENT_ADDRESS_OWNER,
-      getAuthConfig()
+      {
+        ...authConfig,
+        headers: {
+          ...authConfig?.headers,
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+        params: {
+          _ts: Date.now(),
+        },
+      }
     );
 
     if (
