@@ -6,6 +6,13 @@ import { AllProductInfoType, AllProductInfoResponseType, ProductSearchResponseTy
 const DEFAULT_PRODUCT_IMAGE = "/default-image.jpg";
 const PRODUCT_ALL_PATH = "/product/all";
 const PRODUCT_CATALOG_LOOKUP_TIMEOUT_MS = 2500;
+const PRODUCT_CATALOG_LOOKUP_CLIENT_TTL_MS = 5 * 60 * 1000;
+
+let productCatalogLookupClientCache: {
+  expiresAt: number;
+  lookup: Map<string, AllProductInfoType>;
+  promise?: Promise<Map<string, AllProductInfoType>>;
+} | null = null;
 
 const firstNonEmptyUrl = (...urls: Array<string | null | undefined>) => {
   const found = urls.find((url) => typeof url === "string" && url.trim().length > 0);
@@ -76,10 +83,42 @@ async function fetchProductCatalogLookupServer(): Promise<Map<string, AllProduct
 }
 
 async function fetchProductCatalogLookupClient(): Promise<Map<string, AllProductInfoType>> {
+  const now = Date.now();
+
+  if (productCatalogLookupClientCache && productCatalogLookupClientCache.expiresAt > now) {
+    if (productCatalogLookupClientCache.promise) {
+      return productCatalogLookupClientCache.promise;
+    }
+
+    return productCatalogLookupClientCache.lookup;
+  }
+
+  const lookupPromise = (async () => {
+    try {
+      const response = await axiosClient.get<AllProductInfoResponseType>(PRODUCT_ALL_PATH, {
+        timeout: PRODUCT_CATALOG_LOOKUP_TIMEOUT_MS,
+      });
+      const responseData = response as unknown as AllProductInfoResponseType;
+      return buildProductCatalogLookup(Array.isArray(responseData.data) ? responseData.data : []);
+    } catch {
+      return new Map<string, AllProductInfoType>();
+    }
+  })();
+
+  productCatalogLookupClientCache = {
+    expiresAt: now + PRODUCT_CATALOG_LOOKUP_CLIENT_TTL_MS,
+    lookup: productCatalogLookupClientCache?.lookup || new Map<string, AllProductInfoType>(),
+    promise: lookupPromise,
+  };
+
   try {
-    const response = await axiosClient.get<AllProductInfoResponseType>(PRODUCT_ALL_PATH);
-    const responseData = response as unknown as AllProductInfoResponseType;
-    return buildProductCatalogLookup(Array.isArray(responseData.data) ? responseData.data : []);
+    const lookup = await lookupPromise;
+    productCatalogLookupClientCache = {
+      expiresAt: Date.now() + PRODUCT_CATALOG_LOOKUP_CLIENT_TTL_MS,
+      lookup,
+    };
+
+    return lookup;
   } catch {
     return new Map();
   }
@@ -104,31 +143,51 @@ export const SearchGetProduct = async (productName: string): Promise<AllProductI
     const responseData = response as unknown as ProductSearchResponseType;
     
     if (responseData && responseData.status_code === 200 && responseData.data && Array.isArray(responseData.data)) {
+      const catalogLookup = await fetchProductCatalogLookupClient();
+
       const mappedProducts: AllProductInfoType[] = responseData.data.map((product: ProductSearchItemType) => {
         const variants = Array.isArray(product.all_variants)
           ? product.all_variants
           : [];
-
-        const productImage = resolveProductCardImage(product, variants);
-
-        const highestDiscount = variants.length > 0
-          ? Math.max(...variants.map(v => v.discount || 0))
-          : (product.highest_promo || 0);
-
-        return {
+        const catalogProduct = catalogLookup.get(product.id);
+        const mergedProduct = mergeCatalogImageFields({
           id: product.id,
           name: product.name,
           price: product.price,
-          image: productImage,
-          primary_image_url: product.primary_image_url,
-          gallery_images: product.gallery_images,
-          brand_info: product.brand_info || {
+          image: product.image || catalogProduct?.image || DEFAULT_PRODUCT_IMAGE,
+          primary_image_url: product.primary_image_url || catalogProduct?.primary_image_url || null,
+          gallery_images: product.gallery_images?.length ? product.gallery_images : catalogProduct?.gallery_images || [],
+          brand_info: product.brand_info || catalogProduct?.brand_info || {
             id: 0,
             name: "",
             photo_url: undefined,
           },
-          all_variants: variants,
-          created_at: product.created_at || "",
+          all_variants: variants.length > 0 ? variants : catalogProduct?.all_variants || [],
+          created_at: product.created_at || catalogProduct?.created_at || "",
+          brand_highest_discount: product.highest_promo || catalogProduct?.brand_highest_discount,
+        }, catalogProduct);
+
+        const mergedVariants = Array.isArray(mergedProduct.all_variants) ? mergedProduct.all_variants : [];
+        const productImage = resolveProductCardImage(mergedProduct, mergedVariants);
+
+        const highestDiscount = mergedVariants.length > 0
+          ? Math.max(...mergedVariants.map(v => v.discount || 0))
+          : (product.highest_promo || 0);
+
+        return {
+          id: mergedProduct.id,
+          name: mergedProduct.name,
+          price: mergedProduct.price,
+          image: productImage,
+          primary_image_url: mergedProduct.primary_image_url,
+          gallery_images: mergedProduct.gallery_images,
+          brand_info: mergedProduct.brand_info || {
+            id: 0,
+            name: "",
+            photo_url: undefined,
+          },
+          all_variants: mergedVariants,
+          created_at: mergedProduct.created_at || "",
           brand_highest_discount: highestDiscount > 0 ? highestDiscount : undefined,
         };
       });
