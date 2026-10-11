@@ -23,7 +23,7 @@ body {
   justify-content: center;
   align-items: stretch;
   background:
-    radial-gradient(circle at top left, rgba(47, 111, 90, 0.08), transparent 30rem),
+    radial-gradient(circle at top left, rgba(47, 111, 90, 0.07), transparent 30rem),
     radial-gradient(circle at bottom right, rgba(217, 164, 65, 0.12), transparent 26rem),
     linear-gradient(180deg, #f5fbf7 0%, #ffffff 34%, #fffbf1 72%, #f7fbf8 100%);
   margin: 0;
@@ -400,7 +400,13 @@ div[hidden="true"] {
    Keep the brand herbal-green, but lower saturation/contrast so badges,
    selected cards, and success states are calmer on mobile screens. */
 @layer utilities {
-  .bg-emerald-50 {
+  .bg-emerald-50,
+  .bg-emerald-50\/45,
+  .bg-emerald-50\/50,
+  .bg-emerald-50\/60,
+  .bg-emerald-50\/70,
+  .bg-emerald-50\/80,
+  .bg-emerald-50\/90 {
     background-color: #f4faf7 !important;
   }
 
@@ -408,15 +414,33 @@ div[hidden="true"] {
     background-color: #e6f2ec !important;
   }
 
-  .bg-emerald-600 {
+  .bg-emerald-300 {
+    background-color: #c9dfd4 !important;
+  }
+
+  .bg-emerald-600,
+  .bg-emerald-700,
+  .bg-emerald-950,
+  .bg-green-600,
+  .bg-green-700 {
     background-color: #4f8f72 !important;
   }
 
-  .bg-emerald-700 {
-    background-color: #3f755f !important;
+  .hover\:bg-emerald-50:hover,
+  .hover\:bg-emerald-50\/40:hover,
+  .hover\:bg-emerald-50\/60:hover,
+  .hover\:bg-emerald-50\/70:hover,
+  .hover\:bg-green-50:hover {
+    background-color: #f6fbf8 !important;
   }
 
-  .hover\:bg-emerald-700:hover {
+  .hover\:bg-emerald-100:hover,
+  .hover\:bg-green-100:hover {
+    background-color: #e9f4ee !important;
+  }
+
+  .hover\:bg-emerald-700:hover,
+  .hover\:bg-green-700:hover {
     background-color: #3f755f !important;
   }
 
@@ -424,39 +448,79 @@ div[hidden="true"] {
     border-color: #eef7f2 !important;
   }
 
-  .border-emerald-100 {
+  .border-emerald-100,
+  .border-green-100 {
     border-color: #dfeee7 !important;
   }
 
-  .border-emerald-200 {
+  .border-emerald-200,
+  .border-green-200,
+  .border-green-300\/70 {
     border-color: #cfe4d9 !important;
   }
 
-  .ring-emerald-50 {
+  .border-emerald-500,
+  .border-green-500,
+  .focus\:border-emerald-500:focus,
+  .hover\:border-emerald-200:hover,
+  .hover\:border-green-400\/80:hover {
+    border-color: #80ad99 !important;
+  }
+
+  .ring-emerald-50,
+  .ring-emerald-50\/60,
+  .ring-emerald-50\/70,
+  .ring-green-50\/70 {
     --tw-ring-color: #eef7f2 !important;
   }
 
-  .ring-emerald-100 {
+  .ring-emerald-100,
+  .focus\:ring-emerald-100:focus {
     --tw-ring-color: #dfeee7 !important;
   }
 
-  .text-emerald-600 {
+  .ring-emerald-200,
+  .focus\:ring-green-300\/50:focus {
+    --tw-ring-color: #cfe4d9 !important;
+  }
+
+  .text-emerald-200,
+  .text-emerald-50\/90 {
+    color: #dceee6 !important;
+  }
+
+  .text-emerald-500,
+  .text-green-500 {
+    color: #5a9b79 !important;
+  }
+
+  .text-emerald-600,
+  .text-green-600 {
     color: #4a806b !important;
   }
 
-  .text-emerald-700 {
+  .text-emerald-700,
+  .text-emerald-700\/80,
+  .text-emerald-700\/90,
+  .text-green-700 {
     color: #3f715f !important;
   }
 
-  .text-emerald-800 {
+  .text-emerald-800,
+  .text-emerald-800\/80,
+  .text-green-800 {
     color: #345f51 !important;
   }
 
-  .text-emerald-900 {
+  .text-emerald-900,
+  .text-emerald-950,
+  .text-green-900 {
     color: #294d42 !important;
   }
 
-  .bg-green-50 {
+  .bg-green-50,
+  .bg-green-50\/70,
+  .bg-green-50\/90 {
     background-color: #f4faf6 !important;
   }
 
@@ -466,30 +530,6 @@ div[hidden="true"] {
 
   .bg-green-500 {
     background-color: #5a9b79 !important;
-  }
-
-  .text-green-500 {
-    color: #5a9b79 !important;
-  }
-
-  .text-green-600 {
-    color: #4a8067 !important;
-  }
-
-  .text-green-700 {
-    color: #3d6b58 !important;
-  }
-
-  .text-green-900 {
-    color: #2f5548 !important;
-  }
-
-  .border-green-100 {
-    border-color: #dfeee6 !important;
-  }
-
-  .border-green-200 {
-    border-color: #cfe3d8 !important;
   }
 }
 

@@ -86,7 +86,7 @@ export default function HomeClient({
     
   return (
     <div
-      className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,#F1FAF5_0%,#FFFFFF_34%,#FFFBF1_72%,#F4FBF7_100%)] pb-[calc(7rem+env(safe-area-inset-bottom))]"
+      className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,#F5FBF7_0%,#FFFFFF_34%,#FFFBF1_72%,#F7FBF8_100%)] pb-[calc(7rem+env(safe-area-inset-bottom))]"
       suppressHydrationWarning
     >
       <div className="pointer-events-none absolute -right-16 top-24 h-44 w-44 rounded-full bg-primary/10 blur-3xl" />
