@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import type { AllProductInfoType } from "@/types/apiTypes";
 import DetailProductClient from "./DetailProductClient";
 import { getDetailProductServer } from "@/services/api/detail-product";
+import { GetRelatedProductsByBrandNameServer } from "@/services/api/product";
 import { ErrorHandler } from "@/lib/errorHandler";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 import {
@@ -67,10 +69,12 @@ export default async function DetailProduct({ params }: DetailProductPageProps) 
   }
 
   let detailProduct = null;
+  let relatedProducts: AllProductInfoType[] = [];
   let errorMessage: string | null = null;
 
   try {
     detailProduct = await getDetailProductServer(productId);
+    relatedProducts = await GetRelatedProductsByBrandNameServer(detailProduct.company, detailProduct.id, 6);
   } catch (error) {
     errorMessage = 'Detail produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.';
     ErrorHandler.handleError(error instanceof Error ? error : new Error(String(error)), 'DetailProduct');
@@ -79,7 +83,7 @@ export default async function DetailProduct({ params }: DetailProductPageProps) 
   return (
     <>
       {detailProduct ? <JsonLd data={productJsonLd(detailProduct)} /> : null}
-      <DetailProductClient detailProduct={detailProduct} errorMessage={errorMessage} />
+      <DetailProductClient detailProduct={detailProduct} errorMessage={errorMessage} relatedProducts={relatedProducts} />
     </>
   );
 }

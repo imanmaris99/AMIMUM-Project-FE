@@ -8,13 +8,16 @@ import ProductVariants from "@/components/detailproduct/ProductVariants";
 import ProductInformation from "@/components/detailproduct/ProductInformation";
 import ProductDescription from "@/components/detailproduct/ProductDescription";
 import ProductPrice from "@/components/detailproduct/ProductPrice";
+import CardProduct from "@/components/common/Search/CardProduct";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
+import type { AllProductInfoType } from "@/types/apiTypes";
 import { validateDetailProductData } from "@/utils/dataValidation";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
 
 interface DetailProductClientProps {
   detailProduct: DetailProductType | null;
   errorMessage: string | null;
+  relatedProducts?: AllProductInfoType[];
 }
 
 
@@ -85,7 +88,43 @@ const DetailShoppingInfo = () => (
   </section>
 );
 
-export default function DetailProductClient({ detailProduct, errorMessage }: DetailProductClientProps) {
+const RelatedProductsSection = ({
+  products,
+  brandName,
+}: {
+  products: AllProductInfoType[];
+  brandName?: string;
+}) => {
+  if (!products.length) {
+    return null;
+  }
+
+  return (
+    <section className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50" aria-label="Produk lain dari brand ini">
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Produk terkait</p>
+          <h2 className="mt-1 text-base font-bold text-[#0D0E09]">Produk lain dari brand ini</h2>
+          <p className="mt-1 text-xs leading-5 text-[#6B7C73]">
+            {brandName
+              ? `Pilihan lain dari ${brandName} yang masih tersedia di katalog toko.`
+              : "Pilihan produk lain yang masih tersedia di katalog toko."}
+          </p>
+        </div>
+        <span className="shrink-0 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700">
+          {products.length} produk
+        </span>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        {products.map((product) => (
+          <CardProduct key={product.id} product={product} />
+        ))}
+      </div>
+    </section>
+  );
+};
+
+export default function DetailProductClient({ detailProduct, errorMessage, relatedProducts = [] }: DetailProductClientProps) {
   const router = useRouter();
   const [selectedVariant, setSelectedVariant] = useState<VariantProductType | undefined>(undefined);
   
@@ -181,6 +220,7 @@ export default function DetailProductClient({ detailProduct, errorMessage }: Det
             <ProductInformation isLoading={false} isError={isError} datavariant={selectedVariant} />
           )}
           <ProductDescription isLoading={false} isError={isError} data={detailProduct || undefined} />
+          <RelatedProductsSection products={relatedProducts} brandName={detailProduct?.company} />
         </div>
       </div>
 

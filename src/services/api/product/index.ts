@@ -350,3 +350,54 @@ export async function GetProductsByProductionIdServer(productionId: number): Pro
     throw new Error('Data produk brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
   }
 }
+
+/**
+ * Fetch a small related-product list for product detail pages.
+ * Detail product responses currently expose the brand/company name, while product/all
+ * carries the brand id + card-ready data. Filter by normalized brand name and keep
+ * this best-effort so product detail remains usable even when the catalog API is slow.
+ */
+export async function GetRelatedProductsByBrandNameServer(
+  brandName: string | null | undefined,
+  currentProductId: string,
+  limit = 6,
+): Promise<AllProductInfoType[]> {
+  const normalizedBrandName = brandName?.trim().toLowerCase();
+
+  if (!normalizedBrandName || !currentProductId) {
+    return [];
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/product/all`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      next: { revalidate: 300 },
+    });
+
+    if (!res.ok) {
+      return [];
+    }
+
+    const data: AllProductInfoResponseType = await res.json();
+
+    if (!data || !Array.isArray(data.data)) {
+      return [];
+    }
+
+    return data.data
+      .filter((product) => product.id !== currentProductId)
+      .filter((product) => product.brand_info?.name?.trim().toLowerCase() === normalizedBrandName)
+      .map((product) => ({
+        ...product,
+        image: resolveProductCardImage(product, product.all_variants || []),
+        all_variants: product.all_variants || [],
+        created_at: product.created_at || "",
+      }))
+      .slice(0, limit);
+  } catch {
+    return [];
+  }
+}
