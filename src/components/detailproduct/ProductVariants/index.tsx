@@ -19,6 +19,10 @@ const ProductVariants = ({
 }: ProductVariantsProps) => {
   const { isInCart: checkIsInCart } = useCart();
   const productVariants = product?.variants_list ?? variants ?? [];
+  const productCatalogImage = product?.primary_image_url
+    || product?.gallery_images?.find((image) => image.is_primary)?.url
+    || product?.gallery_images?.[0]?.url
+    || "/default-image.jpg";
 
   const handleVariantSelect = (variant: VariantProductType) => {
     onVariantChange?.(variant);
@@ -43,11 +47,16 @@ const ProductVariants = ({
                 : discountedPrice;
               const isSelected = propSelectedVariant?.id === variant.id;
               const isInCart = product ? checkIsInCart(product.id, variant.id) : false;
+              const variantTypeLabel = variant.name && variant.variant && variant.name !== variant.variant
+                ? `${variant.name} • ${variant.variant}`
+                : variant.variant || variant.name || "Varian produk";
+              const variantImage = variant.img || productCatalogImage;
+              const hasVariantPhoto = Boolean(variant.img);
 
               return (
                 <label
                   key={variant.id}
-                  className={`flex items-center space-x-3 rounded-2xl p-4 cursor-pointer transition-all duration-200 ${
+                  className={`flex cursor-pointer items-start gap-3 rounded-2xl p-3 transition-all duration-200 sm:p-4 ${
                     isSelected
                       ? "border border-[#DCEDE5] bg-[#F5FAF7] shadow-[0_4px_14px_rgba(15,23,42,0.06)]"
                       : "border border-transparent bg-white/80 hover:border-[#E6F2EC] hover:bg-[#F8FCFA]"
@@ -59,15 +68,40 @@ const ProductVariants = ({
                     value={variant.variant || variant.name}
                     checked={isSelected}
                     onChange={() => handleVariantSelect(variant)}
-                    className="form-radio text-primary focus:ring-primary text-sm"
+                    className="mt-9 form-radio text-sm text-primary focus:ring-primary"
                   />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className={`font-medium text-sm ${isSelected ? "text-primary" : "text-gray-700"}`}>
-                        {variant.variant || variant.name || "Varian produk"}
-                      </span>
+
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-[#E6F2EC] bg-[#F8FCFA] sm:h-24 sm:w-24">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={variantImage}
+                      alt=""
+                      aria-hidden="true"
+                      className="h-full w-full object-contain p-1.5"
+                      loading="lazy"
+                      onError={(event) => {
+                        event.currentTarget.src = productCatalogImage;
+                      }}
+                    />
+                    <span className="absolute bottom-1 left-1 rounded-full bg-white/90 px-1.5 py-0.5 text-[9px] font-semibold text-[#3F715F] shadow-sm">
+                      {hasVariantPhoto ? "Foto varian" : "Foto produk"}
+                    </span>
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-2 flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <span className={`block text-sm font-semibold leading-5 ${isSelected ? "text-primary" : "text-gray-800"}`}>
+                          {variantTypeLabel}
+                        </span>
+                        {variant.name && variant.variant && variant.name !== variant.variant && (
+                          <span className="block text-[11px] leading-4 text-[#6B7C73]">
+                            Tipe utama: {variant.name}
+                          </span>
+                        )}
+                      </div>
                       {isInCart && (
-                        <span className="rounded-full bg-[#EAF5EF] px-2 py-1 text-xs font-semibold text-[#3F715F]">
+                        <span className="shrink-0 rounded-full bg-[#EAF5EF] px-2 py-1 text-xs font-semibold text-[#3F715F]">
                           ✓ Di Keranjang
                         </span>
                       )}
@@ -84,16 +118,16 @@ const ProductVariants = ({
 
                     <div className="text-xs">
                       {!hasValidPrice ? (
-                        <div className="text-gray-500 font-medium">
+                        <div className="font-medium text-gray-500">
                           Harga varian belum tersedia
                         </div>
                       ) : hasDiscount ? (
                         <div className="space-y-1">
                           <div className="flex items-center gap-1">
-                            <span className="text-red-500 font-semibold">
+                            <span className="font-semibold text-red-500">
                               {Math.round(discountedPrice).toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
                             </span>
-                            <span className="bg-red-100 text-red-600 px-1 py-0.5 rounded text-[10px] font-bold">
+                            <span className="rounded bg-red-100 px-1 py-0.5 text-[10px] font-bold text-red-600">
                               -{variant.discount}%
                             </span>
                           </div>
@@ -102,7 +136,7 @@ const ProductVariants = ({
                           </div>
                         </div>
                       ) : (
-                        <div className="text-gray-600 font-medium">
+                        <div className="font-medium text-gray-600">
                           {discountedPrice.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
                         </div>
                       )}

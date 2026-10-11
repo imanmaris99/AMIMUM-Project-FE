@@ -61,6 +61,17 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
     ? Math.round(displayPrice / (1 - highestDiscount / 100))
     : basePrice;
 
+  const variantTypeLabels = Array.from(
+    new Set(
+      variants
+        .map((variant) => [variant.name, variant.variant].filter(Boolean).join(" • "))
+        .filter(Boolean)
+    )
+  );
+  const variantSummary = variantTypeLabels.length > 0
+    ? variantTypeLabels.slice(0, 2).join(", ") + (variantTypeLabels.length > 2 ? ` +${variantTypeLabels.length - 2} tipe` : "")
+    : "Tipe varian cek di detail";
+
   return (
     <article
       onClick={() => product.id && handleSelectProduct(product.id)}
@@ -126,6 +137,11 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
               ? `${variants.length} varian tersedia`
               : "Varian produk belum tersedia di katalog"}
           </p>
+          {variants.length > 0 && (
+            <p className="line-clamp-2 min-h-[30px] text-[11px] font-medium leading-[15px] text-[#3F715F]">
+              Tipe: {variantSummary}
+            </p>
+          )}
           <div className="flex items-center gap-2">
             <p className="text-[11px] leading-4 text-[#6B7C73]">
               {hasDisplayPrice ? `Mulai dari ${rupiahFormater(displayPrice)}` : "Harga belum tersedia"}

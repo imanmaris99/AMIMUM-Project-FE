@@ -104,8 +104,11 @@ export interface BrandInfoType {
 
 export interface VariantAllProductType {
   id: number;
+  name?: string;
   variant: string;
   img: string;
+  stock?: number;
+  expiration?: string;
   discount: number;
   discounted_price: number;
   updated_at: string;
