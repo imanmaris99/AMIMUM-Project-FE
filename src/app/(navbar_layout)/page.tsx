@@ -5,41 +5,30 @@ import { GetAllBrandServer, GetAllPromoServer } from "@/services/api/brand";
 import { JsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
 export default async function Home() {
-  let categories = null;
-  let categoryError: string | null = null;
-  
-  try {
-    categories = await fetchCategoriesServer();
-  } catch {
-    categoryError = 'Kategori belum bisa dimuat. Produk tetap bisa dilihat dari katalog yang tersedia.';
-  }
+  const [categoriesResult, productionsResult, promosResult, articlesResult] = await Promise.allSettled([
+    fetchCategoriesServer(),
+    GetAllBrandServer(),
+    GetAllPromoServer(),
+    fetchArticlesServer(),
+  ]);
 
-  let productions = null;
-  let productionError: string | null = null;
-  
-  try {
-    productions = await GetAllBrandServer();
-  } catch {
-    productionError = 'Katalog produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.';
-  }
+  const categories = categoriesResult.status === "fulfilled" ? categoriesResult.value : null;
+  const productions = productionsResult.status === "fulfilled" ? productionsResult.value : null;
+  const promos = promosResult.status === "fulfilled" ? promosResult.value : null;
+  const articles = articlesResult.status === "fulfilled" ? articlesResult.value : null;
 
-  let promos = null;
-  let promoError: string | null = null;
-  
-  try {
-    promos = await GetAllPromoServer();
-  } catch {
-    promoError = 'Promo belum bisa dimuat. Harga dan promo final tetap mengikuti data toko saat checkout.';
-  }
-
-  let articles = null;
-  let articleError: string | null = null;
-  
-  try {
-    articles = await fetchArticlesServer();
-  } catch {
-    articleError = 'Artikel belum bisa dimuat. Silakan coba lagi nanti.';
-  }
+  const categoryError = categoriesResult.status === "rejected"
+    ? 'Kategori belum bisa dimuat. Produk tetap bisa dilihat dari katalog yang tersedia.'
+    : null;
+  const productionError = productionsResult.status === "rejected"
+    ? 'Katalog produk belum bisa dimuat. Silakan coba lagi beberapa saat lagi.'
+    : null;
+  const promoError = promosResult.status === "rejected"
+    ? 'Promo belum bisa dimuat. Harga dan promo final tetap mengikuti data toko saat checkout.'
+    : null;
+  const articleError = articlesResult.status === "rejected"
+    ? 'Artikel belum bisa dimuat. Silakan coba lagi nanti.'
+    : null;
 
   return (
     <>

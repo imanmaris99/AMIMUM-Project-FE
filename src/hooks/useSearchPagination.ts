@@ -21,84 +21,87 @@ interface UseSearchPaginationReturn {
   totalAvailable: number;
 }
 
-const useSearchPagination = ({ 
-  searchQuery, 
-  brandFilter 
+const ITEMS_PER_PAGE = 10;
+
+const useSearchPagination = ({
+  searchQuery,
+  brandFilter
 }: UseSearchPaginationProps): UseSearchPaginationReturn => {
+  const [allResults, setAllResults] = useState<CardProductProps[]>([]);
   const [products, setProducts] = useState<CardProductProps[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(false);
   const [totalAvailable, setTotalAvailable] = useState(0);
 
-  const ITEMS_PER_PAGE = 10; // Sesuai dengan backend limit default
-
-  const fetchProducts = useCallback(async (
-    query: string, 
-    page: number, 
-    isInitial: boolean = false
-  ) => {
+  const fetchProducts = useCallback(async (query: string) => {
     try {
-      if (isInitial) {
-        setIsLoading(true);
-        setIsError(false);
-        setErrorMessage(null);
-      } else {
-        setIsLoadingMore(true);
-      }
+      setIsLoading(true);
+      setIsError(false);
+      setErrorMessage(null);
+      setAllResults([]);
+      setProducts([]);
+      setCurrentPage(1);
+      setHasMore(false);
+      setTotalAvailable(0);
 
-      const allProducts = await SearchGetProduct(query);
-      
-      // Apply brand filter if provided
+      const loadedProducts = await SearchGetProduct(query);
       const filteredProducts = brandFilter
-        ? allProducts.filter(product => 
+        ? loadedProducts.filter(product =>
             product.brand_info?.name?.toLowerCase().includes(brandFilter.toLowerCase())
           )
-        : allProducts;
+        : loadedProducts;
 
-      // Client-side pagination (since API doesn't support pagination)
-      const startIndex = (page - 1) * ITEMS_PER_PAGE;
-      const endIndex = startIndex + ITEMS_PER_PAGE;
-      const pageProducts = filteredProducts.slice(startIndex, endIndex);
+      const firstPageProducts = filteredProducts.slice(0, ITEMS_PER_PAGE);
 
-      if (isInitial) {
-        setProducts(pageProducts);
-        setTotalAvailable(filteredProducts.length);
-      } else {
-        setProducts(prev => [...prev, ...pageProducts]);
-      }
-
-      setHasMore(endIndex < filteredProducts.length);
-      setCurrentPage(page);
-
+      setAllResults(filteredProducts);
+      setProducts(firstPageProducts);
+      setTotalAvailable(filteredProducts.length);
+      setHasMore(ITEMS_PER_PAGE < filteredProducts.length);
+      setCurrentPage(1);
     } catch {
       setIsError(true);
       setErrorMessage('Data pencarian produk belum tersedia. Silakan coba lagi beberapa saat lagi.');
     } finally {
       setIsLoading(false);
-      setIsLoadingMore(false);
     }
-  }, [ITEMS_PER_PAGE, brandFilter]);
+  }, [brandFilter]);
 
-  // Reset state when search query changes
   useEffect(() => {
     if (searchQuery.trim()) {
-      setProducts([]);
-      setCurrentPage(1);
-      setHasMore(true);
-      setTotalAvailable(0);
-      fetchProducts(searchQuery, 1, true);
+      fetchProducts(searchQuery.trim());
+      return;
     }
+
+    setAllResults([]);
+    setProducts([]);
+    setCurrentPage(1);
+    setHasMore(false);
+    setTotalAvailable(0);
+    setIsError(false);
+    setErrorMessage(null);
   }, [searchQuery, brandFilter, fetchProducts]);
 
   const loadMore = useCallback(() => {
-    if (!isLoadingMore && hasMore && searchQuery.trim()) {
-      fetchProducts(searchQuery, currentPage + 1, false);
+    if (isLoadingMore || !hasMore) return;
+
+    setIsLoadingMore(true);
+
+    try {
+      const nextPage = currentPage + 1;
+      const endIndex = nextPage * ITEMS_PER_PAGE;
+      const nextProducts = allResults.slice(0, endIndex);
+
+      setProducts(nextProducts);
+      setCurrentPage(nextPage);
+      setHasMore(endIndex < allResults.length);
+    } finally {
+      setIsLoadingMore(false);
     }
-  }, [fetchProducts, isLoadingMore, hasMore, searchQuery, currentPage]);
+  }, [allResults, currentPage, hasMore, isLoadingMore]);
 
   return {
     products,
