@@ -2,6 +2,7 @@ import HomeClient from "./HomeClient";
 import { fetchArticlesServer } from "@/services/api/articles";
 import { fetchCategoriesServer } from "@/services/api/tag-categories";
 import { GetAllBrandServer, GetAllPromoServer } from "@/services/api/brand";
+import { JsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
 export default async function Home() {
   let categories = null;
@@ -41,15 +42,18 @@ export default async function Home() {
   }
 
   return (
-    <HomeClient
-      categories={categories}
-      productions={productions}
-      categoryError={categoryError}
-      productionError={productionError}
-      promo={promos}
-      promoError={promoError}
-      articles={articles}
-      articleError={articleError}
-    />
+    <>
+      <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
+      <HomeClient
+        categories={categories}
+        productions={productions}
+        categoryError={categoryError}
+        productionError={productionError}
+        promo={promos}
+        promoError={promoError}
+        articles={articles}
+        articleError={articleError}
+      />
+    </>
   );
 }

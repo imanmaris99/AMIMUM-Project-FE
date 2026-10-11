@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import DetailBrand from "@/components/DetailBrand";
 import ProductListWithPagination from "@/components/DetailBrand/ProductListWithPagination";
 import SearchProductByBrand from "@/components/DetailBrand/SearchProductByBrand";
@@ -7,8 +8,56 @@ import UnifiedHeader from "@/components/common/UnifiedHeader";
 
 import { GetBrandDetailByIDServer } from "@/services/api/brand";
 import { GetProductsByProductionIdServer } from "@/services/api/product";
+import {
+  buildOpenGraphMetadata,
+  cleanText,
+  itemListJsonLd,
+  JsonLd,
+  SITE_NAME,
+  truncateText,
+} from "@/lib/seo";
 
-export default async function BrandPage({ params }: { params: Promise<{ brandId: string }> }) {
+type BrandPageProps = { params: Promise<{ brandId: string }> };
+
+export async function generateMetadata({ params }: BrandPageProps): Promise<Metadata> {
+  const { brandId } = await params;
+  const productionId = Number.parseInt(brandId, 10);
+
+  if (!Number.isFinite(productionId)) {
+    return buildOpenGraphMetadata({
+      title: "Brand Produk",
+      description: `Daftar brand dan katalog produk di ${SITE_NAME}.`,
+      path: "/search",
+    });
+  }
+
+  try {
+    const brand = await GetBrandDetailByIDServer(productionId);
+    const description = truncateText(
+      [
+        brand.description_list?.map((item) => cleanText(item)).filter(Boolean).join(" "),
+        `Lihat ${brand.total_product || ""} produk ${brand.name} di katalog resmi ${SITE_NAME}.`,
+      ]
+        .filter(Boolean)
+        .join(" ")
+    );
+
+    return buildOpenGraphMetadata({
+      title: truncateText(`${brand.name} - Katalog Produk`, 58),
+      description,
+      path: `/brand/${brand.id}`,
+      image: brand.photo_url || "/logo_toko.svg",
+    });
+  } catch {
+    return buildOpenGraphMetadata({
+      title: "Brand belum tersedia",
+      description: "Detail brand belum bisa dimuat atau belum tersedia di katalog Toko Herbal Amimum.",
+      path: `/brand/${brandId}`,
+    });
+  }
+}
+
+export default async function BrandPage({ params }: BrandPageProps) {
   const { brandId } = await params;
   let brandData: BrandDetailType | null = null;
   let errorMessage: string | null = null;
@@ -58,6 +107,13 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   
   return (
     <div className="bg-transparent pb-8">
+      <JsonLd
+        data={itemListJsonLd({
+          name: `Daftar Produk ${brandData?.name || "Brand Toko Herbal Amimum"}`,
+          path: `/brand/${productionId}`,
+          products,
+        })}
+      />
       <UnifiedHeader 
         type="main"
         showCart={true}
