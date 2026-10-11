@@ -5,6 +5,9 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.tokoherbalamimu
 const staticRoutes = [
   "",
   "/search",
+  "/cara-belanja",
+  "/kebijakan-pembayaran",
+  "/pengiriman-pickup",
   "/login",
   "/register",
   "/forgot-password",
