@@ -4,10 +4,13 @@ import { CardProductProps } from "../CardProduct/types";
 const ListProductSection = ({products}: {products: CardProductProps[]}) => {
   return (
     <>
-      <div className="mt-6">
-        <h1 className="font-semibold font-jakarta">Produk</h1>
+      <div className="mt-6 flex items-center justify-between">
+        <h1 className="font-jakarta text-base font-bold text-[#0D0E09]">Produk</h1>
+        <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700">
+          Katalog toko
+        </span>
       </div>
-      <div className="my-6 grid grid-cols-2 justify-items-center gap-y-4">
+      <div className="my-5 grid grid-cols-2 gap-3 sm:gap-4">
         {products?.map((product, index) => (
           <CardProduct key={index} product={product} />
         ))}

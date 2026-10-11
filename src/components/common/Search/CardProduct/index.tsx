@@ -62,9 +62,12 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
     : basePrice;
 
   return (
-    <div onClick={() => product.id && handleSelectProduct(product.id)} className="w-40 h-56 rounded-lg shadow-md flex flex-col justify-center items-center gap-2 relative cursor-pointer">
+    <article
+      onClick={() => product.id && handleSelectProduct(product.id)}
+      className="group relative flex min-h-[286px] w-full cursor-pointer flex-col overflow-hidden rounded-3xl border border-emerald-50 bg-white/95 p-2.5 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition duration-200 active:scale-[0.99] sm:min-h-[300px] sm:p-3"
+    >
       <div
-        className="absolute top-2 right-2"
+        className="absolute right-2 top-2 z-20"
         onClick={(e) => e.stopPropagation()}
       >
         <WishlistButton
@@ -75,26 +78,25 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
             image: imageUrl,
             brand: product.brand_info?.name,
           }}
-          className="bg-white rounded-full p-1 hover:bg-gray-50"
+          className="rounded-full bg-white/95 p-1 shadow-[0_4px_12px_rgba(15,23,42,0.12)] hover:bg-gray-50"
           size="md"
         />
       </div>
 
       {hasDiscount && (
-        <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md z-10">
+        <div className="absolute left-2 top-2 z-20 rounded-full bg-red-500 px-2 py-1 text-[11px] font-bold text-white shadow-sm">
           -{highestDiscount}%
         </div>
       )}
 
-      <div className="flex flex-col justify-center items-center">
-        <div className="bg-gray-100 w-32 h-28 rounded-lg flex justify-center items-center">
+      <div className="flex h-36 w-full items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-50 via-white to-stone-50 p-2 ring-1 ring-emerald-50 sm:h-40">
           {!isExternalUrl ? (
             <Image
               src={imageUrl}
               alt={productName}
-              width={100}
-              height={100}
-              className="rounded-lg"
+              width={160}
+              height={160}
+              className="h-full w-full rounded-xl object-contain transition duration-200 group-active:scale-[0.98]"
               loading="lazy"
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
@@ -108,56 +110,52 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
             <img
               src={imageUrl}
               alt={productName}
-              width={100}
-              height={100}
-              className="rounded-lg"
-              style={{ maxWidth: "100px", maxHeight: "100px", objectFit: "contain" }}
+              className="h-full w-full rounded-xl object-contain transition duration-200 group-active:scale-[0.98]"
               onError={handleImageError}
               loading="lazy"
             />
           )}
-        </div>
       </div>
-      <div className="flex flex-col justify-center w-32 min-h-20">
-        <div className="space-y-1">
-          <p className="font-bold text-xs whitespace-nowrap overflow-hidden text-ellipsis">
+      <div className="flex flex-1 flex-col justify-between pt-3">
+        <div className="space-y-1.5">
+          <p className="line-clamp-2 min-h-[34px] text-[13px] font-bold leading-[17px] text-[#0D0E09]">
             {productName}
           </p>
-          <p className="text-gray-500 text-[10px]">
+          <p className="text-[11px] leading-4 text-[#6B7C73]">
             {variants.length > 0
               ? `${variants.length} varian tersedia`
               : "Varian produk belum tersedia di katalog"}
           </p>
           <div className="flex items-center gap-2">
-            <p className="text-[10px] text-gray-500">
+            <p className="text-[11px] leading-4 text-[#6B7C73]">
               {hasDisplayPrice ? `Mulai dari ${rupiahFormater(displayPrice)}` : "Harga belum tersedia"}
             </p>
           </div>
-          <div className="flex items-center gap-2">
+        </div>
+        <div className="mt-2 flex min-h-[34px] flex-wrap items-end gap-x-2 gap-y-0.5">
             {!hasDisplayPrice ? (
-              <p className="font-bold text-sm text-gray-500">
+              <p className="text-sm font-bold text-gray-500">
                 Harga belum tersedia
               </p>
             ) : hasDiscount ? (
               <>
-                <p className="font-bold text-sm text-red-500">
+                <p className="text-base font-extrabold leading-5 text-red-500">
                   {rupiahFormater(displayPrice)}
                 </p>
                 {originalPriceForDisplay > displayPrice && (
-                  <p className="text-xs text-gray-400 line-through">
+                  <p className="text-[11px] leading-4 text-gray-400 line-through">
                     {rupiahFormater(originalPriceForDisplay)}
                   </p>
                 )}
               </>
             ) : (
-              <p className="font-bold text-sm">
+              <p className="text-base font-extrabold leading-5 text-[#0D0E09]">
                 {rupiahFormater(displayPrice)}
               </p>
             )}
-          </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 
