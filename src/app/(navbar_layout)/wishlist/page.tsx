@@ -32,12 +32,8 @@ const Wishlist = () => {
       await clearAll();
       setShowConfirmDialog(false);
       toast.success("Semua item telah dihapus dari wishlist");
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Gagal menghapus wishlist. Silakan coba lagi."
-      );
+    } catch {
+      toast.error("Wishlist belum bisa dikosongkan. Silakan coba lagi beberapa saat lagi.");
     } finally {
       setIsClearing(false);
     }

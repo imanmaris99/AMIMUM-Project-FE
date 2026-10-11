@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { SessionManager } from '@/lib/auth';
 import LoginRequiredModal from './LoginRequiredModal';
@@ -24,6 +24,9 @@ const LoginProtection: React.FC<LoginProtectionProps> = ({
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentPathWithQuery = `${pathname || '/'}${searchParams?.toString() ? `?${searchParams.toString()}` : ''}`;
 
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -83,7 +86,7 @@ const LoginProtection: React.FC<LoginProtectionProps> = ({
         feature={feature}
         title={`Login Diperlukan untuk ${feature === 'profile' ? 'Profil' : feature === 'transaction' ? 'Transaksi' : feature === 'wishlist' ? 'Wishlist' : feature === 'tracking' ? 'Tracking' : 'Fitur Ini'}`}
         description={`Silakan login terlebih dahulu untuk mengakses ${feature === 'profile' ? 'dan mengelola profil akun Anda' : feature === 'transaction' ? 'riwayat transaksi dan detail pembelian Anda' : feature === 'wishlist' ? 'daftar produk favorit Anda' : feature === 'tracking' ? 'status pesanan dan pengiriman Anda' : 'fitur ini'}.`}
-        redirectAfterLogin={window.location.pathname}
+        redirectAfterLogin={currentPathWithQuery}
       />
     );
   }

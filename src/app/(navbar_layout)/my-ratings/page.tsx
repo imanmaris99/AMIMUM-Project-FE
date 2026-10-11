@@ -153,12 +153,8 @@ export default function MyRatingsPage() {
       );
       setSelectedRating(null);
       toast.success("Rating berhasil diperbarui.");
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Gagal memperbarui rating."
-      );
+    } catch {
+      toast.error("Rating belum bisa diperbarui. Periksa rating/ulasan, lalu coba lagi.");
     } finally {
       setIsSubmitting(false);
     }

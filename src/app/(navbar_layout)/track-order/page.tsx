@@ -97,11 +97,9 @@ const TrackOrderPage: React.FC = () => {
         } else {
           setCurrentTransaction(null);
         }
-      } catch (error) {
+      } catch {
         setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "Gagal mengambil data pelacakan."
+          "Data pelacakan belum bisa dimuat. Silakan refresh atau coba lagi beberapa saat lagi."
         );
       } finally {
         setIsLoading(false);
