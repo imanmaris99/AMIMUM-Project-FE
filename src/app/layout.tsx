@@ -25,7 +25,7 @@ const inter = Inter({
   display: "swap",
 });
 
-const siteUrl = "https://amimumherbalproject.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://tokoherbalamimum.web.id";
 const siteTitle = "Toko Herbal AmImUm";
 const siteDescription =
   "Katalog produk herbal dan jamu Toko Herbal AmImUm. Lihat produk, promo, metode pembayaran, dan status pesanan dengan informasi yang mengikuti data katalog toko.";
