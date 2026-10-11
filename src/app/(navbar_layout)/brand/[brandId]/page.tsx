@@ -86,22 +86,25 @@ export default async function BrandPage({ params }: BrandPageProps) {
     );
   }
   
-  try {
-    brandData = await GetBrandDetailByIDServer(productionId);
-  } catch {
+  const [brandResult, productsResult] = await Promise.allSettled([
+    GetBrandDetailByIDServer(productionId),
+    GetProductsByProductionIdServer(productionId),
+  ]);
+
+  if (brandResult.status === "fulfilled") {
+    brandData = brandResult.value;
+  } else {
     errorMessage = 'Detail brand belum bisa dimuat. Produk yang tersedia tetap ditampilkan jika ada.';
   }
-    
-  try {
-    const allProducts = await GetProductsByProductionIdServer(productionId);
 
-    products = allProducts.map((product) => ({
+  if (productsResult.status === "fulfilled") {
+    products = productsResult.value.map((product) => ({
       ...product,
       all_variants: Array.isArray(product.all_variants)
         ? product.all_variants
         : [],
     }));
-  } catch {
+  } else {
     products = [];
   }
   

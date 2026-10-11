@@ -5,6 +5,7 @@ import { AllProductInfoType, AllProductInfoResponseType, ProductSearchResponseTy
 
 const DEFAULT_PRODUCT_IMAGE = "/default-image.jpg";
 const PRODUCT_ALL_PATH = "/product/all";
+const PRODUCT_CATALOG_LOOKUP_TIMEOUT_MS = 2500;
 
 const firstNonEmptyUrl = (...urls: Array<string | null | undefined>) => {
   const found = urls.find((url) => typeof url === "string" && url.trim().length > 0);
@@ -59,7 +60,8 @@ async function fetchProductCatalogLookupServer(): Promise<Map<string, AllProduct
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: 60 },
+      next: { revalidate: 300 },
+      signal: AbortSignal.timeout(PRODUCT_CATALOG_LOOKUP_TIMEOUT_MS),
     });
 
     if (!res.ok) {
@@ -364,7 +366,7 @@ export async function GetProductsByProductionIdServer(productionId: number): Pro
       headers: {
         "Content-Type": "application/json",
       },
-      cache: "no-store",
+      next: { revalidate: 30 },
     });
 
     if (res.status === 404) {
