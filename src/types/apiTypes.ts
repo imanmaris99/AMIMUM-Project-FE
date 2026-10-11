@@ -115,7 +115,7 @@ export interface AllProductInfoType {
   id: string;
   name: string;
   price: number;
-  image: string; // Always present - derived from all_variants[0].img if not provided by API
+  image: string; // Always present for cards; prefer product catalog image, variants are fallback only
   primary_image_url?: string | null;
   gallery_images?: Array<{
     id: number;

@@ -47,7 +47,14 @@ export const getProductImage = (product?: DetailProductType | null) =>
   );
 
 export const getListProductImage = (product?: AllProductInfoType | null) =>
-  absoluteUrl(product?.image || product?.all_variants?.find((variant) => Boolean(variant.img))?.img || "/logo_toko.svg");
+  absoluteUrl(
+    product?.primary_image_url ||
+      product?.gallery_images?.find((image) => image.is_primary)?.url ||
+      product?.gallery_images?.[0]?.url ||
+      product?.image ||
+      product?.all_variants?.find((variant) => Boolean(variant.img))?.img ||
+      "/logo_toko.svg"
+  );
 
 export const formatRupiah = (value?: number | null) => {
   if (typeof value !== "number" || Number.isNaN(value)) return undefined;

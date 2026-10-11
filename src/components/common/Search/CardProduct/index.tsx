@@ -21,7 +21,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
     .sort((a, b) => Number(a?.sort_order || 0) - Number(b?.sort_order || 0))
     .find((image) => image?.url)?.url;
   const firstVariantImage = variants.find((variant) => variant?.img)?.img;
-  const imageUrl = product?.image || product?.primary_image_url || primaryGalleryImage || firstGalleryImage || firstVariantImage || "/default-image.jpg";
+  const imageUrl = product?.primary_image_url || primaryGalleryImage || firstGalleryImage || product?.image || firstVariantImage || "/default-image.jpg";
 
   const handleImageError = () => {
     setImageError(true);

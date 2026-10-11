@@ -4,6 +4,7 @@ import { API_BASE_URL, API_ENDPOINTS } from "@/lib/apiConfig";
 import { AllProductInfoType, AllProductInfoResponseType, ProductSearchResponseType, ProductSearchItemType, ProductSearchByBrandResponseType, ProductSearchByBrandItemType, VariantAllProductType } from "@/types/apiTypes";
 
 const DEFAULT_PRODUCT_IMAGE = "/default-image.jpg";
+const PRODUCT_ALL_PATH = "/product/all";
 
 const firstNonEmptyUrl = (...urls: Array<string | null | undefined>) => {
   const found = urls.find((url) => typeof url === "string" && url.trim().length > 0);
@@ -22,13 +23,65 @@ const resolveProductCardImage = (
   const firstVariantImage = variants.find((variant) => variant?.img)?.img;
 
   return firstNonEmptyUrl(
-    product.image,
     product.primary_image_url,
     primaryGalleryImage,
     firstGalleryImage,
+    product.image,
     firstVariantImage,
   ) || DEFAULT_PRODUCT_IMAGE;
 };
+
+const mergeCatalogImageFields = (
+  product: AllProductInfoType,
+  catalogProduct?: AllProductInfoType,
+): AllProductInfoType => {
+  const mergedProduct = {
+    ...product,
+    primary_image_url: product.primary_image_url || catalogProduct?.primary_image_url || null,
+    gallery_images: product.gallery_images?.length
+      ? product.gallery_images
+      : catalogProduct?.gallery_images || [],
+  };
+
+  return {
+    ...mergedProduct,
+    image: resolveProductCardImage(mergedProduct, product.all_variants || catalogProduct?.all_variants || []),
+  };
+};
+
+const buildProductCatalogLookup = (products: AllProductInfoType[]) =>
+  new Map(products.map((product) => [product.id, product]));
+
+async function fetchProductCatalogLookupServer(): Promise<Map<string, AllProductInfoType>> {
+  try {
+    const res = await fetch(`${API_BASE_URL}${PRODUCT_ALL_PATH}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) {
+      return new Map();
+    }
+
+    const data: AllProductInfoResponseType = await res.json();
+    return buildProductCatalogLookup(Array.isArray(data.data) ? data.data : []);
+  } catch {
+    return new Map();
+  }
+}
+
+async function fetchProductCatalogLookupClient(): Promise<Map<string, AllProductInfoType>> {
+  try {
+    const response = await axiosClient.get<AllProductInfoResponseType>(PRODUCT_ALL_PATH);
+    const responseData = response as unknown as AllProductInfoResponseType;
+    return buildProductCatalogLookup(Array.isArray(responseData.data) ? responseData.data : []);
+  } catch {
+    return new Map();
+  }
+}
 
 /**
  * Search products by name (Client-side)
@@ -142,24 +195,30 @@ export const SearchGetProductByBrand = async (productionId: number, productName:
     const responseData = response as unknown as ProductSearchByBrandResponseType;
     
     if (responseData && responseData.status_code === 200 && responseData.data && Array.isArray(responseData.data)) {
+      const catalogLookup = await fetchProductCatalogLookupClient();
+
       const mappedProducts: AllProductInfoType[] = responseData.data.map((product: ProductSearchByBrandItemType) => {
         const highestDiscount = product.highest_promo || 0;
-        const variants: VariantAllProductType[] = [];
-
-        const productImage = "/default-image.jpg";
-
-        return {
+        const catalogProduct = catalogLookup.get(product.id);
+        const mergedProduct = mergeCatalogImageFields({
           id: product.id,
           name: product.name,
           price: product.price,
-          image: productImage,
-          brand_info: {
+          image: catalogProduct?.image || DEFAULT_PRODUCT_IMAGE,
+          primary_image_url: catalogProduct?.primary_image_url || null,
+          gallery_images: catalogProduct?.gallery_images || [],
+          brand_info: catalogProduct?.brand_info || {
             id: productionId,
             name: "",
             photo_url: undefined,
           },
-          all_variants: variants,
-          created_at: "",
+          all_variants: catalogProduct?.all_variants || [],
+          created_at: catalogProduct?.created_at || "",
+          brand_highest_discount: highestDiscount > 0 ? highestDiscount : catalogProduct?.brand_highest_discount,
+        }, catalogProduct);
+
+        return {
+          ...mergedProduct,
           brand_highest_discount: highestDiscount > 0 ? highestDiscount : undefined,
         };
       });
@@ -252,23 +311,28 @@ export async function GetProductDiscountByBrandIdServer(productionId: number): P
       throw new Error('Format data produk belum sesuai. Silakan coba lagi nanti.');
     }
 
+    const catalogLookup = await fetchProductCatalogLookupServer();
+
     const mappedProducts: AllProductInfoType[] = data.data.map((product) => {
-      const productImage = resolveProductCardImage(product, product.all_variants || []);
+      const mergedProduct = mergeCatalogImageFields(product, catalogLookup.get(product.id));
+      const productImage = resolveProductCardImage(mergedProduct, mergedProduct.all_variants || []);
       
       const brandInfo = {
-        ...product.brand_info,
-        photo_url: product.brand_info?.photo_url || undefined,
+        ...mergedProduct.brand_info,
+        photo_url: mergedProduct.brand_info?.photo_url || undefined,
       };
       
       return {
-        id: product.id,
-        name: product.name,
-        price: product.price,
+        id: mergedProduct.id,
+        name: mergedProduct.name,
+        price: mergedProduct.price,
         image: productImage,
+        primary_image_url: mergedProduct.primary_image_url,
+        gallery_images: mergedProduct.gallery_images,
         brand_info: brandInfo,
-        all_variants: product.all_variants || [],
-        created_at: product.created_at || '',
-        brand_highest_discount: product.brand_highest_discount,
+        all_variants: mergedProduct.all_variants || [],
+        created_at: mergedProduct.created_at || '',
+        brand_highest_discount: mergedProduct.brand_highest_discount,
       };
     });
 
@@ -327,17 +391,18 @@ export async function GetProductsByProductionIdServer(productionId: number): Pro
       throw new Error('Format data produk belum sesuai. Silakan coba lagi nanti.');
     }
 
+    const catalogLookup = await fetchProductCatalogLookupServer();
+
     const mappedProducts: AllProductInfoType[] = data.data.map((product) => {
-      const productImage = resolveProductCardImage(product, product.all_variants || []);
+      const mergedProduct = mergeCatalogImageFields(product, catalogLookup.get(product.id));
       
       const brandInfo = {
-        ...product.brand_info,
-        photo_url: product.brand_info?.photo_url || undefined,
+        ...mergedProduct.brand_info,
+        photo_url: mergedProduct.brand_info?.photo_url || undefined,
       };
       
       return {
-        ...product,
-        image: productImage,
+        ...mergedProduct,
         brand_info: brandInfo,
       };
     });
