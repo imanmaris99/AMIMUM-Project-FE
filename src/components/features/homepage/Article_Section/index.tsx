@@ -4,31 +4,13 @@ import AccordionSkeleton from "@/components/ui/AccordionExpandDefault/AccordionS
 import Footer from "../../../layout/Footer";
 import React from "react";
 
-const OPERATIONAL_ARTICLE_KEYWORDS = [
-  "pembayaran",
-  "ongkir",
-  "checkout",
-  "cara belanja",
-  "pengiriman",
-  "pickup",
-  "resi",
-  "tentang aplikasi",
-  "informasi toko",
-  "informasi terbaru",
-];
-
 interface ArticleSectionProps {
   articles: ArticleProps[] | null;
   errorMessage?: string | null;
 }
 
-const isOperationalArticle = (article: ArticleProps) => {
-  const haystack = `${article.title} ${article.description_list.join(" ")}`.toLowerCase();
-  return OPERATIONAL_ARTICLE_KEYWORDS.some((keyword) => haystack.includes(keyword));
-};
-
 const ArticleSection = ({ articles, errorMessage }: ArticleSectionProps) => {
-  const visibleArticles = (articles || []).filter((article) => !isOperationalArticle(article));
+  const visibleArticles = articles || [];
 
   if (errorMessage) {
     return (
@@ -47,7 +29,7 @@ const ArticleSection = ({ articles, errorMessage }: ArticleSectionProps) => {
     return (
       <>
         <div className="mx-6 mt-6">
-          <h6 className="font-semibold font-jakarta">Artikel Herbal</h6>
+          <h6 className="font-semibold font-jakarta">Artikel & Pengumuman</h6>
         </div>
         <div className="mx-6 mt-6 flex flex-col gap-2">
           {Array.from({ length: 3 }, (_, index) => (
@@ -72,7 +54,7 @@ const ArticleSection = ({ articles, errorMessage }: ArticleSectionProps) => {
   return (
     <>
       <div className="mx-6 mt-6">
-        <h6 className="font-semibold font-jakarta">Artikel Herbal</h6>
+        <h6 className="font-semibold font-jakarta">Artikel & Pengumuman</h6>
       </div>
 
       <div className="mx-6 mt-6 flex flex-col gap-2">
