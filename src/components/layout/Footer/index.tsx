@@ -5,31 +5,8 @@ const Footer = () => {
   return (
     <footer className="mx-6 mt-8 mb-8 flex flex-col items-center justify-center gap-3 text-center font-jakarta">
       <div className="max-w-md rounded-2xl border border-primary/10 bg-primary/5 px-4 py-3 text-xs leading-relaxed text-gray-700">
-        Informasi produk, harga, promo, ongkir, dan pembayaran mengikuti data katalog toko saat checkout. Jika ragu sebelum membeli, silakan cek detail produk atau hubungi admin melalui halaman transaksi.
+        Kanal resmi Toko Herbal Amimum. Panduan belanja, pembayaran, pengiriman, dan pickup tersedia di bagian Panduan Resmi Toko pada homepage.
       </div>
-      <nav
-        className="flex flex-wrap items-center justify-center gap-2"
-        aria-label="Panduan toko"
-      >
-        <a
-          href="/cara-belanja"
-          className="rounded-full border border-emerald-700/20 bg-white px-4 py-2 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-600/30"
-        >
-          Cara Belanja
-        </a>
-        <a
-          href="/kebijakan-pembayaran"
-          className="rounded-full border border-emerald-700/20 bg-white px-4 py-2 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-600/30"
-        >
-          Kebijakan Pembayaran
-        </a>
-        <a
-          href="/pengiriman-pickup"
-          className="rounded-full border border-emerald-700/20 bg-white px-4 py-2 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-600/30"
-        >
-          Pengiriman & Pickup
-        </a>
-      </nav>
       <div className="flex flex-wrap items-center justify-center gap-2">
         <a
           href={SHOPEE_MARKETPLACE_URL}
