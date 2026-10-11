@@ -553,3 +553,156 @@ div[hidden="true"] {
 .input {
   @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
 }
+
+/* Final soft-green overrides: keep these outside @layer so they load after
+   generated Tailwind utilities, including hover/focus states. */
+.bg-emerald-50,
+.bg-emerald-50\/45,
+.bg-emerald-50\/50,
+.bg-emerald-50\/60,
+.bg-emerald-50\/70,
+.bg-emerald-50\/80,
+.bg-emerald-50\/90 {
+  background-color: #f4faf7 !important;
+}
+
+.bg-emerald-100,
+.bg-green-100 {
+  background-color: #e6f2ec !important;
+}
+
+.bg-emerald-300 {
+  background-color: #c9dfd4 !important;
+}
+
+.bg-emerald-600,
+.bg-emerald-700,
+.bg-emerald-950,
+.bg-green-600,
+.bg-green-700 {
+  background-color: #4f8f72 !important;
+}
+
+.bg-green-50,
+.bg-green-50\/70,
+.bg-green-50\/90 {
+  background-color: #f4faf6 !important;
+}
+
+.bg-green-500 {
+  background-color: #5a9b79 !important;
+}
+
+.hover\:bg-emerald-50:hover,
+.hover\:bg-emerald-50\/40:hover,
+.hover\:bg-emerald-50\/60:hover,
+.hover\:bg-emerald-50\/70:hover,
+.hover\:bg-green-50:hover {
+  background-color: #f6fbf8 !important;
+}
+
+.hover\:bg-emerald-100:hover,
+.hover\:bg-green-100:hover {
+  background-color: #e9f4ee !important;
+}
+
+.hover\:bg-emerald-700:hover,
+.hover\:bg-green-700:hover,
+.hover\:bg-primary\/90:hover {
+  background-color: #3f755f !important;
+}
+
+.border-emerald-50 {
+  border-color: #eef7f2 !important;
+}
+
+.border-emerald-100,
+.border-green-100 {
+  border-color: #dfeee7 !important;
+}
+
+.border-emerald-200,
+.border-green-200,
+.border-green-300,
+.border-green-300\/70,
+.border-green-400,
+.border-emerald-500,
+.border-green-500,
+.focus\:border-emerald-500:focus,
+.hover\:border-emerald-200:hover,
+.hover\:border-green-400\/80:hover {
+  border-color: #80ad99 !important;
+}
+
+.ring-emerald-50,
+.ring-emerald-50\/60,
+.ring-emerald-50\/70,
+.ring-green-50,
+.ring-green-50\/70 {
+  --tw-ring-color: #eef7f2 !important;
+}
+
+.ring-emerald-100,
+.focus\:ring-emerald-100:focus {
+  --tw-ring-color: #dfeee7 !important;
+}
+
+.ring-emerald-200,
+.ring-green-300,
+.focus\:ring-green-300\/50:focus {
+  --tw-ring-color: #cfe4d9 !important;
+}
+
+.text-emerald-50,
+.text-emerald-50\/90,
+.text-emerald-200 {
+  color: #dceee6 !important;
+}
+
+.text-emerald-500,
+.text-green-500 {
+  color: #5a9b79 !important;
+}
+
+.text-emerald-600,
+.text-green-600 {
+  color: #4a806b !important;
+}
+
+.text-emerald-700,
+.text-emerald-700\/80,
+.text-emerald-700\/90,
+.text-green-700 {
+  color: #3f715f !important;
+}
+
+.text-emerald-800,
+.text-emerald-800\/80,
+.text-green-800 {
+  color: #345f51 !important;
+}
+
+.text-emerald-900,
+.text-emerald-950,
+.text-green-900 {
+  color: #294d42 !important;
+}
+
+html .hover\:bg-emerald-700:hover,
+html .hover\:bg-green-700:hover,
+html .hover\:bg-primary\/90:hover {
+  background-color: #3f755f !important;
+}
+
+html .hover\:bg-emerald-100:hover,
+html .hover\:bg-green-100:hover {
+  background-color: #e9f4ee !important;
+}
+
+html .hover\:bg-emerald-50:hover,
+html .hover\:bg-emerald-50\/40:hover,
+html .hover\:bg-emerald-50\/60:hover,
+html .hover\:bg-emerald-50\/70:hover,
+html .hover\:bg-green-50:hover {
+  background-color: #f6fbf8 !important;
+}
