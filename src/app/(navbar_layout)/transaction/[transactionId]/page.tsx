@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "react-hot-toast";
 import UnifiedHeader from "@/components/common/UnifiedHeader";
+import { StatusOrder } from "@/components/track-order";
 import LoginProtection from "@/components/common/LoginProtection";
 import rupiahFormater from "@/utils/rupiahFormater";
 import {
@@ -133,6 +134,7 @@ const TransactionDetailPage: React.FC = () => {
       transaction.deliveryType === "delivery" ? "Kirim ke tujuan" : "Ambil di toko";
     const shipment = transaction.shipmentAddress;
     const customerSafeNote = getCustomerSafeNote(transaction.notes);
+
     const shippingFeeModeLabel = transaction.shippingDueOnDelivery && transaction.shippingDueOnDelivery > 0
       ? "Bayar ongkir saat paket tiba"
       : transaction.deliveryType === "delivery"
@@ -437,6 +439,19 @@ const TransactionDetailPage: React.FC = () => {
   const trackingDisplay = getTrackingDisplay(transaction.shipmentAddress?.trackingNumber);
   const customerSafeNote = getCustomerSafeNote(transaction.notes);
 
+  const getCurrentStatusIndex = (status: string, deliveryType?: string) => {
+    const normalized = String(status || "").toLowerCase();
+    const type = String(deliveryType || "delivery").toLowerCase();
+
+    if (["pending", "failed", "cancelled", "cancel", "deny", "expire", "refund"].includes(normalized)) return -1;
+    if (["paid", "capture", "settlement"].includes(normalized)) return 0;
+    if (normalized === "processing") return type === "pickup" ? 0 : 1;
+    if (normalized === "shipped") return type === "pickup" ? 1 : 2;
+    if (["completed", "delivered"].includes(normalized)) return type === "pickup" ? 2 : 3;
+    return -1;
+  };
+
+
   return (
     <LoginProtection useModal={true} feature="transaction">
     <div className="min-h-screen bg-transparent">
@@ -540,6 +555,13 @@ const TransactionDetailPage: React.FC = () => {
               </div>
             )}
           </div>
+
+
+
+          <StatusOrder
+            currentStatus={getCurrentStatusIndex(transaction.status, transaction.deliveryType)}
+            deliveryType={transaction.deliveryType}
+          />
 
           <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
             <div className="flex items-start justify-between gap-3">

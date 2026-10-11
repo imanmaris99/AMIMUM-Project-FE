@@ -6,6 +6,7 @@ import Image from "next/image";
 interface StatusItem {
   id: string;
   title: string;
+  description: string;
   icon: string;
   isCompleted: boolean;
 }
@@ -23,18 +24,21 @@ const StatusOrder: React.FC<StatusOrderProps> = ({ currentStatus = 0, deliveryTy
         {
           id: "packed",
           title: "Dibayar",
+          description: "Pembayaran tercatat/menunggu verifikasi admin.",
           icon: "box",
           isCompleted: currentStatus >= 0
         },
         {
           id: "ready",
           title: "Siap Diambil",
+          description: "Admin menyiapkan pesanan dan memberi tanda siap diambil.",
           icon: "box-time",
           isCompleted: currentStatus >= 1
         },
         {
           id: "picked",
           title: "Sudah Diambil",
+          description: "Pesanan sudah diterima langsung di toko.",
           icon: "truck-tick",
           isCompleted: currentStatus >= 2
         }
@@ -44,24 +48,28 @@ const StatusOrder: React.FC<StatusOrderProps> = ({ currentStatus = 0, deliveryTy
         {
           id: "packed",
           title: "Dibayar",
+          description: "Pembayaran diterima atau sedang diverifikasi.",
           icon: "box",
           isCompleted: currentStatus >= 0
         },
         {
           id: "processing",
           title: "Diproses toko",
+          description: "Toko menyiapkan item, packing, dan pengecekan akhir.",
           icon: "box-time",
           isCompleted: currentStatus >= 1
         },
         {
           id: "shipping",
           title: "Pengiriman",
+          description: "Paket diserahkan ke jasa kirim; resi tampil setelah admin input.",
           icon: "truck-time",
           isCompleted: currentStatus >= 2
         },
         {
           id: "delivered",
           title: "Sampai tujuan",
+          description: "Pesanan selesai/diterima customer.",
           icon: "truck-tick",
           isCompleted: currentStatus >= 3
         }
@@ -107,9 +115,14 @@ const StatusOrder: React.FC<StatusOrderProps> = ({ currentStatus = 0, deliveryTy
                 <div className="flex-shrink-0">
                   {getIconComponent(item.icon)}
                 </div>
-                <span className="text-sm font-semibold text-[#242424]">
-                  {item.title}
-                </span>
+                <div className="min-w-0">
+                  <span className="block text-sm font-semibold text-[#242424]">
+                    {item.title}
+                  </span>
+                  <span className="mt-0.5 block text-xs leading-relaxed text-[#6B7C73]">
+                    {item.description}
+                  </span>
+                </div>
               </div>
               
               {/* Right side - Check mark */}

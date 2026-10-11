@@ -73,6 +73,15 @@ const ProductVariants = ({
                       )}
                     </div>
 
+                    <div className="mb-2 flex flex-wrap gap-2 text-[11px]">
+                      <span className={`rounded-full px-2 py-1 font-semibold ${variant.stock > 0 ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+                        {variant.stock > 0 ? `Stok ${variant.stock}` : "Stok perlu konfirmasi"}
+                      </span>
+                      <span className="rounded-full bg-gray-50 px-2 py-1 font-semibold text-gray-600">
+                        Exp: {variant.expiration || "Belum tersedia"}
+                      </span>
+                    </div>
+
                     <div className="text-xs">
                       {!hasValidPrice ? (
                         <div className="text-gray-500 font-medium">
