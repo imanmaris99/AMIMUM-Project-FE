@@ -49,7 +49,7 @@ interface PaymentErrorResponse {
 }
 
 const PAYMENT_SERVICE_ERROR_MESSAGE =
-  "Layanan pembayaran online sementara belum tersedia. Silakan pilih QRIS resmi toko, transfer BRI manual, atau bayar di toko khusus pickup.";
+  "Layanan pembayaran online sementara belum tersedia. Silakan pilih QRIS resmi toko, transfer ke rekening BRI pemilik toko, atau bayar di toko khusus pickup.";
 
 const PAYMENT_REQUEST_TIMEOUT_MS = 60000;
 

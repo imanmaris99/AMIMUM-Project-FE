@@ -12,22 +12,22 @@ export default function KebijakanPembayaranPage() {
     <TrustPageShell
       eyebrow="Pembayaran resmi"
       title="Kebijakan Pembayaran"
-      description="Pembayaran produk dilakukan melalui metode resmi yang tersedia di aplikasi. Informasi ini membantu customer membayar dengan aman dan memahami proses verifikasi."
-      highlight="Untuk soft-launch, pembayaran produk mengikuti metode resmi seperti QRIS/manual transfer/pickup sesuai pilihan yang tampil. Jangan transfer ke rekening/nomor yang tidak tercantum atau tidak dikonfirmasi admin resmi."
+      description="Pembayaran produk mengikuti pilihan yang tersedia di checkout: QRIS resmi toko, transfer BRI pemilik toko, Midtrans sebagai pihak ketiga penyedia pembayaran, dan bayar di toko khusus pickup."
+      highlight="Untuk pesanan kirim, pembayaran produk dilakukan melalui QRIS toko, transfer BRI pemilik toko, atau Midtrans. Pilihan bayar langsung di toko hanya untuk pesanan pickup/ambil di toko."
       sections={[
         {
           title: "Metode pembayaran yang digunakan",
           items: [
-            "QRIS resmi toko bila tersedia di halaman transaksi.",
-            "Transfer bank manual ke rekening resmi yang tampil di aplikasi.",
-            "Bayar di toko khusus pesanan pickup bila opsi tersebut tersedia.",
-            "Metode online lain hanya digunakan jika tampil resmi di checkout/transaksi.",
+            "QRIS resmi toko untuk pembayaran langsung ke QRIS Toko Herbal Amimum.",
+            "Transfer ke rekening BRI pemilik toko yang tampil di aplikasi.",
+            "Midtrans sebagai pihak ketiga penyedia layanan pembayaran online, seperti VA/QRIS/e-wallet/kartu sesuai halaman Midtrans.",
+            "Bayar langsung di toko hanya tersedia untuk pesanan pickup/ambil di toko.",
           ],
         },
         {
           title: "Verifikasi pembayaran",
           items: [
-            "Pesanan manual QRIS/transfer dapat menunggu admin memverifikasi dana masuk.",
+            "Pesanan QRIS toko dan transfer BRI dapat menunggu admin memverifikasi dana masuk.",
             "Customer disarankan menyimpan bukti pembayaran sampai status berubah.",
             "Jika status belum berubah, hubungi admin dengan menyertakan nomor pesanan dan bukti pembayaran.",
           ],
@@ -37,7 +37,7 @@ export default function KebijakanPembayaranPage() {
           items: [
             "Total produk dan ongkir mengikuti ringkasan checkout.",
             "Jika sistem menampilkan ongkir dibayar saat paket tiba, berarti yang dibayar saat checkout hanya total produk/metode toko.",
-            "Pembayaran produk bukan COD kecuali ada instruksi resmi dari toko untuk kondisi khusus pickup/bayar di toko.",
+            "Bayar di tempat hanya berlaku untuk pesanan pickup di toko, bukan untuk pesanan kirim.",
           ],
         },
         {

@@ -36,8 +36,8 @@ export const MIDTRANS_PAYMENT_METHOD_NAME = IS_MIDTRANS_PRODUCTION
   : "Pembayaran Online Midtrans (Uji Coba)";
 
 export const MIDTRANS_PAYMENT_DESCRIPTION = IS_MIDTRANS_PRODUCTION
-  ? "Bayar aman melalui Midtrans: VA, QRIS, GoPay, kartu, atau metode pembayaran lain yang tersedia."
-  : "Mode uji coba: VA, QRIS, GoPay, kartu, atau metode pembayaran lain yang tersedia di halaman Midtrans.";
+  ? "Pembayaran lewat pihak ketiga Midtrans. Pilihan seperti VA, QRIS, GoPay, kartu, atau metode lain mengikuti halaman Midtrans."
+  : "Mode uji coba pihak ketiga Midtrans: VA, QRIS, GoPay, kartu, atau metode lain mengikuti halaman Midtrans.";
 
 const DELIVERY_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
   {
@@ -55,12 +55,12 @@ const DELIVERY_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
   },
   {
     id: "bank_transfer_manual",
-    title: "Transfer Bank Manual",
+    title: "Transfer BRI Pemilik Toko",
     methods: [
       {
         id: "transfer",
-        name: "Transfer BRI Manual",
-        description: `Transfer ke rekening resmi toko: ${STORE_BANK_ACCOUNT_TEXT}. Kirim bukti pembayaran ke admin setelah transfer.`,
+        name: "Transfer BRI a.n. IMAN MARIS",
+        description: `Transfer ke rekening BRI pemilik toko: ${STORE_BANK_ACCOUNT_TEXT}. Simpan bukti dan kirim ke admin setelah transfer.`,
         badge: "BRI",
         isAvailable: true,
       },
@@ -68,7 +68,7 @@ const DELIVERY_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
   },
   {
     id: "online_payment",
-    title: MIDTRANS_PAYMENT_LABEL,
+    title: "Midtrans (Pihak Ketiga)",
     methods: [
       {
         id: "qris",
@@ -97,12 +97,12 @@ const PICKUP_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
   },
   {
     id: "bank_transfer_manual",
-    title: "Transfer Bank Manual",
+    title: "Transfer BRI Pemilik Toko",
     methods: [
       {
         id: "transfer",
-        name: "Transfer BRI Manual",
-        description: `Transfer ke rekening resmi toko: ${STORE_BANK_ACCOUNT_TEXT}. Kirim bukti pembayaran ke admin setelah transfer.`,
+        name: "Transfer BRI a.n. IMAN MARIS",
+        description: `Transfer ke rekening BRI pemilik toko: ${STORE_BANK_ACCOUNT_TEXT}. Simpan bukti dan kirim ke admin setelah transfer.`,
         badge: "BRI",
         isAvailable: true,
       },
@@ -110,7 +110,7 @@ const PICKUP_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
   },
   {
     id: "online_payment",
-    title: MIDTRANS_PAYMENT_LABEL,
+    title: "Midtrans (Pihak Ketiga)",
     methods: [
       {
         id: "qris",
@@ -123,12 +123,12 @@ const PICKUP_PAYMENT_METHOD_GROUPS: PaymentMethodGroup[] = [
   },
   {
     id: "pickup",
-    title: "Bayar Langsung di Toko Amimum",
+    title: "Bayar di Tempat Khusus Pickup",
     methods: [
       {
         id: "pay_at_store",
-        name: "Bayar di Toko Herbal Amimum",
-        description: "Khusus pickup/ambil di toko. Pembayaran dilakukan langsung di toko offline Toko Herbal Amimum.",
+        name: "Bayar di Toko saat Pickup",
+        description: "Khusus pesanan pickup/ambil di toko. Pembayaran dilakukan langsung di toko saat pesanan diambil.",
         badge: "TOKO",
         isAvailable: true,
       },
