@@ -35,7 +35,7 @@ const NotFoundPage = ({ showFooterSpace = true }: NotFoundPageProps) => {
       <div className="mx-auto flex min-h-[calc(100dvh-3rem)] w-full max-w-md flex-col justify-center">
         <section className="rounded-3xl bg-white/95 p-5 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-100">
           <div className="mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-emerald-50 ring-8 ring-emerald-50/60">
-            <span className="text-4xl font-black text-[#006A47]">404</span>
+            <span className="text-4xl font-black text-[#2F6F5A]">404</span>
           </div>
 
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">
@@ -63,7 +63,7 @@ const NotFoundPage = ({ showFooterSpace = true }: NotFoundPageProps) => {
             <button
               type="button"
               onClick={handleGoHome}
-              className="rounded-2xl bg-[#006A47] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#005A3C]"
+              className="rounded-2xl bg-[#2F6F5A] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#285E4E]"
             >
               Kembali ke Beranda
             </button>
@@ -71,14 +71,14 @@ const NotFoundPage = ({ showFooterSpace = true }: NotFoundPageProps) => {
               <button
                 type="button"
                 onClick={handleGoSearch}
-                className="rounded-2xl border border-emerald-200 bg-white px-4 py-3 text-sm font-semibold text-[#006A47] transition-colors hover:bg-emerald-50"
+                className="rounded-2xl border border-emerald-200 bg-white px-4 py-3 text-sm font-semibold text-[#2F6F5A] transition-colors hover:bg-emerald-50"
               >
                 Cari Produk
               </button>
               <button
                 type="button"
                 onClick={handleGoCatalog}
-                className="rounded-2xl border border-emerald-200 bg-white px-4 py-3 text-sm font-semibold text-[#006A47] transition-colors hover:bg-emerald-50"
+                className="rounded-2xl border border-emerald-200 bg-white px-4 py-3 text-sm font-semibold text-[#2F6F5A] transition-colors hover:bg-emerald-50"
               >
                 Lihat Katalog
               </button>

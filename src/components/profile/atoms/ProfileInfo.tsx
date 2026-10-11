@@ -185,7 +185,7 @@ const ProfileInfo: React.FC = () => {
       <div className="flex flex-col items-center px-4 pb-6 pt-5 sm:py-8">
         {/* Profile Avatar */}
         <div className="relative mb-4 sm:mb-6">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#E6F2F0] shadow-inner ring-4 ring-emerald-50 sm:h-24 sm:w-24">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#EAF5EF] shadow-inner ring-4 ring-emerald-50 sm:h-24 sm:w-24">
             {profile?.photo_url ? (
               // Use native img to avoid remote image configuration issues.
               /* eslint-disable-next-line @next/next/no-img-element */
@@ -244,14 +244,14 @@ const ProfileInfo: React.FC = () => {
           <button 
             onClick={handleEditProfileClick}
             disabled={isLoading || Boolean(errorMessage)}
-            className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl border border-[#006A47] bg-[#006A47] px-3 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#005A3C] disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl border border-[#2F6F5A] bg-[#2F6F5A] px-3 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#285E4E] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Image
               src="/edit.svg"
               alt="Edit"
               width={14}
               height={14}
-              className="text-[#E6F2F0]"
+              className="text-[#EAF5EF]"
             />
             Edit Profil
           </button>
@@ -259,7 +259,7 @@ const ProfileInfo: React.FC = () => {
           <button 
             onClick={handleChangePhotoClick}
             disabled={isLoading || Boolean(errorMessage)}
-            className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl bg-emerald-50 px-3 py-2 text-sm font-semibold text-[#006A47] transition-colors hover:bg-[#D4E8E0] disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl bg-emerald-50 px-3 py-2 text-sm font-semibold text-[#2F6F5A] transition-colors hover:bg-[#DCEDE5] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Image
               src="/gallery-export.svg"

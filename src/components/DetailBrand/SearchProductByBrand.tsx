@@ -100,15 +100,15 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
           aria-label="Cari produk dari brand ini"
           disabled={isSearching || !searchQuery.trim()}
           onClick={() => void handleSearch()}
-          className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-xl bg-[#00764F] text-white transition-colors hover:bg-[#005A3C] disabled:cursor-not-allowed disabled:bg-gray-300"
+          className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-xl bg-[#2F6F5A] text-white transition-colors hover:bg-[#285E4E] disabled:cursor-not-allowed disabled:bg-gray-300"
         >
           <CiSearch className="h-5 w-5" />
         </button>
       </div>
 
       {isSearching && (
-        <div className="flex items-center gap-2 rounded-2xl bg-emerald-50 px-3 py-2 text-sm text-[#00764F]">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#00764F] border-t-transparent"></div>
+        <div className="flex items-center gap-2 rounded-2xl bg-emerald-50 px-3 py-2 text-sm text-[#2F6F5A]">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#2F6F5A] border-t-transparent"></div>
           <span>Mencari produk katalog dari {safeBrandName}...</span>
         </div>
       )}
@@ -120,7 +120,7 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
               <p className="text-sm text-amber-800">{searchError}</p>
               <button
                 onClick={handleClearSearch}
-                className="mt-3 text-sm text-[#00764F] hover:underline"
+                className="mt-3 text-sm text-[#2F6F5A] hover:underline"
               >
                 Hapus pencarian
               </button>
@@ -129,11 +129,11 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
             <div>
               <div className="mb-3 flex flex-col gap-2 rounded-2xl bg-emerald-50 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-[#6B7C73]">
-                  Ditemukan <span className="font-semibold text-[#00764F]">{searchResults.length}</span> produk katalog
+                  Ditemukan <span className="font-semibold text-[#2F6F5A]">{searchResults.length}</span> produk katalog
                 </p>
                 <button
                   onClick={handleClearSearch}
-                  className="text-sm text-[#00764F] hover:underline"
+                  className="text-sm text-[#2F6F5A] hover:underline"
                 >
                   Hapus pencarian
                 </button>
@@ -148,7 +148,7 @@ const SearchProductByBrand = ({ brandId, brandName, brandData }: SearchProductBy
               </p>
               <button
                 onClick={handleClearSearch}
-                className="mt-3 text-sm text-[#00764F] hover:underline"
+                className="mt-3 text-sm text-[#2F6F5A] hover:underline"
               >
                 Hapus pencarian
               </button>

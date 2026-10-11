@@ -139,7 +139,7 @@ const FormResetPassword = () => {
     return (
       <div className="space-y-5 pt-2">
         <div className="text-center">
-          <h1 className="text-[#00764F] text-3xl font-bold leading-tight">Password Berhasil</h1>
+          <h1 className="text-[#2F6F5A] text-3xl font-bold leading-tight">Password Berhasil</h1>
           <p className="mt-2 text-sm text-slate-500">Silakan login dengan password baru Anda.</p>
         </div>
 
@@ -177,7 +177,7 @@ const FormResetPassword = () => {
     <div className="space-y-5 pt-2">
       {/* Judul Reset Password */}
       <div className="text-center">
-        <h1 className="text-[#00764F] text-3xl font-bold leading-tight">Reset Password</h1>
+        <h1 className="text-[#2F6F5A] text-3xl font-bold leading-tight">Reset Password</h1>
         <p className="mt-2 text-sm text-slate-500">Masukkan kode dari email dan password baru.</p>
       </div>
 
@@ -345,7 +345,7 @@ const FormResetPassword = () => {
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full h-11 bg-[#00764F] hover:bg-[#00764F]/90 text-white rounded-lg font-medium shadow-sm"
+              className="w-full h-11 bg-[#2F6F5A] hover:bg-[#2F6F5A]/90 text-white rounded-lg font-medium shadow-sm"
               disabled={isSubmitting}
             >
               {isSubmitting ? (

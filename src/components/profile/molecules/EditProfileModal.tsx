@@ -199,14 +199,14 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             <button
               onClick={onClose}
               disabled={isSaving}
-              className="flex-1 rounded-2xl border border-[#006A47] bg-white px-5 py-3 text-base font-medium text-[#006A47] transition-colors hover:bg-[#E6F2F0] disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex-1 rounded-2xl border border-[#2F6F5A] bg-white px-5 py-3 text-base font-medium text-[#2F6F5A] transition-colors hover:bg-[#EAF5EF] disabled:cursor-not-allowed disabled:opacity-60"
             >
               Batal
             </button>
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="flex-1 rounded-2xl bg-[#006A47] px-5 py-3 text-base font-medium text-white transition-colors hover:bg-[#005A3C] disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex-1 rounded-2xl bg-[#2F6F5A] px-5 py-3 text-base font-medium text-white transition-colors hover:bg-[#285E4E] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSaving ? "Menyimpan..." : "Simpan"}
             </button>

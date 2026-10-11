@@ -1344,7 +1344,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                       {selectedAddress.address}, {selectedAddress.city} {selectedAddress.postal_code}
                     </p>
                     {hasValidRajaOngkirCityId(selectedAddress.city_id) ? (
-                      <p className="mt-2 inline-flex rounded-full bg-[#E6F2F0] px-3 py-1 text-xs font-semibold text-primary">
+                      <p className="mt-2 inline-flex rounded-full bg-[#EAF5EF] px-3 py-1 text-xs font-semibold text-primary">
                         Alamat RajaOngkir valid untuk hitung ongkir.
                       </p>
                     ) : (

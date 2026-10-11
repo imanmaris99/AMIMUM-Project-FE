@@ -15,7 +15,7 @@
 /* Mobile-first marketplace shell */
 html {
   min-height: 100%;
-  background: #f4fbf7;
+  background: #f7fbf8;
 }
 
 body {
@@ -23,9 +23,9 @@ body {
   justify-content: center;
   align-items: stretch;
   background:
-    radial-gradient(circle at top left, rgba(0, 106, 71, 0.10), transparent 30rem),
+    radial-gradient(circle at top left, rgba(47, 111, 90, 0.08), transparent 30rem),
     radial-gradient(circle at bottom right, rgba(217, 164, 65, 0.12), transparent 26rem),
-    linear-gradient(180deg, #f1faf5 0%, #ffffff 34%, #fffbf1 72%, #f4fbf7 100%);
+    linear-gradient(180deg, #f5fbf7 0%, #ffffff 34%, #fffbf1 72%, #f7fbf8 100%);
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -39,7 +39,7 @@ main {
   min-height: 100vh;
   min-height: 100dvh;
   background:
-    linear-gradient(180deg, #f1faf5 0%, #ffffff 34%, #fffbf1 72%, #f4fbf7 100%);
+    linear-gradient(180deg, #f5fbf7 0%, #ffffff 34%, #fffbf1 72%, #f7fbf8 100%);
   position: relative;
   overflow-x: hidden;
   box-shadow: 0 0 40px rgba(0, 31, 20, 0.08);
@@ -309,7 +309,7 @@ select:focus-visible {
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 161 100% 23%;
+    --primary: 158 40% 31%;
     --primary-foreground: 0 0% 98%;
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
@@ -337,7 +337,7 @@ select:focus-visible {
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 161 100% 23%;
+    --primary: 158 40% 31%;
     --primary-foreground: 240 5.9% 10%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
@@ -394,6 +394,103 @@ div[hidden="true"] {
 /* Suppress hydration warnings for all elements that might be modified by browser extensions */
 * {
   /* This will suppress hydration warnings globally */
+}
+
+/* Amimum soft green palette
+   Keep the brand herbal-green, but lower saturation/contrast so badges,
+   selected cards, and success states are calmer on mobile screens. */
+@layer utilities {
+  .bg-emerald-50 {
+    background-color: #f4faf7 !important;
+  }
+
+  .bg-emerald-100 {
+    background-color: #e6f2ec !important;
+  }
+
+  .bg-emerald-600 {
+    background-color: #4f8f72 !important;
+  }
+
+  .bg-emerald-700 {
+    background-color: #3f755f !important;
+  }
+
+  .hover\:bg-emerald-700:hover {
+    background-color: #3f755f !important;
+  }
+
+  .border-emerald-50 {
+    border-color: #eef7f2 !important;
+  }
+
+  .border-emerald-100 {
+    border-color: #dfeee7 !important;
+  }
+
+  .border-emerald-200 {
+    border-color: #cfe4d9 !important;
+  }
+
+  .ring-emerald-50 {
+    --tw-ring-color: #eef7f2 !important;
+  }
+
+  .ring-emerald-100 {
+    --tw-ring-color: #dfeee7 !important;
+  }
+
+  .text-emerald-600 {
+    color: #4a806b !important;
+  }
+
+  .text-emerald-700 {
+    color: #3f715f !important;
+  }
+
+  .text-emerald-800 {
+    color: #345f51 !important;
+  }
+
+  .text-emerald-900 {
+    color: #294d42 !important;
+  }
+
+  .bg-green-50 {
+    background-color: #f4faf6 !important;
+  }
+
+  .bg-green-100 {
+    background-color: #e6f2eb !important;
+  }
+
+  .bg-green-500 {
+    background-color: #5a9b79 !important;
+  }
+
+  .text-green-500 {
+    color: #5a9b79 !important;
+  }
+
+  .text-green-600 {
+    color: #4a8067 !important;
+  }
+
+  .text-green-700 {
+    color: #3d6b58 !important;
+  }
+
+  .text-green-900 {
+    color: #2f5548 !important;
+  }
+
+  .border-green-100 {
+    border-color: #dfeee6 !important;
+  }
+
+  .border-green-200 {
+    border-color: #cfe3d8 !important;
+  }
 }
 
 /* Utility classes for common patterns */

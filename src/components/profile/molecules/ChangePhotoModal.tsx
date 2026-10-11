@@ -206,7 +206,7 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({ isOpen, onClose, on
             <button
               onClick={handleClose}
               disabled={isUploading}
-              className="flex-1 rounded-2xl border border-[#006A47] bg-white px-5 py-3 text-base font-medium text-[#006A47] transition-colors hover:bg-[#E6F2F0] disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex-1 rounded-2xl border border-[#2F6F5A] bg-white px-5 py-3 text-base font-medium text-[#2F6F5A] transition-colors hover:bg-[#EAF5EF] disabled:cursor-not-allowed disabled:opacity-60"
             >
               Batal
             </button>
@@ -215,7 +215,7 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({ isOpen, onClose, on
               disabled={!selectedFile || isUploading}
               className={`flex-1 rounded-2xl px-5 py-3 text-base font-medium transition-colors ${
                 selectedFile && !isUploading
-                  ? "bg-[#006A47] text-white hover:bg-[#005A3C]" 
+                  ? "bg-[#2F6F5A] text-white hover:bg-[#285E4E]"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >

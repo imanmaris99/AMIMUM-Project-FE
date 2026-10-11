@@ -27,7 +27,7 @@ const ProductVariants = ({
   return (
     <div className="rounded-3xl bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.08)] backdrop-blur">
       <div className="p-4">
-        <p className="text-emerald-900 text-sm font-semibold mb-3">Varian produk :</p>
+        <p className="mb-3 text-sm font-semibold text-[#294D42]">Varian produk :</p>
         {productVariants.length === 0 ? (
           <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
             Varian produk belum tersedia di katalog. Silakan hubungi admin toko sebelum membeli.
@@ -49,8 +49,8 @@ const ProductVariants = ({
                   key={variant.id}
                   className={`flex items-center space-x-3 rounded-2xl p-4 cursor-pointer transition-all duration-200 ${
                     isSelected
-                      ? "bg-emerald-50 shadow-[0_4px_14px_rgba(15,23,42,0.07)]"
-                      : "bg-white/80 hover:bg-emerald-50/50"
+                      ? "border border-[#DCEDE5] bg-[#F5FAF7] shadow-[0_4px_14px_rgba(15,23,42,0.06)]"
+                      : "border border-transparent bg-white/80 hover:border-[#E6F2EC] hover:bg-[#F8FCFA]"
                   }`}
                 >
                   <input
@@ -67,17 +67,17 @@ const ProductVariants = ({
                         {variant.variant || variant.name || "Varian produk"}
                       </span>
                       {isInCart && (
-                        <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">
+                        <span className="rounded-full bg-[#EAF5EF] px-2 py-1 text-xs font-semibold text-[#3F715F]">
                           ✓ Di Keranjang
                         </span>
                       )}
                     </div>
 
                     <div className="mb-2 flex flex-wrap gap-2 text-[11px]">
-                      <span className={`rounded-full px-2 py-1 font-semibold ${variant.stock > 0 ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+                      <span className={`rounded-full px-2 py-1 font-semibold ${variant.stock > 0 ? "bg-[#EAF5EF] text-[#3F715F]" : "bg-amber-50 text-amber-700"}`}>
                         {variant.stock > 0 ? `Stok ${variant.stock}` : "Stok perlu konfirmasi"}
                       </span>
-                      <span className="rounded-full bg-gray-50 px-2 py-1 font-semibold text-gray-600">
+                      <span className="rounded-full bg-[#F7F9F8] px-2 py-1 font-semibold text-[#5F6F67]">
                         Exp: {variant.expiration || "Belum tersedia"}
                       </span>
                     </div>

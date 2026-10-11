@@ -138,7 +138,7 @@ const EditShipment = () => {
         <div className="relative flex items-center justify-center">
           <button 
             onClick={handleBack}
-            className="absolute left-0 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-2xl text-[#006A47] transition-colors hover:bg-emerald-100"
+            className="absolute left-0 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-2xl text-[#2F6F5A] transition-colors hover:bg-emerald-100"
             aria-label="Kembali"
             type="button"
           >

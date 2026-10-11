@@ -95,7 +95,7 @@ const DeleteAddressModal: React.FC<DeleteAddressModalProps> = ({
             <button
               onClick={onClose}
               disabled={isDeleting}
-              className="flex-1 rounded-2xl border border-[#005A3C] bg-white px-5 py-3 text-sm font-medium text-[#005A3C] transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex-1 rounded-2xl border border-[#285E4E] bg-white px-5 py-3 text-sm font-medium text-[#285E4E] transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
             >
               Batal
             </button>

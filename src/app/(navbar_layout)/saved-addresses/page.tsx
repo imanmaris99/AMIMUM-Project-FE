@@ -280,7 +280,7 @@ const SavedAddressesPage: React.FC = () => {
             type="button"
             onClick={handleBack}
             aria-label="Kembali"
-            className="absolute left-0 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-2xl text-[#006A47] transition-colors hover:bg-emerald-100"
+            className="absolute left-0 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-2xl text-[#2F6F5A] transition-colors hover:bg-emerald-100"
           >
             <GoChevronLeft />
           </button>
@@ -296,7 +296,7 @@ const SavedAddressesPage: React.FC = () => {
         <div className="w-full max-w-sm space-y-4">
           {isLoading ? (
             <div className="rounded-3xl bg-white/95 p-6 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
-              <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-4 border-[#006A47] border-t-transparent" />
+              <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-4 border-[#2F6F5A] border-t-transparent" />
               <p className="text-sm text-[#666666]">
                 Mengambil alamat pengiriman dari server...
               </p>
@@ -317,7 +317,7 @@ const SavedAddressesPage: React.FC = () => {
             </div>
           ) : addresses.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-emerald-100 bg-white/95 p-6 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#E6F2F0] text-2xl font-bold text-[#006A47]">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#EAF5EF] text-2xl font-bold text-[#2F6F5A]">
                 +
               </div>
               <h2 className="mb-2 text-base font-semibold text-[#313131]">
@@ -329,7 +329,7 @@ const SavedAddressesPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleAddAddress}
-                className="mt-5 rounded-2xl bg-[#006A47] px-5 py-3 text-sm font-semibold text-white hover:bg-[#005A3C]"
+                className="mt-5 rounded-2xl bg-[#2F6F5A] px-5 py-3 text-sm font-semibold text-white hover:bg-[#285E4E]"
               >
                 Tambah Alamat Pengiriman
               </button>
@@ -353,7 +353,7 @@ const SavedAddressesPage: React.FC = () => {
                 <div
                   key={item.id}
                   className={`relative cursor-pointer rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] transition-all ${
-                    isSelected ? "ring-2 ring-[#006A47]" : "ring-1 ring-emerald-50"
+                    isSelected ? "ring-2 ring-[#2F6F5A]" : "ring-1 ring-emerald-50"
                   }`}
                   onClick={() => handleSelectAddress(addressId)}
                 >
@@ -362,8 +362,8 @@ const SavedAddressesPage: React.FC = () => {
                       <div
                         className={`w-5 h-5 border-2 rounded-md flex items-center justify-center cursor-pointer transition-colors ${
                           isSelected
-                            ? "bg-[#006A47] border-[#006A47]"
-                            : "border-gray-300 hover:border-[#006A47]"
+                            ? "bg-[#2F6F5A] border-[#2F6F5A]"
+                            : "border-gray-300 hover:border-[#2F6F5A]"
                         }`}
                         onClick={() => handleSelectAddress(addressId)}
                       >
@@ -397,7 +397,7 @@ const SavedAddressesPage: React.FC = () => {
                         </p>
                       )}
                       {hasValidRajaOngkirCity && (
-                        <p className="mt-2 inline-flex rounded-full bg-[#E6F2F0] px-3 py-1 text-xs font-semibold text-[#006A47]">
+                        <p className="mt-2 inline-flex rounded-full bg-[#EAF5EF] px-3 py-1 text-xs font-semibold text-[#2F6F5A]">
                           Siap dipakai checkout
                         </p>
                       )}
@@ -409,7 +409,7 @@ const SavedAddressesPage: React.FC = () => {
                         setSelectedAddress(addressId);
                         handleEditAddress();
                       }}
-                      className="bg-[#006A47] text-white px-3 py-1.5 rounded-2xl text-sm font-medium hover:bg-[#005A3C] transition-colors"
+                      className="bg-[#2F6F5A] text-white px-3 py-1.5 rounded-2xl text-sm font-medium hover:bg-[#285E4E] transition-colors"
                     >
                       Edit
                     </button>
@@ -439,7 +439,7 @@ const SavedAddressesPage: React.FC = () => {
             <button
               type="button"
               onClick={handleAddAddress}
-              className="rounded-2xl bg-[#006A47] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#005A3C]"
+              className="rounded-2xl bg-[#2F6F5A] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#285E4E]"
             >
               + Tambah Alamat Pengiriman
             </button>

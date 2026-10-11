@@ -54,7 +54,7 @@ const SearchPageBox = ({ initialQuery = "" }: SearchPageBoxProps) => {
         <button
           type="submit"
           disabled={!query.trim()}
-          className="h-10 rounded-xl bg-[#00764F] px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#005A3C] disabled:cursor-not-allowed disabled:bg-gray-300"
+          className="h-10 rounded-xl bg-[#2F6F5A] px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#285E4E] disabled:cursor-not-allowed disabled:bg-gray-300"
         >
           Cari
         </button>

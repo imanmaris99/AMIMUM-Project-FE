@@ -113,7 +113,7 @@ const StatusOrder: React.FC<StatusOrderProps> = ({ currentStatus = 0, deliveryTy
                     alt="check mark"
                     width={16}
                     height={16}
-                    className="text-[#00593B]"
+                    className="text-[#285E4E]"
                   />
                 </div>
               )}

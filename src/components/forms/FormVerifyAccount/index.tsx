@@ -156,7 +156,7 @@ const FormVerifyAccount = () => {
     <div className="space-y-5 pt-2">
       {/* Judul Verifikasi Akun */}
       <div className="text-center">
-        <h1 className="text-[#00764F] text-3xl font-bold leading-tight">Verifikasi Akun</h1>
+        <h1 className="text-[#2F6F5A] text-3xl font-bold leading-tight">Verifikasi Akun</h1>
         <p className="mt-2 text-sm text-slate-500">Masukkan kode yang dikirim ke email Anda.</p>
       </div>
 
@@ -254,7 +254,7 @@ const FormVerifyAccount = () => {
             {/* Submit Button */}
             <Button 
               type="submit" 
-              className="w-full h-11 bg-[#00764F] hover:bg-[#00764F]/90 text-white rounded-lg font-medium shadow-sm"
+              className="w-full h-11 bg-[#2F6F5A] hover:bg-[#2F6F5A]/90 text-white rounded-lg font-medium shadow-sm"
               disabled={isSubmitting}
             >
               {isSubmitting ? (

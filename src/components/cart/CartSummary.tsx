@@ -32,7 +32,7 @@ export default function CartSummary() {
             )}
 
             {hasSelectedItems && (
-              <div className="rounded-2xl bg-[#E6F2F0] px-3 py-2">
+              <div className="rounded-2xl bg-[#EAF5EF] px-3 py-2">
                 <p className="text-xs font-semibold text-primary">
                   {selectedQuantity} item dipilih untuk checkout.
                 </p>

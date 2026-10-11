@@ -251,7 +251,7 @@ const ProductPrice = ({
                     className={`${
                       isItemInCart
                         ? "bg-green-600 hover:bg-green-700"
-                        : "bg-[#006A47] hover:bg-[#005A3C]"
+                        : "bg-[#2F6F5A] hover:bg-[#285E4E]"
                     } text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 px-3 py-2 text-xs w-full`}
                   >
                     {isAdding ? (
@@ -295,7 +295,7 @@ const ProductPrice = ({
                     ? "bg-green-600 hover:bg-green-700"
                     : !datavariant || !hasValidPrice
                     ? "bg-gray-400 hover:bg-gray-400"
-                    : "bg-[#006A47] hover:bg-[#005A3C]"
+                    : "bg-[#2F6F5A] hover:bg-[#285E4E]"
                 } text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 px-4 py-2`}
               >
                 {isAdding ? (

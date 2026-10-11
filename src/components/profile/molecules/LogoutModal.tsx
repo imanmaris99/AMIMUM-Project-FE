@@ -79,7 +79,7 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose, onConfirm })
             {/* Iya Button */}
             <button
               onClick={onConfirm}
-              className="flex-1 rounded-2xl bg-[#006A47] px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-[#005A3C]"
+              className="flex-1 rounded-2xl bg-[#2F6F5A] px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-[#285E4E]"
             >
               Keluar
             </button>
@@ -87,7 +87,7 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose, onConfirm })
             {/* Tidak Button */}
             <button
               onClick={onClose}
-              className="flex-1 rounded-2xl border border-[#005A3C] bg-white px-5 py-3 text-sm font-medium text-[#005A3C] transition-colors hover:bg-gray-50"
+              className="flex-1 rounded-2xl border border-[#285E4E] bg-white px-5 py-3 text-sm font-medium text-[#285E4E] transition-colors hover:bg-gray-50"
             >
               Batal
             </button>

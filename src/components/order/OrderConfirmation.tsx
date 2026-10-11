@@ -171,7 +171,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
             <div className="mt-5 grid gap-3">
               <button
                 onClick={() => router.push('/cart')}
-                className="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#005A3C]"
+                className="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#285E4E]"
               >
                 Lihat Keranjang
               </button>
@@ -361,14 +361,14 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
           {isPendingPayment && !isFailedPayment && (
             <button
               onClick={handleContinuePayment}
-              className="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#005A3C]"
+              className="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#285E4E]"
             >
               {isManualQrisPayment ? 'Lihat QRIS Pembayaran' : 'Lanjutkan Pembayaran'}
             </button>
           )}
           <button
             onClick={handleViewOrders}
-            className={`${isPendingPayment ? 'w-full bg-emerald-50 text-primary hover:bg-emerald-100' : 'w-full bg-primary text-white hover:bg-[#005A3C]'} rounded-2xl px-4 py-3 text-sm font-semibold transition-colors`}
+            className={`${isPendingPayment ? 'w-full bg-emerald-50 text-primary hover:bg-emerald-100' : 'w-full bg-primary text-white hover:bg-[#285E4E]'} rounded-2xl px-4 py-3 text-sm font-semibold transition-colors`}
           >
             Lihat Pesanan Saya
           </button>
