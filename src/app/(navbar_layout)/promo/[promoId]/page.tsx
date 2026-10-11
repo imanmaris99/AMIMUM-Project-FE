@@ -35,26 +35,26 @@ export default async function PromoDetailPage({ params }: { params: Promise<{ pr
     );
   }
   
-  const [brandResult, productsResult] = await Promise.allSettled([
-    GetBrandDetailByIDServer(productionId),
-    GetProductDiscountByBrandIdServer(productionId),
-  ]);
-
-  if (brandResult.status === "fulfilled") {
-    brandData = brandResult.value;
-  } else {
+  try {
+    brandData = await GetBrandDetailByIDServer(productionId);
+  } catch {
     errorMessage = 'Detail promo belum bisa dimuat. Produk promo yang tersedia tetap ditampilkan jika ada.';
   }
 
-  if (productsResult.status === "fulfilled") {
-    products = productsResult.value.map((product) => ({
-      ...product,
-      all_variants: Array.isArray(product.all_variants)
-        ? product.all_variants
-        : [],
-    }));
-  } else {
-    products = [];
+  const shouldFetchPromoProducts = !brandData || Number(brandData.total_product_with_promo || 0) > 0;
+
+  if (shouldFetchPromoProducts) {
+    try {
+      const allProducts = await GetProductDiscountByBrandIdServer(productionId);
+      products = allProducts.map((product) => ({
+        ...product,
+        all_variants: Array.isArray(product.all_variants)
+          ? product.all_variants
+          : [],
+      }));
+    } catch {
+      products = [];
+    }
   }
   
   const brandName = brandData?.name?.trim() || "Brand produk";
