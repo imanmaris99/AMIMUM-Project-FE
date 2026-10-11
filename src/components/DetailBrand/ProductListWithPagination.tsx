@@ -55,7 +55,9 @@ const ProductListWithPagination = ({
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">{sectionLabel}</p>
         <h2 className="mt-1 text-lg font-bold text-[#0D0E09]">{title}</h2>
         <p className="mt-1 text-sm leading-5 text-[#6B7C73]">
-          {products.length > 0 ? (helperText || `${totalAvailable} produk tersedia. Harga final mengikuti detail produk saat checkout.`) : emptyMessage}
+          {products.length > 0
+            ? (helperText || `${totalAvailable} produk tersedia. Harga final mengikuti detail produk saat checkout.`)
+            : "Belum ada produk yang bisa ditampilkan pada bagian ini."}
         </p>
       </div>
       {products && products.length > 0 ? (
