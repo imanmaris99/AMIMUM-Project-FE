@@ -501,6 +501,7 @@ export async function GetRelatedProductsByBrandNameServer(
         "Content-Type": "application/json",
       },
       next: { revalidate: 300 },
+      signal: AbortSignal.timeout(PRODUCT_CATALOG_LOOKUP_TIMEOUT_MS),
     });
 
     if (!res.ok) {
