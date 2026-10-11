@@ -10,11 +10,14 @@ interface ProductImageProps {
 
 const ProductImage = ({ detailProduct, selectedVariantImg }: ProductImageProps) => {
   const [imageError, setImageError] = useState(false);
+  const primaryGalleryImage = detailProduct?.gallery_images?.find((img) => img.is_primary)?.url;
+  const firstGalleryImage = detailProduct?.gallery_images?.[0]?.url;
+  const firstVariantImage = detailProduct?.variants_list?.find((variant) => variant?.img)?.img;
   const imageUrl = selectedVariantImg
-    || detailProduct?.variants_list?.[0]?.img
     || detailProduct?.primary_image_url
-    || detailProduct?.gallery_images?.find((img) => img.is_primary)?.url
-    || detailProduct?.gallery_images?.[0]?.url
+    || primaryGalleryImage
+    || firstGalleryImage
+    || firstVariantImage
     || "/default-image.jpg";
 
   const handleImageError = () => {

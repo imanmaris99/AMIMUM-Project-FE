@@ -21,6 +21,9 @@ const WishlistVariantModal: React.FC<WishlistVariantModalProps> = ({
 
   if (!isOpen || !product) return null;
 
+  const firstVariantImage = product.all_variants?.find((variant) => variant?.img)?.img;
+  const fallbackProductImage = product.image || product.primary_image_url || firstVariantImage || "/default-image.jpg";
+
   const handleAddToWishlist = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (selectedVariant) {
@@ -38,7 +41,7 @@ const WishlistVariantModal: React.FC<WishlistVariantModalProps> = ({
           variant: selectedVariant,
           quantity: 1,
           price: selectedVariantData.discounted_price || product.price,
-          image: selectedVariantData.img || product.image || (product.all_variants && product.all_variants.length > 0 ? product.all_variants[0].img : "/default-image.jpg"),
+          image: selectedVariantData.img || fallbackProductImage,
           addedAt: new Date().toISOString(),
           brand: product.brand_info?.name,
           originalPrice: product.price,

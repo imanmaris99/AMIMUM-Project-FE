@@ -17,7 +17,13 @@ const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardPro
   const [imageError, setImageError] = useState(false);
   const variants = Array.isArray(product?.all_variants) ? product.all_variants : [];
   const productName = product?.name?.trim() || "Produk katalog";
-  const imageUrl = product?.image || variants[0]?.img || "/default-image.jpg";
+  const galleryImages = Array.isArray(product?.gallery_images) ? product.gallery_images : [];
+  const primaryGalleryImage = galleryImages.find((image) => image?.is_primary && image?.url)?.url;
+  const firstGalleryImage = [...galleryImages]
+    .sort((a, b) => Number(a?.sort_order || 0) - Number(b?.sort_order || 0))
+    .find((image) => image?.url)?.url;
+  const firstVariantImage = variants.find((variant) => variant?.img)?.img;
+  const imageUrl = product?.image || product?.primary_image_url || primaryGalleryImage || firstGalleryImage || firstVariantImage || "/default-image.jpg";
 
   const handleImageError = () => {
     setImageError(true);

@@ -3,6 +3,33 @@ import axios from "axios";
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/apiConfig";
 import { AllProductInfoType, AllProductInfoResponseType, ProductSearchResponseType, ProductSearchItemType, ProductSearchByBrandResponseType, ProductSearchByBrandItemType, VariantAllProductType } from "@/types/apiTypes";
 
+const DEFAULT_PRODUCT_IMAGE = "/default-image.jpg";
+
+const firstNonEmptyUrl = (...urls: Array<string | null | undefined>) => {
+  const found = urls.find((url) => typeof url === "string" && url.trim().length > 0);
+  return found?.trim();
+};
+
+const resolveProductCardImage = (
+  product: Partial<AllProductInfoType | ProductSearchItemType>,
+  variants: Array<Partial<VariantAllProductType>> = []
+) => {
+  const galleryImages = Array.isArray(product.gallery_images) ? product.gallery_images : [];
+  const primaryGalleryImage = galleryImages.find((image) => image?.is_primary && image?.url)?.url;
+  const firstGalleryImage = [...galleryImages]
+    .sort((a, b) => Number(a?.sort_order || 0) - Number(b?.sort_order || 0))
+    .find((image) => image?.url)?.url;
+  const firstVariantImage = variants.find((variant) => variant?.img)?.img;
+
+  return firstNonEmptyUrl(
+    product.image,
+    product.primary_image_url,
+    primaryGalleryImage,
+    firstGalleryImage,
+    firstVariantImage,
+  ) || DEFAULT_PRODUCT_IMAGE;
+};
+
 /**
  * Search products by name (Client-side)
  * @param productName - Name of the product to search for
@@ -27,9 +54,7 @@ export const SearchGetProduct = async (productName: string): Promise<AllProductI
           ? product.all_variants
           : [];
 
-        const productImage = variants.length > 0 && variants[0].img 
-          ? variants[0].img 
-          : "/default-image.jpg";
+        const productImage = resolveProductCardImage(product, variants);
 
         const highestDiscount = variants.length > 0
           ? Math.max(...variants.map(v => v.discount || 0))
@@ -40,6 +65,8 @@ export const SearchGetProduct = async (productName: string): Promise<AllProductI
           name: product.name,
           price: product.price,
           image: productImage,
+          primary_image_url: product.primary_image_url,
+          gallery_images: product.gallery_images,
           brand_info: product.brand_info || {
             id: 0,
             name: "",
@@ -226,11 +253,7 @@ export async function GetProductDiscountByBrandIdServer(productionId: number): P
     }
 
     const mappedProducts: AllProductInfoType[] = data.data.map((product) => {
-      const productWithImage = product as AllProductInfoType & { image?: string };
-      const productImage = productWithImage.image || 
-        (product.all_variants && product.all_variants.length > 0 && product.all_variants[0]?.img
-          ? product.all_variants[0].img
-          : "/default-image.jpg");
+      const productImage = resolveProductCardImage(product, product.all_variants || []);
       
       const brandInfo = {
         ...product.brand_info,
@@ -305,11 +328,7 @@ export async function GetProductsByProductionIdServer(productionId: number): Pro
     }
 
     const mappedProducts: AllProductInfoType[] = data.data.map((product) => {
-      const productWithImage = product as AllProductInfoType & { image?: string };
-      const productImage = productWithImage.image || 
-        (product.all_variants && product.all_variants.length > 0 && product.all_variants[0]?.img
-          ? product.all_variants[0].img
-          : "/default-image.jpg");
+      const productImage = resolveProductCardImage(product, product.all_variants || []);
       
       const brandInfo = {
         ...product.brand_info,

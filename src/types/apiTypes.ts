@@ -116,6 +116,13 @@ export interface AllProductInfoType {
   name: string;
   price: number;
   image: string; // Always present - derived from all_variants[0].img if not provided by API
+  primary_image_url?: string | null;
+  gallery_images?: Array<{
+    id: number;
+    url: string;
+    is_primary: boolean;
+    sort_order: number;
+  }>;
   brand_info: BrandInfoType;
   all_variants: VariantAllProductType[];
   created_at: string;
@@ -141,6 +148,14 @@ export interface ProductSearchItemType {
     name: string;
     photo_url?: string;
   };
+  image?: string | null;
+  primary_image_url?: string | null;
+  gallery_images?: Array<{
+    id: number;
+    url: string;
+    is_primary: boolean;
+    sort_order: number;
+  }>;
   all_variants?: Array<{
     id: number;
     variant: string;

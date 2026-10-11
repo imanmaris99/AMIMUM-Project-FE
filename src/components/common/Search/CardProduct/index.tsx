@@ -15,7 +15,13 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
   const productName = product?.name?.trim() || "Produk katalog";
   const basePrice = Number(product?.price);
   const hasValidBasePrice = Number.isFinite(basePrice) && basePrice > 0;
-  const imageUrl = product?.image || variants[0]?.img || "/default-image.jpg";
+  const galleryImages = Array.isArray(product?.gallery_images) ? product.gallery_images : [];
+  const primaryGalleryImage = galleryImages.find((image) => image?.is_primary && image?.url)?.url;
+  const firstGalleryImage = [...galleryImages]
+    .sort((a, b) => Number(a?.sort_order || 0) - Number(b?.sort_order || 0))
+    .find((image) => image?.url)?.url;
+  const firstVariantImage = variants.find((variant) => variant?.img)?.img;
+  const imageUrl = product?.image || product?.primary_image_url || primaryGalleryImage || firstGalleryImage || firstVariantImage || "/default-image.jpg";
 
   const handleImageError = () => {
     setImageError(true);
@@ -66,7 +72,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
             id: product.id,
             name: productName,
             price: hasValidBasePrice ? basePrice : 0,
-            image: product.image || variants[0]?.img || "/default-image.jpg",
+            image: imageUrl,
             brand: product.brand_info?.name,
           }}
           className="bg-white rounded-full p-1 hover:bg-gray-50"
