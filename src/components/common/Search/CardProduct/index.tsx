@@ -5,11 +5,12 @@ import { CardProductProps } from "./types";
 import rupiahFormater from "@/utils/rupiahFormater";
 import useSearchLogic from "../useSearchLogic";
 import WishlistButton from "@/components/common/WishlistButton";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const CardProduct = ({ product }: { product: CardProductProps }) => {
   const { handleSelectProduct } = useSearchLogic();
   const [imageError, setImageError] = useState(false);
+  const [imageReady, setImageReady] = useState(false);
 
   const variants = Array.isArray(product?.all_variants) ? product.all_variants : [];
   const productName = product?.name?.trim() || "Produk katalog";
@@ -23,6 +24,12 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
   const firstVariantImage = variants.find((variant) => variant?.img)?.img;
   const imageUrl = product?.primary_image_url || primaryGalleryImage || firstGalleryImage || product?.image || firstVariantImage || "/default-image.jpg";
   const resolvedImageUrl = imageError ? "/default-image.jpg" : imageUrl;
+  const isFallbackImage = resolvedImageUrl === "/default-image.jpg";
+  const showImageFallback = imageError || !imageReady;
+
+  useEffect(() => {
+    setImageReady(false);
+  }, [resolvedImageUrl]);
 
   const handleImageError = () => {
     setImageError(true);
@@ -98,7 +105,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
 
       <div
         className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-[1.1rem] bg-gradient-to-br from-[#F8FBF7] via-white to-[#F3F8F5] bg-contain bg-center bg-no-repeat p-3 ring-1 ring-emerald-50/80"
-        style={{ backgroundImage: imageError ? "url('/default-image.jpg')" : undefined }}
+        style={{ backgroundImage: showImageFallback ? "url('/default-image.jpg')" : undefined }}
       >
           {!isExternalUrl ? (
             <Image
@@ -106,8 +113,11 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
               alt={productName}
               width={160}
               height={160}
-              className="rounded-lg object-contain drop-shadow-[0_8px_14px_rgba(15,23,42,0.10)] transition duration-200 group-active:scale-[0.98]"
+              className={`${imageReady || isFallbackImage ? "opacity-100" : "opacity-0"} rounded-lg object-contain drop-shadow-[0_8px_14px_rgba(15,23,42,0.10)] transition duration-200 group-active:scale-[0.98]`}
               style={{ width: "auto", height: "auto", maxWidth: "78%", maxHeight: "78%" }}
+              onLoad={() => {
+                setImageReady(true);
+              }}
               loading="lazy"
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
@@ -121,8 +131,11 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
             <img
               src={resolvedImageUrl}
               alt={productName}
-              className="rounded-lg object-contain drop-shadow-[0_8px_14px_rgba(15,23,42,0.10)] transition duration-200 group-active:scale-[0.98]"
+              className={`${imageReady || isFallbackImage ? "opacity-100" : "opacity-0"} rounded-lg object-contain drop-shadow-[0_8px_14px_rgba(15,23,42,0.10)] transition duration-200 group-active:scale-[0.98]`}
               style={{ width: "auto", height: "auto", maxWidth: "78%", maxHeight: "78%" }}
+              onLoad={() => {
+                setImageReady(true);
+              }}
               onError={(event) => {
                 if (!event.currentTarget.src.endsWith("/default-image.jpg")) {
                   event.currentTarget.src = "/default-image.jpg";
