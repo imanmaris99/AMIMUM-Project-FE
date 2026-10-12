@@ -22,19 +22,20 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
     .find((image) => image?.url)?.url;
   const firstVariantImage = variants.find((variant) => variant?.img)?.img;
   const imageUrl = product?.primary_image_url || primaryGalleryImage || firstGalleryImage || product?.image || firstVariantImage || "/default-image.jpg";
+  const resolvedImageUrl = imageError ? "/default-image.jpg" : imageUrl;
 
   const handleImageError = () => {
     setImageError(true);
   };
 
   const isExternalUrl = useMemo(() => {
-    if (!imageUrl || imageError || imageUrl.startsWith("/")) {
+    if (!resolvedImageUrl || resolvedImageUrl.startsWith("/")) {
       return false;
     }
 
-    const url = imageUrl.trim();
+    const url = resolvedImageUrl.trim();
     return url.startsWith("http://") || url.startsWith("https://");
-  }, [imageUrl, imageError]);
+  }, [resolvedImageUrl]);
 
   if (!product || !product.id || !productName) {
     return null;
@@ -81,7 +82,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
             id: product.id,
             name: productName,
             price: hasValidBasePrice ? basePrice : 0,
-            image: imageUrl,
+            image: resolvedImageUrl,
             brand: product.brand_info?.name,
           }}
           className="rounded-full bg-white/95 p-0.5 shadow-[0_4px_12px_rgba(15,23,42,0.12)] hover:bg-gray-50"
@@ -98,7 +99,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
       <div className="flex h-[126px] w-full items-center justify-center overflow-hidden rounded-[1.1rem] bg-gradient-to-br from-emerald-50 via-white to-stone-50 p-1.5 ring-1 ring-emerald-50 min-[390px]:h-[136px] sm:h-36">
           {!isExternalUrl ? (
             <Image
-              src={imageUrl}
+              src={resolvedImageUrl}
               alt={productName}
               width={160}
               height={160}
@@ -106,15 +107,15 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
               loading="lazy"
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-              onError={(e) => {
-                e.currentTarget.src = "/default-image.jpg";
+              onError={() => {
+                setImageError(true);
               }}
               unoptimized
             />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={imageUrl}
+              src={resolvedImageUrl}
               alt={productName}
               className="h-full w-full rounded-xl object-contain transition duration-200 group-active:scale-[0.98]"
               onError={(event) => {
