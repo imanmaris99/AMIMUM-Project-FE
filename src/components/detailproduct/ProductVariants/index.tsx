@@ -98,8 +98,8 @@ const ProductVariants = ({
                         key={variant.id}
                         className={`flex cursor-pointer items-start gap-3 rounded-2xl p-3 transition-all duration-200 sm:p-4 ${
                           isSelected
-                            ? "border border-[#DCEDE5] bg-[#F5FAF7] shadow-[0_4px_14px_rgba(15,23,42,0.06)]"
-                            : "border border-transparent bg-white/80 hover:border-[#E6F2EC] hover:bg-[#F8FCFA]"
+                            ? "border-2 border-[#2F6F5A] bg-[#F3FAF6] shadow-[0_6px_18px_rgba(47,111,90,0.14)]"
+                            : "border border-[#EEF4F0] bg-white/85 hover:border-[#DCEDE5] hover:bg-[#F8FCFA]"
                         }`}
                       >
                         <input

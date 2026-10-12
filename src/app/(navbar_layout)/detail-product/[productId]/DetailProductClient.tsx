@@ -45,18 +45,18 @@ const DetailMarketplaceInfo = ({
     <section className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50" aria-label="Ringkasan marketplace produk">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Info marketplace</p>
-          <h2 className="mt-1 text-base font-bold text-[#0D0E09]">Cek sebelum checkout</h2>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Info belanja</p>
+          <h2 className="mt-1 text-base font-bold text-[#0D0E09]">Aman sebelum checkout</h2>
         </div>
         <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700">Produk toko</span>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
         <div className="rounded-2xl bg-emerald-50/70 px-3 py-2">
           <p className="text-[#6B7C73]">Varian</p>
-          <p className="mt-1 font-semibold text-[#0D0E09]">{totalVariants || "Belum tersedia"}</p>
+          <p className="mt-1 font-semibold text-[#0D0E09]">{totalVariants ? `${totalVariants} pilihan` : "Belum tersedia"}</p>
         </div>
         <div className="rounded-2xl bg-emerald-50/70 px-3 py-2">
-          <p className="text-[#6B7C73]">Stok katalog</p>
+          <p className="text-[#6B7C73]">Stok</p>
           <p className="mt-1 font-semibold text-[#0D0E09]">{selectedVariant ? formatStockLabel(selectedVariant.stock) : totalStock > 0 ? `${totalStock} total` : "Pilih varian"}</p>
         </div>
         <div className="rounded-2xl bg-emerald-50/70 px-3 py-2">
@@ -64,14 +64,14 @@ const DetailMarketplaceInfo = ({
           <p className="mt-1 font-semibold text-[#0D0E09]">{rating}</p>
         </div>
         <div className="rounded-2xl bg-emerald-50/70 px-3 py-2">
-          <p className="text-[#6B7C73]">Produksi/brand</p>
+          <p className="text-[#6B7C73]">Brand</p>
           <p className="mt-1 break-words font-semibold text-[#0D0E09]">{detailProduct?.company || "Toko Herbal Amimum"}</p>
         </div>
       </div>
       <div className="mt-3 grid gap-2 text-xs leading-relaxed text-emerald-900">
-        <p className="rounded-2xl bg-white/80 px-3 py-2">✅ Produk dicek dari katalog toko sebelum checkout.</p>
-        <p className="rounded-2xl bg-white/80 px-3 py-2">✅ Bisa pilih pickup atau pengiriman sesuai alamat dan kurir tersedia.</p>
-        <p className="rounded-2xl bg-white/80 px-3 py-2">✅ Status pesanan bisa dipantau dari halaman transaksi/tracking.</p>
+        <p className="rounded-2xl bg-white/80 px-3 py-2">✓ Harga dan stok mengikuti varian yang dipilih.</p>
+        <p className="rounded-2xl bg-white/80 px-3 py-2">✓ Checkout memakai metode pembayaran resmi toko.</p>
+        <p className="rounded-2xl bg-white/80 px-3 py-2">✓ Status pesanan bisa dipantau setelah checkout.</p>
       </div>
     </section>
   );
@@ -206,12 +206,12 @@ export default function DetailProductClient({ detailProduct, errorMessage, relat
           
           {/* Variant Guidance */}
           {!selectedVariant && detailProduct?.variants_list && detailProduct.variants_list.length > 0 && (
-            <div className="rounded-3xl bg-white/90 p-4 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)] backdrop-blur">
-              <p className="text-sm font-semibold leading-6 text-emerald-900">
-                Pilih varian untuk melihat harga, stok, dan masa berlaku produk.
+            <div className="rounded-3xl bg-gradient-to-r from-emerald-600 to-[#2F6F5A] p-4 text-white shadow-[0_10px_24px_rgba(47,111,90,0.20)]">
+              <p className="text-sm font-bold leading-6">
+                Pilih varian untuk lanjut belanja
               </p>
-              <p className="mt-1 text-xs leading-5 text-emerald-700/90">
-                Tombol Keranjang/Beli Langsung akan muncul setelah varian dipilih.
+              <p className="mt-1 text-xs leading-5 text-white/90">
+                Setelah varian dipilih, harga final, stok, tombol Keranjang, dan Beli Langsung akan muncul di bawah layar.
               </p>
             </div>
           )}
