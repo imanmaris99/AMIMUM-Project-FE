@@ -104,7 +104,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
       )}
 
       <div
-        className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-[1.1rem] bg-gradient-to-br from-[#F8FBF7] via-white to-[#F3F8F5] bg-contain bg-center bg-no-repeat p-3 ring-1 ring-emerald-50/80"
+        className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-[1.1rem] bg-gradient-to-br from-[#F8FBF7] via-white to-[#F3F8F5] bg-contain bg-center bg-no-repeat p-2 ring-1 ring-emerald-50/80"
         style={{ backgroundImage: showImageFallback ? "url('/default-image.jpg')" : undefined }}
       >
           {!isExternalUrl ? (
@@ -114,7 +114,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
               width={160}
               height={160}
               className={`${imageReady || isFallbackImage ? "opacity-100" : "opacity-0"} rounded-lg object-contain drop-shadow-[0_8px_14px_rgba(15,23,42,0.10)] transition duration-200 group-active:scale-[0.98]`}
-              style={{ width: "auto", height: "auto", maxWidth: "78%", maxHeight: "78%" }}
+              style={{ width: "auto", height: "auto", maxWidth: "86%", maxHeight: "86%" }}
               onLoad={() => {
                 setImageReady(true);
               }}
@@ -132,7 +132,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
               src={resolvedImageUrl}
               alt={productName}
               className={`${imageReady || isFallbackImage ? "opacity-100" : "opacity-0"} rounded-lg object-contain drop-shadow-[0_8px_14px_rgba(15,23,42,0.10)] transition duration-200 group-active:scale-[0.98]`}
-              style={{ width: "auto", height: "auto", maxWidth: "78%", maxHeight: "78%" }}
+              style={{ width: "auto", height: "auto", maxWidth: "86%", maxHeight: "86%" }}
               onLoad={() => {
                 setImageReady(true);
               }}
