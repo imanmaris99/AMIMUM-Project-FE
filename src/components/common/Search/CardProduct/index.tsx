@@ -10,7 +10,6 @@ import { useEffect, useMemo, useState } from "react";
 const CardProduct = ({ product }: { product: CardProductProps }) => {
   const { handleSelectProduct } = useSearchLogic();
   const [imageError, setImageError] = useState(false);
-  const [imageReady, setImageReady] = useState(false);
 
   const variants = Array.isArray(product?.all_variants) ? product.all_variants : [];
   const productName = product?.name?.trim() || "Produk katalog";
@@ -25,11 +24,11 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
   const imageUrl = product?.primary_image_url || primaryGalleryImage || firstGalleryImage || product?.image || firstVariantImage || "/default-image.jpg";
   const resolvedImageUrl = imageError ? "/default-image.jpg" : imageUrl;
   const isFallbackImage = resolvedImageUrl === "/default-image.jpg";
-  const showImageFallback = imageError || !imageReady;
+  const showImageFallback = imageError || isFallbackImage;
 
   useEffect(() => {
-    setImageReady(false);
-  }, [resolvedImageUrl]);
+    setImageError(false);
+  }, [imageUrl]);
 
   const handleImageError = () => {
     setImageError(true);
@@ -113,10 +112,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
               alt={productName}
               width={160}
               height={160}
-              className={`${imageReady || isFallbackImage ? "opacity-100" : "opacity-0"} h-full w-full rounded-xl object-cover shadow-[inset_0_0_0_1px_rgba(15,23,42,0.03)] transition duration-200 group-active:scale-[0.98]`}
-              onLoad={() => {
-                setImageReady(true);
-              }}
+              className="h-full w-full rounded-xl object-cover opacity-100 shadow-[inset_0_0_0_1px_rgba(15,23,42,0.03)] transition duration-200 group-active:scale-[0.98]"
               loading="lazy"
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
@@ -130,10 +126,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
             <img
               src={resolvedImageUrl}
               alt={productName}
-              className={`${imageReady || isFallbackImage ? "opacity-100" : "opacity-0"} h-full w-full rounded-xl object-cover shadow-[inset_0_0_0_1px_rgba(15,23,42,0.03)] transition duration-200 group-active:scale-[0.98]`}
-              onLoad={() => {
-                setImageReady(true);
-              }}
+              className="h-full w-full rounded-xl object-cover opacity-100 shadow-[inset_0_0_0_1px_rgba(15,23,42,0.03)] transition duration-200 group-active:scale-[0.98]"
               onError={(event) => {
                 if (!event.currentTarget.src.endsWith("/default-image.jpg")) {
                   event.currentTarget.src = "/default-image.jpg";
