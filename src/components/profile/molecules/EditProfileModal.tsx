@@ -95,11 +95,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     try {
       await onSave(formData);
       onClose();
-    } catch (error) {
+    } catch {
       setSubmitError(
-        error instanceof Error
-          ? error.message
-          : "Gagal menyimpan perubahan profil."
+        "Profil belum bisa disimpan. Periksa nama dan nomor WhatsApp, lalu coba lagi."
       );
     } finally {
       setIsSaving(false);

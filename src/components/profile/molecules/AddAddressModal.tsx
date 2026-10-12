@@ -103,11 +103,9 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
       await onSave(formData);
       onClose();
       setFormData(emptyForm);
-    } catch (error) {
+    } catch {
       setSubmitError(
-        error instanceof Error
-          ? error.message
-          : "Gagal menyimpan alamat baru."
+        "Alamat belum bisa disimpan. Pastikan data penerima, nomor WhatsApp, dan kota RajaOngkir sudah benar, lalu coba lagi."
       );
     } finally {
       setIsSaving(false);

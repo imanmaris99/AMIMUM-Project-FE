@@ -50,12 +50,8 @@ const RajaOngkirLocationFields: React.FC<RajaOngkirLocationFieldsProps> = ({
       try {
         const response = await getRajaOngkirProvinces();
         setProvinces(response);
-      } catch (error) {
-        setLoadError(
-          error instanceof Error
-            ? error.message
-            : "Gagal memuat data provinsi."
-        );
+      } catch {
+        setLoadError("Data provinsi belum bisa dimuat. Silakan coba lagi beberapa saat lagi.");
       } finally {
         setIsLoadingProvinces(false);
       }
@@ -96,10 +92,8 @@ const RajaOngkirLocationFields: React.FC<RajaOngkirLocationFieldsProps> = ({
       try {
         const response = await getRajaOngkirCities(Number(selectedProvinceId));
         setCities(response);
-      } catch (error) {
-        setLoadError(
-          error instanceof Error ? error.message : "Gagal memuat data kota."
-        );
+      } catch {
+        setLoadError("Data kota belum bisa dimuat. Silakan pilih provinsi lagi atau coba beberapa saat lagi.");
       } finally {
         setIsLoadingCities(false);
       }

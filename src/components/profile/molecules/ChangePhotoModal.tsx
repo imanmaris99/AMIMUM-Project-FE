@@ -109,11 +109,9 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({ isOpen, onClose, on
     try {
       await onUpload(selectedFile);
       handleClose();
-    } catch (error) {
+    } catch {
       setSubmitError(
-        error instanceof Error
-          ? error.message
-          : "Gagal mengunggah foto profil."
+        "Foto profil belum bisa diunggah. Gunakan gambar png, jpg, jpeg, atau webp maksimal 300 KB, lalu coba lagi."
       );
     } finally {
       setIsUploading(false);

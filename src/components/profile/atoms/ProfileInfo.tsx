@@ -36,16 +36,12 @@ const ProfileInfo: React.FC = () => {
 
         setProfile(response.data);
         syncSessionProfile(response.data);
-      } catch (error) {
+      } catch {
         if (!isMounted) {
           return;
         }
 
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Gagal memuat profil pengguna.";
-        setErrorMessage(message);
+        setErrorMessage("Profil belum bisa dimuat. Silakan refresh atau coba lagi beberapa saat lagi.");
       } finally {
         if (isMounted) {
           setIsLoading(false);

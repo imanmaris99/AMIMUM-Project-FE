@@ -84,11 +84,9 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
     try {
       await onSave(formData);
       onClose();
-    } catch (error) {
+    } catch {
       setSubmitError(
-        error instanceof Error
-          ? error.message
-          : "Gagal memperbarui alamat."
+        "Alamat belum bisa diperbarui. Pastikan data penerima, nomor WhatsApp, dan kota RajaOngkir sudah benar, lalu coba lagi."
       );
     } finally {
       setIsSaving(false);
