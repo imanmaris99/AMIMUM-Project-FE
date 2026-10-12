@@ -24,16 +24,11 @@ const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardPro
     .find((image) => image?.url)?.url;
   const firstVariantImage = variants.find((variant) => variant?.img)?.img;
   const imageUrl = product?.primary_image_url || primaryGalleryImage || firstGalleryImage || product?.image || firstVariantImage || "/default-image.jpg";
-  const variantTypeLabels = Array.from(
-    new Set(
-      variants
-        .map((variant) => [variant.name, variant.variant].filter(Boolean).join(" • "))
-        .filter(Boolean)
-    )
-  );
-  const variantSummary = variantTypeLabels.length > 0
-    ? variantTypeLabels.slice(0, 2).join(", ") + (variantTypeLabels.length > 2 ? ` +${variantTypeLabels.length - 2} tipe` : "")
-    : "Tipe varian cek di detail";
+  const variantCountText = variants.length > 1
+    ? `${variants.length} pilihan varian`
+    : variants.length === 1
+      ? "1 pilihan varian"
+      : "Detail produk tersedia";
 
   const handleImageError = () => {
     setImageError(true);
@@ -82,15 +77,8 @@ const SearchDropdownItem = ({ product, handleSelectProduct }: { product: CardPro
         <div className="min-w-0 flex-1">
           <p className="truncate text-[15px] font-semibold leading-5 text-gray-900">{productName}</p>
           <p className="mt-0.5 text-xs leading-4 text-gray-500">
-            {variants.length > 0
-              ? `${variants.length} varian tersedia`
-              : "Varian produk belum tersedia di katalog"}
+            {variantCountText}
           </p>
-          {variants.length > 0 && (
-            <p className="mt-0.5 line-clamp-1 text-[11px] font-medium leading-4 text-[#3F715F]">
-              Tipe: {variantSummary}
-            </p>
-          )}
         </div>
       </div>
     </li>

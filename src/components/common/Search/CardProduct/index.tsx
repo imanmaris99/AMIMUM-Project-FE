@@ -61,21 +61,16 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
     ? Math.round(displayPrice / (1 - highestDiscount / 100))
     : basePrice;
 
-  const variantTypeLabels = Array.from(
-    new Set(
-      variants
-        .map((variant) => [variant.name, variant.variant].filter(Boolean).join(" • "))
-        .filter(Boolean)
-    )
-  );
-  const variantSummary = variantTypeLabels.length > 0
-    ? variantTypeLabels.slice(0, 2).join(", ") + (variantTypeLabels.length > 2 ? ` +${variantTypeLabels.length - 2} tipe` : "")
-    : "Tipe varian cek di detail";
+  const variantCountText = variants.length > 1
+    ? `${variants.length} pilihan varian`
+    : variants.length === 1
+      ? "1 pilihan varian"
+      : "Detail produk tersedia";
 
   return (
     <article
       onClick={() => product.id && handleSelectProduct(product.id)}
-      className="group relative flex min-h-[286px] w-full cursor-pointer flex-col overflow-hidden rounded-3xl border border-emerald-50 bg-white/95 p-2.5 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition duration-200 active:scale-[0.99] sm:min-h-[300px] sm:p-3"
+      className="group relative flex min-h-[258px] w-full cursor-pointer flex-col overflow-hidden rounded-3xl border border-emerald-50 bg-white/95 p-2.5 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition duration-200 active:scale-[0.99] sm:min-h-[284px] sm:p-3"
     >
       <div
         className="absolute right-2 top-2 z-20"
@@ -132,21 +127,9 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
           <p className="line-clamp-2 min-h-[34px] text-[13px] font-bold leading-[17px] text-[#0D0E09]">
             {productName}
           </p>
-          <p className="text-[11px] leading-4 text-[#6B7C73]">
-            {variants.length > 0
-              ? `${variants.length} varian tersedia`
-              : "Varian produk belum tersedia di katalog"}
+          <p className="line-clamp-1 text-[11px] leading-4 text-[#6B7C73]">
+            {variantCountText}
           </p>
-          {variants.length > 0 && (
-            <p className="line-clamp-2 min-h-[30px] text-[11px] font-medium leading-[15px] text-[#3F715F]">
-              Tipe: {variantSummary}
-            </p>
-          )}
-          <div className="flex items-center gap-2">
-            <p className="text-[11px] leading-4 text-[#6B7C73]">
-              {hasDisplayPrice ? `Mulai dari ${rupiahFormater(displayPrice)}` : "Harga belum tersedia"}
-            </p>
-          </div>
         </div>
         <div className="mt-2 flex min-h-[34px] flex-wrap items-end gap-x-2 gap-y-0.5">
             {!hasDisplayPrice ? (
