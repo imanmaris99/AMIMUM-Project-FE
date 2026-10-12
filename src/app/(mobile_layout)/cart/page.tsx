@@ -106,7 +106,7 @@ export default function CartPage() {
   };
 
   return (
-    <LoginProtection>
+    <LoginProtection useModal={true} feature="cart">
       <div className="min-h-screen bg-[linear-gradient(180deg,#F7FCF9_0%,#FFFFFF_42%,#FFFDF7_100%)]">
         {/* Unified Header */}
         <UnifiedHeader 

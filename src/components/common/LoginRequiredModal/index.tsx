@@ -9,7 +9,7 @@ import { X, LogIn, UserPlus, ShoppingBag, Heart, FileText, Truck } from 'lucide-
 interface LoginRequiredModalProps {
   isOpen: boolean;
   onClose: () => void;
-  feature?: 'checkout' | 'wishlist' | 'profile' | 'transaction' | 'tracking' | 'general';
+  feature?: 'cart' | 'checkout' | 'wishlist' | 'profile' | 'transaction' | 'tracking' | 'general';
   title?: string;
   description?: string;
   redirectAfterLogin?: string;
@@ -70,6 +70,13 @@ const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
 
   const getFeatureInfo = () => {
     switch (feature) {
+      case 'cart':
+        return {
+          icon: <ShoppingBag className="w-8 h-8 text-primary" />,
+          title: title || "Keranjang Belanja",
+          description: description || "Login untuk melihat keranjang, memilih produk, dan melanjutkan checkout resmi toko.",
+          actionText: "Buka Keranjang"
+        };
       case 'checkout':
         return {
           icon: <ShoppingBag className="w-8 h-8 text-primary" />,

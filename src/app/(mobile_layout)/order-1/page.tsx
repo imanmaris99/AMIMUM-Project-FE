@@ -3,7 +3,7 @@ import LoginProtection from '@/components/common/LoginProtection';
 
 export default function Order1() {
   return (
-    <LoginProtection useModal={true} feature="general">
+    <LoginProtection useModal={true} feature="checkout">
       <Order1Page />
     </LoginProtection>
   );

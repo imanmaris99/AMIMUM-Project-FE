@@ -11,8 +11,46 @@ interface LoginProtectionProps {
   redirectTo?: string;
   showMessage?: boolean;
   useModal?: boolean;
-  feature?: 'profile' | 'transaction' | 'wishlist' | 'tracking' | 'general';
+  feature?: 'cart' | 'checkout' | 'profile' | 'transaction' | 'wishlist' | 'tracking' | 'general';
 }
+
+const getLoginFeatureLabel = (feature: NonNullable<LoginProtectionProps['feature']>) => {
+  switch (feature) {
+    case 'cart':
+      return 'Keranjang';
+    case 'checkout':
+      return 'Checkout';
+    case 'profile':
+      return 'Profil';
+    case 'transaction':
+      return 'Transaksi';
+    case 'wishlist':
+      return 'Wishlist';
+    case 'tracking':
+      return 'Tracking';
+    default:
+      return 'Fitur Ini';
+  }
+};
+
+const getLoginFeatureDescription = (feature: NonNullable<LoginProtectionProps['feature']>) => {
+  switch (feature) {
+    case 'cart':
+      return 'keranjang belanja Anda dan memilih produk yang ingin dibeli';
+    case 'checkout':
+      return 'checkout resmi, alamat, ongkir, dan pembayaran pesanan';
+    case 'profile':
+      return 'dan mengelola profil akun Anda';
+    case 'transaction':
+      return 'riwayat transaksi dan detail pembelian Anda';
+    case 'wishlist':
+      return 'daftar produk favorit Anda';
+    case 'tracking':
+      return 'status pesanan dan pengiriman Anda';
+    default:
+      return 'fitur ini';
+  }
+};
 
 const LoginProtection: React.FC<LoginProtectionProps> = ({ 
   children, 
@@ -27,6 +65,8 @@ const LoginProtection: React.FC<LoginProtectionProps> = ({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentPathWithQuery = `${pathname || '/'}${searchParams?.toString() ? `?${searchParams.toString()}` : ''}`;
+  const featureLabel = getLoginFeatureLabel(feature);
+  const featureDescription = getLoginFeatureDescription(feature);
 
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -84,8 +124,8 @@ const LoginProtection: React.FC<LoginProtectionProps> = ({
           router.push('/');
         }}
         feature={feature}
-        title={`Login Diperlukan untuk ${feature === 'profile' ? 'Profil' : feature === 'transaction' ? 'Transaksi' : feature === 'wishlist' ? 'Wishlist' : feature === 'tracking' ? 'Tracking' : 'Fitur Ini'}`}
-        description={`Silakan login terlebih dahulu untuk mengakses ${feature === 'profile' ? 'dan mengelola profil akun Anda' : feature === 'transaction' ? 'riwayat transaksi dan detail pembelian Anda' : feature === 'wishlist' ? 'daftar produk favorit Anda' : feature === 'tracking' ? 'status pesanan dan pengiriman Anda' : 'fitur ini'}.`}
+        title={`Login Diperlukan untuk ${featureLabel}`}
+        description={`Silakan login terlebih dahulu untuk mengakses ${featureDescription}.`}
         redirectAfterLogin={currentPathWithQuery}
       />
     );
