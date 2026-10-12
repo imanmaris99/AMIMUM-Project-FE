@@ -82,6 +82,10 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
   return (
     <div className="fixed bottom-0 left-1/2 z-50 -translate-x-1/2 border-t border-emerald-50 bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur" style={{ maxWidth: '440px', width: '100%' }}>
       <div className="px-4 py-4">
+        <div className="mb-2 flex items-center justify-between gap-3 text-[11px] text-[#6B7C73]">
+          <span>Checkout hanya memproses produk tercentang.</span>
+          <span className="font-semibold text-primary">Pembayaran resmi</span>
+        </div>
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center space-x-2">
             <button
@@ -123,7 +127,7 @@ export default function CartFooter({ onCheckout }: CartFooterProps) {
               : isSavingSelection && hasSelectedItems
                 ? `Menyimpan (${rupiahFormater(total)})`
               : hasSelectedItems
-                ? `Checkout (${rupiahFormater(total)})`
+                ? `Checkout • ${rupiahFormater(total)}`
                 : 'Pilih item dulu'}
           </button>
         </div>

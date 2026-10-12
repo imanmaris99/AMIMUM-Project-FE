@@ -35,23 +35,27 @@ const CartList: React.FC = () => {
           <p className="text-sm text-gray-600">Memuat isi keranjang dari server...</p>
         </div>
       ) : cartItems.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="mb-6">
-            <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-              <GiShoppingCart className="w-8 h-8 text-gray-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Keranjang Kosong</h3>
-            <p className="text-gray-500 mb-6">
-              Belum ada produk terpilih untuk checkout. Silakan pilih produk herbal dari katalog.
-            </p>
+        <section className="rounded-3xl border border-emerald-100 bg-white/95 px-5 py-10 text-center shadow-[0_8px_22px_rgba(15,23,42,0.06)]">
+          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-50 ring-1 ring-emerald-100">
+            <GiShoppingCart className="h-9 w-9 text-primary" />
+          </div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-700">Keranjang belanja</p>
+          <h3 className="mt-2 text-xl font-bold text-gray-950">Keranjang masih kosong</h3>
+          <p className="mx-auto mt-2 max-w-xs text-sm leading-6 text-[#6B7C73]">
+            Pilih produk herbal dari katalog, lalu cek ulang harga dan varian di keranjang sebelum checkout resmi toko.
+          </p>
+          <div className="mt-4 grid gap-2 rounded-2xl bg-emerald-50/70 px-4 py-3 text-left text-xs leading-5 text-emerald-900">
+            <p>✓ Harga final mengikuti data katalog saat checkout.</p>
+            <p>✓ Bisa pilih produk mana yang ingin dibeli sekarang.</p>
+            <p>✓ Pesanan bisa dipantau setelah checkout.</p>
           </div>
           <button
             onClick={handleStartShopping}
-            className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+            className="mt-5 w-full rounded-2xl bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary/90"
           >
             Mulai Belanja
           </button>
-        </div>
+        </section>
       ) : (
         cartItems.map((item) => (
           <CartItem

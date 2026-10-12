@@ -120,15 +120,21 @@ export default function CartPage() {
         <div className={`px-5 py-4 ${!isLoading && hasCartItems ? "pb-[calc(12rem+env(safe-area-inset-bottom))]" : ""}`}>
           {/* Keranjangku Header */}
           <div className="mb-6">
-            <h1 className="text-[#0D0E09] text-lg font-semibold mb-4">
-              Keranjangku
-            </h1>
+            <section className="mb-4 rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.06)] ring-1 ring-emerald-50">
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-700">Keranjang belanja</p>
+              <h1 className="mt-1 text-xl font-bold text-[#0D0E09]">
+                Cek produk sebelum checkout
+              </h1>
+              <p className="mt-2 text-sm leading-6 text-[#6B7C73]">
+                Centang produk yang ingin dibeli sekarang. Harga final, ongkir, dan pembayaran resmi dilanjutkan di checkout.
+              </p>
+            </section>
             
             {/* Total Item Info */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-4">
+            <div className="mb-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
                 <span className="text-[#999999] text-sm">Isi keranjang:</span>
-                <span className="text-[#0D0E09] text-sm font-bold">
+                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-[#0D0E09]">
                   {isLoading ? "Memuat..." : `${cartRowCount} produk`}
                 </span>
               </div>

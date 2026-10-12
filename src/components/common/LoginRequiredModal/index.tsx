@@ -123,6 +123,19 @@ const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
   };
 
   const featureInfo = getFeatureInfo();
+  const benefitItems = feature === 'cart'
+    ? [
+        'Keranjang tersimpan aman di akun Anda',
+        'Pilih produk yang ingin checkout sekarang',
+        'Lanjut ke pembayaran resmi toko',
+        'Pantau status pesanan setelah checkout',
+      ]
+    : [
+        'Simpan produk ke wishlist',
+        'Lacak pesanan dan transaksi',
+        'Checkout lebih cepat',
+        'Riwayat pembelian lengkap',
+      ];
 
   const handleLogin = () => {
     onClose();
@@ -188,16 +201,14 @@ const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
             {featureInfo.description}
           </p>
 
-          {/* Benefits of logging in */}
-          <div className="mb-4 rounded-2xl bg-gray-50 p-4">
-            <h4 className="mb-2 text-sm font-medium text-gray-900">
-              Manfaat login:
+          <div className="mb-4 rounded-2xl bg-emerald-50/80 p-4 ring-1 ring-emerald-100">
+            <h4 className="mb-2 text-sm font-bold text-emerald-950">
+              {feature === 'cart' ? 'Kenapa perlu login?' : 'Manfaat login:'}
             </h4>
-            <ul className="text-xs text-gray-600 space-y-1">
-              <li>• Simpan produk ke wishlist</li>
-              <li>• Lacak pesanan dan transaksi</li>
-              <li>• Checkout lebih cepat</li>
-              <li>• Riwayat pembelian lengkap</li>
+            <ul className="space-y-1.5 text-xs leading-5 text-emerald-900">
+              {benefitItems.map((item) => (
+                <li key={item}>✓ {item}</li>
+              ))}
             </ul>
           </div>
 
@@ -241,8 +252,10 @@ const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
               </button>
             )}
           </div>
-          <p className="mt-3 text-center text-xs text-gray-500">
-            Dengan login, Anda akan mendapatkan pengalaman berbelanja yang lebih baik
+          <p className="mt-3 text-center text-xs leading-5 text-gray-500">
+            {feature === 'cart'
+              ? 'Login menjaga pilihan keranjang tetap aman sebelum checkout.'
+              : 'Dengan login, Anda akan mendapatkan pengalaman berbelanja yang lebih baik'}
           </p>
         </div>
       </div>
