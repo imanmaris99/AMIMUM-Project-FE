@@ -97,7 +97,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
       )}
 
       <div
-        className="flex h-[126px] w-full items-center justify-center overflow-hidden rounded-[1.1rem] bg-gradient-to-br from-emerald-50 via-white to-stone-50 bg-contain bg-center bg-no-repeat p-1.5 ring-1 ring-emerald-50 min-[390px]:h-[136px] sm:h-36"
+        className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-[1.1rem] bg-gradient-to-br from-emerald-50 via-white to-stone-50 bg-contain bg-center bg-no-repeat p-1.5 ring-1 ring-emerald-50"
         style={{ backgroundImage: "url('/default-image.jpg')" }}
       >
           {!isExternalUrl ? (
@@ -131,12 +131,12 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
             />
           )}
       </div>
-      <div className="flex flex-col gap-1 px-0.5 pb-0.5 pt-2">
+      <div className="flex flex-col gap-1.5 px-0.5 pb-0.5 pt-2.5">
         <div className="space-y-0.5">
-          <p className="line-clamp-2 min-h-[30px] text-[12.5px] font-bold leading-[15px] text-[#0D0E09]">
+          <p className="line-clamp-2 min-h-[32px] text-[13px] font-bold leading-4 text-[#0D0E09]">
             {productName}
           </p>
-          <p className="line-clamp-1 text-[10.5px] leading-4 text-[#7A887F]">
+          <p className="line-clamp-1 text-[11px] leading-4 text-[#7A887F]">
             {variantCountText}
           </p>
         </div>
@@ -147,7 +147,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
               </p>
             ) : hasDiscount ? (
               <>
-                <p className="text-[16px] font-extrabold leading-5 text-red-500">
+                <p className="text-[17px] font-extrabold leading-5 text-red-500">
                   {rupiahFormater(displayPrice)}
                 </p>
                 {originalPriceForDisplay > displayPrice && (
@@ -157,7 +157,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
                 )}
               </>
             ) : (
-              <p className="text-[16px] font-extrabold leading-5 text-[#0D0E09]">
+              <p className="text-[17px] font-extrabold leading-5 text-[#0D0E09]">
                 {rupiahFormater(displayPrice)}
               </p>
             )}

@@ -2,6 +2,8 @@ import CardProduct from "../CardProduct";
 import { CardProductProps } from "../CardProduct/types";
 
 const ListProductSection = ({products}: {products: CardProductProps[]}) => {
+  const isSingleProduct = products?.length === 1;
+
   return (
     <>
       <div className="mt-5 flex items-center justify-between">
@@ -10,9 +12,14 @@ const ListProductSection = ({products}: {products: CardProductProps[]}) => {
           Katalog toko
         </span>
       </div>
-      <div className="my-4 grid grid-cols-2 gap-3 sm:gap-4">
+      <div className={isSingleProduct
+        ? "my-4 grid grid-cols-1 justify-items-center"
+        : "my-4 grid grid-cols-2 gap-3 sm:gap-4"
+      }>
         {products?.map((product, index) => (
-          <CardProduct key={index} product={product} />
+          <div key={index} className={isSingleProduct ? "w-[min(46vw,188px)]" : "w-full"}>
+            <CardProduct product={product} />
+          </div>
         ))}
       </div>
     </>
