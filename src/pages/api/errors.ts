@@ -22,6 +22,8 @@ interface ErrorRequest {
   errors: ErrorReport[];
 }
 
+const MAX_ERROR_REPORTS_PER_REQUEST = 50;
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -35,6 +37,10 @@ export default async function handler(
 
     if (!errors || !Array.isArray(errors)) {
       return res.status(400).json({ message: 'Data laporan error tidak valid' });
+    }
+
+    if (errors.length > MAX_ERROR_REPORTS_PER_REQUEST) {
+      return res.status(413).json({ message: 'Jumlah laporan error terlalu banyak' });
     }
 
     // Log errors to console in development

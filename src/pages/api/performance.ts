@@ -17,6 +17,8 @@ interface PerformanceRequest {
   performance: PerformanceReport[];
 }
 
+const MAX_PERFORMANCE_REPORTS_PER_REQUEST = 50;
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -30,6 +32,10 @@ export default async function handler(
 
     if (!performance || !Array.isArray(performance)) {
       return res.status(400).json({ message: 'Data performa tidak valid' });
+    }
+
+    if (performance.length > MAX_PERFORMANCE_REPORTS_PER_REQUEST) {
+      return res.status(413).json({ message: 'Jumlah laporan performa terlalu banyak' });
     }
 
     // Log performance to console in development

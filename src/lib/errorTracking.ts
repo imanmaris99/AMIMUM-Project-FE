@@ -251,8 +251,8 @@ class ErrorTracker {
     try {
       await this.sendToEndpoint('/api/errors', { errors });
     } catch {
-      // Failed to send error reports - re-adding to queue for retry
-      this.errorQueue.unshift(...errors);
+      // Failed to send error reports - keep a bounded retry queue.
+      this.errorQueue = [...errors, ...this.errorQueue].slice(0, this.maxQueueSize);
     }
   }
 
@@ -265,8 +265,8 @@ class ErrorTracker {
     try {
       await this.sendToEndpoint('/api/performance', { performance });
     } catch {
-      // Failed to send performance reports - re-adding to queue for retry
-      this.performanceQueue.unshift(...performance);
+      // Failed to send performance reports - keep a bounded retry queue.
+      this.performanceQueue = [...performance, ...this.performanceQueue].slice(0, this.maxQueueSize);
     }
   }
 
