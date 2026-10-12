@@ -117,7 +117,12 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
               src={imageUrl}
               alt={productName}
               className="h-full w-full rounded-xl object-contain transition duration-200 group-active:scale-[0.98]"
-              onError={handleImageError}
+              onError={(event) => {
+                if (!event.currentTarget.src.endsWith("/default-image.jpg")) {
+                  event.currentTarget.src = "/default-image.jpg";
+                }
+                handleImageError();
+              }}
               loading="lazy"
             />
           )}
