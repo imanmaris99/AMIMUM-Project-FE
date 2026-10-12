@@ -94,12 +94,8 @@ export default function CartPage() {
       await clearAll();
       setShowConfirmDialog(false);
       toast.success("Semua item telah dihapus dari keranjang.");
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Gagal menghapus semua item keranjang."
-      );
+    } catch {
+      toast.error("Keranjang belum bisa dikosongkan. Silakan coba lagi beberapa saat lagi.");
     } finally {
       setIsClearingCart(false);
     }

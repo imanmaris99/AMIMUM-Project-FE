@@ -872,8 +872,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
 
           await Promise.all(cartIdsToDelete.map((cartId) => deleteCartProduct(cartId)));
           await refreshCart();
-        } catch (cartCleanupError) {
-          console.warn('Failed to clean checked-out cart items', cartCleanupError);
+        } catch {
+          console.warn('Checked-out cart cleanup deferred; cart will be refreshed.');
           await refreshCart();
         }
       }
