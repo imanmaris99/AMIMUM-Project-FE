@@ -117,7 +117,7 @@ const RelatedProductsSection = ({
       </div>
       <div className="grid grid-cols-2 gap-3">
         {products.map((product) => (
-          <CardProduct key={product.id} product={product} />
+          <CardProduct key={product.id} product={product} imageLoading="eager" />
         ))}
       </div>
     </section>

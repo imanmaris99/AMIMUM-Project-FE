@@ -7,7 +7,15 @@ import useSearchLogic from "../useSearchLogic";
 import WishlistButton from "@/components/common/WishlistButton";
 import { useEffect, useMemo, useState } from "react";
 
-const CardProduct = ({ product }: { product: CardProductProps }) => {
+type CardProductImageLoading = "lazy" | "eager";
+
+const CardProduct = ({
+  product,
+  imageLoading = "lazy",
+}: {
+  product: CardProductProps;
+  imageLoading?: CardProductImageLoading;
+}) => {
   const { handleSelectProduct } = useSearchLogic();
   const [imageError, setImageError] = useState(false);
 
@@ -113,7 +121,8 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
               width={160}
               height={160}
               className="h-full w-full rounded-xl object-cover opacity-100 shadow-[inset_0_0_0_1px_rgba(15,23,42,0.03)] transition duration-200 group-active:scale-[0.98]"
-              loading="lazy"
+              loading={imageLoading}
+              priority={imageLoading === "eager"}
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
               onError={() => {
@@ -133,7 +142,8 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
                 }
                 handleImageError();
               }}
-              loading="lazy"
+              loading={imageLoading}
+              fetchPriority={imageLoading === "eager" ? "high" : "auto"}
             />
           )}
       </div>
