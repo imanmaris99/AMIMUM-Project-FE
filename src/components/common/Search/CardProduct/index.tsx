@@ -106,7 +106,8 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
               alt={productName}
               width={160}
               height={160}
-              className="h-auto max-h-[84%] w-auto max-w-[84%] rounded-lg object-contain drop-shadow-[0_8px_14px_rgba(15,23,42,0.10)] transition duration-200 group-active:scale-[0.98]"
+              className="rounded-lg object-contain drop-shadow-[0_8px_14px_rgba(15,23,42,0.10)] transition duration-200 group-active:scale-[0.98]"
+              style={{ width: "auto", height: "auto", maxWidth: "78%", maxHeight: "78%" }}
               loading="lazy"
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
@@ -120,7 +121,8 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
             <img
               src={resolvedImageUrl}
               alt={productName}
-              className="h-auto max-h-[84%] w-auto max-w-[84%] rounded-lg object-contain drop-shadow-[0_8px_14px_rgba(15,23,42,0.10)] transition duration-200 group-active:scale-[0.98]"
+              className="rounded-lg object-contain drop-shadow-[0_8px_14px_rgba(15,23,42,0.10)] transition duration-200 group-active:scale-[0.98]"
+              style={{ width: "auto", height: "auto", maxWidth: "78%", maxHeight: "78%" }}
               onError={(event) => {
                 if (!event.currentTarget.src.endsWith("/default-image.jpg")) {
                   event.currentTarget.src = "/default-image.jpg";
