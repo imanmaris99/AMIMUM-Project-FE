@@ -97,8 +97,8 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
       )}
 
       <div
-        className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-[1.1rem] bg-gradient-to-br from-emerald-50 via-white to-stone-50 bg-contain bg-center bg-no-repeat p-1.5 ring-1 ring-emerald-50"
-        style={{ backgroundImage: "url('/default-image.jpg')" }}
+        className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-[1.1rem] bg-gradient-to-br from-[#F8FBF7] via-white to-[#F3F8F5] bg-contain bg-center bg-no-repeat p-3 ring-1 ring-emerald-50/80"
+        style={{ backgroundImage: imageError ? "url('/default-image.jpg')" : undefined }}
       >
           {!isExternalUrl ? (
             <Image
@@ -106,7 +106,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
               alt={productName}
               width={160}
               height={160}
-              className="h-full w-full rounded-xl object-contain transition duration-200 group-active:scale-[0.98]"
+              className="h-auto max-h-[84%] w-auto max-w-[84%] rounded-lg object-contain drop-shadow-[0_8px_14px_rgba(15,23,42,0.10)] transition duration-200 group-active:scale-[0.98]"
               loading="lazy"
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
@@ -120,7 +120,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
             <img
               src={resolvedImageUrl}
               alt={productName}
-              className="h-full w-full rounded-xl object-contain transition duration-200 group-active:scale-[0.98]"
+              className="h-auto max-h-[84%] w-auto max-w-[84%] rounded-lg object-contain drop-shadow-[0_8px_14px_rgba(15,23,42,0.10)] transition duration-200 group-active:scale-[0.98]"
               onError={(event) => {
                 if (!event.currentTarget.src.endsWith("/default-image.jpg")) {
                   event.currentTarget.src = "/default-image.jpg";
