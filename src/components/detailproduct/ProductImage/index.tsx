@@ -10,7 +10,6 @@ interface ProductImageProps {
 
 const ProductImage = ({ detailProduct, selectedVariantImg }: ProductImageProps) => {
   const [imageError, setImageError] = useState(false);
-  const [imageReady, setImageReady] = useState(false);
   const primaryGalleryImage = detailProduct?.gallery_images?.find((img) => img.is_primary)?.url;
   const firstGalleryImage = detailProduct?.gallery_images?.[0]?.url;
   const firstVariantImage = detailProduct?.variants_list?.find((variant) => variant?.img)?.img;
@@ -21,16 +20,13 @@ const ProductImage = ({ detailProduct, selectedVariantImg }: ProductImageProps) 
     || firstVariantImage
     || "/default-image.jpg";
   const resolvedImageUrl = imageError ? "/default-image.jpg" : imageUrl;
-  const isFallbackImage = resolvedImageUrl === "/default-image.jpg";
 
   useEffect(() => {
     setImageError(false);
-    setImageReady(false);
   }, [imageUrl]);
 
   const handleImageError = () => {
     setImageError(true);
-    setImageReady(false);
   };
 
   const isExternalUrl = useMemo(() => {
@@ -58,11 +54,10 @@ const ProductImage = ({ detailProduct, selectedVariantImg }: ProductImageProps) 
             src={resolvedImageUrl}
             alt={detailProduct?.name || "Gambar produk katalog"}
             fill
-            className={`${imageReady || isFallbackImage ? "opacity-100" : "opacity-0"} object-contain p-5 transition duration-200`}
+            className="object-contain p-5 opacity-100 transition duration-200"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            priority={false}
+            priority
             unoptimized
-            onLoad={() => setImageReady(true)}
             onError={handleImageError}
           />
         ) : (
@@ -70,10 +65,10 @@ const ProductImage = ({ detailProduct, selectedVariantImg }: ProductImageProps) 
           <img
             src={resolvedImageUrl}
             alt={detailProduct?.name || "Gambar produk katalog"}
-            className={`${imageReady || isFallbackImage ? "opacity-100" : "opacity-0"} relative h-full w-full object-contain p-5 transition duration-200`}
-            onLoad={() => setImageReady(true)}
+            className="relative h-full w-full object-contain p-5 opacity-100 transition duration-200"
             onError={handleImageError}
-            loading="lazy"
+            loading="eager"
+            fetchPriority="high"
           />
         )}
       </div>
