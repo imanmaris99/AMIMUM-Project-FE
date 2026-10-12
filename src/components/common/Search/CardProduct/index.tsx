@@ -96,7 +96,10 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
         </div>
       )}
 
-      <div className="flex h-[126px] w-full items-center justify-center overflow-hidden rounded-[1.1rem] bg-gradient-to-br from-emerald-50 via-white to-stone-50 p-1.5 ring-1 ring-emerald-50 min-[390px]:h-[136px] sm:h-36">
+      <div
+        className="flex h-[126px] w-full items-center justify-center overflow-hidden rounded-[1.1rem] bg-gradient-to-br from-emerald-50 via-white to-stone-50 bg-contain bg-center bg-no-repeat p-1.5 ring-1 ring-emerald-50 min-[390px]:h-[136px] sm:h-36"
+        style={{ backgroundImage: "url('/default-image.jpg')" }}
+      >
           {!isExternalUrl ? (
             <Image
               src={resolvedImageUrl}
