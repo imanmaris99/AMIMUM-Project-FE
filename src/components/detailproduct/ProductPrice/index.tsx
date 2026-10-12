@@ -30,6 +30,7 @@ const ProductPrice = ({
   const [isAdding, setIsAdding] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loginFeature, setLoginFeature] = useState<'cart' | 'checkout'>('cart');
   const { addToCart, isInCart, updateActiveStatus, refreshCart } = useCart();
   const router = useRouter();
 
@@ -77,6 +78,7 @@ const ProductPrice = ({
     }
 
     if (!SessionManager.isAuthenticated()) {
+      setLoginFeature('cart');
       setShowLoginModal(true);
       return;
     }
@@ -86,16 +88,16 @@ const ProductPrice = ({
     try {
       await addToCart(data, datavariant);
       setShowFeedback(true);
-      toast.success("Produk berhasil tersimpan di keranjang. Membuka keranjang...");
-      setTimeout(() => setShowFeedback(false), 2000);
-      router.push("/cart");
+      toast.success("Produk berhasil ditambahkan ke keranjang.");
+      setTimeout(() => setShowFeedback(false), 3200);
     } catch (error) {
       if (isSlowCartProcessingError(error)) {
         try {
           await waitForCartRecovery();
           await ensureTargetCartItemActive();
-          toast.success("Produk berhasil tersimpan di keranjang. Membuka keranjang...");
-          router.push("/cart");
+          setShowFeedback(true);
+          toast.success("Produk berhasil ditambahkan ke keranjang.");
+          setTimeout(() => setShowFeedback(false), 3200);
           return;
         } catch {
           // Fall through to the safe customer message below.
@@ -115,6 +117,7 @@ const ProductPrice = ({
     }
 
     if (!SessionManager.isAuthenticated()) {
+      setLoginFeature('checkout');
       setShowLoginModal(true);
       return;
     }
@@ -317,12 +320,22 @@ const ProductPrice = ({
 
             {/* User Feedback Toast */}
             {showFeedback && (
-              <div className="fixed top-7 left-[49%] transform -translate-x-1/2 bg-primary text-white px-4 py-2 rounded-lg shadow-lg z-50 max-w-[280px] mx-4">
-                <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <div className="fixed top-7 left-1/2 z-50 mx-4 w-[min(360px,calc(100vw-2rem))] -translate-x-1/2 rounded-2xl bg-primary px-4 py-3 text-white shadow-lg">
+                <div className="flex items-start gap-2">
+                  <svg className="mt-0.5 h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-sm font-medium">Ditambahkan ke keranjang!</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold">Produk berhasil ditambahkan.</p>
+                    <p className="mt-0.5 text-xs leading-4 text-white/85">Kamu tetap di halaman produk dan bisa lanjut belanja.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => router.push('/cart')}
+                    className="shrink-0 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-primary"
+                  >
+                    Lihat
+                  </button>
                 </div>
               </div>
             )}
@@ -331,9 +344,12 @@ const ProductPrice = ({
             <LoginRequiredModal
               isOpen={showLoginModal}
               onClose={() => setShowLoginModal(false)}
-              feature="checkout"
-              title="Login Diperlukan untuk Pembelian"
-              description="Silakan login terlebih dahulu untuk melanjutkan pembelian dan menyelesaikan checkout dengan aman."
+              feature={loginFeature}
+              title={loginFeature === 'cart' ? "Login Diperlukan untuk Keranjang" : "Login Diperlukan untuk Pembelian"}
+              description={loginFeature === 'cart'
+                ? "Silakan login terlebih dahulu agar produk bisa tersimpan aman di keranjang Anda."
+                : "Silakan login terlebih dahulu untuk melanjutkan pembelian dan menyelesaikan checkout dengan aman."
+              }
             />
           </div>
         </div>
