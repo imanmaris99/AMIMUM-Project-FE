@@ -86,7 +86,7 @@ const ProductPrice = ({
     setIsAdding(true);
 
     try {
-      await addToCart(data, datavariant);
+      await addToCart(data, datavariant, { skipRefresh: true });
       setShowFeedback(true);
       toast.success("Produk berhasil ditambahkan ke keranjang.");
       setTimeout(() => setShowFeedback(false), 3200);
