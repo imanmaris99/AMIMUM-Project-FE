@@ -13,6 +13,7 @@ import { postForgotPassword } from "@/services/api/forgot-password";
 import toast from "react-hot-toast";
 import { useGoogleLogin } from "@/hooks/useGoogleLogin";
 import { AUTH_FLOW_STORAGE_KEYS, saveAuthFlowEmail } from "@/lib/authFlow";
+import { sanitizeCustomerErrorMessage } from "@/lib/errorHandler";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Format email tidak valid" }),
@@ -51,7 +52,10 @@ const FormForgotPassword = () => {
         );
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Gagal mengirim email reset password. Silakan coba lagi.";
+      const errorMessage = sanitizeCustomerErrorMessage(
+        error instanceof Error ? error.message : undefined,
+        "Gagal mengirim email reset password. Silakan coba lagi."
+      );
       setApiError(errorMessage);
       form.setError("email", {
         type: "manual",

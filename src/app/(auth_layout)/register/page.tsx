@@ -9,6 +9,7 @@ import Image from "next/image";
 import { postRegister } from "@/services/api/register";
 import toast from "react-hot-toast";
 import { AUTH_FLOW_STORAGE_KEYS, saveAuthFlowEmail } from "@/lib/authFlow";
+import { sanitizeCustomerErrorMessage } from "@/lib/errorHandler";
 
 const Register = () => {
   const router = useRouter();
@@ -137,7 +138,10 @@ const Register = () => {
         }, 3000);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Gagal mendaftar. Silakan coba lagi.";
+      const errorMessage = sanitizeCustomerErrorMessage(
+        error instanceof Error ? error.message : undefined,
+        "Gagal mendaftar. Silakan coba lagi."
+      );
       setApiError(errorMessage);
       toast.error(errorMessage);
     } finally {

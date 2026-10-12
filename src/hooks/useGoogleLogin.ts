@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { handleGoogleLogin } from "@/lib/googleAuth";
+import { sanitizeCustomerErrorMessage } from "@/lib/errorHandler";
 
 export const useGoogleLogin = () => {
   const router = useRouter();
@@ -33,7 +34,10 @@ export const useGoogleLogin = () => {
         toast.error(result.message || "Login dengan Google gagal. Silakan coba lagi.");
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Login dengan Google gagal. Silakan coba lagi.";
+      const errorMessage = sanitizeCustomerErrorMessage(
+        error instanceof Error ? error.message : undefined,
+        "Login dengan Google gagal. Silakan coba lagi."
+      );
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);

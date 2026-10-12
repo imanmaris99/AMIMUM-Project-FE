@@ -2,6 +2,22 @@
 import withBundleAnalyzer from '@next/bundle-analyzer';
 
 const nextConfig = {
+    async headers() {
+        return [
+            {
+                source: '/(.*)',
+                headers: [
+                    { key: 'X-Content-Type-Options', value: 'nosniff' },
+                    { key: 'X-Frame-Options', value: 'DENY' },
+                    { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+                    {
+                        key: 'Permissions-Policy',
+                        value: 'camera=(), microphone=(), geolocation=(), payment=()'
+                    },
+                ],
+            },
+        ];
+    },
     images: {
         // Only allow hostnames that are actually used in API responses
         // This improves security by limiting external image sources

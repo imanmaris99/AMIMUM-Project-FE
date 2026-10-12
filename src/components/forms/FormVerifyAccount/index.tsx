@@ -18,6 +18,7 @@ import {
   resolveAuthFlowEmail,
   saveAuthFlowEmail,
 } from "@/lib/authFlow";
+import { sanitizeCustomerErrorMessage } from "@/lib/errorHandler";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Format email tidak valid" }),
@@ -102,7 +103,10 @@ const FormVerifyAccount = () => {
       toast.success("Email verifikasi telah dikirim ulang. Silakan cek email Anda.");
       setResendCooldown(60);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Gagal mengirim ulang email verifikasi. Silakan coba lagi.";
+      const errorMessage = sanitizeCustomerErrorMessage(
+        error instanceof Error ? error.message : undefined,
+        "Gagal mengirim ulang email verifikasi. Silakan coba lagi."
+      );
       toast.error(errorMessage);
     } finally {
       setIsResending(false);
@@ -130,8 +134,10 @@ const FormVerifyAccount = () => {
         }
       );
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Gagal memverifikasi akun. Cek ulang email dan kode verifikasi.";
+      const errorMessage = sanitizeCustomerErrorMessage(
+        error instanceof Error ? error.message : undefined,
+        "Gagal memverifikasi akun. Cek ulang email dan kode verifikasi."
+      );
       setApiError(errorMessage);
       toast.error(errorMessage);
     } finally {

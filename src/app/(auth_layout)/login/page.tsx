@@ -21,6 +21,7 @@ import {
   saveAuthFlowEmail,
   takeAuthFlowEmail,
 } from "@/lib/authFlow";
+import { sanitizeCustomerErrorMessage } from "@/lib/errorHandler";
 
 type LoginFlowError = Error & {
   isAccountInactive?: boolean;
@@ -250,7 +251,10 @@ const Login = () => {
         }, 2000);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Login gagal. Silakan coba lagi.";
+      const errorMessage = sanitizeCustomerErrorMessage(
+        error instanceof Error ? error.message : undefined,
+        "Login gagal. Silakan coba lagi."
+      );
       const typedError = error as LoginFlowError;
       
       let isInactiveError = false;
@@ -343,7 +347,10 @@ const Login = () => {
         toast.error(result.message || "Login dengan Google gagal. Silakan coba lagi.");
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Login dengan Google gagal. Silakan coba lagi.";
+      const errorMessage = sanitizeCustomerErrorMessage(
+        error instanceof Error ? error.message : undefined,
+        "Login dengan Google gagal. Silakan coba lagi."
+      );
       setApiError(errorMessage);
       toast.error(errorMessage);
     } finally {

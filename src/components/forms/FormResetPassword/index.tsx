@@ -19,6 +19,7 @@ import {
   resolveAuthFlowEmail,
   saveAuthFlowEmail,
 } from "@/lib/authFlow";
+import { sanitizeCustomerErrorMessage } from "@/lib/errorHandler";
 
 // Password validation schema sesuai kriteria API
 const passwordSchema = z
@@ -112,8 +113,10 @@ const FormResetPassword = () => {
       saveAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.resetEmail, "");
       saveAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.loginEmail, normalizedEmail);
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Gagal reset password. Silakan coba lagi.";
+      const errorMessage = sanitizeCustomerErrorMessage(
+        error instanceof Error ? error.message : undefined,
+        "Gagal reset password. Silakan coba lagi."
+      );
       setApiError(errorMessage);
       toast.error(errorMessage);
     } finally {

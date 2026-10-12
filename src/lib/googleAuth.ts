@@ -4,6 +4,7 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../../utils/firebase-config";
 import { postGoogleLogin } from "@/services/api/google-login";
 import { SessionManager, isJwtToken } from "./auth";
+import { sanitizeCustomerErrorMessage } from "./errorHandler";
 
 export interface GoogleAuthResult {
   success: boolean;
@@ -100,7 +101,10 @@ export const handleGoogleLogin = async (): Promise<GoogleAuthResult> => {
 
       return {
         success: false,
-        message: error.message || "Login dengan Google gagal. Silakan coba lagi.",
+        message: sanitizeCustomerErrorMessage(
+          error.message,
+          "Login dengan Google gagal. Silakan coba lagi."
+        ),
       };
     }
 

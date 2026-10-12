@@ -136,6 +136,48 @@ export const ERROR_MESSAGES = {
   }
 };
 
+const CUSTOMER_ERROR_TECHNICAL_MARKERS = [
+  'unauthorized',
+  'not authenticated',
+  'internal server error',
+  'bad gateway',
+  'traceback',
+  'firebase',
+  'auth/',
+  'axios',
+  'jwt',
+  'token',
+  'stack',
+  'database',
+  'sql',
+  'exception',
+  'networkerror',
+  'failed to fetch',
+];
+
+export function sanitizeCustomerErrorMessage(
+  message: string | undefined,
+  fallback: string
+): string {
+  const trimmedMessage = message?.trim();
+
+  if (!trimmedMessage) {
+    return fallback;
+  }
+
+  const normalizedMessage = trimmedMessage.toLowerCase();
+  const hasTechnicalMarker = CUSTOMER_ERROR_TECHNICAL_MARKERS.some((marker) =>
+    normalizedMessage.includes(marker)
+  );
+  const hasSensitiveShape = /https?:\/\/|bearer\s+|api[_-]?key|password|secret/i.test(trimmedMessage);
+
+  if (hasTechnicalMarker || hasSensitiveShape) {
+    return fallback;
+  }
+
+  return trimmedMessage;
+}
+
 // Error handler with retry mechanism
 export class ErrorHandler {
   private static retryAttempts = new Map<string, number>();
