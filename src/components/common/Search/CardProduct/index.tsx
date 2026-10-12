@@ -113,8 +113,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
               alt={productName}
               width={160}
               height={160}
-              className={`${imageReady || isFallbackImage ? "opacity-100" : "opacity-0"} rounded-lg object-contain drop-shadow-[0_8px_14px_rgba(15,23,42,0.10)] transition duration-200 group-active:scale-[0.98]`}
-              style={{ width: "auto", height: "auto", maxWidth: "86%", maxHeight: "86%" }}
+              className={`${imageReady || isFallbackImage ? "opacity-100" : "opacity-0"} h-full w-full rounded-xl object-cover shadow-[inset_0_0_0_1px_rgba(15,23,42,0.03)] transition duration-200 group-active:scale-[0.98]`}
               onLoad={() => {
                 setImageReady(true);
               }}
@@ -131,8 +130,7 @@ const CardProduct = ({ product }: { product: CardProductProps }) => {
             <img
               src={resolvedImageUrl}
               alt={productName}
-              className={`${imageReady || isFallbackImage ? "opacity-100" : "opacity-0"} rounded-lg object-contain drop-shadow-[0_8px_14px_rgba(15,23,42,0.10)] transition duration-200 group-active:scale-[0.98]`}
-              style={{ width: "auto", height: "auto", maxWidth: "86%", maxHeight: "86%" }}
+              className={`${imageReady || isFallbackImage ? "opacity-100" : "opacity-0"} h-full w-full rounded-xl object-cover shadow-[inset_0_0_0_1px_rgba(15,23,42,0.03)] transition duration-200 group-active:scale-[0.98]`}
               onLoad={() => {
                 setImageReady(true);
               }}
