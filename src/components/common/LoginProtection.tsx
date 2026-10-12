@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { SessionManager } from '@/lib/auth';
 import LoginRequiredModal from './LoginRequiredModal';
@@ -61,15 +61,14 @@ const LoginProtection: React.FC<LoginProtectionProps> = ({
 }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [currentPathWithQuery, setCurrentPathWithQuery] = useState('/');
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const currentPathWithQuery = `${pathname || '/'}${searchParams?.toString() ? `?${searchParams.toString()}` : ''}`;
   const featureLabel = getLoginFeatureLabel(feature);
   const featureDescription = getLoginFeatureDescription(feature);
 
   useEffect(() => {
     const checkLoginStatus = () => {
+      setCurrentPathWithQuery(`${window.location.pathname}${window.location.search}` || '/');
       const isAuthenticated = SessionManager.isAuthenticated();
       
       if (isAuthenticated) {
