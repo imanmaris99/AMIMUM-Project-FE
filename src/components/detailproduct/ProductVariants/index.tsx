@@ -14,6 +14,31 @@ interface ProductVariantsProps {
 const formatCurrency = (value: number) =>
   value.toLocaleString("id-ID", { style: "currency", currency: "IDR" });
 
+const getNaturalSortValue = (value?: string | null) => {
+  const label = value?.trim() || "";
+  const numberMatch = label.match(/\d+/);
+
+  return {
+    number: numberMatch ? Number(numberMatch[0]) : Number.POSITIVE_INFINITY,
+    label: label.toLocaleLowerCase("id-ID"),
+  };
+};
+
+const compareNaturalLabel = (left?: string | null, right?: string | null) => {
+  const a = getNaturalSortValue(left);
+  const b = getNaturalSortValue(right);
+
+  if (a.number !== b.number) return a.number - b.number;
+  return a.label.localeCompare(b.label, "id-ID", { numeric: true, sensitivity: "base" });
+};
+
+const compareVariants = (left: VariantProductType, right: VariantProductType) => {
+  const variantCompare = compareNaturalLabel(left.variant || left.name, right.variant || right.name);
+  if (variantCompare !== 0) return variantCompare;
+
+  return compareNaturalLabel(left.name, right.name);
+};
+
 const ProductVariants = ({
   product,
   variants,
@@ -41,7 +66,12 @@ const ProductVariants = ({
       return groups;
     },
     []
-  );
+  )
+    .map((group) => ({
+      ...group,
+      items: [...group.items].sort(compareVariants),
+    }))
+    .sort((left, right) => compareNaturalLabel(left.optionName, right.optionName));
 
   const handleVariantSelect = (variant: VariantProductType) => {
     onVariantChange?.(variant);
