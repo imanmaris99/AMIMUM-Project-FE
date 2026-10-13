@@ -111,6 +111,14 @@ const ProductDescription = ({
 
     return parseDescriptionBlocks(descriptionItems);
   }, [data?.description_list]);
+  const hasCustomVariant = useMemo(() => {
+    const variants = Array.isArray(data?.variants_list) ? data.variants_list : [];
+
+    return variants.some((variant) => {
+      const optionName = `${variant?.name || ""} ${variant?.variant || ""}`.toLowerCase();
+      return optionName.includes("custom");
+    });
+  }, [data?.variants_list]);
   const isLongDescription = descriptionBlocks.length > 4;
   const visibleBlocks = showFullDescription || !isLongDescription
     ? descriptionBlocks
@@ -176,6 +184,15 @@ const ProductDescription = ({
               >
                 {showFullDescription ? "Tampilkan lebih sedikit" : `Baca selengkapnya (${descriptionBlocks.length - visibleBlocks.length} bagian lagi)`}
               </button>
+            )}
+
+            {hasCustomVariant && (
+              <div className="rounded-2xl border border-amber-100 bg-amber-50/80 px-3 py-3">
+                <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-amber-700">Info custom produk</p>
+                <p className="mt-1 text-sm leading-6 text-amber-900">
+                  Untuk varian custom, tuliskan detail request seperti warna, kombinasi, opsi LED, nama/desain, atau catatan khusus di kolom <strong>Catatan Tambahan</strong> saat checkout/pembayaran agar admin bisa menyesuaikan pesanan.
+                </p>
+              </div>
             )}
           </>
         ) : (
