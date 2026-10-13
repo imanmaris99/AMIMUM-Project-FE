@@ -8,6 +8,7 @@ import {
   isPendingPaymentStatus,
 } from "@/lib/transactionStatus";
 import { getPaymentMethodLabel } from "@/lib/paymentMethods";
+import { isArchivedTrackingTransaction, TRACK_ORDER_ACTIVE_DAYS } from "@/lib/orderArchive";
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -75,6 +76,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
   const firstItem = transaction.items[0];
   const remainingItems = Math.max(transaction.items.length - 1, 0);
   const trackingNumber = transaction.shipmentAddress?.trackingNumber;
+  const isArchivedTracking = isArchivedTrackingTransaction(transaction);
   const selectedQuantity = transaction.items.reduce(
     (total, item) => total + item.quantity,
     0
@@ -82,9 +84,12 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
   const shouldTrackDirectly =
     transaction.deliveryType === "delivery" &&
     ["shipped", "delivered", "completed"].includes(transaction.status) &&
+    !isArchivedTracking &&
     Boolean(onTrackOrder);
-  const primaryActionLabel = getPrimaryActionLabel(transaction);
-  const helperText = getTransactionHelperText(transaction);
+  const primaryActionLabel = isArchivedTracking ? "Lihat detail" : getPrimaryActionLabel(transaction);
+  const helperText = isArchivedTracking
+    ? `Tracking aktif sudah diarsipkan karena pesanan selesai lebih dari ${TRACK_ORDER_ACTIVE_DAYS} hari. Detail transaksi tetap tersimpan di sini.`
+    : getTransactionHelperText(transaction);
 
   const handlePrimaryAction = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();

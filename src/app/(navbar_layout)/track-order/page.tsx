@@ -23,6 +23,11 @@ import {
   mapOrderSummaryToTransaction,
 } from "@/services/api/orders";
 import { useTransaction } from "@/contexts/TransactionContext";
+import {
+  isActiveTrackingTransaction,
+  isArchivedTrackingTransaction,
+  TRACK_ORDER_ACTIVE_DAYS,
+} from "@/lib/orderArchive";
 
 const BACKEND_ORDER_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -113,6 +118,14 @@ const TrackOrderPage: React.FC = () => {
     () => [...apiOrders],
     [apiOrders]
   );
+  const activeTrackingOrders = useMemo(
+    () => orders.filter((transaction) => isActiveTrackingTransaction(transaction)),
+    [orders]
+  );
+  const archivedTrackingCount = useMemo(
+    () => orders.filter((transaction) => isArchivedTrackingTransaction(transaction)).length,
+    [orders]
+  );
   const hasLocalLegacyTransactions = localTransactions.length > 0;
 
   const handleBack = () => {
@@ -183,7 +196,16 @@ const TrackOrderPage: React.FC = () => {
         currentTransaction.deliveryType || "delivery"
       )
     : null;
-  const displayedTransactions = transactionId && currentTransaction ? [currentTransaction] : orders;
+  const archivedDirectTransaction = Boolean(
+    transactionId &&
+    currentTransaction &&
+    isArchivedTrackingTransaction(currentTransaction)
+  );
+  const displayedTransactions = transactionId && currentTransaction
+    ? isActiveTrackingTransaction(currentTransaction)
+      ? [currentTransaction]
+      : []
+    : activeTrackingOrders;
   const showGlobalAlert = Boolean(transactionId && currentOrderAlert);
 
   return (
@@ -242,7 +264,7 @@ const TrackOrderPage: React.FC = () => {
               </h3>
               <p className="text-sm text-[#6B7C73]">{errorMessage}</p>
             </div>
-          ) : orders.length === 0 ? (
+          ) : displayedTransactions.length === 0 ? (
             <div className="w-full max-w-sm rounded-3xl bg-white/95 p-6 text-center shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
               <div className="flex flex-col items-center gap-4">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50">
@@ -262,16 +284,22 @@ const TrackOrderPage: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="mb-2 text-lg font-bold text-[#0D0E09]">
-                    Belum Ada Pesanan
+                    {archivedDirectTransaction || archivedTrackingCount > 0
+                      ? "Tracking Aktif Sudah Diarsipkan"
+                      : "Belum Ada Pesanan"}
                   </h3>
                   <p className="mb-4 text-sm leading-6 text-[#6B7C73]">
-                    Data pelacakan akan muncul setelah bro memiliki pesanan yang tercatat di server toko.
+                    {archivedDirectTransaction
+                      ? `Pesanan ini sudah selesai lebih dari ${TRACK_ORDER_ACTIVE_DAYS} hari, jadi tidak lagi tampil sebagai tracking aktif. Detail dan bukti transaksi tetap bisa dibuka dari Riwayat Transaksi.`
+                      : archivedTrackingCount > 0
+                        ? `Pesanan yang sudah selesai lebih dari ${TRACK_ORDER_ACTIVE_DAYS} hari dipindahkan dari Lacak Pesanan agar daftar tracking tetap ringkas. Riwayat transaksi tetap tersimpan di halaman Transaksi.`
+                        : "Data pelacakan akan muncul setelah bro memiliki pesanan yang tercatat di server toko."}
                   </p>
                   <button
-                    onClick={() => router.push("/")}
+                    onClick={() => router.push(archivedDirectTransaction || archivedTrackingCount > 0 ? "/transaction" : "/")}
                     className="rounded-2xl bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
                   >
-                    Mulai Belanja
+                    {archivedDirectTransaction || archivedTrackingCount > 0 ? "Buka Riwayat Transaksi" : "Mulai Belanja"}
                   </button>
                 </div>
               </div>

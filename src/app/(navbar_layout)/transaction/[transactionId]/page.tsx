@@ -33,6 +33,7 @@ import {
   isOfflinePaymentMethod,
   isPendingPaymentStatus,
 } from "@/lib/transactionStatus";
+import { isArchivedTrackingTransaction, TRACK_ORDER_ACTIVE_DAYS } from "@/lib/orderArchive";
 
 const BACKEND_ORDER_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -403,6 +404,7 @@ const TransactionDetailPage: React.FC = () => {
   const isOfflinePayment = isOfflinePaymentMethod(transaction.paymentMethod);
   const isManualQrisPayment = isManualQrisPaymentMethod(transaction.paymentMethod);
   const isManualBankTransferPayment = isManualBankTransferPaymentMethod(transaction.paymentMethod);
+  const isArchivedTracking = isArchivedTrackingTransaction(transaction);
   const shouldShowPaymentActions =
     !isLocalSimulatedTransaction && !isOfflinePayment && !isManualQrisPayment && !isManualBankTransferPayment && (isPendingPayment || canRetryPayment);
   const normalizedStatus = String(transaction.status || '').toLowerCase();
@@ -828,13 +830,18 @@ const TransactionDetailPage: React.FC = () => {
                   </button>
                 </>
               )}
-              {transaction.deliveryType === "delivery" && (
+              {transaction.deliveryType === "delivery" && !isArchivedTracking && (
                 <button
                   onClick={handleTrackShipment}
                   className="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
                 >
                   Lacak Pengiriman
                 </button>
+              )}
+              {isArchivedTracking && (
+                <p className="rounded-2xl bg-emerald-50/80 px-3 py-2 text-xs font-medium leading-relaxed text-emerald-800">
+                  Tracking aktif sudah diarsipkan karena pesanan selesai lebih dari {TRACK_ORDER_ACTIVE_DAYS} hari. Detail transaksi dan invoice tetap tersimpan di halaman ini.
+                </p>
               )}
               <button
                 onClick={handleDownloadInvoice}
