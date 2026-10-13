@@ -1503,7 +1503,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                   setAdditionalNotes(e.target.value);
                   clearError('notes');
                 }}
-                placeholder="Contoh: Request custom warna hijau-putih, tambah nama Aris. Jika ingin LED/lampu, pilih juga opsi tambah lampu."
+                placeholder="Contoh: Request custom warna hijau-putih, ukuran kecil, tambah nama/logo. Opsi tambahan dipilih terpisah jika tersedia."
                 className="w-full resize-none rounded-2xl border border-emerald-100 px-3 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 rows={3}
                 maxLength={500}
@@ -1523,7 +1523,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
                 💡 Catatan berguna untuk toko:
               </p>
               <ul className="text-xs text-blue-700 space-y-1">
-                <li>• &ldquo;Request custom: warna hijau-putih, tambah nama/logo. LED/lampu pilih lewat opsi tambahan.&rdquo;</li>
+                <li>• &ldquo;Request custom: warna, ukuran, nama/logo, atau desain. Opsi tambahan pilih terpisah jika tersedia.&rdquo;</li>
                 <li>• &ldquo;Ambil jam 3 sore&rdquo;</li>
                 <li>• &ldquo;Tolong bungkus rapi&rdquo;</li>
                 <li>• &ldquo;Kirim ke alamat kantor&rdquo;</li>
