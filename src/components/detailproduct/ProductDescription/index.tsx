@@ -190,7 +190,7 @@ const ProductDescription = ({
               <div className="rounded-2xl border border-amber-100 bg-amber-50/80 px-3 py-3">
                 <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-amber-700">Info custom produk</p>
                 <p className="mt-1 text-sm leading-6 text-amber-900">
-                  Untuk varian custom, tuliskan detail request seperti warna, kombinasi, opsi LED, nama/desain, atau catatan khusus di kolom <strong>Catatan Tambahan</strong> saat checkout/pembayaran agar admin bisa menyesuaikan pesanan.
+                  Untuk varian custom tanpa LED, tuliskan detail request seperti warna, kombinasi, nama/desain, atau catatan khusus di kolom <strong>Catatan Tambahan</strong> saat checkout/pembayaran. Jika ingin menambah LED/lampu, pilih juga opsi/perangkat tambahan lampu yang tersedia agar admin bisa menyesuaikan pesanan.
                 </p>
               </div>
             )}
