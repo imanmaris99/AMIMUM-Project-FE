@@ -16,6 +16,7 @@ const staticRoutes = [
   { path: "/cara-belanja", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/kebijakan-pembayaran", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/pengiriman-pickup", priority: 0.7, changeFrequency: "monthly" as const },
+  { path: "/retur-komplain", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/login", priority: 0.3, changeFrequency: "monthly" as const },
   { path: "/register", priority: 0.3, changeFrequency: "monthly" as const },
   { path: "/forgot-password", priority: 0.2, changeFrequency: "yearly" as const },

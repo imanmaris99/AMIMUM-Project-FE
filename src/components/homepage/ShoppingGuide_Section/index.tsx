@@ -18,6 +18,11 @@ const guideLinks = [
     title: "Pengiriman & Pickup",
     description: "Aturan resi, kurir, dan ambil langsung di toko.",
   },
+  {
+    href: "/retur-komplain",
+    title: "Retur & Komplain",
+    description: "Alur bantuan jika pesanan bermasalah atau perlu dicek admin.",
+  },
 ];
 
 export default function ShoppingGuideSection() {
