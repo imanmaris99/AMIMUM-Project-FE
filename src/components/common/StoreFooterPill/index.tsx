@@ -10,6 +10,8 @@ const footerLinks = [
   { href: "/kebijakan-pembayaran", label: "Pembayaran" },
   { href: "/pengiriman-pickup", label: "Pengiriman" },
   { href: "/retur-komplain", label: "Retur/Komplain" },
+  { href: "/kebijakan-privasi", label: "Privasi" },
+  { href: "/syarat-ketentuan", label: "S&K" },
 ];
 
 const StoreFooterPill: React.FC<StoreFooterPillProps> = ({ className = "" }) => {
