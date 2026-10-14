@@ -440,6 +440,16 @@ const TransactionDetailPage: React.FC = () => {
     transaction.deliveryType === "delivery" ? "Kirim ke tujuan" : "Ambil di toko";
   const trackingDisplay = getTrackingDisplay(transaction.shipmentAddress?.trackingNumber);
   const customerSafeNote = getCustomerSafeNote(transaction.notes);
+  const totalItemQuantity = transaction.items.reduce((sum, item) => sum + item.quantity, 0);
+  const paymentMethodLabel = getPaymentMethodLabel(transaction.paymentMethod);
+  const fulfillmentLabel = transaction.deliveryType === "delivery"
+    ? [transaction.shipmentAddress?.courier, transaction.shipmentAddress?.service].filter(Boolean).join(" • ") || "Kurir pengiriman"
+    : "Pickup / ambil di toko";
+  const shippingFeeModeLabel = transaction.shippingDueOnDelivery && transaction.shippingDueOnDelivery > 0
+    ? "Ongkir dibayar saat paket tiba"
+    : transaction.deliveryType === "delivery"
+      ? "Ongkir termasuk total toko"
+      : "Tidak memakai ongkir kurir";
 
   const getCurrentStatusIndex = (status: string, deliveryType?: string) => {
     const normalized = String(status || "").toLowerCase();
@@ -565,43 +575,114 @@ const TransactionDetailPage: React.FC = () => {
             deliveryType={transaction.deliveryType}
           />
 
-          <div className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)]">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-                  TOKO HERBAL AMIMUM
-                </p>
-                <h3 className="mt-1 text-lg font-semibold text-[#0D0E09]">
-                  Bukti Transaksi Customer
-                </h3>
-                <p className="mt-1 text-xs text-[#6B7C73]">
-                  Simpan bukti ini untuk arsip pembelian, komplain, atau retur sesuai kebijakan toko.
-                </p>
+          <div className="overflow-hidden rounded-3xl bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50">
+            <div className="bg-emerald-950 px-4 py-4 text-white">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-100">
+                    Toko Herbal AmImUm
+                  </p>
+                  <h3 className="mt-1 text-xl font-extrabold leading-tight">
+                    Struk / Invoice Pembelian
+                  </h3>
+                  <p className="mt-1 text-xs leading-relaxed text-emerald-50/90">
+                    Bukti transaksi customer untuk arsip, komplain, retur, dan pengecekan pesanan.
+                  </p>
+                </div>
+                <span className="shrink-0 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold text-white ring-1 ring-white/20">
+                  RESMI
+                </span>
               </div>
-              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                Invoice
-              </span>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
-              <div className="rounded-2xl bg-emerald-50/50 p-3">
-                <p className="text-[#6B7C73]">Invoice ID</p>
-                <p className="mt-1 break-words font-semibold text-[#0D0E09]">
-                  {transaction.transactionId}
-                </p>
+
+            <div className="space-y-4 p-4">
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="col-span-2 rounded-2xl bg-emerald-50/70 p-3">
+                  <p className="text-[#6B7C73]">No. Invoice</p>
+                  <p className="mt-1 break-all font-bold text-[#0D0E09]">
+                    {transaction.transactionId}
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-slate-50 p-3">
+                  <p className="text-[#6B7C73]">Tanggal</p>
+                  <p className="mt-1 break-words font-semibold text-[#0D0E09]">{transaction.date}</p>
+                </div>
+                <div className="rounded-2xl bg-slate-50 p-3">
+                  <p className="text-[#6B7C73]">Status</p>
+                  <p className="mt-1 font-semibold text-[#0D0E09]">{statusConfig.text}</p>
+                </div>
+                <div className="rounded-2xl bg-slate-50 p-3">
+                  <p className="text-[#6B7C73]">Metode bayar</p>
+                  <p className="mt-1 break-words font-semibold text-[#0D0E09]">{paymentMethodLabel}</p>
+                </div>
+                <div className="rounded-2xl bg-slate-50 p-3">
+                  <p className="text-[#6B7C73]">Pemenuhan</p>
+                  <p className="mt-1 break-words font-semibold text-[#0D0E09]">{deliveryLabel}</p>
+                </div>
               </div>
-              <div className="rounded-2xl bg-emerald-50/50 p-3">
-                <p className="text-[#6B7C73]">Status</p>
-                <p className="mt-1 font-semibold text-[#0D0E09]">{statusConfig.text}</p>
+
+              <div className="rounded-2xl border border-emerald-100 bg-white p-3">
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <p className="text-sm font-bold text-[#0D0E09]">Rincian item</p>
+                  <span className="rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-700">
+                    {totalItemQuantity} item
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {transaction.items.map((item, index) => {
+                    const itemSubtotal = item.price * item.quantity;
+
+                    return (
+                      <div key={`${item.id}-invoice-${index}`} className="rounded-2xl bg-emerald-50/50 px-3 py-2">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="break-words text-sm font-semibold text-[#0D0E09]">
+                              {index + 1}. {item.name}
+                            </p>
+                            <p className="mt-0.5 text-xs leading-relaxed text-[#6B7C73]">
+                              {item.variantName ? `${item.variantName} • ` : ""}{item.quantity} x {rupiahFormater(item.price)}
+                            </p>
+                          </div>
+                          <p className="shrink-0 text-right text-sm font-bold text-primary">
+                            {rupiahFormater(itemSubtotal)}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              <div className="rounded-2xl bg-emerald-50/50 p-3">
-                <p className="text-[#6B7C73]">Metode bayar</p>
-                <p className="mt-1 font-semibold text-[#0D0E09]">
-                  {getPaymentMethodLabel(transaction.paymentMethod)}
-                </p>
+
+              <div className="rounded-2xl bg-slate-950 p-3 text-white">
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-slate-300">Subtotal produk</span>
+                    <strong>{rupiahFormater(transaction.subtotal)}</strong>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-slate-300">Ongkir</span>
+                    <strong>{rupiahFormater(transaction.shippingCost)}</strong>
+                  </div>
+                  {transaction.shippingDueOnDelivery && transaction.shippingDueOnDelivery > 0 ? (
+                    <div className="flex items-center justify-between gap-3 text-amber-100">
+                      <span>Ongkir bayar saat tiba</span>
+                      <strong>{rupiahFormater(transaction.shippingDueOnDelivery)}</strong>
+                    </div>
+                  ) : null}
+                  <div className="border-t border-white/10 pt-2">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-base font-bold">Total pembayaran toko</span>
+                      <strong className="text-lg">{rupiahFormater(transaction.total)}</strong>
+                    </div>
+                    <p className="mt-1 text-[11px] leading-relaxed text-slate-300">{shippingFeeModeLabel}</p>
+                  </div>
+                </div>
               </div>
-              <div className="rounded-2xl bg-emerald-50/50 p-3">
-                <p className="text-[#6B7C73]">Pengiriman</p>
-                <p className="mt-1 font-semibold text-[#0D0E09]">{deliveryLabel}</p>
+
+              <div className="rounded-2xl bg-emerald-50 px-3 py-2 text-xs leading-relaxed text-emerald-900">
+                <p><strong>Metode:</strong> {fulfillmentLabel}</p>
+                <p><strong>Resi:</strong> {transaction.deliveryType === "delivery" ? trackingDisplay : "Pickup tidak memakai nomor resi"}</p>
+                <p className="mt-1 text-emerald-800">Simpan struk ini bersama bukti pembayaran. Untuk retur/komplain, gunakan nomor invoice dan bukti kondisi barang sesuai kebijakan toko.</p>
               </div>
             </div>
           </div>
@@ -847,7 +928,7 @@ const TransactionDetailPage: React.FC = () => {
                 onClick={handleDownloadInvoice}
                 className="w-full rounded-2xl border border-emerald-100 px-4 py-3 text-sm font-semibold text-[#0D0E09] transition-colors hover:bg-emerald-50"
               >
-                Download Invoice
+                Download Struk / Invoice
               </button>
             </div>
           </div>
