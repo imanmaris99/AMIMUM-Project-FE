@@ -9,8 +9,23 @@ interface ArticleSectionProps {
   errorMessage?: string | null;
 }
 
+const isPlaceholderArticle = (article: ArticleProps) => {
+  const normalizedTitle = article.title
+    .normalize("NFKC")
+    .toLocaleLowerCase("id-ID")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+  const description = (article.description_list || []).join(" ").toLocaleLowerCase("id-ID");
+
+  return (
+    normalizedTitle === "informasi terbaru akan segera hadir" &&
+    /(belum tersedia|sedang dalam proses pembaruan)/.test(description) &&
+    /(segera memperbarui|segera kami hadirkan)/.test(description)
+  );
+};
+
 const ArticleSection = ({ articles, errorMessage }: ArticleSectionProps) => {
-  const visibleArticles = articles || [];
+  const visibleArticles = (articles || []).filter((article) => !isPlaceholderArticle(article));
 
   if (errorMessage) {
     return (
