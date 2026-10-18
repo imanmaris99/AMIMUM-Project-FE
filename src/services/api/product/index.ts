@@ -1,7 +1,7 @@
 import axiosClient from "@/lib/axiosClient";
 import axios from "axios";
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/apiConfig";
-import { shouldFetchProductCatalogForSearch } from "@/lib/productSearchMedia";
+import { resolveSearchProductImage, shouldFetchProductCatalogForSearch } from "@/lib/productSearchMedia";
 import { AllProductInfoType, AllProductInfoResponseType, ProductSearchResponseType, ProductSearchItemType, ProductSearchByBrandResponseType, ProductSearchByBrandItemType, VariantAllProductType } from "@/types/apiTypes";
 
 const DEFAULT_PRODUCT_IMAGE = "/default-image.jpg";
@@ -15,30 +15,14 @@ let productCatalogLookupClientCache: {
   promise?: Promise<Map<string, AllProductInfoType>>;
 } | null = null;
 
-const firstNonEmptyUrl = (...urls: Array<string | null | undefined>) => {
-  const found = urls.find((url) => typeof url === "string" && url.trim().length > 0);
-  return found?.trim();
-};
-
 const resolveProductCardImage = (
   product: Partial<AllProductInfoType | ProductSearchItemType>,
   variants: Array<Partial<VariantAllProductType>> = []
-) => {
-  const galleryImages = Array.isArray(product.gallery_images) ? product.gallery_images : [];
-  const primaryGalleryImage = galleryImages.find((image) => image?.is_primary && image?.url)?.url;
-  const firstGalleryImage = [...galleryImages]
-    .sort((a, b) => Number(a?.sort_order || 0) - Number(b?.sort_order || 0))
-    .find((image) => image?.url)?.url;
-  const firstVariantImage = variants.find((variant) => variant?.img)?.img;
-
-  return firstNonEmptyUrl(
-    product.primary_image_url,
-    primaryGalleryImage,
-    firstGalleryImage,
-    product.image,
-    firstVariantImage,
-  ) || DEFAULT_PRODUCT_IMAGE;
-};
+) => resolveSearchProductImage(
+  product,
+  variants.map((variant) => variant?.img),
+  DEFAULT_PRODUCT_IMAGE,
+);
 
 const mergeCatalogImageFields = (
   product: AllProductInfoType,
