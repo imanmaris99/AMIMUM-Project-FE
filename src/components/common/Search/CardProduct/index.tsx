@@ -59,22 +59,22 @@ const CardProduct = ({
     const discount = Number(variant.discount || 0);
     return Number.isFinite(discount) && discount > max ? discount : max;
   }, 0);
-  const highestDiscount = Number(product.brand_highest_discount || highestVariantDiscount || 0);
+  const productHighestDiscount = Number(product.brand_highest_discount);
+  const highestDiscount = Math.max(
+    Number.isFinite(productHighestDiscount) ? productHighestDiscount : 0,
+    highestVariantDiscount,
+  );
 
   const variantPrices = variants
     .map((variant) => Number(variant.discounted_price || basePrice))
     .filter((price) => Number.isFinite(price) && price > 0);
 
-  const lowestDiscountedPrice = variantPrices.length > 0
+  const displayPrice = variantPrices.length > 0
     ? Math.min(...variantPrices)
     : basePrice;
 
-  const hasDiscount = hasValidBasePrice && Number.isFinite(highestDiscount) && highestDiscount > 0;
-  const displayPrice = hasDiscount ? lowestDiscountedPrice : basePrice;
   const hasDisplayPrice = Number.isFinite(displayPrice) && displayPrice > 0;
-  const originalPriceForDisplay = hasDiscount && product.brand_highest_discount
-    ? Math.round(displayPrice / (1 - highestDiscount / 100))
-    : basePrice;
+  const hasDiscount = hasDisplayPrice && highestDiscount > 0;
 
   const variantCountText = variants.length > 1
     ? `${variants.length} pilihan varian`
@@ -105,8 +105,8 @@ const CardProduct = ({
       </div>
 
       {hasDiscount && (
-        <div className="absolute left-2 top-2 z-20 rounded-full bg-red-500 px-2 py-1 text-[11px] font-bold text-white shadow-sm">
-          -{highestDiscount}%
+        <div className="absolute left-2 top-2 z-20 rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white shadow-sm sm:text-[11px]">
+          Diskon hingga {highestDiscount}%
         </div>
       )}
 
@@ -161,21 +161,13 @@ const CardProduct = ({
               <p className="text-sm font-bold text-gray-500">
                 Harga belum tersedia
               </p>
-            ) : hasDiscount ? (
-              <>
-                <p className="text-[17px] font-extrabold leading-5 text-red-500">
+            ) : (
+              <div className="flex flex-col">
+                <span className="text-[10px] font-medium leading-3 text-[#7A887F]">Mulai dari</span>
+                <p className="text-[17px] font-extrabold leading-5 text-[#0D0E09]">
                   {rupiahFormater(displayPrice)}
                 </p>
-                {originalPriceForDisplay > displayPrice && (
-                  <p className="text-[11px] leading-4 text-gray-400 line-through">
-                    {rupiahFormater(originalPriceForDisplay)}
-                  </p>
-                )}
-              </>
-            ) : (
-              <p className="text-[17px] font-extrabold leading-5 text-[#0D0E09]">
-                {rupiahFormater(displayPrice)}
-              </p>
+              </div>
             )}
         </div>
       </div>
