@@ -143,7 +143,16 @@ export const SearchGetProduct = async (productName: string): Promise<AllProductI
     const responseData = response as unknown as ProductSearchResponseType;
     
     if (responseData && responseData.status_code === 200 && responseData.data && Array.isArray(responseData.data)) {
-      const catalogLookup = await fetchProductCatalogLookupClient();
+      const searchIncludesProductImages = responseData.data.every((product) =>
+        Boolean(
+          product.primary_image_url ||
+          product.gallery_images?.some((image) => Boolean(image?.url)) ||
+          product.image
+        )
+      );
+      const catalogLookup = searchIncludesProductImages
+        ? new Map<string, AllProductInfoType>()
+        : await fetchProductCatalogLookupClient();
 
       const mappedProducts: AllProductInfoType[] = responseData.data.map((product: ProductSearchItemType) => {
         const variants = Array.isArray(product.all_variants)
