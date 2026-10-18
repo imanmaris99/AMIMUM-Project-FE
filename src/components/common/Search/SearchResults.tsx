@@ -1,10 +1,11 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { CardProductProps } from "./CardProduct/types";
 import ListProductSection from "./List_Product_Section";
 import LoadMoreButton from "./LoadMoreButton";
 import { CiSearch } from "react-icons/ci";
+import { filterAndSortSearchProducts, SearchProductSortOrder } from "@/lib/searchProductControls";
 
 interface SearchResultsProps {
   searchQuery: string;
@@ -31,6 +32,11 @@ const SearchResults = ({
   totalLoaded = 0,
   totalAvailable = 0
 }: SearchResultsProps) => {
+  const [sortOrder, setSortOrder] = useState<SearchProductSortOrder>('relevance');
+  const [selectedBrand, setSelectedBrand] = useState('');
+  const [minPriceInput, setMinPriceInput] = useState('');
+  const [maxPriceInput, setMaxPriceInput] = useState('');
+  const [inStockOnly, setInStockOnly] = useState(false);
   const hasResults = searchResults && searchResults.length > 0;
   const sanitizedSearchQuery = searchQuery.trim();
   const sanitizedBrandFilter = brandFilter?.trim();
@@ -41,6 +47,46 @@ const SearchResults = ({
   const displayTotalLoaded = totalLoaded > 0 ? totalLoaded : searchResults.length;
   const displayTotalAvailable = totalAvailable > 0 ? totalAvailable : searchResults.length;
   const displayIsLoadingMore = isLoadingMore;
+
+  useEffect(() => {
+    setSortOrder('relevance');
+    setSelectedBrand('');
+    setMinPriceInput('');
+    setMaxPriceInput('');
+    setInStockOnly(false);
+  }, [searchQuery, brandFilter]);
+
+  const brandOptions = useMemo(() => {
+    const brands = new Map<string, string>();
+    searchResults.forEach((product) => {
+      const name = product.brand_info?.name?.trim();
+      if (name) brands.set(name.toLowerCase(), name);
+    });
+    return [...brands.values()].sort((a, b) => a.localeCompare(b, 'id'));
+  }, [searchResults]);
+
+  const minPrice = minPriceInput.trim() ? Number(minPriceInput) : undefined;
+  const maxPrice = maxPriceInput.trim() ? Number(maxPriceInput) : undefined;
+  const filteredSearchResults = useMemo(
+    () => filterAndSortSearchProducts(searchResults, {
+      brandName: selectedBrand || undefined,
+      minPrice: Number.isFinite(minPrice) ? minPrice : undefined,
+      maxPrice: Number.isFinite(maxPrice) ? maxPrice : undefined,
+      inStockOnly,
+      sortOrder,
+    }),
+    [searchResults, selectedBrand, minPrice, maxPrice, inStockOnly, sortOrder],
+  );
+  const hasActiveFilters = Boolean(selectedBrand || minPriceInput || maxPriceInput || inStockOnly);
+  const hasActiveControls = hasActiveFilters || sortOrder !== 'relevance';
+
+  const resetControls = () => {
+    setSortOrder('relevance');
+    setSelectedBrand('');
+    setMinPriceInput('');
+    setMaxPriceInput('');
+    setInStockOnly(false);
+  };
 
   const handleLoadMore = () => {
     if (onLoadMore) {
@@ -145,18 +191,118 @@ const SearchResults = ({
 
       {/* Results Count */}
       {hasResults && (
-        <div className="mb-4 rounded-2xl bg-white/80 px-4 py-3 shadow-[0_8px_18px_rgba(15,23,42,0.05)]">
-          <p className="text-sm text-[#6B7C73]">
-            Ditemukan <span className="font-semibold text-[#2F6F5A]">{displayTotalAvailable}</span> produk
-            {sanitizedBrandFilter && (
-              <span> dari merek <span className="font-semibold text-[#2F6F5A]">&ldquo;{sanitizedBrandFilter}&rdquo;</span></span>
+        <div className="mb-4 rounded-2xl bg-white/80 p-4 shadow-[0_8px_18px_rgba(15,23,42,0.05)]">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm text-[#6B7C73]" aria-live="polite">
+              {hasActiveFilters ? (
+                <>Menampilkan <span className="font-semibold text-[#2F6F5A]">{filteredSearchResults.length}</span> dari <span className="font-semibold text-[#2F6F5A]">{displayTotalAvailable}</span> produk</>
+              ) : (
+                <>Ditemukan <span className="font-semibold text-[#2F6F5A]">{displayTotalAvailable}</span> produk</>
+              )}
+              {sanitizedBrandFilter && (
+                <span> dari merek <span className="font-semibold text-[#2F6F5A]">&ldquo;{sanitizedBrandFilter}&rdquo;</span></span>
+              )}
+            </p>
+            {hasActiveControls && (
+              <button
+                type="button"
+                onClick={resetControls}
+                className="min-h-9 rounded-xl px-3 text-xs font-semibold text-emerald-800 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+              >
+                Reset
+              </button>
             )}
-          </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <label className="flex min-w-0 flex-col gap-1 text-xs font-medium text-[#6B7C73]">
+              Urutkan
+              <select
+                aria-label="Urutkan produk"
+                className="min-h-11 w-full rounded-xl border border-emerald-100 bg-white px-3 text-sm text-[#0D0E09] outline-none focus:ring-2 focus:ring-emerald-200"
+                value={sortOrder}
+                onChange={(event) => setSortOrder(event.target.value as SearchProductSortOrder)}
+              >
+                <option value="relevance">Paling relevan</option>
+                <option value="price-asc">Harga terendah</option>
+                <option value="price-desc">Harga tertinggi</option>
+                <option value="newest">Terbaru</option>
+              </select>
+            </label>
+
+            {brandOptions.length > 1 && (
+              <label className="flex min-w-0 flex-col gap-1 text-xs font-medium text-[#6B7C73]">
+                Merek
+                <select
+                  aria-label="Filter merek"
+                  className="min-h-11 w-full rounded-xl border border-emerald-100 bg-white px-3 text-sm text-[#0D0E09] outline-none focus:ring-2 focus:ring-emerald-200"
+                  value={selectedBrand}
+                  onChange={(event) => setSelectedBrand(event.target.value)}
+                >
+                  <option value="">Semua merek</option>
+                  {brandOptions.map((brand) => <option key={brand} value={brand}>{brand}</option>)}
+                </select>
+              </label>
+            )}
+
+            <div className="grid grid-cols-2 gap-2">
+              <label className="flex min-w-0 flex-col gap-1 text-xs font-medium text-[#6B7C73]">
+                Harga min. (Rp)
+                <input
+                  aria-label="Harga minimum"
+                  type="number"
+                  min="0"
+                  inputMode="numeric"
+                  placeholder="Tanpa batas"
+                  value={minPriceInput}
+                  onChange={(event) => setMinPriceInput(event.target.value)}
+                  className="min-h-11 w-full min-w-0 rounded-xl border border-emerald-100 bg-white px-3 text-sm text-[#0D0E09] outline-none focus:ring-2 focus:ring-emerald-200"
+                />
+              </label>
+              <label className="flex min-w-0 flex-col gap-1 text-xs font-medium text-[#6B7C73]">
+                Harga maks. (Rp)
+                <input
+                  aria-label="Harga maksimum"
+                  type="number"
+                  min="0"
+                  inputMode="numeric"
+                  placeholder="Tanpa batas"
+                  value={maxPriceInput}
+                  onChange={(event) => setMaxPriceInput(event.target.value)}
+                  className="min-h-11 w-full min-w-0 rounded-xl border border-emerald-100 bg-white px-3 text-sm text-[#0D0E09] outline-none focus:ring-2 focus:ring-emerald-200"
+                />
+              </label>
+            </div>
+
+            <label className="flex min-h-11 items-center gap-2 rounded-xl border border-emerald-100 bg-white px-3 text-sm text-[#0D0E09] sm:self-end">
+              <input
+                type="checkbox"
+                checked={inStockOnly}
+                onChange={(event) => setInStockOnly(event.target.checked)}
+                className="h-4 w-4 accent-emerald-700"
+              />
+              Stok tersedia
+            </label>
+          </div>
+        </div>
+      )}
+
+      {hasResults && filteredSearchResults.length === 0 && (
+        <div role="status" className="mb-4 rounded-2xl bg-white/95 px-5 py-8 text-center shadow-[0_8px_22px_rgba(15,23,42,0.06)]">
+          <h3 className="text-base font-semibold text-gray-900">Tidak ada produk yang cocok</h3>
+          <p className="mt-1 text-sm text-[#6B7C73]">Coba ubah rentang harga, merek, atau pilihan stok.</p>
+          <button
+            type="button"
+            onClick={resetControls}
+            className="mt-4 min-h-10 rounded-xl bg-[#2F6F5A] px-4 text-sm font-semibold text-white hover:bg-[#285E4E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+          >
+            Hapus filter
+          </button>
         </div>
       )}
 
       {/* Product List */}
-      {hasResults && <ListProductSection products={searchResults} />}
+      {hasResults && filteredSearchResults.length > 0 && <ListProductSection products={filteredSearchResults} />}
 
       {/* Load More Button */}
       {hasResults && (
