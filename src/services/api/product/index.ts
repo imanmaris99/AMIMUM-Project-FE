@@ -1,6 +1,7 @@
 import axiosClient from "@/lib/axiosClient";
 import axios from "axios";
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/apiConfig";
+import { shouldFetchProductCatalogForSearch } from "@/lib/productSearchMedia";
 import { AllProductInfoType, AllProductInfoResponseType, ProductSearchResponseType, ProductSearchItemType, ProductSearchByBrandResponseType, ProductSearchByBrandItemType, VariantAllProductType } from "@/types/apiTypes";
 
 const DEFAULT_PRODUCT_IMAGE = "/default-image.jpg";
@@ -143,16 +144,9 @@ export const SearchGetProduct = async (productName: string): Promise<AllProductI
     const responseData = response as unknown as ProductSearchResponseType;
     
     if (responseData && responseData.status_code === 200 && responseData.data && Array.isArray(responseData.data)) {
-      const searchIncludesProductImages = responseData.data.every((product) =>
-        Boolean(
-          product.primary_image_url ||
-          product.gallery_images?.some((image) => Boolean(image?.url)) ||
-          product.image
-        )
-      );
-      const catalogLookup = searchIncludesProductImages
-        ? new Map<string, AllProductInfoType>()
-        : await fetchProductCatalogLookupClient();
+      const catalogLookup = shouldFetchProductCatalogForSearch(responseData.data)
+        ? await fetchProductCatalogLookupClient()
+        : new Map<string, AllProductInfoType>();
 
       const mappedProducts: AllProductInfoType[] = responseData.data.map((product: ProductSearchItemType) => {
         const variants = Array.isArray(product.all_variants)
