@@ -1,6 +1,7 @@
 import axios from "axios";
 import { apiClient } from "@/lib/axiosClient";
 import { API_ENDPOINTS } from "@/lib/apiConfig";
+import { getRating403Message } from "@/lib/ratingApiErrors";
 
 export interface ProductRatingItem {
   id: number;
@@ -98,7 +99,11 @@ const handleRatingError = (error: unknown, action: "load" | "create" | "update" 
   if (axios.isAxiosError(error) && error.response) {
     const status = error.response.status;
 
-    if (status === 403 || status === 401) {
+    if (status === 403) {
+      throw new Error(getRating403Message(error.response.data));
+    }
+
+    if (status === 401) {
       throw new Error(ratingAuthMessage());
     }
 
