@@ -174,7 +174,10 @@ export const websiteJsonLd = () => ({
   },
 });
 
-export const productJsonLd = (product: DetailProductType) => {
+export const productJsonLd = (
+  product: DetailProductType,
+  verifiedRating?: { avg_rating: number; total_rater: number }
+) => {
   const image = getProductImage(product);
   const inStock = product.variants_list?.some((variant) => Number(variant.stock || 0) > 0);
   const price = typeof product.price === "number" ? product.price : product.variants_list?.[0]?.discounted_price;
@@ -192,11 +195,11 @@ export const productJsonLd = (product: DetailProductType) => {
     },
     sku: product.id,
     aggregateRating:
-      product.avg_rating && product.total_rater
+      verifiedRating && verifiedRating.total_rater > 0 && verifiedRating.avg_rating > 0
         ? {
             "@type": "AggregateRating",
-            ratingValue: product.avg_rating,
-            reviewCount: product.total_rater,
+            ratingValue: verifiedRating.avg_rating,
+            reviewCount: verifiedRating.total_rater,
           }
         : undefined,
     offers: {

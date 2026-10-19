@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { RATING_REVIEW_MAX_LENGTH } from '@/lib/ratingConstraints';
 
 interface RatingFormProps {
   productName: string;
@@ -51,10 +52,10 @@ const RatingForm: React.FC<RatingFormProps> = ({
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Rating Stars */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
-            Rating *
+          <label id="rating-stars-label" className="text-sm font-medium text-gray-700">
+            Rating wajib dipilih
           </label>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1" role="group" aria-labelledby="rating-stars-label">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
@@ -62,7 +63,9 @@ const RatingForm: React.FC<RatingFormProps> = ({
                 onClick={() => handleStarClick(star)}
                 onMouseEnter={() => handleStarHover(star)}
                 onMouseLeave={handleStarLeave}
-                className={`w-8 h-8 transition-colors duration-200 ${
+                aria-label={`${star} dari 5 bintang`}
+                aria-pressed={rating === star}
+                className={`h-10 w-10 transition-colors duration-200 ${
                   star <= displayRating
                     ? "text-yellow-400"
                     : "text-gray-300 hover:text-yellow-200"
@@ -95,11 +98,11 @@ const RatingForm: React.FC<RatingFormProps> = ({
             placeholder="Bagikan pengalaman Anda dengan produk ini..."
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
             rows={4}
-            maxLength={500}
+            maxLength={RATING_REVIEW_MAX_LENGTH}
             disabled={isSubmitting}
           />
-          <div className="text-xs text-gray-500 text-right">
-            {review.length}/500 karakter
+          <div className="text-right text-xs text-gray-500" aria-live="polite">
+            {review.length}/{RATING_REVIEW_MAX_LENGTH} karakter
           </div>
         </div>
 

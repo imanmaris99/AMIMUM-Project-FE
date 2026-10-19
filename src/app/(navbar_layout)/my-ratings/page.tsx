@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-hot-toast';
 import LoginProtection from '@/components/common/LoginProtection';
+import { getRatingInputError, RATING_REVIEW_MAX_LENGTH } from '@/lib/ratingConstraints';
 import UnifiedHeader from '@/components/common/UnifiedHeader';
 import {
   deleteProductRating,
@@ -121,13 +122,11 @@ export default function MyRatingsPage() {
   };
 
   const handleSubmitEdit = async () => {
-    if (!selectedRating || editableRate < 1 || editableRate > 5) {
-      toast.error("Pilih rating 1 sampai 5 bintang sebelum menyimpan ulasan.");
-      return;
-    }
+    if (!selectedRating) return;
 
-    if (editableReview.trim().length > 500) {
-      toast.error("Ulasan maksimal 500 karakter.");
+    const validationError = getRatingInputError(editableRate, editableReview.trim());
+    if (validationError) {
+      toast.error(validationError);
       return;
     }
 
@@ -299,9 +298,12 @@ export default function MyRatingsPage() {
                       onChange={(event) => setEditableReview(event.target.value)}
                       rows={4}
                       className="min-h-[120px] w-full resize-none rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3 text-sm leading-6 text-[#0D0E09] outline-none"
-                      maxLength={500}
+                      maxLength={RATING_REVIEW_MAX_LENGTH}
                       placeholder="Bagikan pengalaman Anda terhadap produk ini"
                     />
+                    <p className="mt-1 text-right text-xs text-gray-500" aria-live="polite">
+                      {editableReview.length}/{RATING_REVIEW_MAX_LENGTH} karakter
+                    </p>
                   </div>
                   <div className="sticky bottom-0 -mx-5 flex gap-3 bg-white/95 px-5 pt-4 backdrop-blur">
                     <Button

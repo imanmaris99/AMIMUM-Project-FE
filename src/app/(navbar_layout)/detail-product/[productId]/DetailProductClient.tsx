@@ -38,9 +38,7 @@ const DetailMarketplaceInfo = ({
 }) => {
   const totalVariants = detailProduct?.variants_list?.length ?? 0;
   const totalStock = detailProduct?.variants_list?.reduce((sum, variant) => sum + (typeof variant.stock === "number" ? Math.max(variant.stock, 0) : 0), 0) ?? 0;
-  const rating = typeof detailProduct?.avg_rating === "number" && detailProduct.avg_rating > 0
-    ? `${detailProduct.avg_rating.toFixed(1)} / 5`
-    : "Belum ada rating";
+  const rating = "Lihat ulasan terverifikasi";
 
   return (
     <section className="rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-50" aria-label="Ringkasan marketplace produk">
@@ -62,7 +60,7 @@ const DetailMarketplaceInfo = ({
         </div>
         <div className="rounded-2xl bg-emerald-50/70 px-3 py-2">
           <p className="text-[#6B7C73]">Rating</p>
-          <p className="mt-1 font-semibold text-[#0D0E09]">{rating}</p>
+          <a href="#product-ratings" className="mt-1 inline-block font-semibold text-emerald-800 underline-offset-2 hover:underline">{rating}</a>
         </div>
         <div className="rounded-2xl bg-emerald-50/70 px-3 py-2">
           <p className="text-[#6B7C73]">Brand</p>
@@ -223,10 +221,9 @@ export default function DetailProductClient({ detailProduct, errorMessage, relat
           <ProductDescription isLoading={false} isError={isError} data={detailProduct || undefined} />
           {detailProduct && (
             <ProductRatingSection
+              key={detailProduct.id}
               productId={detailProduct.id}
               productName={detailProduct.name}
-              averageRating={detailProduct.avg_rating}
-              totalRatings={detailProduct.total_rater}
             />
           )}
           <RelatedProductsSection products={relatedProducts} brandName={detailProduct?.company} />

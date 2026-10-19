@@ -3,7 +3,6 @@ import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 import Spinner from "@/components/ui/Spinner";
 import ButtonSpinner from "@/components/ui/ButtonSpinner";
 import { useState } from "react";
-import RatingDisplay from "@/components/rating/RatingDisplay";
 import { useCart } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
 import { SessionManager } from "@/lib/auth";
@@ -177,19 +176,6 @@ const ProductPrice = ({
   return (
     <div className={isSticky ? 'bg-transparent' : 'rounded-3xl bg-white/95 shadow-[0_8px_22px_rgba(15,23,42,0.08)] backdrop-blur'}>
       <div className={isSticky ? 'p-3' : 'p-4'}>
-        {/* Rating Section - Only show in non-sticky mode */}
-        {!isSticky && data?.id && (
-          <RatingDisplay
-            ratingData={{
-              avg_rating: data.avg_rating || 0,
-              total_rater: data.total_rater || 0,
-              rating_distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
-              recent_reviews: []
-            }}
-            className="mb-4"
-          />
-        )}
-
         {/* Price Section */}
         <div className={isSticky ? "space-y-2" : "flex items-center justify-between"}>
           <div className={isSticky ? "text-center" : "flex-1"}>

@@ -2,6 +2,7 @@ import axios from "axios";
 import { apiClient } from "@/lib/axiosClient";
 import { API_ENDPOINTS } from "@/lib/apiConfig";
 import { getRating403Message } from "@/lib/ratingApiErrors";
+import { getRatingInputError } from "@/lib/ratingConstraints";
 
 export interface ProductRatingItem {
   id: number;
@@ -16,6 +17,31 @@ export interface ProductRatingListResponse {
   status_code: number;
   message: string;
   data: ProductRatingItem[];
+}
+
+export interface PublicProductRating {
+  id: number;
+  rate: number;
+  review?: string | null;
+  rater_name: string;
+  created_at: string;
+  verified_purchase: boolean;
+}
+
+export interface ProductRatingSummary {
+  avg_rating: number;
+  total_rater: number;
+  rating_distribution: Record<string, number>;
+}
+
+export interface ProductRatingsPageResponse {
+  status_code: number;
+  message: string;
+  summary: ProductRatingSummary;
+  data: PublicProductRating[];
+  skip: number;
+  limit: number;
+  has_more: boolean;
 }
 
 export interface ProductRatingResponse {
@@ -49,14 +75,9 @@ export interface UpdateRatingPayload {
 }
 
 const validateRatingInput = (rate: number, review: string) => {
-  const safeRate = Number(rate);
-
-  if (!Number.isInteger(safeRate) || safeRate < 1 || safeRate > 5) {
-    throw new Error("Pilih rating 1 sampai 5 bintang sebelum menyimpan ulasan.");
-  }
-
-  if (review.length > 500) {
-    throw new Error("Ulasan maksimal 500 karakter.");
+  const validationError = getRatingInputError(Number(rate), review);
+  if (validationError) {
+    throw new Error(validationError);
   }
 };
 
@@ -153,6 +174,43 @@ export const getMyProductRatings = async (): Promise<ProductRatingListResponse> 
       };
     }
 
+    return handleRatingError(error, "load");
+  }
+};
+
+export interface ProductRatingQuery {
+  skip?: number;
+  limit?: number;
+  rate?: number | null;
+  sort?: "recent" | "highest" | "lowest";
+}
+
+export const getProductRatings = async (
+  productId: string,
+  query: ProductRatingQuery = {}
+): Promise<ProductRatingsPageResponse> => {
+  try {
+    const response = await apiClient.get<ProductRatingsPageResponse>(
+      API_ENDPOINTS.RATING_CREATE(productId),
+      {
+        params: {
+          skip: query.skip ?? 0,
+          limit: query.limit ?? 10,
+          ...(query.rate ? { rate: query.rate } : {}),
+          sort: query.sort ?? "recent",
+        },
+      }
+    );
+
+    if (response?.status_code === 200 && response.summary && Array.isArray(response.data)) {
+      return response;
+    }
+
+    throw new Error("Rating produk belum bisa dimuat. Silakan coba lagi.");
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      throw new Error("Produk tidak ditemukan atau ulasan belum bisa dimuat.");
+    }
     return handleRatingError(error, "load");
   }
 };

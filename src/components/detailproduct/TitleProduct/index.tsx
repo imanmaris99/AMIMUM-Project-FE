@@ -29,8 +29,6 @@ const TitleProduct = ({ isError, isLoading, data }: TitleProductProps) => {
 
   const productName = data.name?.trim() || "Produk katalog";
   const brandName = data.company?.trim() || "Brand belum tersedia";
-  const rating = Number(data.avg_rating);
-  const hasRating = Number.isFinite(rating) && rating > 0;
   const variants = Array.isArray(data.variants_list) ? data.variants_list : [];
   const activePrices = variants
     .map((variant) => Number(variant.discounted_price || data.price || 0))
@@ -47,16 +45,14 @@ const TitleProduct = ({ isError, isLoading, data }: TitleProductProps) => {
             <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-700">{brandName}</p>
             <h1 className="mt-1 text-xl font-bold leading-7 text-gray-950">{productName}</h1>
           </div>
-          {hasRating ? (
-            <div className="flex shrink-0 items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-orange-600 ring-1 ring-orange-100">
-              <AiFillStar />
-              <span className="text-sm font-bold">{rating.toFixed(1)}</span>
-            </div>
-          ) : (
-            <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
-              Baru
-            </span>
-          )}
+          <a
+            href="#product-ratings"
+            aria-label="Lihat rating dan ulasan pembeli terverifikasi"
+            className="flex shrink-0 items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-orange-700 ring-1 ring-orange-100"
+          >
+            <AiFillStar aria-hidden="true" />
+            <span className="text-xs font-bold">Lihat ulasan</span>
+          </a>
         </div>
 
         <div className="rounded-2xl bg-gradient-to-r from-emerald-50 to-white px-3 py-3 ring-1 ring-emerald-50">
