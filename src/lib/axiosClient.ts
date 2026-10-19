@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { ErrorHandler, withRetry, safeAsync } from "./errorHandler";
 import { SessionManager, isJwtToken } from "./auth";
+import { isRatingEndpointHandled } from "./ratingApiErrors";
 import { API_BASE_URL, API_ENDPOINTS } from "./apiConfig";
 
 interface AxiosRequestConfigWithMetadata extends AxiosRequestConfig {
@@ -89,6 +90,7 @@ axiosClient.interceptors.response.use(
     ];
     const isExpectedHandledEndpoint =
       expectedHandledEndpoints.includes(urlPath) ||
+      isRatingEndpointHandled(urlPath) ||
       /^\/orders\/(my-orders|detail|complete-details)(?:\/|$)/.test(urlPath) ||
       /^\/cart\/(product|update-quantity|update-activate|delete)(?:\/|$)/.test(urlPath) ||
       /^\/wishlist\/(product|delete)(?:\/|$)/.test(urlPath) ||

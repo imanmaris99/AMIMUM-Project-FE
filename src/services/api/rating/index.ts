@@ -116,7 +116,7 @@ const handleRatingError = (error: unknown, action: "load" | "create" | "update" 
     }
 
     if (status === 409) {
-      throw new Error("Rating produk sedang belum bisa diproses. Silakan cek kembali data pesanan atau coba lagi nanti.");
+      throw new Error("Anda sudah memberi rating untuk produk ini. Buka halaman Rating & Ulasan Saya untuk memperbarui rating yang ada.");
     }
 
     throw new Error(ratingActionMessage(action));

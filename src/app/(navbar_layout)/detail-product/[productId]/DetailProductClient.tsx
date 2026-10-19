@@ -8,6 +8,7 @@ import ProductVariants from "@/components/detailproduct/ProductVariants";
 import ProductInformation from "@/components/detailproduct/ProductInformation";
 import ProductDescription from "@/components/detailproduct/ProductDescription";
 import ProductPrice from "@/components/detailproduct/ProductPrice";
+import ProductRatingSection from "@/components/rating/ProductRatingSection";
 import CardProduct from "@/components/common/Search/CardProduct";
 import { DetailProductType, VariantProductType } from "@/types/detailProduct";
 import type { AllProductInfoType } from "@/types/apiTypes";
@@ -220,6 +221,14 @@ export default function DetailProductClient({ detailProduct, errorMessage, relat
             <ProductInformation isLoading={false} isError={isError} datavariant={selectedVariant} />
           )}
           <ProductDescription isLoading={false} isError={isError} data={detailProduct || undefined} />
+          {detailProduct && (
+            <ProductRatingSection
+              productId={detailProduct.id}
+              productName={detailProduct.name}
+              averageRating={detailProduct.avg_rating}
+              totalRatings={detailProduct.total_rater}
+            />
+          )}
           <RelatedProductsSection products={relatedProducts} brandName={detailProduct?.company} />
         </div>
       </div>

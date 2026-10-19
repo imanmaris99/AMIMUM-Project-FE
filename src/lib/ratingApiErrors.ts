@@ -13,3 +13,6 @@ export const getRating403Message = (errorData: unknown): string => {
 
   return "Silakan login kembali untuk mengelola rating produk.";
 };
+
+export const isRatingEndpointHandled = (urlPath: string): boolean =>
+  /^\/rating\/(?:product\/[^/]+|my-rating-products-list|edit\/\d+|delete\/\d+)$/.test(urlPath);
