@@ -1,4 +1,8 @@
 import Link from "next/link";
+import {
+  buildAdminSupportMessage,
+  buildOfficialAdminWhatsAppUrl,
+} from "@/lib/whatsapp";
 
 export type TrustSection = {
   title: string;
@@ -83,7 +87,7 @@ export default function TrustPageShell({
               Kembali Belanja
             </Link>
             <a
-              href="https://wa.me/6281298742102"
+              href={buildOfficialAdminWhatsAppUrl(buildAdminSupportMessage(title))}
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-2xl border border-white/30 px-4 py-3 text-center text-sm font-bold text-white transition hover:bg-white/10"

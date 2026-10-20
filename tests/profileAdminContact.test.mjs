@@ -10,7 +10,7 @@ const profileSettings = readFileSync(
 test("profile admin contact opens the official WhatsApp channel instead of showing a placeholder toast", () => {
   assert.match(
     profileSettings,
-    /<a[\s\S]*?href="https:\/\/wa\.me\/6281298742102"[\s\S]*?target="_blank"[\s\S]*?rel="noopener noreferrer"[\s\S]*?Kontak Admin[\s\S]*?<\/a>/,
+    /<a[\s\S]*?href=\{buildOfficialAdminWhatsAppUrl\(PROFILE_ADMIN_SUPPORT_MESSAGE\)\}[\s\S]*?target="_blank"[\s\S]*?rel="noopener noreferrer"[\s\S]*?Kontak Admin[\s\S]*?<\/a>/,
   );
   assert.doesNotMatch(profileSettings, /Kontak admin akan tersedia dari kanal resmi toko/);
 });

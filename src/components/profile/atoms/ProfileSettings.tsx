@@ -6,6 +6,10 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import LogoutModal from "../molecules/LogoutModal";
 import { SessionManager } from "@/lib/auth";
+import {
+  buildOfficialAdminWhatsAppUrl,
+  PROFILE_ADMIN_SUPPORT_MESSAGE,
+} from "@/lib/whatsapp";
 
 const ProfileSettings: React.FC = () => {
   const router = useRouter();
@@ -88,7 +92,7 @@ const ProfileSettings: React.FC = () => {
 
         {/* Admin Contact */}
         <a
-          href="https://wa.me/6281298742102"
+          href={buildOfficialAdminWhatsAppUrl(PROFILE_ADMIN_SUPPORT_MESSAGE)}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Hubungi admin toko melalui WhatsApp resmi"

@@ -1,6 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
+import {
+  buildOfficialAdminWhatsAppUrl,
+  CREATIVE_CUSTOM_SUPPORT_MESSAGE,
+} from "@/lib/whatsapp";
 
 const creativeProducts = [
   {
@@ -16,9 +20,6 @@ const creativeProducts = [
     description: "Fidget clicker, mini tools, dekorasi, prototype, model custom, dan produk kreatif lain.",
   },
 ];
-
-const CUSTOM_CRAFT_WHATSAPP_URL =
-  "https://wa.me/6281298742102?text=Assalamu%27alaikum%20Admin%20Amimum%2C%20saya%20ingin%20konsultasi%20custom%20produk%20Amimum%20Creative.";
 
 const CreativeCraftSection = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -86,7 +87,7 @@ const CreativeCraftSection = () => {
             </div>
 
             <a
-              href={CUSTOM_CRAFT_WHATSAPP_URL}
+              href={buildOfficialAdminWhatsAppUrl(CREATIVE_CUSTOM_SUPPORT_MESSAGE)}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-4 flex w-full items-center justify-center rounded-2xl bg-primary px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-primary/90"
