@@ -17,6 +17,7 @@ import {
 } from "@/services/api/shipment";
 import { toast } from "react-hot-toast";
 import LoginProtection from "@/components/common/LoginProtection";
+import { SessionManager } from "@/lib/auth";
 
 const mapShipmentToViewModel = (shipment: ShipmentListItem): ShipmentData => ({
   id: shipment.id,
@@ -113,6 +114,11 @@ const Shipment = () => {
 
   useEffect(() => {
     const loadData = async () => {
+      if (!SessionManager.isAuthenticated()) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       try {
         await refreshShipments();
@@ -282,7 +288,7 @@ const Shipment = () => {
   }
 
   return (
-    <LoginProtection useModal={true} feature="general">
+    <LoginProtection useModal={true} feature="shipment">
     <div className="min-h-screen pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
       {/* Success Message */}
       {showSuccessMessage && (

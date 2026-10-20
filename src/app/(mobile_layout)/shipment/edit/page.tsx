@@ -11,6 +11,7 @@ import { ReceiverFormData, PackageFormData } from "@/types/shipment";
 import { getMyShipments } from "@/services/api/shipment";
 import { getOwnerShipmentAddress } from "@/services/api/shipment-address";
 import LoginProtection from "@/components/common/LoginProtection";
+import { SessionManager } from "@/lib/auth";
 
 interface StoreAddressInfo {
   name: string;
@@ -33,6 +34,11 @@ const EditShipment = () => {
   const [packageData, setPackageData] = useState<PackageFormData | null>(null);
 
   useEffect(() => {
+    if (!SessionManager.isAuthenticated()) {
+      setIsStoreAddressLoading(false);
+      return;
+    }
+
     const loadStoreAddress = async () => {
       setIsStoreAddressLoading(true);
       try {
@@ -65,6 +71,10 @@ const EditShipment = () => {
   }, []);
 
   useEffect(() => {
+    if (!SessionManager.isAuthenticated()) {
+      return;
+    }
+
     const loadShipment = async () => {
       if (!shipmentId) {
         return;
@@ -132,7 +142,7 @@ const EditShipment = () => {
   };
 
   return (
-    <LoginProtection useModal={true} feature="general">
+    <LoginProtection useModal={true} feature="shipment">
     <div className="min-h-screen pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
       <section className="mx-4 mt-4 rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-100">
         <div className="relative flex items-center justify-center">

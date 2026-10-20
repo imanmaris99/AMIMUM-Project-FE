@@ -9,7 +9,7 @@ import { X, LogIn, UserPlus, ShoppingBag, Heart, FileText, Truck, Star } from 'l
 interface LoginRequiredModalProps {
   isOpen: boolean;
   onClose: () => void;
-  feature?: 'cart' | 'checkout' | 'wishlist' | 'profile' | 'transaction' | 'tracking' | 'rating' | 'general';
+  feature?: 'cart' | 'checkout' | 'wishlist' | 'profile' | 'transaction' | 'tracking' | 'rating' | 'saved-addresses' | 'my-ratings' | 'shipment' | 'order-confirmation' | 'general';
   title?: string;
   description?: string;
   redirectAfterLogin?: string;
@@ -130,19 +130,52 @@ const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
   };
 
   const featureInfo = getFeatureInfo();
-  const benefitItems = feature === 'cart'
-    ? [
-        'Keranjang tersimpan aman di akun Anda',
-        'Pilih produk yang ingin checkout sekarang',
-        'Lanjut ke pembayaran resmi toko',
-        'Pantau status pesanan setelah checkout',
-      ]
-    : [
-        'Simpan produk ke wishlist',
-        'Lacak pesanan dan transaksi',
-        'Checkout lebih cepat',
-        'Riwayat pembelian lengkap',
-      ];
+  const benefitItems = (() => {
+    switch (feature) {
+      case 'cart':
+        return [
+          'Keranjang tersimpan aman di akun Anda',
+          'Pilih produk yang ingin checkout sekarang',
+          'Lanjut ke pembayaran resmi toko',
+          'Pantau status pesanan setelah checkout',
+        ];
+      case 'saved-addresses':
+        return [
+          'Kelola alamat tujuan tersimpan di akun Anda',
+          'Isi alamat tujuan lebih cepat saat checkout',
+          'Perbarui atau hapus alamat dari akun Anda',
+          'Gunakan alamat pilihan untuk pesanan delivery',
+        ];
+      case 'my-ratings':
+        return [
+          'Lihat rating dan ulasan yang pernah Anda berikan',
+          'Ubah atau hapus ulasan dari akun Anda',
+          'Ulasan tetap terhubung dengan item pesanan',
+          'Bantu pelanggan lain memilih produk',
+        ];
+      case 'shipment':
+        return [
+          'Kelola alamat pengiriman untuk checkout delivery',
+          'Periksa data penerima sebelum pesanan dibuat',
+          'Simpan perubahan alamat pada akun Anda',
+          'Hindari mengisi ulang data pengiriman',
+        ];
+      case 'order-confirmation':
+        return [
+          'Lihat ringkasan konfirmasi pesanan dari akun Anda',
+          'Tinjau item dan informasi pesanan',
+          'Gunakan konfirmasi sebagai acuan setelah checkout',
+          'Lanjutkan ke halaman tracking pesanan',
+        ];
+      default:
+        return [
+          'Simpan produk ke wishlist',
+          'Lacak pesanan dan transaksi',
+          'Checkout lebih cepat',
+          'Riwayat pembelian lengkap',
+        ];
+    }
+  })();
 
   const handleLogin = () => {
     onClose();

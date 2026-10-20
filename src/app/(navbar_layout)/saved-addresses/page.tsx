@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { GoChevronLeft } from "react-icons/go";
 import { toast } from "react-hot-toast";
 import LoginProtection from "@/components/common/LoginProtection";
+import { SessionManager } from "@/lib/auth";
 import EditAddressModal from "../../../components/profile/molecules/EditAddressModal";
 import DeleteAddressModal from "../../../components/profile/molecules/DeleteAddressModal";
 import AddAddressModal, {
@@ -37,6 +38,11 @@ const SavedAddressesPage: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
+
+    if (!SessionManager.isAuthenticated()) {
+      setIsLoading(false);
+      return;
+    }
 
     const loadAddresses = async () => {
       setIsLoading(true);
@@ -272,7 +278,7 @@ const SavedAddressesPage: React.FC = () => {
   }, [addresses, selectedAddress]);
 
   return (
-    <LoginProtection useModal={true} feature="general">
+    <LoginProtection useModal={true} feature="saved-addresses">
       <div className="min-h-screen bg-transparent pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
       <section className="mx-4 mt-4 rounded-3xl bg-white/95 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-emerald-100">
         <div className="relative flex items-center justify-center">

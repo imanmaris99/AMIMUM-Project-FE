@@ -6,7 +6,7 @@ import LoginProtection from "@/components/common/LoginProtection";
 
 export default function OrderConfirmationPage() {
   return (
-    <LoginProtection useModal={true} feature="general">
+    <LoginProtection useModal={true} feature="order-confirmation">
       <OrderConfirmation />
     </LoginProtection>
   );

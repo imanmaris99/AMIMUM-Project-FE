@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-hot-toast';
 import LoginProtection from '@/components/common/LoginProtection';
+import { SessionManager } from '@/lib/auth';
 import { getRatingInputError, RATING_REVIEW_MAX_LENGTH } from '@/lib/ratingConstraints';
 import UnifiedHeader from '@/components/common/UnifiedHeader';
 import {
@@ -50,6 +51,11 @@ export default function MyRatingsPage() {
   const [pendingDeleteRating, setPendingDeleteRating] = useState<ProductRatingItem | null>(null);
 
   useEffect(() => {
+    if (!SessionManager.isAuthenticated()) {
+      setIsLoading(false);
+      return;
+    }
+
     const loadRatings = async () => {
       try {
         const response = await getMyProductRatings();
@@ -160,7 +166,7 @@ export default function MyRatingsPage() {
   };
 
   return (
-    <LoginProtection useModal={true} feature="general">
+    <LoginProtection useModal={true} feature="my-ratings">
       <div className="min-h-screen bg-transparent pb-24">
         <UnifiedHeader
           type="main"

@@ -11,7 +11,7 @@ interface LoginProtectionProps {
   redirectTo?: string;
   showMessage?: boolean;
   useModal?: boolean;
-  feature?: 'cart' | 'checkout' | 'profile' | 'transaction' | 'wishlist' | 'tracking' | 'rating' | 'general';
+  feature?: 'cart' | 'checkout' | 'profile' | 'transaction' | 'wishlist' | 'tracking' | 'rating' | 'saved-addresses' | 'my-ratings' | 'shipment' | 'order-confirmation' | 'general';
 }
 
 const getLoginFeatureLabel = (feature: NonNullable<LoginProtectionProps['feature']>) => {
@@ -30,6 +30,14 @@ const getLoginFeatureLabel = (feature: NonNullable<LoginProtectionProps['feature
       return 'Tracking';
     case 'rating':
       return 'Rating & Ulasan';
+    case 'saved-addresses':
+      return 'Alamat Tersimpan';
+    case 'my-ratings':
+      return 'Rating & Ulasan Saya';
+    case 'shipment':
+      return 'Alamat Pengiriman';
+    case 'order-confirmation':
+      return 'Konfirmasi Pesanan';
     default:
       return 'Fitur Ini';
   }
@@ -51,6 +59,14 @@ const getLoginFeatureDescription = (feature: NonNullable<LoginProtectionProps['f
       return 'status pesanan dan pengiriman Anda';
     case 'rating':
       return 'menulis rating dan ulasan untuk item pesanan selesai milik akun Anda';
+    case 'saved-addresses':
+      return 'mengelola alamat tujuan yang tersimpan di akun Anda';
+    case 'my-ratings':
+      return 'melihat dan mengelola rating serta ulasan yang sudah Anda berikan';
+    case 'shipment':
+      return 'mengelola alamat pengiriman dan ongkir untuk checkout delivery';
+    case 'order-confirmation':
+      return 'melihat konfirmasi pesanan setelah checkout';
     default:
       return 'fitur ini';
   }
