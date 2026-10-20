@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { RATING_REVIEW_MAX_LENGTH } from '@/lib/ratingConstraints';
+import { EligibleRatingVariant } from '@/services/api/rating';
 
 interface RatingFormProps {
   productName: string;
-  onSubmit: (rating: number, review: string) => void;
+  variantOptions: EligibleRatingVariant[];
+  selectedVariantKey: string;
+  onVariantChange: (key: string) => void;
+  isLoadingVariants?: boolean;
+  variantError?: string;
+  onSubmit: (rating: number, review: string, variantId: number | null) => void;
   onCancel?: () => void;
   isSubmitting?: boolean;
   className?: string;
@@ -12,6 +18,11 @@ interface RatingFormProps {
 
 const RatingForm: React.FC<RatingFormProps> = ({
   productName,
+  variantOptions,
+  selectedVariantKey,
+  onVariantChange,
+  isLoadingVariants = false,
+  variantError = "",
   onSubmit,
   onCancel,
   isSubmitting = false,
@@ -22,26 +33,22 @@ const RatingForm: React.FC<RatingFormProps> = ({
   const [hoveredRating, setHoveredRating] = useState(0);
   const safeProductName = productName?.trim() || "Produk katalog";
 
+  const displayRating = hoveredRating || rating;
+  const selectedVariant = variantOptions.find(
+    (option) => (option.variant_id === null ? "none" : String(option.variant_id)) === selectedVariantKey
+  );
+  const canSubmit = rating > 0 && !isLoadingVariants && Boolean(selectedVariant);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (rating > 0) {
-      onSubmit(rating, review.trim());
+    if (canSubmit && selectedVariant) {
+      onSubmit(rating, review.trim(), selectedVariant.variant_id);
     }
   };
 
-  const handleStarClick = (starRating: number) => {
-    setRating(starRating);
-  };
-
-  const handleStarHover = (starRating: number) => {
-    setHoveredRating(starRating);
-  };
-
-  const handleStarLeave = () => {
-    setHoveredRating(0);
-  };
-
-  const displayRating = hoveredRating || rating;
+  const handleStarClick = (starRating: number) => setRating(starRating);
+  const handleStarHover = (starRating: number) => setHoveredRating(starRating);
+  const handleStarLeave = () => setHoveredRating(0);
 
   return (
     <div className={`bg-white p-6 rounded-lg shadow-sm border ${className}`}>
@@ -50,6 +57,48 @@ const RatingForm: React.FC<RatingFormProps> = ({
       </h3>
       
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          {variantOptions.length > 1 ? (
+            <label htmlFor="rating-purchased-variant" className="text-sm font-medium text-gray-700">
+              Varian yang dibeli
+            </label>
+          ) : (
+            <p className="text-sm font-medium text-gray-700">Varian yang dibeli</p>
+          )}
+          {isLoadingVariants ? (
+            <p className="rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-900" role="status">
+              Memuat varian dari pesanan selesai…
+            </p>
+          ) : variantError ? (
+            <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-900" role="alert">
+              {variantError}
+            </p>
+          ) : variantOptions.length === 0 ? (
+            <p className="rounded-xl bg-gray-50 px-3 py-2 text-sm text-gray-600">
+              Belum ada pesanan selesai untuk produk ini.
+            </p>
+          ) : variantOptions.length === 1 ? (
+            <p className="rounded-xl border border-emerald-100 bg-emerald-50/60 px-3 py-2 text-sm font-medium text-emerald-900">
+              {variantOptions[0].variant_name}
+            </p>
+          ) : (
+            <select
+              id="rating-purchased-variant"
+              value={selectedVariantKey}
+              onChange={(event) => onVariantChange(event.target.value)}
+              disabled={isSubmitting}
+              className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+              required
+            >
+              <option value="" disabled>Pilih varian dari pesanan Anda</option>
+              {variantOptions.map((option) => {
+                const key = option.variant_id === null ? "none" : String(option.variant_id);
+                return <option key={key} value={key}>{option.variant_name}</option>;
+              })}
+            </select>
+          )}
+        </div>
+
         {/* Rating Stars */}
         <div className="space-y-2">
           <label id="rating-stars-label" className="text-sm font-medium text-gray-700">
@@ -110,7 +159,7 @@ const RatingForm: React.FC<RatingFormProps> = ({
         <div className="flex gap-3 pt-4">
           <Button
             type="submit"
-            disabled={rating === 0 || isSubmitting}
+            disabled={!canSubmit || isSubmitting}
             className="flex-1 bg-primary hover:bg-primary/90 text-white"
           >
             {isSubmitting ? (

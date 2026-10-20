@@ -11,7 +11,9 @@ import { SessionManager } from "@/lib/auth";
 import { RequestGeneration } from "@/lib/ratingRequestGeneration";
 import {
   createProductRating,
+  getEligibleRatingVariants,
   getProductRatings,
+  EligibleRatingVariant,
   ProductRatingSummary,
   ProductRatingsPageResponse,
 } from "@/services/api/rating";
@@ -45,6 +47,9 @@ const ReviewStars = ({ rate }: { rate: number }) => (
   </div>
 );
 
+const variantOptionKey = (variantId: number | null) =>
+  variantId === null ? "none" : String(variantId);
+
 const ProductRatingSection = ({ productId, productName, onSummaryChange }: ProductRatingSectionProps) => {
   const [page, setPage] = useState<ProductRatingsPageResponse | null>(null);
   const requestGeneration = useRef(new RequestGeneration());
@@ -58,6 +63,10 @@ const ProductRatingSection = ({ productId, productName, onSummaryChange }: Produ
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [duplicateReview, setDuplicateReview] = useState(false);
+  const [eligibleVariants, setEligibleVariants] = useState<EligibleRatingVariant[]>([]);
+  const [selectedVariantKey, setSelectedVariantKey] = useState("");
+  const [isLoadingVariants, setIsLoadingVariants] = useState(false);
+  const [variantLoadError, setVariantLoadError] = useState("");
 
   useEffect(() => {
     const generationTracker = requestGeneration.current;
@@ -87,6 +96,41 @@ const ProductRatingSection = ({ productId, productName, onSummaryChange }: Produ
     };
   }, [productId, selectedRate, sort, reloadVersion, onSummaryChange]);
 
+  useEffect(() => {
+    let isCurrent = true;
+
+    if (!showForm) {
+      setEligibleVariants([]);
+      setSelectedVariantKey("");
+      setVariantLoadError("");
+      setIsLoadingVariants(false);
+      return () => { isCurrent = false; };
+    }
+
+    setEligibleVariants([]);
+    setSelectedVariantKey("");
+    setVariantLoadError("");
+    setIsLoadingVariants(true);
+
+    getEligibleRatingVariants(productId)
+      .then((response) => {
+        if (!isCurrent) return;
+        setEligibleVariants(response.data);
+        setSelectedVariantKey(
+          response.data.length === 1 ? variantOptionKey(response.data[0].variant_id) : ""
+        );
+      })
+      .catch((error: unknown) => {
+        if (!isCurrent) return;
+        setVariantLoadError(error instanceof Error ? error.message : "Varian pesanan belum bisa dimuat.");
+      })
+      .finally(() => {
+        if (isCurrent) setIsLoadingVariants(false);
+      });
+
+    return () => { isCurrent = false; };
+  }, [showForm, productId]);
+
   const handleStartReview = () => {
     if (!SessionManager.isAuthenticated()) {
       setShowLoginModal(true);
@@ -96,12 +140,12 @@ const ProductRatingSection = ({ productId, productName, onSummaryChange }: Produ
     setShowForm((current) => !current);
   };
 
-  const handleSubmit = async (rate: number, review: string) => {
+  const handleSubmit = async (rate: number, review: string, variantId: number | null) => {
     setIsSubmitting(true);
     setDuplicateReview(false);
 
     try {
-      await createProductRating({ productId, rate, review });
+      await createProductRating({ productId, rate, review, variantId });
       setShowForm(false);
       setReloadVersion((current) => current + 1);
       toast.success("Terima kasih, ulasan Anda berhasil dikirim.");
@@ -273,6 +317,11 @@ const ProductRatingSection = ({ productId, productName, onSummaryChange }: Produ
                     <time className="text-xs text-gray-500" dateTime={review.created_at}>{formatReviewDate(review.created_at)}</time>
                   </div>
                   <div className="mt-2"><ReviewStars rate={review.rate} /></div>
+                  {review.variant_name?.trim() && (
+                    <p className="mt-2 inline-flex max-w-full rounded-full bg-gray-50 px-2.5 py-1 text-xs text-gray-600">
+                      Varian: <span className="ml-1 break-words font-medium text-gray-800">{review.variant_name}</span>
+                    </p>
+                  )}
                   {review.review?.trim() ? (
                     <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-gray-700">{review.review.trim()}</p>
                   ) : (
@@ -295,6 +344,11 @@ const ProductRatingSection = ({ productId, productName, onSummaryChange }: Produ
       {showForm && (
         <RatingForm
           productName={productName}
+          variantOptions={eligibleVariants}
+          selectedVariantKey={selectedVariantKey}
+          onVariantChange={setSelectedVariantKey}
+          isLoadingVariants={isLoadingVariants}
+          variantError={variantLoadError}
           onSubmit={handleSubmit}
           onCancel={() => setShowForm(false)}
           isSubmitting={isSubmitting}

@@ -222,6 +222,11 @@ export default function MyRatingsPage() {
                         </div>
                         <span className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">{rating.rate > 0 ? `${rating.rate} bintang` : "Rating belum valid"}</span>
                       </div>
+                      {rating.variant_name?.trim() && (
+                        <p className="mb-3 inline-flex max-w-full rounded-full bg-gray-50 px-2.5 py-1 text-xs text-gray-600">
+                          Varian: <span className="ml-1 break-words font-medium text-gray-800">{rating.variant_name}</span>
+                        </p>
+                      )}
                       {rating.review ? (
                         <p className="mb-3 whitespace-pre-line rounded-2xl bg-emerald-50/60 px-3 py-2 text-sm leading-6 text-[#4B5C54]">{rating.review}</p>
                       ) : (
@@ -267,6 +272,9 @@ export default function MyRatingsPage() {
                   <p className="mt-2 text-sm leading-6 text-[#6B7C73]">
                     {selectedRating.product_name || 'Produk tidak tersedia'}
                   </p>
+                  {selectedRating.variant_name?.trim() && (
+                    <p className="mt-1 text-xs font-medium text-emerald-800">Varian: {selectedRating.variant_name}</p>
+                  )}
                 </div>
                 <div className="space-y-4">
                   <div>

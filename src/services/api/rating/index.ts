@@ -9,6 +9,7 @@ export interface ProductRatingItem {
   rate: number;
   review: string;
   product_name: string;
+  variant_name?: string | null;
   rater_name?: string;
   created_at: string;
 }
@@ -24,6 +25,7 @@ export interface PublicProductRating {
   rate: number;
   review?: string | null;
   rater_name: string;
+  variant_name?: string | null;
   created_at: string;
   verified_purchase: boolean;
 }
@@ -66,6 +68,18 @@ export interface CreateRatingPayload {
   productId: string;
   rate: number;
   review: string;
+  variantId: number | null;
+}
+
+export interface EligibleRatingVariant {
+  variant_id: number | null;
+  variant_name: string;
+}
+
+export interface EligibleRatingVariantsResponse {
+  status_code: number;
+  message: string;
+  data: EligibleRatingVariant[];
 }
 
 export interface UpdateRatingPayload {
@@ -215,6 +229,25 @@ export const getProductRatings = async (
   }
 };
 
+export const getEligibleRatingVariants = async (
+  productId: string
+): Promise<EligibleRatingVariantsResponse> => {
+  try {
+    const response = await apiClient.get<EligibleRatingVariantsResponse>(
+      API_ENDPOINTS.RATING_ELIGIBLE_VARIANTS(productId)
+    );
+
+    if (response?.status_code === 200 && Array.isArray(response.data)) {
+      return response;
+    }
+
+    throw new Error(ratingActionMessage("load"));
+  } catch (error: unknown) {
+    return handleRatingError(error, "load");
+  }
+};
+
+
 export const createProductRating = async (
   payload: CreateRatingPayload
 ): Promise<ProductRatingResponse> => {
@@ -230,6 +263,7 @@ export const createProductRating = async (
         create_rate: {
           rate: payload.rate,
           review: payload.review.trim(),
+          variant_id: payload.variantId,
         },
       }
     );

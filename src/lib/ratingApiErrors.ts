@@ -11,8 +11,12 @@ export const getRating403Message = (errorData: unknown): string => {
     return "Rating hanya dapat diberikan setelah pesanan produk berstatus selesai.";
   }
 
+  if (errorCode === "Purchased Variant Required") {
+    return "Pilih varian yang benar-benar pernah Anda beli pada pesanan selesai.";
+  }
+
   return "Silakan login kembali untuk mengelola rating produk.";
 };
 
 export const isRatingEndpointHandled = (urlPath: string): boolean =>
-  /^\/rating\/(?:product\/[^/]+|my-rating-products-list|edit\/\d+|delete\/\d+)$/.test(urlPath);
+  /^\/rating\/(?:product\/[^/]+(?:\/eligible-variants)?|my-rating-products-list|edit\/\d+|delete\/\d+)$/.test(urlPath);

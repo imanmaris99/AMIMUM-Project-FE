@@ -118,6 +118,7 @@ export const API_ENDPOINTS = {
 
   // Rating
   RATING_CREATE: (productId: string) => `/rating/product/${productId}`,
+  RATING_ELIGIBLE_VARIANTS: (productId: string) => `/rating/product/${productId}/eligible-variants`,
   RATING_MY_LIST: '/rating/my-rating-products-list',
   RATING_EDIT: (ratingId: number | string) => `/rating/edit/${ratingId}`,
   RATING_DELETE: (ratingId: number | string) => `/rating/delete/${ratingId}`,
