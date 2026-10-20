@@ -1,7 +1,7 @@
 import axios from "axios";
 import { apiClient } from "@/lib/axiosClient";
 import { API_ENDPOINTS } from "@/lib/apiConfig";
-import { getRating403Message } from "@/lib/ratingApiErrors";
+import { getRating403Message, getRating409Message } from "@/lib/ratingApiErrors";
 import { getRatingInputError } from "@/lib/ratingConstraints";
 
 export interface ProductRatingItem {
@@ -66,9 +66,24 @@ interface ValidationErrorResponse {
 
 export interface CreateRatingPayload {
   productId: string;
+  orderItemId: number;
   rate: number;
   review: string;
   variantId: number | null;
+}
+
+export interface EligibleRatingOrderItem {
+  order_item_id: number;
+  order_id: string;
+  order_date: string;
+  variant_id: number | null;
+  variant_name: string;
+}
+
+export interface EligibleRatingOrderItemsResponse {
+  status_code: number;
+  message: string;
+  data: EligibleRatingOrderItem[];
 }
 
 export interface EligibleRatingVariant {
@@ -151,7 +166,7 @@ const handleRatingError = (error: unknown, action: "load" | "create" | "update" 
     }
 
     if (status === 409) {
-      throw new Error("Anda sudah memberi rating untuk produk ini. Buka halaman Rating & Ulasan Saya untuk memperbarui rating yang ada.");
+      throw new Error(getRating409Message(action));
     }
 
     throw new Error(ratingActionMessage(action));
@@ -248,6 +263,25 @@ export const getEligibleRatingVariants = async (
 };
 
 
+export const getEligibleRatingOrderItems = async (
+  productId: string
+): Promise<EligibleRatingOrderItemsResponse> => {
+  try {
+    const response = await apiClient.get<EligibleRatingOrderItemsResponse>(
+      API_ENDPOINTS.RATING_ELIGIBLE_ORDER_ITEMS(productId)
+    );
+
+    if (response?.status_code === 200 && Array.isArray(response.data)) {
+      return response;
+    }
+
+    throw new Error(ratingActionMessage("load"));
+  } catch (error: unknown) {
+    return handleRatingError(error, "load");
+  }
+};
+
+
 export const createProductRating = async (
   payload: CreateRatingPayload
 ): Promise<ProductRatingResponse> => {
@@ -264,6 +298,7 @@ export const createProductRating = async (
           rate: payload.rate,
           review: payload.review.trim(),
           variant_id: payload.variantId,
+          order_item_id: payload.orderItemId,
         },
       }
     );

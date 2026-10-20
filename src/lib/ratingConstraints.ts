@@ -2,7 +2,7 @@ export const RATING_REVIEW_MAX_LENGTH = 100;
 export const RATING_PURCHASE_ELIGIBILITY_COPY =
   "Rating hanya dapat diberikan setelah pesanan berstatus selesai dan pembayaran berhasil.";
 export const RATING_VARIANT_SELECTION_COPY =
-  "Pilih varian yang tercatat pada pesanan Anda.";
+  "Pilih item pesanan selesai yang ingin dinilai; varian mengikuti item tersebut.";
 export const RATING_NO_ELIGIBLE_PURCHASE_COPY =
   "Belum ada pembelian yang memenuhi syarat. Rating tersedia setelah pesanan selesai dan pembayaran berhasil.";
 
@@ -12,18 +12,22 @@ export const getRatingEligibilityProductId = (productId?: string | null): string
 export const getCompletedOrderRatingHref = (
   orderStatus: string,
   productId?: string | null,
+  orderItemId?: string | number | null,
   isLocalSimulatedTransaction = false
 ): string | null => {
   const normalizedProductId = getRatingEligibilityProductId(productId);
+  const normalizedOrderItemId = Number(orderItemId);
   if (
     isLocalSimulatedTransaction ||
     orderStatus.trim().toLowerCase() !== "completed" ||
-    !normalizedProductId
+    !normalizedProductId ||
+    !Number.isSafeInteger(normalizedOrderItemId) ||
+    normalizedOrderItemId <= 0
   ) {
     return null;
   }
 
-  return `/detail-product/${encodeURIComponent(normalizedProductId)}#product-ratings`;
+  return `/detail-product/${encodeURIComponent(normalizedProductId)}?orderItemId=${normalizedOrderItemId}#product-ratings`;
 };
 
 export const getRatingInputError = (rate: number, review: string): string | null => {

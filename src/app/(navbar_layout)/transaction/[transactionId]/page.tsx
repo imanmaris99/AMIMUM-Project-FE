@@ -773,6 +773,7 @@ const TransactionDetailPage: React.FC = () => {
                 const ratingHref = getCompletedOrderRatingHref(
                   transaction.status,
                   item.productId,
+                  item.id,
                   isLocalSimulatedTransaction
                 );
 

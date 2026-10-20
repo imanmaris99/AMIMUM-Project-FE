@@ -26,21 +26,24 @@ test("rejects review text beyond the backend-supported length", () => {
 test("rating eligibility guidance states completed order, successful payment, and purchased variant", () => {
   assert.match(RATING_PURCHASE_ELIGIBILITY_COPY, /pesanan berstatus selesai/i);
   assert.match(RATING_PURCHASE_ELIGIBILITY_COPY, /pembayaran berhasil/i);
-  assert.match(RATING_VARIANT_SELECTION_COPY, /tercatat pada pesanan/i);
+  assert.match(RATING_VARIANT_SELECTION_COPY, /item pesanan selesai/i);
+  assert.match(RATING_VARIANT_SELECTION_COPY, /varian mengikuti item/i);
   assert.match(RATING_NO_ELIGIBLE_PURCHASE_COPY, /pembayaran berhasil/i);
 });
 
-test("only completed server-order products link to their rating section", () => {
+test("only completed real order items link to their product rating section", () => {
   const productId = "8c8877e3-1000-4f00-9000-afe1b4e2f62a";
   assert.equal(getRatingEligibilityProductId(` ${productId} `), productId);
   assert.equal(getRatingEligibilityProductId(null), "");
   assert.equal(
-    getCompletedOrderRatingHref("completed", productId),
-    `/detail-product/${productId}#product-ratings`
+    getCompletedOrderRatingHref("completed", productId, 14),
+    `/detail-product/${productId}?orderItemId=14#product-ratings`
   );
-  assert.equal(getCompletedOrderRatingHref("processing", productId), null);
-  assert.equal(getCompletedOrderRatingHref("completed", ""), null);
-  assert.equal(getCompletedOrderRatingHref("completed", productId, true), null);
+  assert.equal(getCompletedOrderRatingHref("processing", productId, 14), null);
+  assert.equal(getCompletedOrderRatingHref("completed", "", 14), null);
+  assert.equal(getCompletedOrderRatingHref("completed", productId, null), null);
+  assert.equal(getCompletedOrderRatingHref("completed", productId, 0), null);
+  assert.equal(getCompletedOrderRatingHref("completed", productId, 14, true), null);
 });
 
 test("rejects ratings outside the one-to-five star range", () => {

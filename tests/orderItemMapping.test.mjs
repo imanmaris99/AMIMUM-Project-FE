@@ -47,7 +47,7 @@ test("completed order item maps through to the product rating section", () => {
   });
 
   assert.equal(
-    getCompletedOrderRatingHref("completed", mapped.productId),
-    "/detail-product/product-abc#product-ratings"
+    getCompletedOrderRatingHref("completed", mapped.productId, mapped.id),
+    "/detail-product/product-abc?orderItemId=14#product-ratings"
   );
 });
