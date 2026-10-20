@@ -117,6 +117,8 @@ const countActiveCartItems = (items: CartItemType[]) =>
 const normalizeCartItem = (
   item: {
     id: number;
+    product_id: string;
+    variant_id: number;
     product_name: string;
     product_price: number;
     variant_info: Record<string, unknown>;
@@ -134,8 +136,8 @@ const normalizeCartItem = (
 
   return {
     id: item.id.toString(),
-    product_id: metadata?.productId || "",
-    variant_id: metadata?.variantId || variantId,
+    product_id: item.product_id || metadata?.productId || "",
+    variant_id: item.variant_id ?? metadata?.variantId ?? variantId,
     quantity: item.quantity,
     price:
       typeof variantInfo.discounted_price === "number"

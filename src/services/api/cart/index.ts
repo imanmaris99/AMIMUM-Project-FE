@@ -14,6 +14,8 @@ export interface CartVariantInfo {
 
 export interface CartApiItem {
   id: number;
+  product_id: string;
+  variant_id: number;
   product_name: string;
   product_price: number;
   variant_info: Record<string, unknown>;

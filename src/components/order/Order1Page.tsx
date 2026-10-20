@@ -13,7 +13,8 @@ import { CartItemType } from '@/types/apiTypes';
 import { useTransaction } from '@/contexts/TransactionContext';
 import { checkoutOrder, directCheckoutOrder, getMyOrders } from '@/services/api/orders';
 import { createPayment } from '@/services/api/payments';
-import { CartApiItem, deleteCartProduct, extractVariantInfo, getMyCartProducts } from '@/services/api/cart';
+import { deleteCartProduct, getMyCartProducts } from '@/services/api/cart';
+import { buildCheckoutCartSnapshot } from '@/lib/checkoutCartSnapshot';
 import { createShipment, activateShipment, getMyShipments } from '@/services/api/shipment';
 import CourierSelector from './CourierSelector';
 import AddressSelector from './AddressSelector';
@@ -451,43 +452,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     }
 
     const freshCart = await getMyCartProducts();
-    const freshActiveItems = freshCart.data.filter((item: CartApiItem) => item.is_active !== false);
-
-    if (freshActiveItems.length === 0) {
-      return {
-        items: [] as CartItemType[],
-        subtotal: 0,
-        total: 0,
-      };
-    }
-
-    const activeItemsById = new Map(currentItems.map((item) => [item.id, item]));
+    const freshActiveItems = buildCheckoutCartSnapshot(freshCart.data, currentItems);
 
     return {
-      items: freshActiveItems.map((item: CartApiItem) => {
-        const existingItem = activeItemsById.get(item.id.toString());
-        if (existingItem) {
-          return existingItem;
-        }
-
-        const variantInfo = extractVariantInfo(item.variant_info);
-        return {
-          id: item.id.toString(),
-          product_id: '',
-          variant_id: typeof variantInfo.id === 'number' ? variantInfo.id : 0,
-          quantity: item.quantity,
-          price:
-            typeof variantInfo.discounted_price === 'number'
-              ? variantInfo.discounted_price
-              : item.product_price,
-          product_name: item.product_name,
-          variant_name: variantInfo.variant || '',
-          image: variantInfo.img || '/default-image.jpg',
-          created_at: item.created_at,
-          updated_at: variantInfo.updated_at || item.created_at,
-          is_active: item.is_active,
-        };
-      }),
+      items: freshActiveItems,
       subtotal: freshCart.total_prices.all_item_active_prices,
       total: freshCart.total_prices.total_all_active_prices,
     };
