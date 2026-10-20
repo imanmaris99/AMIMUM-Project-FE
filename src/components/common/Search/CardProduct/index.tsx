@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { CardProductProps } from "./types";
 import rupiahFormater from "@/utils/rupiahFormater";
-import useSearchLogic from "../useSearchLogic";
 import WishlistButton from "@/components/common/WishlistButton";
 import { useEffect, useMemo, useState } from "react";
 
@@ -16,7 +16,6 @@ const CardProduct = ({
   product: CardProductProps;
   imageLoading?: CardProductImageLoading;
 }) => {
-  const { handleSelectProduct } = useSearchLogic();
   const [imageError, setImageError] = useState(false);
 
   const variants = Array.isArray(product?.all_variants) ? product.all_variants : [];
@@ -83,13 +82,14 @@ const CardProduct = ({
       : "Detail produk tersedia";
 
   return (
-    <article
-      onClick={() => product.id && handleSelectProduct(product.id)}
-      className="group relative flex w-full cursor-pointer flex-col overflow-hidden rounded-[1.35rem] border border-emerald-50 bg-white/95 p-2 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition duration-200 active:scale-[0.99] sm:p-2.5"
-    >
+    <article className="group relative flex w-full cursor-pointer flex-col overflow-hidden rounded-[1.35rem] border border-emerald-50 bg-white/95 p-2 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition duration-200 active:scale-[0.99] sm:p-2.5">
+      <Link
+        href={`/detail-product/${encodeURIComponent(product.id)}`}
+        aria-label={`Lihat detail ${productName}`}
+        className="absolute inset-0 z-10 rounded-[1.35rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-700"
+      />
       <div
         className="absolute right-2 top-2 z-20"
-        onClick={(e) => e.stopPropagation()}
       >
         <WishlistButton
           product={{
@@ -105,7 +105,7 @@ const CardProduct = ({
       </div>
 
       {hasDiscount && (
-        <div className="absolute left-2 top-2 z-20 rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white shadow-sm sm:text-[11px]">
+        <div className="pointer-events-none absolute left-2 top-2 z-20 rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white shadow-sm sm:text-[11px]">
           Diskon hingga {highestDiscount}%
         </div>
       )}

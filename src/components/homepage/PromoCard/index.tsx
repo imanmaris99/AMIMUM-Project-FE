@@ -1,21 +1,16 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { PromoProps } from "./types";
 import styles from "./PromoCard.module.css";
-import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 const PromoCard = ({ promo }: { promo: PromoProps }) => {
-  const router = useRouter();
   const [imageError, setImageError] = useState(false);
   const promoName = promo.name?.trim() || "Promo toko";
   const promoPercent = Number(promo.promo_special);
   const hasValidPromoPercent = Number.isFinite(promoPercent) && promoPercent > 0;
-
-  const handleCardClick = () => {
-    router.push(`/promo/${promo.id}`);
-  };
 
   const handleImageError = () => {
     setImageError(true);
@@ -35,9 +30,10 @@ const PromoCard = ({ promo }: { promo: PromoProps }) => {
 
   return (
     <>
-      <div
-        onClick={handleCardClick}
-        className="bg-customGreen5 rounded-lg h-36 flex flex-col items-center justify-center w-24 cursor-pointer"
+      <Link
+        href={`/promo/${promo.id}`}
+        aria-label={`Lihat promo ${promoName}`}
+        className="bg-customGreen5 rounded-lg h-36 flex flex-col items-center justify-center w-24 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2"
       >
         <div className="bg-white rounded-lg px-3 py-2 flex flex-col justify-center items-center w-20 h-20">
           {!isExternalUrl ? (
@@ -92,7 +88,7 @@ const PromoCard = ({ promo }: { promo: PromoProps }) => {
             </p>
           </div>
         </div>
-      </div>
+      </Link>
     </>
   );
 };
