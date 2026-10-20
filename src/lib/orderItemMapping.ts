@@ -11,6 +11,7 @@ export interface OrderItemForTransactionMapping {
   image?: string;
   variant_image?: string;
   product_image?: string;
+  has_rating?: boolean;
 }
 
 export const mapOrderItemToTransactionItem = (
@@ -23,4 +24,5 @@ export const mapOrderItemToTransactionItem = (
   quantity: item.quantity,
   price: item.price_per_item,
   image: item.img || item.image || item.variant_image || item.product_image || "/default-image.jpg",
+  hasRating: item.has_rating === true,
 });

@@ -67,6 +67,7 @@ export interface TransactionItem {
   quantity: number;
   price: number;
   image: string;
+  hasRating?: boolean;
 }
 
 export interface TransactionData {

@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   getCompletedOrderRatingHref,
+  getOrderItemRatingAction,
   getRatingEligibilityProductId,
   getRatingInputError,
   RATING_NO_ELIGIBLE_PURCHASE_COPY,
@@ -44,6 +45,26 @@ test("only completed real order items link to their product rating section", () 
   assert.equal(getCompletedOrderRatingHref("completed", productId, null), null);
   assert.equal(getCompletedOrderRatingHref("completed", productId, 0), null);
   assert.equal(getCompletedOrderRatingHref("completed", productId, 14, true), null);
+});
+
+test("marks an already-rated order item as disabled with an explicit explanation", () => {
+  const state = getOrderItemRatingAction(
+    true,
+    "/detail-product/product-abc?orderItemId=14#product-ratings"
+  );
+
+  assert.equal(state.kind, "rated");
+  assert.equal(state.disabled, true);
+  assert.equal(state.label, "Sudah dinilai");
+  assert.match(state.message, /sudah memberikan penilaian/i);
+  assert.equal(state.href, null);
+});
+
+test("keeps the rating action available only for an unrated eligible item", () => {
+  const state = getOrderItemRatingAction(false, "/rating-link");
+  assert.equal(state.kind, "available");
+  assert.equal(state.disabled, false);
+  assert.equal(state.href, "/rating-link");
 });
 
 test("rejects ratings outside the one-to-five star range", () => {

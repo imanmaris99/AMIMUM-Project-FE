@@ -29,6 +29,7 @@ export interface OrderListItemDto {
     image?: string;
     product_image?: string;
     variant_image?: string;
+    has_rating?: boolean;
   }>;
 }
 

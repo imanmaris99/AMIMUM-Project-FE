@@ -30,6 +30,28 @@ export const getCompletedOrderRatingHref = (
   return `/detail-product/${encodeURIComponent(normalizedProductId)}?orderItemId=${normalizedOrderItemId}#product-ratings`;
 };
 
+export const getOrderItemRatingAction = (hasRating: boolean, ratingHref: string | null) => {
+  if (hasRating) {
+    return {
+      kind: "rated" as const,
+      disabled: true,
+      label: "Sudah dinilai",
+      message: "Anda sudah memberikan penilaian untuk item pesanan ini. Tombol penilaian tidak dapat digunakan lagi.",
+      href: null,
+    };
+  }
+
+  if (!ratingHref) return null;
+
+  return {
+    kind: "available" as const,
+    disabled: false,
+    label: "Beri penilaian",
+    message: null,
+    href: ratingHref,
+  };
+};
+
 export const getRatingInputError = (rate: number, review: string): string | null => {
   if (!Number.isInteger(rate) || rate < 1 || rate > 5) {
     return "Pilih rating 1 sampai 5 bintang sebelum menyimpan ulasan.";

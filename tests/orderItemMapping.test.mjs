@@ -14,9 +14,11 @@ test("order item mapping preserves the product ID needed for verified-purchase r
     quantity: 2,
     price_per_item: 12500,
     img: "/product.webp",
+    has_rating: true,
   });
 
   assert.equal(mapped.productId, productId);
+  assert.equal(mapped.hasRating, true);
   assert.equal(mapped.name, "Produk Uji");
   assert.equal(mapped.variantName, "Type 02");
   assert.equal(mapped.image, "/product.webp");
