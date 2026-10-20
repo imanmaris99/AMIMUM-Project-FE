@@ -1,4 +1,4 @@
-import { TransactionPaymentMethod, TransactionStatus } from "@/types/transaction";
+import type { TransactionPaymentMethod, TransactionStatus } from "@/types/transaction";
 
 export interface PaymentMethodOption {
   id: TransactionPaymentMethod;
