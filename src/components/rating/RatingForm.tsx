@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { RATING_REVIEW_MAX_LENGTH } from '@/lib/ratingConstraints';
+import {
+  RATING_NO_ELIGIBLE_PURCHASE_COPY,
+  RATING_REVIEW_MAX_LENGTH,
+  RATING_VARIANT_SELECTION_COPY,
+} from "@/lib/ratingConstraints";
 import { EligibleRatingVariant } from '@/services/api/rating';
 
 interface RatingFormProps {
@@ -75,7 +79,7 @@ const RatingForm: React.FC<RatingFormProps> = ({
             </p>
           ) : variantOptions.length === 0 ? (
             <p className="rounded-xl bg-gray-50 px-3 py-2 text-sm text-gray-600">
-              Belum ada pesanan selesai untuk produk ini.
+              {RATING_NO_ELIGIBLE_PURCHASE_COPY}
             </p>
           ) : variantOptions.length === 1 ? (
             <p className="rounded-xl border border-emerald-100 bg-emerald-50/60 px-3 py-2 text-sm font-medium text-emerald-900">
@@ -96,6 +100,9 @@ const RatingForm: React.FC<RatingFormProps> = ({
                 return <option key={key} value={key}>{option.variant_name}</option>;
               })}
             </select>
+          )}
+          {variantOptions.length > 0 && !isLoadingVariants && !variantError && (
+            <p className="text-xs leading-5 text-gray-500">{RATING_VARIANT_SELECTION_COPY}</p>
           )}
         </div>
 

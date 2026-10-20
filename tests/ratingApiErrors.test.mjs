@@ -2,11 +2,12 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { getRating403Message, isRatingEndpointHandled } from "../src/lib/ratingApiErrors.ts";
+import { RATING_PURCHASE_ELIGIBILITY_COPY } from "../src/lib/ratingConstraints.ts";
 
 test("purchase eligibility denial is not reported as an authentication failure", () => {
   assert.equal(
     getRating403Message({ detail: { error: "Purchase Required" } }),
-    "Rating hanya dapat diberikan setelah pesanan produk berstatus selesai."
+    RATING_PURCHASE_ELIGIBILITY_COPY
   );
 });
 

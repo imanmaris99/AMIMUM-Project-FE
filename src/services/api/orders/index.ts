@@ -2,6 +2,7 @@ import axios from "axios";
 import { apiClient } from "@/lib/axiosClient";
 import { API_ENDPOINTS } from "@/lib/apiConfig";
 import { Transaction, TransactionItem, TransactionPaymentMethod, TransactionStatus } from "@/types/transaction";
+import { mapOrderItemToTransactionItem } from "@/lib/orderItemMapping";
 
 export interface OrderListItemDto {
   id: string;
@@ -15,6 +16,8 @@ export interface OrderListItemDto {
   shipping_cost: number;
   order_item_lists: Array<{
     id: number;
+    product_id?: string | null;
+    variant_id?: number | null;
     product_name: string;
     variant_product: string;
     variant_discount: number;
@@ -321,16 +324,7 @@ const normalizeTrackingNumber = (trackingNumber?: string | null): string | undef
 
 const mapOrderItems = (
   items: OrderListItemDto["order_item_lists"]
-): TransactionItem[] =>
-  items.map((item) => ({
-    id: item.id.toString(),
-    productId: "",
-    name: item.product_name,
-    variantName: item.variant_product,
-    quantity: item.quantity,
-    price: item.price_per_item,
-    image: item.img || item.image || item.variant_image || item.product_image || "/default-image.jpg",
-  }));
+): TransactionItem[] => items.map(mapOrderItemToTransactionItem);
 
 export const mapOrderSummaryToTransaction = (
   order: OrderListItemDto

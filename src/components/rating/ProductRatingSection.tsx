@@ -8,6 +8,7 @@ import LoginRequiredModal from "@/components/common/LoginRequiredModal";
 import { Button } from "@/components/ui/button";
 import RatingForm from "@/components/rating/RatingForm";
 import { SessionManager } from "@/lib/auth";
+import { RATING_PURCHASE_ELIGIBILITY_COPY } from "@/lib/ratingConstraints";
 import { RequestGeneration } from "@/lib/ratingRequestGeneration";
 import {
   createProductRating,
@@ -196,7 +197,9 @@ const ProductRatingSection = ({ productId, productName, onSummaryChange }: Produ
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Pengalaman pembeli</p>
           <h2 id="product-ratings-heading" className="mt-1 text-base font-bold text-[#0D0E09]">Rating & ulasan</h2>
-          <p className="mt-1 text-xs leading-5 text-[#6B7C73]">Ulasan publik hanya menampilkan pembelian yang terverifikasi.</p>
+          <p className="mt-1 text-xs leading-5 text-[#6B7C73]">
+            {RATING_PURCHASE_ELIGIBILITY_COPY} Ulasan publik hanya menampilkan pembelian yang terverifikasi.
+          </p>
         </div>
         <Button
           type="button"
@@ -363,7 +366,8 @@ const ProductRatingSection = ({ productId, productName, onSummaryChange }: Produ
       )}
 
       <p className="mt-3 text-xs leading-5 text-gray-500">
-        Nama pembeli disamarkan. Rating hanya dapat diberikan oleh akun pemilik pesanan produk berstatus selesai; satu akun dapat memberi satu rating per produk.
+        Nama pembeli disamarkan. Satu akun dapat memberi satu rating per produk. Rating yang sudah dikirim dapat diedit atau dihapus di{" "}
+        <Link href="/my-ratings" className="font-semibold text-emerald-800 underline underline-offset-2">Rating & Ulasan Saya</Link>.
       </p>
 
       <LoginRequiredModal
@@ -371,7 +375,7 @@ const ProductRatingSection = ({ productId, productName, onSummaryChange }: Produ
         onClose={() => setShowLoginModal(false)}
         feature="general"
         title="Login untuk menulis ulasan"
-        description="Login terlebih dahulu. Rating hanya bisa dikirim oleh akun yang memiliki pesanan produk ini dengan status selesai."
+        description={`Login terlebih dahulu. ${RATING_PURCHASE_ELIGIBILITY_COPY}`}
         redirectAfterLogin={`/detail-product/${productId}`}
       />
     </section>

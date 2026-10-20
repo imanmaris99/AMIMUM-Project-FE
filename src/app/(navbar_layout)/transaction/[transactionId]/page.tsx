@@ -34,6 +34,7 @@ import {
   isPendingPaymentStatus,
 } from "@/lib/transactionStatus";
 import { isArchivedTrackingTransaction, TRACK_ORDER_ACTIVE_DAYS } from "@/lib/orderArchive";
+import { getCompletedOrderRatingHref } from "@/lib/ratingConstraints";
 
 const BACKEND_ORDER_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -769,6 +770,11 @@ const TransactionDetailPage: React.FC = () => {
             <div className="space-y-3">
               {transaction.items.map((item) => {
                 const itemSubtotal = item.price * item.quantity;
+                const ratingHref = getCompletedOrderRatingHref(
+                  transaction.status,
+                  item.productId,
+                  isLocalSimulatedTransaction
+                );
 
                 return (
                 <div
@@ -803,6 +809,15 @@ const TransactionDetailPage: React.FC = () => {
                     <p className="text-xs font-semibold text-primary">
                       Subtotal item: {rupiahFormater(itemSubtotal)}
                     </p>
+                    {ratingHref && (
+                      <button
+                        type="button"
+                        onClick={() => router.push(ratingHref)}
+                        className="mt-2 rounded-xl border border-emerald-200 bg-white px-3 py-2 text-xs font-semibold text-emerald-800 hover:bg-emerald-50"
+                      >
+                        Beri penilaian
+                      </button>
+                    )}
                   </div>
                 </div>
                 );
