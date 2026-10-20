@@ -1,24 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { BadgeCheck, Star } from "lucide-react";
-import { toast } from "react-hot-toast";
-import LoginRequiredModal from "@/components/common/LoginRequiredModal";
 import { Button } from "@/components/ui/button";
-import RatingForm from "@/components/rating/RatingForm";
-import { SessionManager } from "@/lib/auth";
-import {
-  getCompletedOrderRatingHref,
-  RATING_PURCHASE_ELIGIBILITY_COPY,
-} from "@/lib/ratingConstraints";
 import { RequestGeneration } from "@/lib/ratingRequestGeneration";
 import {
-  createProductRating,
-  getEligibleRatingOrderItems,
   getProductRatings,
-  EligibleRatingOrderItem,
-  ProductRatingSummary,
   ProductRatingsPageResponse,
 } from "@/services/api/rating";
 
@@ -28,8 +15,6 @@ type ReviewSort = "recent" | "highest" | "lowest";
 
 interface ProductRatingSectionProps {
   productId: string;
-  productName: string;
-  onSummaryChange?: (summary: ProductRatingSummary | null) => void;
 }
 
 const formatReviewDate = (value: string) => {
@@ -51,7 +36,7 @@ const ReviewStars = ({ rate }: { rate: number }) => (
   </div>
 );
 
-const ProductRatingSection = ({ productId, productName, onSummaryChange }: ProductRatingSectionProps) => {
+const ProductRatingSection = ({ productId }: ProductRatingSectionProps) => {
   const [page, setPage] = useState<ProductRatingsPageResponse | null>(null);
   const requestGeneration = useRef(new RequestGeneration());
   const [selectedRate, setSelectedRate] = useState<number | null>(null);
@@ -60,27 +45,6 @@ const ProductRatingSection = ({ productId, productName, onSummaryChange }: Produ
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadError, setLoadError] = useState("");
-  const [showForm, setShowForm] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [duplicateReview, setDuplicateReview] = useState(false);
-  const [eligibleOrderItems, setEligibleOrderItems] = useState<EligibleRatingOrderItem[]>([]);
-  const [selectedOrderItemId, setSelectedOrderItemId] = useState("");
-  const [requestedOrderItemId, setRequestedOrderItemId] = useState("");
-  const [isLoadingOrderItems, setIsLoadingOrderItems] = useState(false);
-  const [orderItemLoadError, setOrderItemLoadError] = useState("");
-
-  useEffect(() => {
-    const orderItemId = new URLSearchParams(window.location.search).get("orderItemId") ?? "";
-    setRequestedOrderItemId(orderItemId);
-    if (!orderItemId) return;
-    if (SessionManager.isAuthenticated()) {
-      setShowForm(true);
-    } else {
-      setShowLoginModal(true);
-    }
-  }, [productId]);
-
   useEffect(() => {
     const generationTracker = requestGeneration.current;
     const generation = generationTracker.begin();
@@ -88,13 +52,11 @@ const ProductRatingSection = ({ productId, productName, onSummaryChange }: Produ
     setIsLoadingMore(false);
     setLoadError("");
     setPage(null);
-    onSummaryChange?.(null);
 
     getProductRatings(productId, { skip: 0, limit: PAGE_SIZE, rate: selectedRate, sort })
       .then((result) => {
         if (!generationTracker.isCurrent(generation)) return;
         setPage(result);
-        onSummaryChange?.(result.summary);
       })
       .catch((error: unknown) => {
         if (!generationTracker.isCurrent(generation)) return;
@@ -107,93 +69,7 @@ const ProductRatingSection = ({ productId, productName, onSummaryChange }: Produ
     return () => {
       generationTracker.begin();
     };
-  }, [productId, selectedRate, sort, reloadVersion, onSummaryChange]);
-
-  useEffect(() => {
-    let isCurrent = true;
-
-    if (!showForm) {
-      setEligibleOrderItems([]);
-      setSelectedOrderItemId("");
-      setOrderItemLoadError("");
-      setIsLoadingOrderItems(false);
-      return () => { isCurrent = false; };
-    }
-
-    setEligibleOrderItems([]);
-    setSelectedOrderItemId("");
-    setOrderItemLoadError("");
-    setIsLoadingOrderItems(true);
-
-    getEligibleRatingOrderItems(productId)
-      .then((response) => {
-        if (!isCurrent) return;
-        setEligibleOrderItems(response.data);
-        const requestedId = Number(requestedOrderItemId);
-        if (requestedOrderItemId) {
-          const requestedItem = Number.isSafeInteger(requestedId)
-            ? response.data.find((item) => item.order_item_id === requestedId)
-            : undefined;
-          if (requestedItem) {
-            setSelectedOrderItemId(String(requestedItem.order_item_id));
-          } else {
-            setOrderItemLoadError("Item pesanan ini tidak memenuhi syarat rating atau tidak tersedia di akun ini.");
-          }
-          return;
-        }
-        setSelectedOrderItemId(
-          response.data.length === 1 ? String(response.data[0].order_item_id) : ""
-        );
-      })
-      .catch((error: unknown) => {
-        if (!isCurrent) return;
-        setOrderItemLoadError(error instanceof Error ? error.message : "Item pesanan belum bisa dimuat.");
-      })
-      .finally(() => {
-        if (isCurrent) setIsLoadingOrderItems(false);
-      });
-
-    return () => { isCurrent = false; };
-  }, [showForm, productId, requestedOrderItemId]);
-
-  const handleStartReview = () => {
-    if (!SessionManager.isAuthenticated()) {
-      setShowLoginModal(true);
-      return;
-    }
-    setDuplicateReview(false);
-    setShowForm((current) => !current);
-  };
-
-  const handleSubmit = async (
-    rate: number,
-    review: string,
-    orderItem: EligibleRatingOrderItem
-  ) => {
-    setIsSubmitting(true);
-    setDuplicateReview(false);
-
-    try {
-      await createProductRating({
-        productId,
-        orderItemId: orderItem.order_item_id,
-        rate,
-        review,
-        variantId: orderItem.variant_id,
-      });
-      setShowForm(false);
-      setReloadVersion((current) => current + 1);
-      toast.success("Terima kasih, ulasan untuk item pesanan ini berhasil dikirim.");
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Ulasan belum bisa dikirim. Silakan coba lagi.";
-      const isDuplicate = message.includes("Item pesanan ini sudah diberi rating");
-      setDuplicateReview(isDuplicate);
-      if (isDuplicate) setShowForm(false);
-      toast.error(message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  }, [productId, selectedRate, sort, reloadVersion]);
 
   const handleLoadMore = async () => {
     if (!page || isLoadingMore) return;
@@ -210,7 +86,6 @@ const ProductRatingSection = ({ productId, productName, onSummaryChange }: Produ
       });
       if (!requestGeneration.current.isCurrent(generation)) return;
       setPage((current) => current ? { ...nextPage, data: [...current.data, ...nextPage.data] } : nextPage);
-      onSummaryChange?.(nextPage.summary);
     } catch (error) {
       if (!requestGeneration.current.isCurrent(generation)) return;
       setLoadError(error instanceof Error ? error.message : "Ulasan berikutnya belum bisa dimuat.");
@@ -234,18 +109,9 @@ const ProductRatingSection = ({ productId, productName, onSummaryChange }: Produ
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Pengalaman pembeli</p>
           <h2 id="product-ratings-heading" className="mt-1 text-base font-bold text-[#0D0E09]">Rating & ulasan</h2>
           <p className="mt-1 text-xs leading-5 text-[#6B7C73]">
-            {RATING_PURCHASE_ELIGIBILITY_COPY} Ulasan publik hanya menampilkan pembelian yang terverifikasi.
+            Ulasan yang ditampilkan berasal dari pembelian terverifikasi.
           </p>
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleStartReview}
-          aria-expanded={showForm}
-          className="shrink-0 border-emerald-700 px-3 py-2 text-xs font-semibold text-emerald-800 hover:bg-emerald-50"
-        >
-          {showForm ? "Tutup form" : "Tulis ulasan"}
-        </Button>
       </div>
 
       {isLoading ? (
@@ -380,43 +246,6 @@ const ProductRatingSection = ({ productId, productName, onSummaryChange }: Produ
         </>
       )}
 
-      {showForm && (
-        <RatingForm
-          productName={productName}
-          orderItems={eligibleOrderItems}
-          selectedOrderItemId={selectedOrderItemId}
-          onOrderItemChange={setSelectedOrderItemId}
-          isLoadingOrderItems={isLoadingOrderItems}
-          orderItemsError={orderItemLoadError}
-          onSubmit={handleSubmit}
-          onCancel={() => setShowForm(false)}
-          isSubmitting={isSubmitting}
-          className="mt-4 rounded-2xl border-emerald-100 p-4 shadow-none"
-        />
-      )}
-      {duplicateReview && (
-        <div className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm text-amber-900" role="status">
-          Item pesanan ini sudah diberi rating. Buka halaman Rating & Ulasan Saya untuk mengubahnya.
-          <Link href="/my-ratings" className="ml-1 inline-flex font-semibold underline underline-offset-2">Edit rating</Link>
-        </div>
-      )}
-
-      <p className="mt-3 text-xs leading-5 text-gray-500">
-        Setiap item pesanan selesai dapat diberi satu rating. Rating yang sudah dikirim dapat diedit atau dihapus di{" "}
-        <Link href="/my-ratings" className="font-semibold text-emerald-800 underline underline-offset-2">Rating & Ulasan Saya</Link>.
-      </p>
-
-      <LoginRequiredModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        feature="general"
-        title="Login untuk menulis ulasan"
-        description={`Login terlebih dahulu. ${RATING_PURCHASE_ELIGIBILITY_COPY}`}
-        redirectAfterLogin={
-          getCompletedOrderRatingHref("completed", productId, requestedOrderItemId) ??
-          `/detail-product/${encodeURIComponent(productId)}`
-        }
-      />
     </section>
   );
 };

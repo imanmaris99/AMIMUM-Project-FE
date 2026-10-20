@@ -11,7 +11,7 @@ interface LoginProtectionProps {
   redirectTo?: string;
   showMessage?: boolean;
   useModal?: boolean;
-  feature?: 'cart' | 'checkout' | 'profile' | 'transaction' | 'wishlist' | 'tracking' | 'general';
+  feature?: 'cart' | 'checkout' | 'profile' | 'transaction' | 'wishlist' | 'tracking' | 'rating' | 'general';
 }
 
 const getLoginFeatureLabel = (feature: NonNullable<LoginProtectionProps['feature']>) => {
@@ -28,6 +28,8 @@ const getLoginFeatureLabel = (feature: NonNullable<LoginProtectionProps['feature
       return 'Wishlist';
     case 'tracking':
       return 'Tracking';
+    case 'rating':
+      return 'Rating & Ulasan';
     default:
       return 'Fitur Ini';
   }
@@ -47,6 +49,8 @@ const getLoginFeatureDescription = (feature: NonNullable<LoginProtectionProps['f
       return 'daftar produk favorit Anda';
     case 'tracking':
       return 'status pesanan dan pengiriman Anda';
+    case 'rating':
+      return 'menulis rating dan ulasan untuk item pesanan selesai milik akun Anda';
     default:
       return 'fitur ini';
   }

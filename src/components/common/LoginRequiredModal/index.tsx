@@ -4,12 +4,12 @@ import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { X, LogIn, UserPlus, ShoppingBag, Heart, FileText, Truck } from 'lucide-react';
+import { X, LogIn, UserPlus, ShoppingBag, Heart, FileText, Truck, Star } from 'lucide-react';
 
 interface LoginRequiredModalProps {
   isOpen: boolean;
   onClose: () => void;
-  feature?: 'cart' | 'checkout' | 'wishlist' | 'profile' | 'transaction' | 'tracking' | 'general';
+  feature?: 'cart' | 'checkout' | 'wishlist' | 'profile' | 'transaction' | 'tracking' | 'rating' | 'general';
   title?: string;
   description?: string;
   redirectAfterLogin?: string;
@@ -111,6 +111,13 @@ const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
           title: title || "Tracking Pesanan",
           description: description || "Login untuk melacak status pesanan dan pengiriman Anda.",
           actionText: "Lacak Pesanan"
+        };
+      case 'rating':
+        return {
+          icon: <Star className="w-8 h-8 fill-amber-400 text-amber-500" />,
+          title: title || "Rating Khusus Pembeli",
+          description: description || "Login untuk memberi rating pada item pesanan selesai milik akun Anda.",
+          actionText: "Lanjutkan ke Rating"
         };
       default:
         return {

@@ -38,7 +38,7 @@ test("order item mapping safely leaves missing product IDs empty", () => {
   assert.equal(mapped.image, "/default-image.jpg");
 });
 
-test("completed order item maps through to the product rating section", () => {
+test("completed order item links to the private review page", () => {
   const mapped = mapOrderItemToTransactionItem({
     id: 14,
     product_id: "product-abc",
@@ -50,6 +50,6 @@ test("completed order item maps through to the product rating section", () => {
 
   assert.equal(
     getCompletedOrderRatingHref("completed", mapped.productId, mapped.id),
-    "/detail-product/product-abc?orderItemId=14#product-ratings"
+    "/write-review/product-abc/14"
   );
 });

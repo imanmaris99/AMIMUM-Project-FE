@@ -27,7 +27,7 @@ export const getCompletedOrderRatingHref = (
     return null;
   }
 
-  return `/detail-product/${encodeURIComponent(normalizedProductId)}?orderItemId=${normalizedOrderItemId}#product-ratings`;
+  return `/write-review/${encodeURIComponent(normalizedProductId)}/${normalizedOrderItemId}`;
 };
 
 export const getOrderItemRatingAction = (hasRating: boolean, ratingHref: string | null) => {

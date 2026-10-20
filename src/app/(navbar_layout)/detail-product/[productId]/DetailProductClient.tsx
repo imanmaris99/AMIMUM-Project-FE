@@ -223,7 +223,6 @@ export default function DetailProductClient({ detailProduct, errorMessage, relat
             <ProductRatingSection
               key={detailProduct.id}
               productId={detailProduct.id}
-              productName={detailProduct.name}
             />
           )}
           <RelatedProductsSection products={relatedProducts} brandName={detailProduct?.company} />

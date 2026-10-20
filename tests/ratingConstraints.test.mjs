@@ -32,13 +32,13 @@ test("rating eligibility guidance states completed order, successful payment, an
   assert.match(RATING_NO_ELIGIBLE_PURCHASE_COPY, /pembayaran berhasil/i);
 });
 
-test("only completed real order items link to their product rating section", () => {
+test("only completed real order items link to the private rating page", () => {
   const productId = "8c8877e3-1000-4f00-9000-afe1b4e2f62a";
   assert.equal(getRatingEligibilityProductId(` ${productId} `), productId);
   assert.equal(getRatingEligibilityProductId(null), "");
   assert.equal(
     getCompletedOrderRatingHref("completed", productId, 14),
-    `/detail-product/${productId}?orderItemId=14#product-ratings`
+    `/write-review/${productId}/14`
   );
   assert.equal(getCompletedOrderRatingHref("processing", productId, 14), null);
   assert.equal(getCompletedOrderRatingHref("completed", "", 14), null);
@@ -50,7 +50,7 @@ test("only completed real order items link to their product rating section", () 
 test("marks an already-rated order item as disabled with an explicit explanation", () => {
   const state = getOrderItemRatingAction(
     true,
-    "/detail-product/product-abc?orderItemId=14#product-ratings"
+    "/write-review/product-abc/14"
   );
 
   assert.equal(state.kind, "rated");
