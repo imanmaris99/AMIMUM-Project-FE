@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { BadgeCheck, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RequestGeneration } from "@/lib/ratingRequestGeneration";
+import { deriveCompleteRatingPage, getRatingListContentState } from "@/lib/ratingPresentation";
 import {
   getProductRatings,
   ProductRatingsPageResponse,
@@ -39,6 +40,7 @@ const ReviewStars = ({ rate }: { rate: number }) => (
 const ProductRatingSection = ({ productId }: ProductRatingSectionProps) => {
   const [page, setPage] = useState<ProductRatingsPageResponse | null>(null);
   const requestGeneration = useRef(new RequestGeneration());
+  const completePageRef = useRef<{ productId: string; page: ProductRatingsPageResponse } | null>(null);
   const [selectedRate, setSelectedRate] = useState<number | null>(null);
   const [sort, setSort] = useState<ReviewSort>("recent");
   const [reloadVersion, setReloadVersion] = useState(0);
@@ -48,19 +50,35 @@ const ProductRatingSection = ({ productId }: ProductRatingSectionProps) => {
   useEffect(() => {
     const generationTracker = requestGeneration.current;
     const generation = generationTracker.begin();
+    const completePage = completePageRef.current;
+    if (completePage?.productId === productId) {
+      const localPage = deriveCompleteRatingPage(completePage.page, selectedRate, sort);
+      if (localPage) {
+        setPage(localPage);
+        setIsLoading(false);
+        setIsLoadingMore(false);
+        setLoadError("");
+        return () => {
+          generationTracker.begin();
+        };
+      }
+    }
+
     setIsLoading(true);
     setIsLoadingMore(false);
     setLoadError("");
-    setPage(null);
 
     getProductRatings(productId, { skip: 0, limit: PAGE_SIZE, rate: selectedRate, sort })
       .then((result) => {
         if (!generationTracker.isCurrent(generation)) return;
+        if (selectedRate === null && sort === "recent" && !result.has_more) {
+          completePageRef.current = { productId, page: result };
+        }
         setPage(result);
       })
-      .catch((error: unknown) => {
+      .catch(() => {
         if (!generationTracker.isCurrent(generation)) return;
-        setLoadError(error instanceof Error ? error.message : "Ulasan produk belum bisa dimuat.");
+        setLoadError("Ulasan produk belum bisa dimuat. Silakan coba lagi.");
       })
       .finally(() => {
         if (generationTracker.isCurrent(generation)) setIsLoading(false);
@@ -72,7 +90,7 @@ const ProductRatingSection = ({ productId }: ProductRatingSectionProps) => {
   }, [productId, selectedRate, sort, reloadVersion]);
 
   const handleLoadMore = async () => {
-    if (!page || isLoadingMore) return;
+    if (!page || isLoadingMore || isLoading) return;
     const generation = requestGeneration.current.current();
     setIsLoadingMore(true);
     setLoadError("");
@@ -86,9 +104,9 @@ const ProductRatingSection = ({ productId }: ProductRatingSectionProps) => {
       });
       if (!requestGeneration.current.isCurrent(generation)) return;
       setPage((current) => current ? { ...nextPage, data: [...current.data, ...nextPage.data] } : nextPage);
-    } catch (error) {
+    } catch {
       if (!requestGeneration.current.isCurrent(generation)) return;
-      setLoadError(error instanceof Error ? error.message : "Ulasan berikutnya belum bisa dimuat.");
+      setLoadError("Ulasan berikutnya belum bisa dimuat. Silakan coba lagi.");
     } finally {
       if (requestGeneration.current.isCurrent(generation)) setIsLoadingMore(false);
     }
@@ -97,6 +115,7 @@ const ProductRatingSection = ({ productId }: ProductRatingSectionProps) => {
   const summary = page?.summary;
   const distribution = summary?.rating_distribution ?? {};
   const hasVerifiedReviews = (summary?.total_rater ?? 0) > 0;
+  const reviewListState = getRatingListContentState(isLoading, loadError);
 
   return (
     <section
@@ -114,7 +133,7 @@ const ProductRatingSection = ({ productId }: ProductRatingSectionProps) => {
         </div>
       </div>
 
-      {isLoading ? (
+      {isLoading && !page ? (
         <div className="mt-4 rounded-2xl bg-emerald-50/60 p-5 text-center text-sm text-emerald-900" role="status">
           Memuat rating pembeli terverifikasi…
         </div>
@@ -151,10 +170,11 @@ const ProductRatingSection = ({ productId }: ProductRatingSectionProps) => {
                   <button
                     key={star}
                     type="button"
+                    disabled={count === 0}
                     onClick={() => setSelectedRate((current) => current === star ? null : star)}
                     aria-pressed={selectedRate === star}
                     aria-label={`Filter ${star} bintang, ${count} ulasan`}
-                    className={`grid w-full grid-cols-[3.5rem_1fr_2rem] items-center gap-2 rounded-lg px-2 py-1 text-left text-xs transition ${selectedRate === star ? "bg-emerald-100" : "hover:bg-white/70"}`}
+                    className={`grid w-full grid-cols-[3.5rem_1fr_2rem] items-center gap-2 rounded-lg px-2 py-1 text-left text-xs transition disabled:cursor-not-allowed disabled:opacity-50 ${selectedRate === star ? "bg-emerald-100" : "hover:bg-white/70"}`}
                   >
                     <span className="font-medium text-gray-700">{star} bintang</span>
                     <span className="h-2 overflow-hidden rounded-full bg-gray-200">
@@ -198,7 +218,18 @@ const ProductRatingSection = ({ productId }: ProductRatingSectionProps) => {
             </label>
           </div>
 
-          {page.data.length === 0 ? (
+          {reviewListState === "loading" ? (
+            <div className="py-8 text-center text-sm text-emerald-900" role="status" aria-live="polite">
+              Memuat ulasan sesuai filter…
+            </div>
+          ) : reviewListState === "error" ? (
+            <div className="py-6 text-center" role="alert">
+              <p className="text-sm text-amber-900">{loadError}</p>
+              <Button type="button" variant="outline" onClick={() => setReloadVersion((current) => current + 1)} className="mt-3 border-amber-300">
+                Coba lagi
+              </Button>
+            </div>
+          ) : page.data.length === 0 ? (
             <div className="py-8 text-center">
               <p className="font-semibold text-gray-800">
                 {hasVerifiedReviews ? "Tidak ada ulasan pada filter ini." : "Belum ada ulasan terverifikasi."}
@@ -237,9 +268,8 @@ const ProductRatingSection = ({ productId }: ProductRatingSectionProps) => {
             </div>
           )}
 
-          {loadError && <p className="mt-3 text-sm text-amber-800" role="alert">{loadError}</p>}
           {page.has_more && (
-            <Button type="button" variant="outline" onClick={handleLoadMore} disabled={isLoadingMore} className="mt-3 w-full border-emerald-200 text-emerald-800">
+            <Button type="button" variant="outline" onClick={handleLoadMore} disabled={isLoadingMore || isLoading} className="mt-3 w-full border-emerald-200 text-emerald-800">
               {isLoadingMore ? "Memuat ulasan…" : "Muat ulasan lainnya"}
             </Button>
           )}
