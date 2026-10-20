@@ -15,10 +15,6 @@ const ProfileSettings: React.FC = () => {
     router.push("/saved-addresses");
   };
 
-  const handleAdminClick = () => {
-    toast("Kontak admin akan tersedia dari kanal resmi toko.");
-  };
-
   const handleLogoutClick = () => {
     setIsLogoutModalOpen(true);
   };
@@ -91,16 +87,20 @@ const ProfileSettings: React.FC = () => {
         </div>
 
         {/* Admin Contact */}
-        <div 
-          className="-mx-2 flex cursor-pointer items-center justify-between rounded-2xl px-2 py-3 transition-colors hover:bg-emerald-50/70"
-          onClick={handleAdminClick}
+        <a
+          href="https://wa.me/6281298742102"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Hubungi admin toko melalui WhatsApp resmi"
+          className="-mx-2 flex cursor-pointer items-center justify-between rounded-2xl px-2 py-3 transition-colors hover:bg-emerald-50/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"
         >
           <div className="flex min-w-0 items-center gap-3">
             <Image
               src="/call-calling.svg"
-              alt="Call"
+              alt=""
               width={20}
               height={20}
+              aria-hidden="true"
               className="text-[#007A4F]"
             />
             <div className="min-w-0">
@@ -114,12 +114,13 @@ const ProfileSettings: React.FC = () => {
           </div>
           <Image
             src="/arrow-right.svg"
-            alt="Arrow"
+            alt=""
             width={24}
             height={24}
+            aria-hidden="true"
             className="shrink-0 text-[#292D32]"
           />
-        </div>
+        </a>
 
         {/* Logout */}
         <div 
