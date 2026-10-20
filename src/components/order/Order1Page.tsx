@@ -15,6 +15,7 @@ import { checkoutOrder, directCheckoutOrder, getMyOrders } from '@/services/api/
 import { createPayment } from '@/services/api/payments';
 import { deleteCartProduct, getMyCartProducts } from '@/services/api/cart';
 import { buildCheckoutCartSnapshot } from '@/lib/checkoutCartSnapshot';
+import { findLatestRecentPendingOrder } from '@/lib/paymentRecovery';
 import { createShipment, activateShipment, getMyShipments } from '@/services/api/shipment';
 import CourierSelector from './CourierSelector';
 import AddressSelector from './AddressSelector';
@@ -465,20 +466,10 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
     selectedPayment: TransactionPaymentMethod
   ) => {
     const ordersResponse = await getMyOrders();
-    const now = Date.now();
-    const recentPendingOnlineOrder = ordersResponse.data.find((order) => {
-      const createdAt = new Date(order.created_at).getTime();
-      const ageMinutes = Number.isFinite(createdAt)
-        ? (now - createdAt) / 60000
-        : Number.POSITIVE_INFINITY;
-      const paymentToken = order.notes?.match(/\[PAYMENT:\s*([^\]]+)\]/i)?.[1]?.trim().toLowerCase();
-
-      return (
-        order.status?.toLowerCase() === 'pending' &&
-        ageMinutes <= 30 &&
-        paymentToken === selectedPayment
-      );
-    });
+    const recentPendingOnlineOrder = findLatestRecentPendingOrder(
+      ordersResponse.data,
+      selectedPayment
+    );
 
     if (!recentPendingOnlineOrder) {
       return false;
