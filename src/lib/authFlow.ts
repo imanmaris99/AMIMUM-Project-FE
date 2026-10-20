@@ -1,3 +1,30 @@
+export const takePostLoginRedirect = (
+  storage: Pick<Storage, "getItem" | "removeItem">,
+  origin: string,
+) => {
+  const redirectUrl = storage.getItem("redirectAfterLogin");
+  if (!redirectUrl) {
+    return "/";
+  }
+
+  storage.removeItem("redirectAfterLogin");
+
+  try {
+    if (!redirectUrl.startsWith("/") || redirectUrl.startsWith("//")) {
+      return "/";
+    }
+
+    const destination = new URL(redirectUrl, origin);
+    if (destination.origin !== origin) {
+      return "/";
+    }
+
+    return `${destination.pathname}${destination.search}${destination.hash}`;
+  } catch {
+    return "/";
+  }
+};
+
 export const AUTH_FLOW_STORAGE_KEYS = {
   verifyEmail: "verifyEmail",
   resetEmail: "resetPasswordEmail",

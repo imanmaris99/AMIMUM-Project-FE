@@ -19,6 +19,7 @@ import {
   AUTH_FLOW_STORAGE_KEYS,
   resolveAuthFlowEmail,
   saveAuthFlowEmail,
+  takePostLoginRedirect,
   takeAuthFlowEmail,
 } from "@/lib/authFlow";
 import { sanitizeCustomerErrorMessage } from "@/lib/errorHandler";
@@ -56,15 +57,9 @@ const Login = () => {
 
   useEffect(() => {
     if (SessionManager.isAuthenticated()) {
-      const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
-      if (redirectUrl) {
-        sessionStorage.removeItem('redirectAfterLogin');
-        router.push(redirectUrl);
-      } else {
-        router.push("/");
-      }
+      router.push(takePostLoginRedirect(sessionStorage, window.location.origin));
     }
-  }, [router, isSuccess]);
+  }, [router]);
 
   useEffect(() => {
     if (!pendingLoginEmail) {
@@ -241,13 +236,7 @@ const Login = () => {
         toast.success(response.message || 'Login berhasil! Mengarahkan ke halaman utama...');
         
         setTimeout(() => {
-          const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
-          if (redirectUrl) {
-            sessionStorage.removeItem('redirectAfterLogin');
-            router.push(redirectUrl);
-          } else {
-            router.push("/");
-          }
+          router.push(takePostLoginRedirect(sessionStorage, window.location.origin));
         }, 2000);
       }
     } catch (error) {
@@ -331,13 +320,7 @@ const Login = () => {
 
         setTimeout(() => {
           if (SessionManager.isAuthenticated()) {
-            const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
-            if (redirectUrl) {
-              sessionStorage.removeItem('redirectAfterLogin');
-              router.push(redirectUrl);
-            } else {
-              router.push("/");
-            }
+            router.push(takePostLoginRedirect(sessionStorage, window.location.origin));
           } else {
             router.push("/");
           }
