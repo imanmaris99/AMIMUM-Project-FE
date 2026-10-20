@@ -7,6 +7,7 @@ import {
   getRatingEligibilityProductId,
   getRatingInputError,
   RATING_NO_ELIGIBLE_PURCHASE_COPY,
+  RATING_PRIVATE_FORM_ACCESS_COPY,
   RATING_PURCHASE_ELIGIBILITY_COPY,
   RATING_REVIEW_MAX_LENGTH,
   RATING_VARIANT_SELECTION_COPY,
@@ -30,6 +31,10 @@ test("rating eligibility guidance states completed order, successful payment, an
   assert.match(RATING_VARIANT_SELECTION_COPY, /item pesanan selesai/i);
   assert.match(RATING_VARIANT_SELECTION_COPY, /varian mengikuti item/i);
   assert.match(RATING_NO_ELIGIBLE_PURCHASE_COPY, /pembayaran berhasil/i);
+  assert.match(RATING_PRIVATE_FORM_ACCESS_COPY, /akun Anda/i);
+  assert.match(RATING_PRIVATE_FORM_ACCESS_COPY, /berstatus selesai/i);
+  assert.match(RATING_PRIVATE_FORM_ACCESS_COPY, /pembayarannya berhasil/i);
+  assert.match(RATING_PRIVATE_FORM_ACCESS_COPY, /belum pernah diberi rating/i);
 });
 
 test("only completed real order items link to the private rating page", () => {

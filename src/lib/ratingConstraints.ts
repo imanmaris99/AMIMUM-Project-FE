@@ -5,6 +5,8 @@ export const RATING_VARIANT_SELECTION_COPY =
   "Pilih item pesanan selesai yang ingin dinilai; varian mengikuti item tersebut.";
 export const RATING_NO_ELIGIBLE_PURCHASE_COPY =
   "Belum ada pembelian yang memenuhi syarat. Rating tersedia setelah pesanan selesai dan pembayaran berhasil.";
+export const RATING_PRIVATE_FORM_ACCESS_COPY =
+  "Form ini hanya tersedia untuk item pesanan milik akun Anda yang berstatus selesai, pembayarannya berhasil, dan belum pernah diberi rating.";
 
 export const getRatingEligibilityProductId = (productId?: string | null): string =>
   typeof productId === "string" ? productId.trim() : "";

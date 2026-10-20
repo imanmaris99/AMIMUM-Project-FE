@@ -15,6 +15,7 @@ import {
   EligibleRatingOrderItem,
 } from "@/services/api/rating";
 import { resolvePrivateRatingAccess } from "@/lib/privateRatingAccess";
+import { RATING_PRIVATE_FORM_ACCESS_COPY } from "@/lib/ratingConstraints";
 
 interface WriteRatingClientProps {
   productId: string;
@@ -133,7 +134,7 @@ const WriteRatingClient = ({ productId, orderItemId, productName }: WriteRatingC
               <div>
                 <h1 className="text-lg font-bold text-gray-900">Beri rating untuk pembelian Anda</h1>
                 <p className="mt-1 text-sm leading-6 text-gray-600">
-                  Form ini hanya tersedia untuk item pesanan selesai milik akun Anda yang belum pernah diberi rating.
+                  {RATING_PRIVATE_FORM_ACCESS_COPY}
                 </p>
               </div>
             </div>
