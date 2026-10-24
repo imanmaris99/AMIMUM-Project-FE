@@ -306,9 +306,10 @@ const Register = () => {
                 type={showPassword ? "text" : "password"}
                 value={formData.password}
                 onChange={(e) => handleInputChange("password", e.target.value)}
-                placeholder="Min. 8 karakter: huruf besar-kecil, angka, simbol"
+                placeholder="Min. 8 karakter"
                 className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm pr-10 py-3 pb-1 ${errors.password ? 'text-red-500' : ''}`}
                 aria-label="Password"
+                aria-describedby="password-hint"
                 autoComplete="new-password"
                 name="password"
                 id="password"
@@ -330,6 +331,9 @@ const Register = () => {
                 <p className="text-red-500 text-xs mt-1">{errors.password}</p>
               )}
             </div>
+            <p id="password-hint" className="text-[11px] leading-4 text-slate-500">
+              Gunakan huruf besar, huruf kecil, angka, dan simbol.
+            </p>
 
             {/* Konfirmasi Password */}
             <div className="relative">

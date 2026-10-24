@@ -36,6 +36,13 @@ test("registration password validation matches the backend policy", () => {
     "registration form should use the backend-matching password validator");
 });
 
+test("registration password hint remains concise and explains the full rule", () => {
+  assert.ok(registerSource.includes('placeholder="Min. 8 karakter"'));
+  assert.ok(registerSource.includes(
+    "Gunakan huruf besar, huruf kecil, angka, dan simbol.",
+  ));
+});
+
 test("registration phone is normalized and validated in the backend format", () => {
   assert.equal(typeof validation.normalizeRegistrationPhoneNumber, "function");
   assert.equal(typeof validation.isValidRegistrationPhone, "function");
