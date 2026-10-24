@@ -1,6 +1,7 @@
 import axiosInstance from "../../../lib/axiosInstance";
 import axios from "axios";
 import { API_ENDPOINTS } from "../../../lib/apiConfig";
+import { getRegisterErrorMessage } from "../../../lib/authFormValidation";
 
 export interface RegisterRequest {
   firstname: string;
@@ -27,17 +28,6 @@ export interface RegisterResponse {
   };
 }
 
-export interface RegisterErrorResponse {
-  status_code: number;
-  error?: string;
-  message: string;
-  detail?: Array<{
-    loc: (string | number)[];
-    msg: string;
-    type: string;
-  }>;
-}
-
 export const postRegister = async (data: RegisterRequest): Promise<RegisterResponse> => {
   try {
     const response = await axiosInstance.post<RegisterResponse>(
@@ -48,23 +38,7 @@ export const postRegister = async (data: RegisterRequest): Promise<RegisterRespo
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response) {
       const status = error.response.status;
-      const errorData = error.response.data as RegisterErrorResponse;
-
-      if (status === 400) {
-        throw new Error("Email atau nomor telepon sudah terdaftar.");
-      }
-
-      if (status === 422) {
-        const validationErrors = errorData.detail || [];
-        const errorMessages = validationErrors.map((err) => err.msg).join(", ");
-        throw new Error(errorMessages || "Kesalahan validasi. Silakan periksa data yang Anda masukkan.");
-      }
-
-      if (status === 500) {
-        throw new Error("Registrasi belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
-      }
-
-      throw new Error("Registrasi belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
+      throw new Error(getRegisterErrorMessage(status, error.response.data));
     }
 
     if (error instanceof Error) {

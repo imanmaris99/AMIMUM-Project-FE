@@ -7,7 +7,8 @@ import { EyeOff } from "../register/EyeOff";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { SessionManager, generateSecureToken, validateEmail } from "@/lib/auth";
-import { RateLimiter, validatePassword, sanitizeUserInput } from "@/lib/security";
+import { RateLimiter } from "@/lib/security";
+import { buildLoginPayload } from "@/lib/authFormValidation";
 import { toast } from "react-hot-toast";
 import { postLogin } from "@/services/api/login";
 import { handleGoogleLogin as handleGoogleAuth } from "@/lib/googleAuth";
@@ -101,25 +102,17 @@ const Login = () => {
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
 
-    // Sanitize inputs
-    const sanitizedEmail = sanitizeUserInput(formData.email);
-    const sanitizedPassword = sanitizeUserInput(formData.password);
+    const email = formData.email.trim().toLowerCase();
 
-    // Validasi email dengan enhanced security
-    if (!sanitizedEmail.trim()) {
+    if (!email) {
       newErrors.email = "Email harus diisi";
-    } else if (!validateEmail(sanitizedEmail)) {
+    } else if (!validateEmail(email)) {
       newErrors.email = "Format email tidak valid";
     }
 
-    // Validasi password dengan enhanced security
-    if (!sanitizedPassword) {
+    // Login must not re-apply registration strength rules to existing passwords.
+    if (!formData.password) {
       newErrors.password = "Password harus diisi";
-    } else {
-      const passwordValidation = validatePassword(sanitizedPassword);
-      if (!passwordValidation.valid) {
-        newErrors.password = passwordValidation.errors[0];
-      }
     }
 
     setErrors(newErrors);
@@ -168,16 +161,11 @@ const Login = () => {
         return;
       }
       
-      const sanitizedEmail = sanitizeUserInput(formData.email).toLowerCase();
-      const sanitizedPassword = sanitizeUserInput(formData.password);
-      
-      const response = await postLogin({
-        email: sanitizedEmail,
-        password: sanitizedPassword,
-      });
+      const loginPayload = buildLoginPayload(formData.email, formData.password);
+      const response = await postLogin(loginPayload);
       
       if (response.status_code === 200) {
-        const { user: parsedUser, backendToken } = parseLoginResult(response, sanitizedEmail);
+        const { user: parsedUser, backendToken } = parseLoginResult(response, loginPayload.email);
 
         const user = {
           id: generateSecureToken(),

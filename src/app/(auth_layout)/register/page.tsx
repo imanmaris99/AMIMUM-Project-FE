@@ -10,6 +10,11 @@ import { postRegister } from "@/services/api/register";
 import toast from "react-hot-toast";
 import { AUTH_FLOW_STORAGE_KEYS, saveAuthFlowEmail } from "@/lib/authFlow";
 import { sanitizeCustomerErrorMessage } from "@/lib/errorHandler";
+import {
+  getRegistrationPasswordError,
+  isValidRegistrationPhone,
+  normalizeRegistrationPhoneNumber,
+} from "@/lib/authFormValidation";
 
 const Register = () => {
   const router = useRouter();
@@ -55,18 +60,20 @@ const Register = () => {
       newErrors.email = "Format email tidak valid";
     }
 
-    // Validasi nomor HP
+    // Normalize local Indonesian input to the format required by the API.
+    const normalizedPhone = normalizeRegistrationPhoneNumber(formData.nomorHp);
     if (!formData.nomorHp.trim()) {
       newErrors.nomorHp = "Nomor HP harus diisi";
-    } else if (!/^[0-9+\-\s()]+$/.test(formData.nomorHp)) {
-      newErrors.nomorHp = "Format nomor HP tidak valid";
+    } else if (!isValidRegistrationPhone(normalizedPhone)) {
+      newErrors.nomorHp = "Gunakan nomor Indonesia 08... atau +62... dengan jumlah digit yang benar.";
     }
 
-    // Validasi password
+    // Match the backend registration policy before sending the request.
     if (!formData.password) {
       newErrors.password = "Password harus diisi";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password minimal 6 karakter";
+    } else {
+      const passwordError = getRegistrationPasswordError(formData.password);
+      if (passwordError) newErrors.password = passwordError;
     }
 
     // Validasi konfirmasi password
@@ -117,7 +124,7 @@ const Register = () => {
         lastname: formData.namaBelakang.trim(),
         gender: genderMap[formData.jenisKelamin] || "male",
         email: formData.email.trim(),
-        phone: formData.nomorHp.trim(),
+        phone: normalizeRegistrationPhoneNumber(formData.nomorHp),
         password: formData.password,
       };
 
@@ -281,7 +288,7 @@ const Register = () => {
                 type="tel"
                 value={formData.nomorHp}
                 onChange={(e) => handleInputChange("nomorHp", e.target.value)}
-                placeholder="Nomor HP"
+                placeholder="Nomor HP (08... atau +62...)"
                 className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm py-3 pb-1 ${errors.nomorHp ? 'text-red-500' : ''}`}
                 aria-label="Phone Number"
                 autoComplete="tel"
@@ -299,7 +306,7 @@ const Register = () => {
                 type={showPassword ? "text" : "password"}
                 value={formData.password}
                 onChange={(e) => handleInputChange("password", e.target.value)}
-                placeholder="Password minimal 6 karakter"
+                placeholder="Min. 8 karakter: huruf besar-kecil, angka, simbol"
                 className={`w-full bg-transparent border-none outline-none text-slate-600 text-sm pr-10 py-3 pb-1 ${errors.password ? 'text-red-500' : ''}`}
                 aria-label="Password"
                 autoComplete="new-password"
