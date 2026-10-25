@@ -23,6 +23,7 @@ import {
   normalizeIndonesianWhatsAppNumber,
   WHATSAPP_PHONE_ERROR,
 } from "@/lib/phone";
+import { hasValidRajaOngkirCityId } from "@/lib/checkoutAddressGuard";
 
 const SavedAddressesPage: React.FC = () => {
   const router = useRouter();
@@ -344,7 +345,7 @@ const SavedAddressesPage: React.FC = () => {
             addresses.map((item) => {
               const addressId = item.id.toString();
               const isSelected = selectedAddress === addressId;
-              const hasValidRajaOngkirCity = Boolean(item.city_id && Number(item.city_id) > 0);
+              const hasValidRajaOngkirCity = hasValidRajaOngkirCityId(item.city_id);
               const addressSummary = [
                 item.address,
                 item.city,

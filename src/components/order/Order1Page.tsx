@@ -40,6 +40,7 @@ import {
   getRajaOngkirProvinces,
   SUPPORTED_COURIERS,
 } from '@/services/api/rajaongkir';
+import { hasValidRajaOngkirCityId } from '@/lib/checkoutAddressGuard';
 
 interface Order1PageProps {
   onBack?: () => void;
@@ -58,9 +59,6 @@ interface AddressInfo {
   postal_code: string;
   isDefault?: boolean;
 }
-
-const hasValidRajaOngkirCityId = (cityId?: number) =>
-  Boolean(cityId && Number(cityId) > 0);
 
 interface StoreAddressInfo {
   name: string;
@@ -233,7 +231,8 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       if (
         deliveryMethod !== 'delivery' ||
         !selectedCourierCompany ||
-        !selectedAddress?.city_id ||
+        !selectedAddress ||
+        !hasValidRajaOngkirCityId(selectedAddress.city_id) ||
         !storeAddress?.cityId
       ) {
         return;
@@ -262,7 +261,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
           try {
             const response = await getRajaOngkirShippingCost({
               origin: storeAddress.cityId,
-              destination: selectedAddress.city_id,
+              destination: Number(selectedAddress.city_id),
               weight: 1000,
               courier,
             });
@@ -757,7 +756,11 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
       };
 
       if (deliveryMethod === 'delivery') {
-        if (!selectedAddress?.city_id || !selectedCourierData) {
+        if (
+          !selectedAddress ||
+          !hasValidRajaOngkirCityId(selectedAddress.city_id) ||
+          !selectedCourierData
+        ) {
           throw new Error('Alamat dan layanan kurir belum lengkap.');
         }
 
@@ -767,7 +770,7 @@ const Order1Page: React.FC<Order1PageProps> = ({ onBack }) => {
             phone: selectedAddress.phone,
             address: selectedAddress.address,
             city: selectedAddress.city,
-            city_id: selectedAddress.city_id,
+            city_id: Number(selectedAddress.city_id),
             state: selectedAddress.state || '',
             country: 'Indonesia',
             zip_code: Number(selectedAddress.postal_code || 0),

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { GoLocation, GoCheck, GoPlus, GoX } from 'react-icons/go';
 import { IoWarning } from 'react-icons/io5';
+import { isCheckoutAddressSelectable } from '@/lib/checkoutAddressGuard';
 
 interface AddressInfo {
   id: string;
@@ -121,9 +122,7 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
           ) : (
             <div className="space-y-3">
               {filteredAddresses.map((address) => {
-                const hasValidRajaOngkirCity = Boolean(
-                  address.city_id && Number(address.city_id) > 0
-                );
+                const hasValidRajaOngkirCity = isCheckoutAddressSelectable(address);
 
                 return (
                 <div
