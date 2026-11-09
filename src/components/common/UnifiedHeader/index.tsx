@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { GoChevronLeft } from 'react-icons/go';
 import { HiOutlineShoppingBag, HiOutlineUser, HiOutlineMenu, HiOutlineX, HiOutlineLogout, HiOutlineCog } from 'react-icons/hi';
+import { toast } from 'react-hot-toast';
 import { useCart } from '@/contexts/CartContext';
 import { SessionManager } from '@/lib/auth';
 
@@ -99,11 +100,8 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
     }
   };
 
-  const handleLogout = () => {
-    // Use SessionManager to clear session
-    SessionManager.clearSession();
-
-    // Immediately update local state
+  const handleLogout = async () => {
+    const logoutRequest = SessionManager.clearSession();
     setIsLoggedIn(false);
     setUserEmail("");
     setUserDisplayName("");
@@ -111,7 +109,6 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
     setShowProfileDropdown(false);
     setShowMobileMenu(false);
 
-    // Force trigger storage event for cross-tab synchronization
     window.dispatchEvent(new StorageEvent('storage', {
       key: 'isLoggedIn',
       newValue: null,
@@ -119,7 +116,10 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
       storageArea: localStorage
     }));
 
-    // Redirect to homepage
+    const serverLogoutSucceeded = await logoutRequest;
+    if (!serverLogoutSucceeded) {
+      toast.error("Sesi di browser sudah dibersihkan, tetapi logout server belum terkonfirmasi. Silakan coba lagi.");
+    }
     router.push('/');
   };
 

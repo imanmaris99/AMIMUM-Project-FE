@@ -16,6 +16,18 @@ const nextConfig = {
                     },
                 ],
             },
+            {
+                source: '/reset-password',
+                headers: [
+                    { key: 'Referrer-Policy', value: 'no-referrer' },
+                ],
+            },
+            {
+                source: '/verify-account',
+                headers: [
+                    { key: 'Referrer-Policy', value: 'no-referrer' },
+                ],
+            },
         ];
     },
     images: {

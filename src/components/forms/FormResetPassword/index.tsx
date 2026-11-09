@@ -20,6 +20,10 @@ import {
   saveAuthFlowEmail,
 } from "@/lib/authFlow";
 import { sanitizeCustomerErrorMessage } from "@/lib/errorHandler";
+import {
+  clearResetPasswordQuery,
+  readResetPasswordParams,
+} from "@/lib/resetPasswordLink";
 
 // Password validation schema sesuai kriteria API
 const passwordSchema = z
@@ -51,18 +55,28 @@ const FormResetPassword = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const { login: handleGoogleLogin, isLoading: isGoogleLoading } = useGoogleLogin();
+  const [resetLinkParams] = React.useState(() =>
+    readResetPasswordParams(
+      searchParams?.toString() ?? "",
+      typeof window === "undefined" ? "" : window.location.hash
+    )
+  );
   const initialEmail = React.useMemo(
     () =>
       resolveAuthFlowEmail(
-        searchParams?.get("email") ?? null,
+        resetLinkParams.email,
         AUTH_FLOW_STORAGE_KEYS.resetEmail
       ),
-    [searchParams]
+    [resetLinkParams.email]
   );
-  const initialCode = React.useMemo(
-    () => searchParams?.get("code")?.trim() ?? "",
-    [searchParams]
-  );
+  const initialCode = resetLinkParams.code;
+
+  React.useEffect(() => {
+    clearResetPasswordQuery(window.location, window.history);
+    return () => {
+      saveAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.resetEmail, "");
+    };
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

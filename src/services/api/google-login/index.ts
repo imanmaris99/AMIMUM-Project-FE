@@ -1,6 +1,5 @@
-import axiosInstance from "@/lib/axiosInstance";
+import { SessionManager } from '@/lib/auth';
 import axios from "axios";
-import { API_ENDPOINTS } from "@/lib/apiConfig";
 
 export interface GoogleLoginRequest {
   id_token: string;
@@ -23,10 +22,6 @@ export interface GoogleLoginResponse {
     is_active: boolean;
     created_at: string;
     updated_at: string;
-    token?: string;
-    access_token?: string;
-    jwt?: string;
-    auth_token?: string;
   };
 }
 
@@ -41,12 +36,18 @@ export interface GoogleLoginErrorResponse {
   }>;
 }
 
-export const postGoogleLogin = async (data: GoogleLoginRequest): Promise<GoogleLoginResponse> => {
+export const postGoogleLogin = async (
+  data: GoogleLoginRequest,
+  loginRevision: string | null,
+  onComplete?: (response: GoogleLoginResponse) => void,
+): Promise<GoogleLoginResponse> =>
+  SessionManager.withSessionRevisionTransition(loginRevision, async (getCsrfToken) => {
   try {
-    const response = await axiosInstance.post<GoogleLoginResponse>(
-      API_ENDPOINTS.USER_GOOGLE_LOGIN,
-      data
-    );
+    const token = await getCsrfToken();
+    const response = await axios.post<GoogleLoginResponse>('/api/auth/google-login', data, {
+      withCredentials: true,
+      headers: { 'X-CSRF-Token': token },
+    });
 
     if (response.data.status_code === 200) {
       return response.data;
@@ -63,7 +64,7 @@ export const postGoogleLogin = async (data: GoogleLoginRequest): Promise<GoogleL
       }
 
       if (status === 404) {
-        throw new Error("Akun Google belum terdaftar. Silakan daftar terlebih dahulu.");
+        throw new Error("Login Google belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
       }
 
       if (status === 422) {
@@ -89,4 +90,4 @@ export const postGoogleLogin = async (data: GoogleLoginRequest): Promise<GoogleL
 
     throw new Error("Login Google belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
-};
+}, onComplete);

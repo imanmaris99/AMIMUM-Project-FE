@@ -125,6 +125,7 @@ const extractCartError = (
 };
 
 export const getMyCartProducts = async (): Promise<CartListResponse> => {
+  const requestRevision = SessionManager.captureSessionRevision();
   try {
     const response = await apiClient.get<CartListResponse>(API_ENDPOINTS.CART_MY_CART, {
       timeout: CART_READ_TIMEOUT_MS,
@@ -145,7 +146,7 @@ export const getMyCartProducts = async (): Promise<CartListResponse> => {
       const errorData = error.response.data as CartErrorResponse;
 
       if (status === 401 || status === 403) {
-        SessionManager.clearSession();
+        if (status === 401) await SessionManager.clearLocalSessionIfRevisionMatches(requestRevision);
         return {
           status_code: 200,
           message: "Sesi perlu diperbarui.",
@@ -183,6 +184,7 @@ export const getMyCartProducts = async (): Promise<CartListResponse> => {
 };
 
 export const getCartTotalItems = async (): Promise<CartTotalItemsResponse> => {
+  const requestRevision = SessionManager.captureSessionRevision();
   try {
     const response = await apiClient.get<CartTotalItemsResponse>(
       API_ENDPOINTS.CART_TOTAL_ITEMS,
@@ -204,7 +206,7 @@ export const getCartTotalItems = async (): Promise<CartTotalItemsResponse> => {
       const errorData = error.response.data as CartErrorResponse;
 
       if (status === 401 || status === 403) {
-        SessionManager.clearSession();
+        if (status === 401) await SessionManager.clearLocalSessionIfRevisionMatches(requestRevision);
         return {
           status_code: 200,
           message: "Sesi perlu diperbarui.",

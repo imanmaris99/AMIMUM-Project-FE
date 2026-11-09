@@ -19,6 +19,10 @@ import {
   saveAuthFlowEmail,
 } from "@/lib/authFlow";
 import { sanitizeCustomerErrorMessage } from "@/lib/errorHandler";
+import {
+  clearResetPasswordQuery,
+  readResetPasswordParams,
+} from "@/lib/resetPasswordLink";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Format email tidak valid" }),
@@ -34,19 +38,28 @@ const FormVerifyAccount = () => {
   const [apiError, setApiError] = React.useState<string | null>(null);
   const { login: handleGoogleLogin, isLoading: isGoogleLoading } = useGoogleLogin();
 
+  const [authLinkParams] = React.useState(() =>
+    readResetPasswordParams(
+      searchParams?.toString() ?? "",
+      typeof window === "undefined" ? "" : window.location.hash
+    )
+  );
   const initialEmail = React.useMemo(
     () =>
       resolveAuthFlowEmail(
-        searchParams?.get("email") ?? null,
+        authLinkParams.email,
         AUTH_FLOW_STORAGE_KEYS.verifyEmail
       ),
-    [searchParams]
+    [authLinkParams.email]
   );
+  const initialCode = authLinkParams.code;
 
-  const initialCode = React.useMemo(
-    () => searchParams?.get("code")?.trim() ?? "",
-    [searchParams]
-  );
+  React.useEffect(() => {
+    clearResetPasswordQuery(window.location, window.history);
+    return () => {
+      saveAuthFlowEmail(AUTH_FLOW_STORAGE_KEYS.verifyEmail, "");
+    };
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

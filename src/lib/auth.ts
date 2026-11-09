@@ -12,16 +12,6 @@ export interface User {
   lastLogin?: Date;
 }
 
-export interface AuthToken {
-  token: string;
-  expiresAt: Date;
-  refreshToken: string;
-}
-
-export function isJwtToken(token: string): boolean {
-  return /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token);
-}
-
 // Secure token generation
 export function generateSecureToken(): string {
   // Generate secure token for browser environment
@@ -33,18 +23,6 @@ export function generateSecureToken(): string {
 // Password hashing (for production, use bcrypt)
 export function hashPassword(password: string): string {
   return createHash('sha256').update(password + process.env.PASSWORD_SALT).digest('hex');
-}
-
-// Backend-auth token validation.
-// Customer account pages call protected backend APIs, so a local/random token must
-// not be treated as an authenticated session. Older builds could store fallback
-// local tokens; clearing them prevents repeated 403 toast popups on every page.
-export function validateToken(token: string): boolean {
-  try {
-    return Boolean(token && isJwtToken(token));
-  } catch {
-    return false;
-  }
 }
 
 // Secure storage utilities
@@ -79,60 +57,198 @@ export class SecureStorage {
   }
 }
 
-// Session management
+// Session management stores display metadata only; backend credentials stay in the HttpOnly cookie.
+type AuthCookieLockManager = {
+  request<T>(name: string, callback: () => Promise<T>): Promise<T>;
+};
+
 export class SessionManager {
-  private static readonly SESSION_KEY = 'user_session';
-  private static readonly TOKEN_KEY = 'auth_token';
-  private static readonly AUTH_FLAG_KEY = 'isLoggedIn'; // For storage event compatibility
-  
-  static setSession(user: User, token: AuthToken): void {
-    SecureStorage.setItem(this.SESSION_KEY, user);
-    SecureStorage.setItem(this.TOKEN_KEY, token);
-    // Set a flag in regular localStorage for storage event compatibility
-    localStorage.setItem(this.AUTH_FLAG_KEY, 'true');
-    localStorage.setItem('userEmail', user.email);
+  static readonly AUTH_LOCK_UNSUPPORTED_MESSAGE = 'Secure sign-in requires a supported, current browser. Please update your browser and try again.';
+
+  static supportsAuthCookieTransitions(): boolean {
+    return typeof navigator !== 'undefined' && typeof (navigator as Navigator & { locks?: AuthCookieLockManager }).locks?.request === 'function';
   }
-  
-  static getSession(): { user: User; token: AuthToken } | null {
-    const user = SecureStorage.getItem<User>(this.SESSION_KEY);
-    const token = SecureStorage.getItem<AuthToken>(this.TOKEN_KEY);
-    
-    if (!user || !token) return null;
-    
-    // Check token expiration
-    if (!validateToken(token.token)) {
-      this.clearSession();
-      return null;
+
+  static withAuthCookieTransition<T>(
+    operation: (getCsrfToken: () => Promise<string>) => Promise<T>,
+    onComplete?: (result: T) => void,
+  ): Promise<T> {
+    if (!this.supportsAuthCookieTransitions()) {
+      return Promise.reject(new Error(this.AUTH_LOCK_UNSUPPORTED_MESSAGE));
     }
-    
-    return { user, token };
+    const run = async () => {
+      const result = await operation(() => this.readOrCreateCsrfToken());
+      onComplete?.(result);
+      return result;
+    };
+    const locks = (navigator as Navigator & { locks: AuthCookieLockManager }).locks;
+    return locks.request('amimum-auth-cookie-transition', run);
   }
-  
-  static clearSession(): void {
-    // Clear secure storage
+
+  static withSessionRevisionTransition<T>(
+    expectedRevision: string | null,
+    operation: (getCsrfToken: () => Promise<string>) => Promise<T>,
+    onComplete?: (result: T) => void,
+  ): Promise<T> {
+    return this.withAuthCookieTransition(async (getCsrfToken) => {
+      if (!this.isSessionRevisionCurrent(expectedRevision)) {
+        throw new Error('Login attempt was superseded');
+      }
+      return operation(getCsrfToken);
+    }, onComplete);
+  }
+
+  private static pendingCsrfToken: Promise<string> | null = null;
+
+  static getCsrfToken(): Promise<string> {
+    if (this.supportsAuthCookieTransitions()) {
+      return this.withAuthCookieTransition((getToken) => getToken());
+    }
+    if (this.pendingCsrfToken) return this.pendingCsrfToken;
+
+    const request = this.readOrCreateCsrfToken();
+    this.pendingCsrfToken = request;
+    const clearPending = () => {
+      if (this.pendingCsrfToken === request) this.pendingCsrfToken = null;
+    };
+    void request.then(clearPending, clearPending);
+    return request;
+  }
+
+  private static async readOrCreateCsrfToken(): Promise<string> {
+    const match = typeof document !== 'undefined'
+      ? document.cookie.match(/(?:^|;\s*)amimum_csrf=([^;]+)/)
+      : null;
+    if (match?.[1]) return decodeURIComponent(match[1]);
+
+    const response = await fetch('/api/auth/csrf', {
+      credentials: 'same-origin',
+      cache: 'no-store',
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!response.ok) throw new Error('Could not establish CSRF protection');
+    const body = await response.json() as { token?: unknown };
+    if (typeof body.token !== 'string' || !body.token) throw new Error('Could not establish CSRF protection');
+    return body.token;
+  }
+
+  private static readonly SESSION_KEY = 'user_session';
+  private static readonly AUTH_FLAG_KEY = 'isLoggedIn';
+  private static readonly SESSION_REVISION_KEY = 'amimum_session_revision';
+
+  static captureSessionRevision(): string | null {
+    return localStorage.getItem(this.SESSION_REVISION_KEY);
+  }
+
+  static isSessionRevisionCurrent(expectedRevision: string | null): boolean {
+    return this.captureSessionRevision() === expectedRevision;
+  }
+
+  static setSessionIfRevisionMatches(user: User, expectedRevision: string | null): Promise<boolean> {
+    return this.withAuthCookieTransition(async () => this.setSessionInAuthTransitionIfRevisionMatches(user, expectedRevision));
+  }
+
+  static setSessionInAuthTransitionIfRevisionMatches(user: User, expectedRevision: string | null): boolean {
+    if (!this.isSessionRevisionCurrent(expectedRevision)) return false;
+    this.writeSessionMetadata(user);
+    return true;
+  }
+
+  static clearLocalSessionIfRevisionMatches(expectedRevision: string | null): Promise<boolean> {
+    return this.withAuthCookieTransition(async () => this.clearLocalSessionInAuthTransitionIfRevisionMatches(expectedRevision));
+  }
+
+  static clearLocalSessionInAuthTransitionIfRevisionMatches(expectedRevision: string | null): boolean {
+    if (!this.isSessionRevisionCurrent(expectedRevision)) return false;
+    this.clearLocalSessionMetadata();
+    return true;
+  }
+
+  private static rotateSessionRevision(): void {
+    localStorage.setItem(this.SESSION_REVISION_KEY, generateSecureToken());
+  }
+
+  private static clearLocalSessionMetadata(): void {
+    this.rotateSessionRevision();
     SecureStorage.removeItem(this.SESSION_KEY);
-    SecureStorage.removeItem(this.TOKEN_KEY);
-    
-    // Clear the flag in regular localStorage
+    SecureStorage.removeItem('auth_token');
     localStorage.removeItem(this.AUTH_FLAG_KEY);
     localStorage.removeItem('userEmail');
+    this.notifyStorageChange(this.AUTH_FLAG_KEY, null);
+    this.notifyStorageChange('userEmail', null);
   }
-  
+  private static notifyStorageChange(key: string, newValue: string | null): void {
+    if (typeof window === 'undefined') return;
+    window.dispatchEvent(new StorageEvent('storage', {
+      key,
+      newValue,
+      storageArea: localStorage,
+      url: window.location.href,
+    }));
+  }
+
+  static setSession(user: User): Promise<void> {
+    return this.withAuthCookieTransition(async () => { this.writeSessionMetadata(user); });
+  }
+
+  private static writeSessionMetadata(user: User): void {
+    this.rotateSessionRevision();
+    SecureStorage.setItem(this.SESSION_KEY, user);
+    SecureStorage.removeItem('auth_token');
+    localStorage.setItem(this.AUTH_FLAG_KEY, 'true');
+    localStorage.setItem('userEmail', user.email);
+    this.notifyStorageChange(this.AUTH_FLAG_KEY, 'true');
+    this.notifyStorageChange('userEmail', user.email);
+  }
+
+  static getSession(): { user: User } | null {
+    SecureStorage.removeItem('auth_token');
+    const user = SecureStorage.getItem<User>(this.SESSION_KEY);
+    return user ? { user } : null;
+  }
+
+  private static pendingClearSession: Promise<boolean> | null = null;
+
+  static clearSession(): Promise<boolean> {
+    if (typeof window === 'undefined') return Promise.resolve(false);
+    if (!this.supportsAuthCookieTransitions()) {
+      this.clearLocalSessionMetadata();
+      return Promise.resolve(false);
+    }
+    if (this.pendingClearSession) return this.pendingClearSession;
+
+    const request = this.withAuthCookieTransition(async (getCsrfToken) => {
+      this.clearLocalSessionMetadata();
+      try {
+        return await this.clearServerSessionCookie(await getCsrfToken());
+      } catch {
+        return false;
+      }
+    }).catch(() => false);
+    this.pendingClearSession = request;
+    void request.then(() => {
+      if (this.pendingClearSession === request) this.pendingClearSession = null;
+    });
+    return request;
+  }
+
+  private static async clearServerSessionCookie(csrfToken: string): Promise<boolean> {
+    try {
+      const logoutResponse = await fetch('/api/auth/session', {
+        method: 'DELETE',
+        credentials: 'same-origin',
+        cache: 'no-store',
+        signal: AbortSignal.timeout(5000),
+        headers: { 'X-CSRF-Token': csrfToken },
+      });
+      return logoutResponse.ok;
+    } catch {
+      return false;
+    }
+  }
+
   static isAuthenticated(): boolean {
-    const session = this.getSession();
-    if (!session) {
-      return false;
-    }
-    
-    // Additional check: verify the session is still valid
-    const now = new Date();
-    if (session.token && session.token.expiresAt && new Date(session.token.expiresAt) < now) {
-      // Token expired, clear session
-      this.clearSession();
-      return false;
-    }
-    
-    return true;
+    return this.getSession() !== null;
   }
 }
 

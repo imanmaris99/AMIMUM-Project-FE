@@ -1,6 +1,5 @@
-import axiosInstance from "@/lib/axiosInstance";
+import { SessionManager } from '@/lib/auth';
 import axios from "axios";
-import { API_ENDPOINTS } from "@/lib/apiConfig";
 
 export interface LoginRequest {
   email: string;
@@ -24,17 +23,23 @@ export interface LoginErrorResponse {
   }>;
 }
 
-type AccountInactiveError = Error & {
-  isAccountInactive?: boolean;
+type LoginRecoveryError = Error & {
   statusCode?: number;
+  mayNeedVerification?: boolean;
 };
 
-export const postLogin = async (data: LoginRequest): Promise<LoginResponse> => {
+export const postLogin = async (
+  data: LoginRequest,
+  loginRevision: string | null,
+  onComplete?: (response: LoginResponse) => void,
+): Promise<LoginResponse> =>
+  SessionManager.withSessionRevisionTransition(loginRevision, async (getCsrfToken) => {
   try {
-    const response = await axiosInstance.post<LoginResponse>(
-      API_ENDPOINTS.USER_LOGIN,
-      data
-    );
+    const token = await getCsrfToken();
+    const response = await axios.post<LoginResponse>('/api/auth/login', data, {
+      withCredentials: true,
+      headers: { 'X-CSRF-Token': token },
+    });
 
     if (response.data.status_code === 200) {
       return response.data;
@@ -46,21 +51,15 @@ export const postLogin = async (data: LoginRequest): Promise<LoginResponse> => {
       const status = error.response.status;
       const errorData = error.response.data as LoginErrorResponse;
 
-      if (status === 401) {
-        throw new Error("Email atau password salah.");
-      }
-
-      if (status === 403) {
-        const inactiveError: AccountInactiveError = new Error(
-          "Akun Anda belum terverifikasi. Silakan verifikasi email Anda terlebih dahulu."
-        );
-        inactiveError.isAccountInactive = true;
-        inactiveError.statusCode = 403;
-        throw inactiveError;
+      if (status === 401 || status === 403) {
+        const invalidError: LoginRecoveryError = new Error("Email atau password tidak valid.");
+        invalidError.statusCode = status;
+        invalidError.mayNeedVerification = true;
+        throw invalidError;
       }
 
       if (status === 404) {
-        throw new Error("Email atau password salah.");
+        throw new Error("Email atau password tidak valid.");
       }
 
       if (status === 422) {
@@ -86,4 +85,4 @@ export const postLogin = async (data: LoginRequest): Promise<LoginResponse> => {
 
     throw new Error("Login belum bisa diproses. Silakan coba lagi beberapa saat lagi.");
   }
-};
+}, onComplete);

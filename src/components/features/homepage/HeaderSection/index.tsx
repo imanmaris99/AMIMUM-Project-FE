@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import HeaderWithNotifications from "@/components/common/HeaderWithNotifications";
 import { SessionManager } from "@/lib/auth";
+import { toast } from "react-hot-toast";
 
 const Header = () => {
   const [userEmail, setUserEmail] = useState("");
@@ -16,24 +17,24 @@ const Header = () => {
     }
   }, []);
 
-  const handleLogout = () => {
-    // Use SessionManager to clear session
-    SessionManager.clearSession();
+  const handleLogout = async () => {
+    const logoutRequest = SessionManager.clearSession();
     setUserEmail("");
-    
-    // Force trigger storage event for cross-tab synchronization
+
     window.dispatchEvent(new StorageEvent('storage', {
       key: 'isLoggedIn',
       newValue: null,
       oldValue: 'true',
       storageArea: localStorage
     }));
-    
-    // Show success message
-    setShowLogoutMessage(true);
-    setTimeout(() => {
-      setShowLogoutMessage(false);
-    }, 3000);
+
+    const serverLogoutSucceeded = await logoutRequest;
+    if (serverLogoutSucceeded) {
+      setShowLogoutMessage(true);
+      setTimeout(() => setShowLogoutMessage(false), 3000);
+    } else {
+      toast.error("Sesi di browser sudah dibersihkan, tetapi logout server belum terkonfirmasi. Silakan coba lagi.");
+    }
   };
 
   return (

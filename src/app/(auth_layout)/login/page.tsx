@@ -14,8 +14,7 @@ import { postLogin } from "@/services/api/login";
 import { handleGoogleLogin as handleGoogleAuth } from "@/lib/googleAuth";
 import axios, { AxiosError } from "axios";
 import axiosInstance from "@/lib/axiosInstance";
-import { API_ENDPOINTS } from "@/lib/apiConfig";
-import { getTokenExpiry, parseLoginResult, UserProfileResponseShape } from "@/lib/loginParser";
+import { parseLoginResult, UserProfileResponseShape } from "@/lib/loginParser";
 import {
   AUTH_FLOW_STORAGE_KEYS,
   resolveAuthFlowEmail,
@@ -26,8 +25,8 @@ import {
 import { sanitizeCustomerErrorMessage } from "@/lib/errorHandler";
 
 type LoginFlowError = Error & {
-  isAccountInactive?: boolean;
   statusCode?: number;
+  mayNeedVerification?: boolean;
 };
 
 const Login = () => {
@@ -124,7 +123,12 @@ const Login = () => {
       ...prev,
       [field]: value
     }));
-    
+
+    if (field === "email") {
+      setIsAccountInactive(false);
+      setInactiveEmail("");
+    }
+
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
@@ -162,12 +166,22 @@ const Login = () => {
       }
       
       const loginPayload = buildLoginPayload(formData.email, formData.password);
-      const response = await postLogin(loginPayload);
-      
-      if (response.status_code === 200) {
-        const { user: parsedUser, backendToken } = parseLoginResult(response, loginPayload.email);
-
-        const user = {
+      const loginRevision = SessionManager.captureSessionRevision();
+      let user: {
+        id: string;
+        email: string;
+        name: string;
+        firstname?: string;
+        role: 'user' | 'admin';
+        createdAt: Date;
+        lastLogin: Date;
+      } | undefined;
+      let sessionCommitted = false;
+      let committedRevision: string | null = null;
+      const response = await postLogin(loginPayload, loginRevision, (loginResponse) => {
+        if (loginResponse.status_code !== 200) return;
+        const { user: parsedUser } = parseLoginResult(loginResponse, loginPayload.email);
+        user = {
           id: generateSecureToken(),
           email: parsedUser.email,
           name: parsedUser.name,
@@ -176,47 +190,32 @@ const Login = () => {
           createdAt: new Date(),
           lastLogin: new Date(),
         };
-        
-        if (!backendToken) {
-          throw new Error("Login berhasil diterima, tetapi sesi toko belum siap. Silakan coba lagi beberapa saat lagi.");
-        }
+        sessionCommitted = SessionManager.setSessionInAuthTransitionIfRevisionMatches(user, loginRevision);
+        if (sessionCommitted) committedRevision = SessionManager.captureSessionRevision();
+      });
 
-        const token = {
-          token: backendToken,
-          expiresAt: getTokenExpiry(backendToken),
-          refreshToken: generateSecureToken(),
-        };
+      if (response.status_code === 200 && user) {
+        if (!sessionCommitted) return;
+        const loginUser = user;
         
-        SessionManager.setSession(user, token);
-
         try {
-            const profileResponse = await axiosInstance.get<UserProfileResponseShape>(
-              API_ENDPOINTS.USER_PROFILE,
-              {
-                headers: {
-                  Authorization: `Bearer ${backendToken}`,
-                },
-              }
-            );
-            const profile = profileResponse?.data?.data;
-            const profileFirstname = profile?.firstname?.trim() || profile?.first_name?.trim();
-            const profileLastname = profile?.lastname?.trim() || profile?.last_name?.trim();
-            const profileEmail = profile?.email?.trim() || user.email;
-            const profileName = `${profileFirstname ?? ''} ${profileLastname ?? ''}`.trim() || user.name;
-
-            SessionManager.setSession(
-              {
-                ...user,
-                email: profileEmail,
-                name: profileName,
-                firstname: profileFirstname || user.firstname,
-                role: profile?.role === 'admin' ? ('admin' as const) : user.role,
-              },
-              token
-            );
-          } catch {
-            // Keep login successful even when profile sync fails.
-          }
+          const profileResponse = await axiosInstance.get<UserProfileResponseShape>('/user/profile');
+          if (!SessionManager.isSessionRevisionCurrent(committedRevision)) return;
+          const profile = profileResponse?.data?.data;
+          const profileFirstname = profile?.firstname?.trim() || profile?.first_name?.trim();
+          const profileLastname = profile?.lastname?.trim() || profile?.last_name?.trim();
+          const profileEmail = profile?.email?.trim() || loginUser.email;
+          const profileName = `${profileFirstname ?? ''} ${profileLastname ?? ''}`.trim() || loginUser.name;
+          await SessionManager.setSessionIfRevisionMatches({
+            ...loginUser,
+            email: profileEmail,
+            name: profileName,
+            firstname: profileFirstname || loginUser.firstname,
+            role: profile?.role === 'admin' ? ('admin' as const) : loginUser.role,
+          }, committedRevision);
+        } catch {
+          // Login stays successful if profile hydration is temporarily unavailable.
+        }
 
         RateLimiter.resetLimit(clientId);
         
@@ -234,29 +233,13 @@ const Login = () => {
       );
       const typedError = error as LoginFlowError;
       
-      let isInactiveError = false;
-      
+      let isInactiveError = typedError?.mayNeedVerification === true;
+
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError;
-        if (axiosError.response?.status === 403) {
+        if (axiosError.response?.status === 401 || axiosError.response?.status === 403) {
           isInactiveError = true;
         }
-      }
-      
-      if (!isInactiveError) {
-        const errorLower = errorMessage.toLowerCase();
-        isInactiveError = typedError?.isAccountInactive === true || 
-                          typedError?.statusCode === 403 ||
-                          errorLower.includes("tidak aktif") || 
-                          errorLower.includes("not active") ||
-                          errorLower.includes("belum terverifikasi") ||
-                          errorLower.includes("not verified") ||
-                          errorLower.includes("account is not active") ||
-                          errorLower.includes("akun anda tidak aktif") ||
-                          errorLower.includes("your account is not active") ||
-                          errorLower.includes("please contact support") ||
-                          errorLower.includes("akun anda") && errorLower.includes("aktif") ||
-                          errorLower.includes("account") && errorLower.includes("active");
       }
       
       if (isInactiveError) {
@@ -264,7 +247,7 @@ const Login = () => {
         setInactiveEmail(formData.email.trim().toLowerCase());
         setApiError("");
         setErrors({});
-        toast.error("Akun belum terverifikasi. Silakan cek email Anda untuk kode verifikasi.");
+        toast.error("Email atau password tidak valid.");
       } else {
         const clientId = localStorage.getItem('client_id') || generateSecureToken();
         const isStillAllowed = RateLimiter.incrementAttempt(clientId);
@@ -407,10 +390,10 @@ const Login = () => {
             {isAccountInactive && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
                 <p className="text-yellow-800 text-sm font-semibold mb-2">
-                  Akun Anda belum terverifikasi
+                  Email atau password tidak valid
                 </p>
                 <p className="text-yellow-700 text-xs mb-3">
-                  Silakan cek email Anda untuk kode verifikasi. Jika tidak menerima email, klik tombol di bawah untuk verifikasi akun.
+                  Periksa kembali data masuk Anda. Jika akun Anda belum diverifikasi, cek email atau lanjutkan ke verifikasi akun untuk meminta instruksi baru.
                 </p>
                 <button
                   type="button"

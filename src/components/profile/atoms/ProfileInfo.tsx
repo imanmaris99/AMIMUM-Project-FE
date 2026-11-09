@@ -22,6 +22,7 @@ const ProfileInfo: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
+    const requestRevision = SessionManager.captureSessionRevision();
 
     const loadProfile = async () => {
       setIsLoading(true);
@@ -30,14 +31,15 @@ const ProfileInfo: React.FC = () => {
       try {
         const response = await getUserProfile();
 
-        if (!isMounted) {
+        if (!isMounted || (requestRevision !== null && !SessionManager.isSessionRevisionCurrent(requestRevision))) {
           return;
         }
 
+        const sessionRevision = requestRevision ?? SessionManager.captureSessionRevision();
         setProfile(response.data);
-        syncSessionProfile(response.data);
+        syncSessionProfile(response.data, sessionRevision);
       } catch {
-        if (!isMounted) {
+        if (!isMounted || (requestRevision !== null && !SessionManager.isSessionRevisionCurrent(requestRevision))) {
           return;
         }
 
@@ -75,6 +77,7 @@ const ProfileInfo: React.FC = () => {
     const address = profileData.address.trim();
     const fullname = `${firstname} ${lastname}`.trim();
 
+    const sessionRevision = SessionManager.captureSessionRevision();
     const response = await updateUserProfile({
       fullname,
       firstname,
@@ -83,6 +86,7 @@ const ProfileInfo: React.FC = () => {
       address,
     });
 
+    if (!SessionManager.isSessionRevisionCurrent(sessionRevision)) return;
     const updatedProfile = {
       ...profile,
       firstname: response.data.firstname,
@@ -93,7 +97,7 @@ const ProfileInfo: React.FC = () => {
     };
 
     setProfile(updatedProfile);
-    syncSessionProfile(updatedProfile);
+    await syncSessionProfile(updatedProfile, sessionRevision);
 
     toast.success(response.message || "Profil berhasil diperbarui.");
   };
@@ -111,7 +115,9 @@ const ProfileInfo: React.FC = () => {
       throw new Error("Data profil belum tersedia.");
     }
 
+    const sessionRevision = SessionManager.captureSessionRevision();
     const response = await updateUserPhoto(file);
+    if (!SessionManager.isSessionRevisionCurrent(sessionRevision)) return;
 
     const updatedProfile = {
       ...profile,
@@ -120,30 +126,27 @@ const ProfileInfo: React.FC = () => {
     };
 
     setProfile(updatedProfile);
-    syncSessionProfile(updatedProfile);
+    await syncSessionProfile(updatedProfile, sessionRevision);
 
     toast.success(response.message || "Foto profil berhasil diperbarui.");
   };
 
-  const syncSessionProfile = (nextProfile: UserProfile) => {
+  const syncSessionProfile = async (nextProfile: UserProfile, expectedRevision: string | null) => {
     const session = SessionManager.getSession();
 
     if (!session) {
       return;
     }
 
-    SessionManager.setSession(
-      {
-        ...session.user,
-        email: nextProfile.email,
-        name:
-          `${nextProfile.firstname ?? ""} ${nextProfile.lastname ?? ""}`.trim() ||
-          session.user.name,
-        firstname: nextProfile.firstname || session.user.firstname,
-        photoUrl: nextProfile.photo_url || "",
-      },
-      session.token
-    );
+    await SessionManager.setSessionIfRevisionMatches({
+      ...session.user,
+      email: nextProfile.email,
+      name:
+        `${nextProfile.firstname ?? ""} ${nextProfile.lastname ?? ""}`.trim() ||
+        session.user.name,
+      firstname: nextProfile.firstname || session.user.firstname,
+      photoUrl: nextProfile.photo_url || "",
+    }, expectedRevision);
 
     window.dispatchEvent(
       new StorageEvent("storage", {

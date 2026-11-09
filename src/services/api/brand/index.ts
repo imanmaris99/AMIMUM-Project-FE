@@ -2,6 +2,7 @@ import axiosClient from "@/lib/axiosClient";
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/apiConfig";
 import { BrandsResponseType, ProductionProps, PromoProps, PromosResponseType } from "@/types/apiTypes";
 import { BrandDetailType, BrandDetailResponseType } from "@/types/detailProduct";
+import { collectBrandLoaderPages } from "@/lib/server/brandLoader";
 
 export const GetAllPromo = async () => {
     try {
@@ -153,51 +154,13 @@ export async function GetAllPromoServer(): Promise<PromoProps[]> {
  * @throws Error if request fails (409, 500, or network error)
  */
 export async function GetAllBrandServer(): Promise<ProductionProps[]> {
-  try {
-    const allBrands: ProductionProps[] = [];
-    const pageSize = 50;
-    let skip = 0;
-    let hasMore = true;
-
-    while (hasMore) {
-      const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.BRAND_LOADER}?skip=${skip}&limit=${pageSize}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        next: { revalidate: 60 },
-      });
-
-      if (res.status === 409) {
-        throw new Error('Data brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
-      }
-
-      if (res.status === 500) {
-        throw new Error('Data brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
-      }
-
-      if (!res.ok) {
-        throw new Error('Data brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
-      }
-
-      const payload = await res.json();
-      const pageData = Array.isArray(payload?.data) ? payload.data as ProductionProps[] : [];
-
-      allBrands.push(...pageData);
-
-      hasMore = Boolean(payload?.has_more) && pageData.length > 0;
-      skip += pageData.length;
-
-      if (pageData.length === 0) break;
-    }
-
-    return allBrands;
-  } catch (error) {
-    if (error instanceof Error) {
-      throw error;
-    }
-    throw new Error('Data brand belum bisa dimuat. Silakan coba lagi beberapa saat lagi.');
-  }
+  return collectBrandLoaderPages<ProductionProps>((skip, limit) =>
+    fetch(`${API_BASE_URL}${API_ENDPOINTS.BRAND_LOADER}?skip=${skip}&limit=${limit}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      next: { revalidate: 60 },
+    })
+  );
 }
 
 /**

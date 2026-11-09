@@ -13,8 +13,6 @@ export interface ResetPasswordResponse {
   message: string;
   data: {
     email: string;
-    code: string;
-    new_password: string;
   };
 }
 

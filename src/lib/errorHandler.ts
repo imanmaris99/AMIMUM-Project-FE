@@ -195,6 +195,15 @@ export class ErrorHandler {
     const errorCode = (error as { code?: string | number; status?: number })?.code || 
                      (error as { status?: number })?.status;
     const errorDetails = (error as { details?: unknown })?.details || error;
+    const isBrowser = typeof window !== 'undefined';
+    const readBrowserStorage = (key: string): string | undefined => {
+      if (!isBrowser) return undefined;
+      try {
+        return window.localStorage.getItem(key) || undefined;
+      } catch {
+        return undefined;
+      }
+    };
     
     const errorInfo: ErrorInfo = {
       type: errorType,
@@ -202,13 +211,14 @@ export class ErrorHandler {
       code: errorCode,
       details: errorDetails,
       timestamp: new Date(),
-      userId: localStorage.getItem('user_id') || undefined,
-      sessionId: localStorage.getItem('session_id') || undefined,
-      url: window.location.href,
-      userAgent: navigator.userAgent
+      userId: readBrowserStorage('user_id'),
+      sessionId: readBrowserStorage('session_id'),
+      url: isBrowser ? window.location.href : undefined,
+      userAgent: isBrowser && typeof navigator !== 'undefined' ? navigator.userAgent : undefined
     };
 
     await this.reportError();
+    if (!isBrowser) return;
 
     // Handle retry logic
     if (retryable && retryFunction && errorType === ErrorType.NETWORK) {

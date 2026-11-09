@@ -10,6 +10,8 @@ import CartWithNotification from "@/components/common/CartWithNotification";
 import NotificationErrorBoundary from "@/components/common/NotificationErrorBoundary";
 import ToastProvider from "@/components/ui/ToastProvider";
 import { ClientErrorBoundary } from "@/components/common/ClientErrorBoundary";
+import SessionBootstrap from "@/components/common/SessionBootstrap";
+import { getRobotsMetadata } from "../../utils/seo-robots";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -26,6 +28,7 @@ const inter = Inter({
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.tokoherbalamimum.web.id";
+const robotsMetadata = getRobotsMetadata(siteUrl);
 const siteTitle = "Toko Herbal AmImUm";
 const siteDescription =
   "Katalog produk herbal dan jamu Toko Herbal AmImUm. Lihat produk, promo, metode pembayaran, dan status pesanan dengan informasi yang mengikuti data katalog toko.";
@@ -48,10 +51,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: robotsMetadata,
   openGraph: {
     type: "website",
     locale: "id_ID",
@@ -121,6 +121,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased font-jakarta" suppressHydrationWarning={true}>
+        <SessionBootstrap />
         <ClientErrorBoundary>
           <NotificationErrorBoundary>
             <NotificationProvider>

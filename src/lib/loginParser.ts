@@ -1,5 +1,3 @@
-import { isJwtToken } from "@/lib/auth";
-
 type LoginUserData = {
   firstname?: string;
   first_name?: string;
@@ -22,10 +20,6 @@ type LoginUserData = {
 };
 
 type LoginResponseDataShape = LoginUserData & {
-  token?: string;
-  access_token?: string;
-  jwt?: string;
-  auth_token?: string;
   data?: {
     firstname?: string;
     first_name?: string;
@@ -45,10 +39,6 @@ type LoginResponseDataShape = LoginUserData & {
       email?: string;
       role?: string;
     };
-    token?: string;
-    access_token?: string;
-    jwt?: string;
-    auth_token?: string;
   };
 };
 
@@ -63,7 +53,6 @@ export type ParsedLoginUser = {
 
 export type ParsedLoginResult = {
   user: ParsedLoginUser;
-  backendToken?: string;
 };
 
 export type UserProfileResponseShape = {
@@ -128,60 +117,8 @@ const findFirstStringByKeys = (
   return undefined;
 };
 
-const findFirstJwtToken = (value: unknown, depth = 0, maxDepth = 5): string | undefined => {
-  if (depth > maxDepth) {
-    return undefined;
-  }
-
-  if (typeof value === "string") {
-    return isJwtToken(value) ? value : undefined;
-  }
-
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      const found = findFirstJwtToken(item, depth + 1, maxDepth);
-      if (found) {
-        return found;
-      }
-    }
-    return undefined;
-  }
-
-  if (!isJsonRecord(value)) {
-    return undefined;
-  }
-
-  for (const nestedValue of Object.values(value)) {
-    const found = findFirstJwtToken(nestedValue, depth + 1, maxDepth);
-    if (found) {
-      return found;
-    }
-  }
-
-  return undefined;
-};
-
 const normalizeRole = (role?: string): "user" | "admin" => {
   return role?.toLowerCase() === "admin" ? "admin" : "user";
-};
-
-export const getTokenExpiry = (token: string): Date => {
-  try {
-    const [, payloadBase64] = token.split(".");
-    if (!payloadBase64) {
-      return new Date(Date.now() + 24 * 60 * 60 * 1000);
-    }
-
-    const payloadJson = atob(payloadBase64.replace(/-/g, "+").replace(/_/g, "/"));
-    const payload = JSON.parse(payloadJson) as { exp?: number };
-    if (payload.exp) {
-      return new Date(payload.exp * 1000);
-    }
-  } catch {
-    // Fallback to 24h when token is not JWT or parsing fails.
-  }
-
-  return new Date(Date.now() + 24 * 60 * 60 * 1000);
 };
 
 export const parseLoginResult = (response: unknown, fallbackEmail: string): ParsedLoginResult => {
@@ -210,8 +147,6 @@ export const parseLoginResult = (response: unknown, fallbackEmail: string): Pars
 
   const email = findFirstStringByKeys(responsePayload, ["email"]) || fallbackEmail;
   const role = normalizeRole(findFirstStringByKeys(responsePayload, ["role"]) || profileData.role);
-  const backendToken = findFirstJwtToken(responsePayload);
-
   return {
     user: {
       email,
@@ -219,6 +154,5 @@ export const parseLoginResult = (response: unknown, fallbackEmail: string): Pars
       firstname: firstname || fallbackName,
       role,
     },
-    backendToken,
   };
 };

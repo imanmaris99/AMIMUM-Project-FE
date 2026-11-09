@@ -1,7 +1,6 @@
 import axios from "axios";
 import axiosInstance from "@/lib/axiosInstance";
 import { API_ENDPOINTS } from "@/lib/apiConfig";
-import { isJwtToken, SessionManager } from "@/lib/auth";
 
 export interface ShipmentAddress {
   id: number;
@@ -100,18 +99,7 @@ const customerAddressNotFoundMessage = (action: ShipmentAddressAction) => {
 const safeAddressValidationMessage = () =>
   "Data alamat belum valid. Pastikan nama, nomor telepon, alamat, provinsi, kota/kabupaten RajaOngkir, dan kode pos sudah benar.";
 
-const getAuthConfig = () => {
-  const session = SessionManager.getSession();
-  const token = session?.token?.token;
-
-  return token && isJwtToken(token)
-    ? {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    : undefined;
-};
+const getAuthConfig = () => ({ headers: {} });
 
 const handleShipmentAddressError = (error: unknown, action: ShipmentAddressAction): never => {
   if (axios.isAxiosError(error) && error.response) {

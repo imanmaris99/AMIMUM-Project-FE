@@ -8,6 +8,10 @@ const readSource = (relativePath) =>
 const loginSource = readSource("../src/app/(auth_layout)/login/page.tsx");
 const registerSource = readSource("../src/app/(auth_layout)/register/page.tsx");
 const registerApiSource = readSource("../src/services/api/register/index.ts");
+const loginApiSource = readSource("../src/services/api/login/index.ts");
+const googleLoginApiSource = readSource("../src/services/api/google-login/index.ts");
+const googleAuthSource = readSource("../src/lib/googleAuth.ts");
+const nextConfigSource = readSource("../next.config.mjs");
 const validation = await import("../src/lib/authFormValidation.ts").catch(() => ({}));
 
 test("login payload preserves the exact password and normalizes only email", () => {
@@ -58,6 +62,14 @@ test("registration phone is normalized and validated in the backend format", () 
     "registration form should submit a normalized Indonesian phone number");
 });
 
+test("login errors keep account state generic while offering verification help", () => {
+  assert.ok(/status === 401/.test(loginApiSource));
+  assert.ok(/mayNeedVerification = true/.test(loginApiSource));
+  assert.ok(/setIsAccountInactive\(true\)/.test(loginSource));
+  assert.ok(loginSource.includes("Jika akun Anda belum diverifikasi"));
+  assert.doesNotMatch(loginSource, /Akun Anda belum terverifikasi/);
+});
+
 test("registration API errors distinguish password-policy failures from duplicates", () => {
   assert.equal(typeof validation.getRegisterErrorMessage, "function");
   assert.equal(
@@ -80,4 +92,20 @@ test("registration API errors distinguish password-policy failures from duplicat
   );
   assert.ok(/getRegisterErrorMessage\(status, error\.response\.data\)/.test(registerApiSource),
     "registration API errors should be mapped by their actual backend reason");
+});
+
+test("Google login errors stay generic and consume the backend-issued token only through the BFF", () => {
+  assert.doesNotMatch(googleLoginApiSource, /Akun Google belum terdaftar/);
+  assert.match(googleLoginApiSource, /\/api\/auth\/google-login/);
+  assert.doesNotMatch(googleAuthSource, /response\.data\.(?:access_token|token|jwt|auth_token)/);
+  assert.doesNotMatch(googleAuthSource, /isJwtToken/);
+});
+
+test("verification and reset routes disable referrer headers for legacy code links", () => {
+  for (const route of ["reset-password", "verify-account"]) {
+    assert.match(
+      nextConfigSource,
+      new RegExp(`source: '/${route}',\\s*headers:\\s*\\[\\s*\\{ key: 'Referrer-Policy', value: 'no-referrer' \\}`),
+    );
+  }
 });

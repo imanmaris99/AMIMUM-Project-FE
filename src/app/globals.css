@@ -706,3 +706,24 @@ html .hover\:bg-emerald-50\/70:hover,
 html .hover\:bg-green-50:hover {
   background-color: #f6fbf8 !important;
 }
+
+/* The Firebase Auth Emulator injects a fixed warning. Keep it above the mobile
+   navigation and reserve footer space so neither is hidden while testing staging. */
+@media (max-width: 480px) {
+  .firebase-emulator-warning {
+    bottom: calc(65px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 50% !important;
+    width: min(100vw, 440px) !important;
+    transform: translateX(-50%) !important;
+    box-sizing: border-box !important;
+    z-index: 49 !important;
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+    line-height: 16px !important;
+    pointer-events: none !important;
+  }
+
+  body:has(.firebase-emulator-warning) main {
+    padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+  }
+}

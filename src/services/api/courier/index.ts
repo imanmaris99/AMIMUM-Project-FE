@@ -1,7 +1,6 @@
 import axios from "axios";
 import axiosInstance from "@/lib/axiosInstance";
 import { API_ENDPOINTS } from "@/lib/apiConfig";
-import { isJwtToken, SessionManager } from "@/lib/auth";
 
 export interface CourierInfo {
   id: number;
@@ -58,18 +57,7 @@ const courierValidationMessage =
   "Data ongkir belum valid. Pastikan kota asal, kota tujuan, berat paket, dan kurir sudah benar.";
 
 function getAuthorizedConfig() {
-  const session = SessionManager.getSession();
-  const token = session?.token?.token;
-
-  if (token && isJwtToken(token)) {
-    return {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-  }
-
-  return undefined;
+  return {};
 }
 
 const handleCourierError = (error: unknown, action: CourierAction): never => {

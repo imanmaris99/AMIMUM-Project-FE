@@ -45,7 +45,7 @@ const FormForgotPassword = () => {
       
       if (response.status_code === 200) {
         setIsSuccess(true);
-        toast.success(response.message || "Email reset password telah dikirim. Silakan cek email Anda.");
+        toast.success(response.message || "Jika email terdaftar, instruksi reset password akan dikirim.");
         saveAuthFlowEmail(
           AUTH_FLOW_STORAGE_KEYS.resetEmail,
           normalizedEmail
@@ -84,8 +84,8 @@ const FormForgotPassword = () => {
             </div>
             <h3 className="text-base font-semibold text-green-800 mb-2">Permintaan berhasil dikirim</h3>
             <p className="text-green-700 text-sm leading-relaxed">
-              Kami telah mengirimkan kode reset password ke email Anda.
-              Buka link pada email untuk melanjutkan reset password.
+              Jika email terdaftar, instruksi reset password akan dikirim.
+              Buka link dari email untuk melanjutkan reset password.
             </p>
             <p className="text-green-600 text-xs mt-3">
               Klik tombol atau link reset password dari email agar kode otomatis terisi.

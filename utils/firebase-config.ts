@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { connectAuthEmulator, getAuth, GoogleAuthProvider } from "firebase/auth";
+import { connectFirebaseAuthEmulatorIfConfigured } from "./firebase-auth-emulator";
 
 /**
  * Firebase Configuration
@@ -27,6 +28,12 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+connectFirebaseAuthEmulatorIfConfigured(
+  auth,
+  process.env.NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST,
+  firebaseConfig.projectId,
+  connectAuthEmulator,
+);
 const provider = new GoogleAuthProvider();
 
 export { auth, provider };

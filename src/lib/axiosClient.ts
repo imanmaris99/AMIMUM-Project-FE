@@ -1,10 +1,11 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { ErrorHandler, withRetry, safeAsync } from "./errorHandler";
-import { SessionManager, isJwtToken } from "./auth";
+import { SessionManager } from "./auth";
 import { isRatingEndpointHandled } from "./ratingApiErrors";
-import { API_BASE_URL, API_ENDPOINTS } from "./apiConfig";
+import { API_ENDPOINTS } from "./apiConfig";
 
 interface AxiosRequestConfigWithMetadata extends AxiosRequestConfig {
+  authSessionRevision?: string | null;
   metadata?: {
     startTime: number;
   };
@@ -12,30 +13,23 @@ interface AxiosRequestConfigWithMetadata extends AxiosRequestConfig {
 
 // Enhanced axios client with comprehensive error handling
 const axiosClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  timeout: 10000, // 10 seconds timeout
+  baseURL: '/api/backend',
+  withCredentials: true,
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 20000,
 });
 
 // Request interceptor with enhanced security
 axiosClient.interceptors.request.use(
   async (config) => {
+    const requestConfig = config as AxiosRequestConfigWithMetadata;
+    requestConfig.authSessionRevision = SessionManager.captureSessionRevision();
     try {
-      const session = SessionManager.getSession();
-      if (session?.token && isJwtToken(session.token.token)) {
-        config.headers.Authorization = `Bearer ${session.token.token}`;
+      if (!['get', 'head', 'options'].includes((config.method || 'get').toLowerCase())) {
+        config.headers['X-CSRF-Token'] = await SessionManager.getCsrfToken();
       }
-
-      const csrfToken = localStorage.getItem('csrf_token');
-      if (csrfToken) {
-        config.headers['X-CSRF-Token'] = csrfToken;
-      }
-
-      config.headers['X-Request-ID'] = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      config.headers['X-Request-ID'] = `req_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
       (config as AxiosRequestConfigWithMetadata).metadata = { startTime: Date.now() };
-
       return config;
     } catch (error) {
       return Promise.reject(error);
@@ -65,7 +59,7 @@ axiosClient.interceptors.response.use(
     const requestUrl = originalRequest?.url || '';
     
     const urlPath = typeof requestUrl === 'string' 
-      ? requestUrl.replace(API_BASE_URL, '').split('?')[0]
+      ? requestUrl.replace(/^\/api\/backend/, '').split('?')[0]
       : '';
     const isSearchEndpoint = (
       /^\/product\/[^\/]+$/.test(urlPath) || 
@@ -100,11 +94,10 @@ axiosClient.interceptors.response.use(
     
     if (error.response) {
       switch (status) {
-        case 401:
-          // Unauthorized - clear session. Endpoint-specific screens/services handle
-          // their own UX so customers do not see duplicate/global error popups.
-          SessionManager.clearSession();
-          if (!isExpectedHandledEndpoint) {
+        case 401: {
+          const requestRevision = (originalRequest as AxiosRequestConfigWithMetadata | undefined)?.authSessionRevision ?? null;
+          const clearedCurrentSession = await SessionManager.clearLocalSessionIfRevisionMatches(requestRevision);
+          if (clearedCurrentSession && !isExpectedHandledEndpoint) {
             await ErrorHandler.handleError(
               new Error('Session expired'),
               'API_401',
@@ -115,6 +108,7 @@ axiosClient.interceptors.response.use(
             }, 2000);
           }
           break;
+        }
 
         case 403:
           if (!isExpectedHandledEndpoint) {

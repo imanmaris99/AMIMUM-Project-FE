@@ -1,14 +1,18 @@
-import axios from "axios"
-import { API_BASE_URL } from "./apiConfig"
+import axios from "axios";
+import { SessionManager } from "./auth";
 
 const axiosInstance = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-        "Content-Type": 'application/json'
-    },
-    // Email flows can take >10s when the backend waits for SMTP/provider response.
-    // Keep this above backend SMTP timeout so users receive the real API error/success.
-    timeout: 30000,
-})
+  baseURL: '/api/backend',
+  withCredentials: true,
+  headers: { "Content-Type": 'application/json' },
+  timeout: 30000,
+});
 
-export default axiosInstance
+axiosInstance.interceptors.request.use(async (config) => {
+  if (!['get', 'head', 'options'].includes((config.method || 'get').toLowerCase())) {
+    config.headers['X-CSRF-Token'] = await SessionManager.getCsrfToken();
+  }
+  return config;
+});
+
+export default axiosInstance;

@@ -23,27 +23,23 @@ const ProfileSettings: React.FC = () => {
     setIsLogoutModalOpen(true);
   };
 
-  const handleConfirmLogout = () => {
-    // Use SessionManager to clear session
-    SessionManager.clearSession();
-    
-    // Close modal first
+  const handleConfirmLogout = async () => {
+    const logoutRequest = SessionManager.clearSession();
     setIsLogoutModalOpen(false);
-    
-    // Force trigger storage event for cross-tab synchronization
+
     window.dispatchEvent(new StorageEvent('storage', {
       key: 'isLoggedIn',
       newValue: null,
       oldValue: 'true',
       storageArea: localStorage
     }));
-    
-    // Show success message after a brief delay
-    setTimeout(() => {
+
+    const serverLogoutSucceeded = await logoutRequest;
+    if (serverLogoutSucceeded) {
       toast.success("Berhasil keluar! Anda masih bisa menjelajahi toko.");
-    }, 100);
-    
-    // Redirect to homepage
+    } else {
+      toast.error("Sesi di browser sudah dibersihkan, tetapi logout server belum terkonfirmasi. Silakan coba lagi.");
+    }
     router.push("/");
   };
 
