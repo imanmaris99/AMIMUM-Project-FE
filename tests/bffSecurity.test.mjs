@@ -60,10 +60,17 @@ test('BFF exposes public product-rating reads while keeping rating writes method
   assert.equal(isAllowedBackendRoute('GET', `/rating/product/${productId}/unknown`), false);
 });
 
-test('CSRF requires exact same-origin and constant-time token equality', () => {
-  assert.equal(validateCsrf({ origin: 'https://shop.test', requestOrigin: 'https://shop.test', cookieToken: 'abc', headerToken: 'abc' }), true);
-  assert.equal(validateCsrf({ origin: 'https://evil.test', requestOrigin: 'https://shop.test', cookieToken: 'abc', headerToken: 'abc' }), false);
-  assert.equal(validateCsrf({ origin: 'https://shop.test', requestOrigin: 'https://shop.test', cookieToken: 'abc', headerToken: 'abd' }), false);
+test('CSRF requires exact same-origin and constant-time token equality without an override', () => {
+  const previous = process.env.BFF_PUBLIC_ORIGIN;
+  delete process.env.BFF_PUBLIC_ORIGIN;
+  try {
+    assert.equal(validateCsrf({ origin: 'https://shop.test', requestOrigin: 'https://shop.test', cookieToken: 'abc', headerToken: 'abc' }), true);
+    assert.equal(validateCsrf({ origin: 'https://evil.test', requestOrigin: 'https://shop.test', cookieToken: 'abc', headerToken: 'abc' }), false);
+    assert.equal(validateCsrf({ origin: 'https://shop.test', requestOrigin: 'https://shop.test', cookieToken: 'abc', headerToken: 'abd' }), false);
+  } finally {
+    if (previous === undefined) delete process.env.BFF_PUBLIC_ORIGIN;
+    else process.env.BFF_PUBLIC_ORIGIN = previous;
+  }
 });
 
 test('CSRF token endpoint reuses a valid cookie rather than rotating it on concurrent requests', () => {
@@ -72,6 +79,28 @@ test('CSRF token endpoint reuses a valid cookie rather than rotating it on concu
   const created = getOrCreateCsrfToken();
   assert.match(created, /^[a-f0-9]{64}$/);
   assert.notEqual(getOrCreateCsrfToken('invalid'), 'invalid');
+});
+
+test('CSRF accepts the configured public origin when the proxy reports an internal origin', () => {
+  const previous = process.env.BFF_PUBLIC_ORIGIN;
+  const previousNodeEnv = process.env.NODE_ENV;
+  process.env.BFF_PUBLIC_ORIGIN = 'https://shop.test';
+  process.env.NODE_ENV = 'production';
+  try {
+    assert.equal(validateCsrf({ origin: 'https://shop.test', requestOrigin: 'http://127.0.0.1:3000', cookieToken: 'abc', headerToken: 'abc' }), true);
+    assert.equal(validateCsrf({ origin: 'https://evil.test', requestOrigin: 'http://127.0.0.1:3000', cookieToken: 'abc', headerToken: 'abc' }), false);
+    assert.equal(validateCsrf({ origin: 'https://shop.test', requestOrigin: 'http://127.0.0.1:3000', cookieToken: 'abc', headerToken: 'abd' }), false);
+    process.env.BFF_PUBLIC_ORIGIN = 'not-an-origin';
+    assert.equal(validateCsrf({ origin: 'http://127.0.0.1:3000', requestOrigin: 'http://127.0.0.1:3000', cookieToken: 'abc', headerToken: 'abc' }), false);
+    process.env.BFF_PUBLIC_ORIGIN = 'http://shop.test';
+    process.env.NODE_ENV = 'production';
+    assert.equal(validateCsrf({ origin: 'http://shop.test', requestOrigin: 'http://127.0.0.1:3000', cookieToken: 'abc', headerToken: 'abc' }), false);
+  } finally {
+    if (previous === undefined) delete process.env.BFF_PUBLIC_ORIGIN;
+    else process.env.BFF_PUBLIC_ORIGIN = previous;
+    if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = previousNodeEnv;
+  }
 });
 
 test('token stripping removes ID, session, and bearer credential field variants', () => {

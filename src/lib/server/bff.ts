@@ -30,7 +30,19 @@ export function isAllowedBackendRoute(method: string, path: string): boolean {
 }
 
 export function validateCsrf(input: { origin: string | null; requestOrigin: string; cookieToken: string | undefined; headerToken: string | null }): boolean {
-  if (!input.origin || input.origin !== input.requestOrigin || !input.cookieToken || !input.headerToken) return false;
+  if (!input.origin || !input.cookieToken || !input.headerToken) return false;
+
+  let expectedOrigin = input.requestOrigin;
+  const configuredOrigin = process.env.BFF_PUBLIC_ORIGIN;
+  if (configuredOrigin !== undefined) {
+    try {
+      const parsed = new URL(configuredOrigin.trim());
+      if (parsed.origin !== configuredOrigin.trim() || (process.env.NODE_ENV === 'production' && parsed.protocol !== 'https:')) return false;
+      expectedOrigin = parsed.origin;
+    } catch { return false; }
+  }
+  if (input.origin !== expectedOrigin) return false;
+
   const a = Buffer.from(input.cookieToken);
   const b = Buffer.from(input.headerToken);
   return a.length === b.length && timingSafeEqual(a, b);
